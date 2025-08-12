@@ -1,0 +1,11 @@
+# Title (Conventional Commit, one line)
+# e.g. test(unit): red AddEntry validates title and body
+
+# Motivation / Behavior
+# - Why this change (for RED: failing behavior)
+# - For GREEN: minimal implementation note
+# - For REFACTOR: design improvements
+
+# Notes
+# - Any caveats or follow-ups
+
