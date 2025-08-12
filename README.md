@@ -8,6 +8,10 @@ A journaling application built with clean architecture principles, following TDD
 - Composer, Codeception (unit/integration/functional)
 - Vite for frontend (later)
 
+## Required PHP Extensions
+
+- mbstring
+
 ## Principles
 - Framework-independent Domain/Application layers.
 - One TDD step = one commit (Conventional Commits).
