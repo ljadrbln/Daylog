@@ -1,0 +1,37 @@
+{
+  "name": "daylog/daylog",
+  "description": "Daylog — clean architecture journaling app",
+  "type": "project",
+  "authors": [
+    {
+      "name": "Pavel Konovalov",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": "^8.1"
+  },
+  "require-dev": {
+    "codeception/codeception": "^5.2",
+    "codeception/module-phpbrowser": "^3.0",
+    "codeception/module-asserts": "*",
+    "codeception/module-rest": "^3.4",
+    "codeception/module-db": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Daylog\\": "backend/src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Daylog\\Tests\\": "backend/tests/"
+    }
+  },
+  "scripts": {
+    "test": "vendor/bin/codecept run"
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}
+
