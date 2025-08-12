@@ -21,3 +21,8 @@ These rules apply across the system unless a use case specifies otherwise.
 ## BR-5 Status
 - New entries default to `published` (no draft workflow in v1).
 
+## BR-6 Entry date
+- On creation, the client must provide an explicit date in format `YYYY-MM-DD` (ISO-8601, date only).
+- The date must be a valid calendar date and not empty.
+- The date is independent from timestamps (`createdAt`, `updatedAt`) and represents the logical date of the entry.
+
