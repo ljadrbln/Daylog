@@ -3,7 +3,7 @@
 A journaling application built with clean architecture principles, following TDD from day one.
 
 ## Stack
-- PHP 8.3+
+- PHP 8.1+
 - Fat-Free Framework (F3) in Presentation
 - Composer, Codeception (unit/integration/functional)
 - Vite for frontend (later)
