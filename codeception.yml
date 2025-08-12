@@ -1,0 +1,15 @@
+namespace: Daylog\Tests
+paths:
+  tests: backend/tests
+  output: backend/tests/_output
+  data: backend/tests/_data
+  support: backend/tests/_support
+  envs: backend/tests/_envs
+actor_suffix: Tester
+extensions:
+  enabled:
+    - Codeception\Extension\RunFailed
+settings:
+  colors: true
+  shuffle: false
+

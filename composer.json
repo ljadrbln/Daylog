@@ -23,11 +23,6 @@
       "Daylog\\": "backend/src/"
     }
   },
-  "autoload-dev": {
-    "psr-4": {
-      "Daylog\\Tests\\": "backend/tests/"
-    }
-  },
   "scripts": {
     "test": "vendor/bin/codecept run"
   },
