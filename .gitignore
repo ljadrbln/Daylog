@@ -6,7 +6,6 @@ Thumbs.db
 
 # Composer / PHP
 /vendor/
-/composer.lock
 
 # Codeception / PHPUnit
 /.phpunit.result.cache
