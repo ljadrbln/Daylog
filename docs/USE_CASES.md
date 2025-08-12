@@ -7,5 +7,5 @@ Create a new diary entry with title and body.
 
 ---
 
-*(No other use cases yet)*
+*(More use cases will be added as the project evolves.)*
 
