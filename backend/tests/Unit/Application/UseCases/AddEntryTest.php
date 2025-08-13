@@ -1,22 +1,23 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Unit\Application\UseCases;
+namespace Daylog\Tests\Unit\Application\UseCases;
 
 use Codeception\Test\Unit;
 
-// These classes do not exist yet — expected Red on first run.
+// Expected missing classes on first Red run.
 use Daylog\Application\UseCases\Entries\AddEntry;
 use Daylog\Application\DTO\Entries\AddEntryRequest;
 use Daylog\Domain\Interfaces\EntryRepositoryInterface;
 use Daylog\Domain\Models\Entry;
 use Daylog\Domain\Errors\ValidationException;
+use Daylog\Tests\Support\Fakes\FakeEntryRepository;
 
 /**
  * UC-1: AddEntry (Use Case)
  *
  * Red tests: happy path + validations.
- * Repository is mocked; DTO is a simple data carrier (no trim/validation inside).
+ * Repository is a simple fake (no PHPUnit callbacks / expects()).
  */
 final class AddEntryTest extends Unit
 {
@@ -28,7 +29,7 @@ final class AddEntryTest extends Unit
 
     /**
      * Ensures AddEntry creates a domain Entry, calls repository->save(Entry)
-     * exactly once with correct data, and returns the generated UUID.
+     * exactly once with correct data, and returns a UUID.
      *
      * @return void
      */
@@ -39,24 +40,31 @@ final class AddEntryTest extends Unit
         $date  = '2025-08-12';
         $uuid  = '00000000-0000-4000-8000-000000000001';
 
-        $repo = $this->createMock(EntryRepositoryInterface::class);
-        $repo
-            ->expects($this->once())
-            ->method('save')
-            ->with($this->callback(function (Entry $e) use ($title, $body, $date): bool {
-                $sameTitle = $e->getTitle() === $title;
-                $sameBody  = $e->getBody()  === $body;
-                $sameDate  = $e->getDate()  === $date;
-                return $sameTitle && $sameBody && $sameDate;
-            }))
-            ->willReturn($uuid);
+        $repo = new FakeEntryRepository();
+        $repo->returnUuid = $uuid;
 
         $request = new AddEntryRequest($title, $body, $date);
         $useCase = new AddEntry($repo);
 
         $result = $useCase->execute($request);
 
-        $this->assertSame($uuid, $result);
+        $saveCalls = $repo->saveCalls;
+        $this->assertSame(1, $saveCalls);
+
+        /** @var Entry|null $saved */
+        $saved = $repo->savedEntry;
+        $this->assertInstanceOf(Entry::class, $saved);
+
+        $savedTitle = $saved?->getTitle();
+        $savedBody  = $saved?->getBody();
+        $savedDate  = $saved?->getDate();
+
+        $this->assertSame($title, $savedTitle);
+        $this->assertSame($body,  $savedBody);
+        $this->assertSame($date,  $savedDate);
+
+        $returnedUuid = $result; // or $result->getData()['entryUuid'] if you choose a response object
+        $this->assertSame($uuid, $returnedUuid);
     }
 
     /**
@@ -70,14 +78,17 @@ final class AddEntryTest extends Unit
         $body  = 'Body present';
         $date  = '2025-08-12';
 
-        $repo = $this->createMock(EntryRepositoryInterface::class);
-        $repo->expects($this->never())->method('save');
-
+        $repo = new FakeEntryRepository();
         $request = new AddEntryRequest($title, $body, $date);
         $useCase = new AddEntry($repo);
 
-        $this->expectException(ValidationException::class);
-        $useCase->execute($request);
+        $expected = ValidationException::class;
+        $this->expectException($expected);
+
+        $unused = $useCase->execute($request);
+
+        $saveCalls = $repo->saveCalls;
+        $this->assertSame(0, $saveCalls);
     }
 
     /**
@@ -91,14 +102,17 @@ final class AddEntryTest extends Unit
         $body  = '';
         $date  = '2025-08-12';
 
-        $repo = $this->createMock(EntryRepositoryInterface::class);
-        $repo->expects($this->never())->method('save');
-
+        $repo = new FakeEntryRepository();
         $request = new AddEntryRequest($title, $body, $date);
         $useCase = new AddEntry($repo);
 
-        $this->expectException(ValidationException::class);
-        $useCase->execute($request);
+        $expected = ValidationException::class;
+        $this->expectException($expected);
+
+        $unused = $useCase->execute($request);
+
+        $saveCalls = $repo->saveCalls;
+        $this->assertSame(0, $saveCalls);
     }
 
     /**
@@ -112,14 +126,17 @@ final class AddEntryTest extends Unit
         $body  = 'Body present';
         $date  = '2025-08-12';
 
-        $repo = $this->createMock(EntryRepositoryInterface::class);
-        $repo->expects($this->never())->method('save');
-
+        $repo = new FakeEntryRepository();
         $request = new AddEntryRequest($title, $body, $date);
         $useCase = new AddEntry($repo);
 
-        $this->expectException(ValidationException::class);
-        $useCase->execute($request);
+        $expected = ValidationException::class;
+        $this->expectException($expected);
+
+        $unused = $useCase->execute($request);
+
+        $saveCalls = $repo->saveCalls;
+        $this->assertSame(0, $saveCalls);
     }
 
     /**
@@ -133,14 +150,17 @@ final class AddEntryTest extends Unit
         $body  = str_repeat('B', self::BODY_MAX + 1);
         $date  = '2025-08-12';
 
-        $repo = $this->createMock(EntryRepositoryInterface::class);
-        $repo->expects($this->never())->method('save');
-
+        $repo = new FakeEntryRepository();
         $request = new AddEntryRequest($title, $body, $date);
         $useCase = new AddEntry($repo);
 
-        $this->expectException(ValidationException::class);
-        $useCase->execute($request);
+        $expected = ValidationException::class;
+        $this->expectException($expected);
+
+        $unused = $useCase->execute($request);
+
+        $saveCalls = $repo->saveCalls;
+        $this->assertSame(0, $saveCalls);
     }
 
     /**
@@ -154,14 +174,17 @@ final class AddEntryTest extends Unit
         $body  = 'Valid body';
         $date  = '12-08-2025';
 
-        $repo = $this->createMock(EntryRepositoryInterface::class);
-        $repo->expects($this->never())->method('save');
-
+        $repo = new FakeEntryRepository();
         $request = new AddEntryRequest($title, $body, $date);
         $useCase = new AddEntry($repo);
 
-        $this->expectException(ValidationException::class);
-        $useCase->execute($request);
+        $expected = ValidationException::class;
+        $this->expectException($expected);
+
+        $unused = $useCase->execute($request);
+
+        $saveCalls = $repo->saveCalls;
+        $this->assertSame(0, $saveCalls);
     }
 
     /**
@@ -175,14 +198,17 @@ final class AddEntryTest extends Unit
         $body  = 'Valid body';
         $date  = '2025-02-30';
 
-        $repo = $this->createMock(EntryRepositoryInterface::class);
-        $repo->expects($this->never())->method('save');
-
+        $repo = new FakeEntryRepository();
         $request = new AddEntryRequest($title, $body, $date);
         $useCase = new AddEntry($repo);
 
-        $this->expectException(ValidationException::class);
-        $useCase->execute($request);
+        $expected = ValidationException::class;
+        $this->expectException($expected);
+
+        $unused = $useCase->execute($request);
+
+        $saveCalls = $repo->saveCalls;
+        $this->assertSame(0, $saveCalls);
     }
 
     /**
@@ -196,14 +222,16 @@ final class AddEntryTest extends Unit
         $body  = 'Valid body';
         $date  = '';
 
-        $repo = $this->createMock(EntryRepositoryInterface::class);
-        $repo->expects($this->never())->method('save');
-
+        $repo = new FakeEntryRepository();
         $request = new AddEntryRequest($title, $body, $date);
         $useCase = new AddEntry($repo);
 
-        $this->expectException(ValidationException::class);
-        $useCase->execute($request);
+        $expected = ValidationException::class;
+        $this->expectException($expected);
+
+        $unused = $useCase->execute($request);
+
+        $saveCalls = $repo->saveCalls;
+        $this->assertSame(0, $saveCalls);
     }
 }
-
