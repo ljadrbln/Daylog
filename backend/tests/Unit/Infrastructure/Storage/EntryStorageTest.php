@@ -5,7 +5,7 @@ namespace Daylog\Tests\Unit\Infrastructure\Storage;
 
 use Codeception\Test\Unit;
 use Daylog\Domain\Models\Entry;
-use Daylog\Infrastructure\Storage\EntryStorage;
+use Daylog\Infrastructure\Storage\Entry\EntryStorage;
 
 /**
  * Class EntryStorageTest
