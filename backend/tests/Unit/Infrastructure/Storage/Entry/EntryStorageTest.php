@@ -5,6 +5,7 @@ namespace Daylog\Tests\Unit\Infrastructure\Storage\Entry;
 
 use Codeception\Test\Unit;
 use Daylog\Domain\Models\Entry;
+use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Infrastructure\Storage\Entry\EntryStorage;
 use Daylog\Tests\Helper\EntryHelper;
 
@@ -26,7 +27,7 @@ final class EntryStorageTest extends Unit
 
         $uuid = $storage->insert($entry);
 
-        $pattern = '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i';
-        $this->assertSame(1, preg_match($pattern, $uuid));
+        $isValid = UuidGenerator::isValid($uuid);
+        $this->assertTrue($isValid);
     }
 }
