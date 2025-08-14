@@ -6,6 +6,7 @@ namespace Daylog\Tests\Unit\Infrastructure\Storage\Entry;
 use Codeception\Test\Unit;
 use Daylog\Domain\Models\Entry;
 use Daylog\Infrastructure\Storage\Entry\EntryStorage;
+use Daylog\Tests\Helper\EntryHelper;
 
 /**
  * Class EntryStorageTest
@@ -26,6 +27,7 @@ final class EntryStorageTest extends Unit
             'date'  => '2025-08-13',
         ];
 
+        $data  = EntryHelper::getData();
         $entry = Entry::fromArray($data);
 
         $uuid = $storage->insert($entry);

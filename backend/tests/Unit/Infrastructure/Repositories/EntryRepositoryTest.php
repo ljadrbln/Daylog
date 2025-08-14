@@ -7,6 +7,7 @@ use Codeception\Test\Unit;
 use Daylog\Domain\Models\Entry;
 use Daylog\Infrastructure\Repositories\EntryRepository;
 use Daylog\Tests\Support\Fakes\FakeEntryStorage;
+use Daylog\Tests\Helper\EntryHelper;
 
 /**
  * Class EntryRepositoryTest
@@ -28,6 +29,7 @@ final class EntryRepositoryTest extends Unit
             'date'  => '2025-08-13',
         ];
 
+        $data  = EntryHelper::getData();
         $entry = Entry::fromArray($data);
 
         $uuid = $repo->save($entry);
