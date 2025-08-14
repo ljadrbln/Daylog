@@ -9,6 +9,7 @@ use Daylog\Application\UseCases\Entries\AddEntry;
 use Daylog\Domain\Errors\ValidationException;
 use Daylog\Domain\Models\Entry;
 use Daylog\Domain\Models\EntryConstraints;
+use Daylog\Domain\Interfaces\EntryRepositoryInterface;
 use Daylog\Tests\Support\Fakes\FakeEntryRepository;
 use Daylog\Tests\Support\Helper\EntryHelper;
 
@@ -21,6 +22,39 @@ use Daylog\Tests\Support\Helper\EntryHelper;
  */
 final class AddEntryTest extends Unit
 {
+    /**
+     * Happy path: repository->save() is called exactly once with expected Entry.
+     *
+     * This test uses a mock to verify contract-level behavior without relying on a fake repository.
+     *
+     * @return void
+     */
+    public function testHappyPathCallsRepositoryWithExpectedEntryUsingMock(): void
+    {
+        $data = EntryHelper::getData(); // ['title' => ..., 'body' => ..., 'date' => ...]
+        $expectedEntry = Entry::fromArray($data);
+
+        // Create mock for EntryRepositoryInterface
+        $repoClass = EntryRepositoryInterface::class;
+        $repoMock  = $this->createMock($repoClass);
+
+        // Expect save() to be called exactly once with an Entry having expected fields
+        $repoMock->expects($this->once())
+            ->method('save')
+            ->with($this->callback(function (Entry $entry) use ($expectedEntry): bool {
+                return $entry->equals($expectedEntry);
+            }))
+            ->willReturn('mocked-uuid');
+
+        $uc   = new AddEntry($repoMock);
+        $req  = AddEntryRequest::fromArray($data);
+
+        $uuid = $uc->execute($req);
+
+        // Assert returned UUID is the same as from mock
+        $this->assertSame('mocked-uuid', $uuid);
+    }
+
     /**
      * Happy path: repository is called once, saved entry matches input,
      * and the returned value looks like a non-empty UUID string.
