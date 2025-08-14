@@ -9,6 +9,7 @@ namespace Daylog\Application\DTO\Entries;
  * Immutable request DTO for UC-1 Add Entry.
  * Carries raw user input: title, body and logical date (YYYY-MM-DD).
  */
+
 final class AddEntryRequest
 {
     /** @var string */
@@ -35,35 +36,42 @@ final class AddEntryRequest
     }
 
     /**
-     * Get original (raw) title.
+     * Factory method to create a request from an associative array.
      *
+     * @param array<string,string> $data Input array with keys: title, body, date.
+     * @return self
+     */
+    public static function fromArray(array $data): self
+    {
+        $title = $data['title'] ?? '';
+        $body  = $data['body']  ?? '';
+        $date  = $data['date']  ?? '';
+
+        $request = new self($title, $body, $date);
+        return $request;
+    }
+
+    /**
      * @return string
      */
     public function getTitle(): string
     {
-        $result = $this->title;
-        return $result;
+        return $this->title;
     }
 
     /**
-     * Get original (raw) body.
-     *
      * @return string
      */
     public function getBody(): string
     {
-        $result = $this->body;
-        return $result;
+        return $this->body;
     }
 
     /**
-     * Get original (raw) date.
-     *
      * @return string
      */
     public function getDate(): string
     {
-        $result = $this->date;
-        return $result;
+        return $this->date;
     }
 }
