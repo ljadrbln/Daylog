@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Daylog\Domain\Models;
 
+use Daylog\Domain\Models\EntryConstraints;
 use Daylog\Domain\Errors\ValidationException;
 
 /**
@@ -16,9 +17,6 @@ use Daylog\Domain\Errors\ValidationException;
  */
 class Entry
 {
-    private const TITLE_MAX = 200;
-    private const BODY_MAX  = 50000;
-
     private string $title;
     private string $body;
     private string $date; // stored as 'YYYY-MM-DD'
@@ -38,8 +36,8 @@ class Entry
 
         $this->assertNotEmpty($title, 'title');
         $this->assertNotEmpty($body, 'body');
-        $this->assertMaxLength($title, self::TITLE_MAX, 'title');
-        $this->assertMaxLength($body, self::BODY_MAX, 'body');
+        $this->assertMaxLength($title, EntryConstraints::TITLE_MAX, 'title');
+        $this->assertMaxLength($body, EntryConstraints::BODY_MAX, 'body');
         $this->assertValidDate($date);
 
         $this->title = $title;

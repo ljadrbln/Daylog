@@ -7,9 +7,7 @@ use Codeception\Test\Unit;
 
 use Daylog\Domain\Models\Entry;
 use Daylog\Domain\Errors\ValidationException;
-
-// These classes do not exist yet — the test will fail on the Red step.
-use Daylog\Domain\Entries\EntryConstraints;
+use Daylog\Domain\Models\EntryConstraints;
 
 
 /**
