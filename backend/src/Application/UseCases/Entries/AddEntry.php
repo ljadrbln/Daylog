@@ -49,7 +49,13 @@ final class AddEntry
         $bodyTrimmed  = trim($body);
         $dateValue    = $date;
 
-        $entry = new Entry($titleTrimmed, $bodyTrimmed, $dateValue);
+        $data = [
+            'title' => $titleTrimmed,
+            'body'  => $bodyTrimmed,
+            'date'  => $dateValue,
+        ];
+
+        $entry = Entry::fromArray($data);
 
         $uuid = $this->repo->save($entry);
         return $uuid;

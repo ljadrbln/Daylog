@@ -48,7 +48,7 @@ class Entry
      *
      * @throws ValidationException
      */
-    public function __construct(string $title, string $body, string $date)
+    private function __construct(string $title, string $body, string $date)
     {
         $title = trim($title);
         $body  = trim($body);
