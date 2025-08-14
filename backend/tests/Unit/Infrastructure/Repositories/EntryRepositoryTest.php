@@ -7,7 +7,7 @@ use Codeception\Test\Unit;
 use Daylog\Domain\Models\Entry;
 use Daylog\Infrastructure\Repositories\EntryRepository;
 use Daylog\Tests\Support\Fakes\FakeEntryStorage;
-use Daylog\Tests\Helper\EntryHelper;
+use Daylog\Tests\Support\Helper\EntryHelper;
 
 /**
  * Class EntryRepositoryTest

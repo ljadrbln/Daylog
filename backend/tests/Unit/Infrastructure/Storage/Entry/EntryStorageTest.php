@@ -7,7 +7,7 @@ use Codeception\Test\Unit;
 use Daylog\Domain\Models\Entry;
 use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Infrastructure\Storage\Entry\EntryStorage;
-use Daylog\Tests\Helper\EntryHelper;
+use Daylog\Tests\Support\Helper\EntryHelper;
 
 /**
  * Class EntryStorageTest

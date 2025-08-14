@@ -1,6 +1,6 @@
 <?php
 
-namespace Daylog\Tests\Helper;
+namespace Daylog\Tests\Support\Helper;
 
 /**
  * Helper for creating valid entry data arrays in tests.

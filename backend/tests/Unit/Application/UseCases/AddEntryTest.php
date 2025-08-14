@@ -4,270 +4,116 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases;
 
 use Codeception\Test\Unit;
-
-// Expected missing classes on first Red run.
-use Daylog\Application\UseCases\Entries\AddEntry;
 use Daylog\Application\DTO\Entries\AddEntryRequest;
-use Daylog\Domain\Interfaces\EntryRepositoryInterface;
-use Daylog\Domain\Models\Entry;
+use Daylog\Application\UseCases\Entries\AddEntry;
 use Daylog\Domain\Errors\ValidationException;
+use Daylog\Domain\Models\Entry;
+use Daylog\Domain\Models\EntryConstraints;
 use Daylog\Tests\Support\Fakes\FakeEntryRepository;
+use Daylog\Tests\Support\Helper\EntryHelper;
 
 /**
  * UC-1: AddEntry (Use Case)
  *
- * Red tests: happy path + validations.
- * Repository is a simple fake (no PHPUnit callbacks / expects()).
+ * Goals:
+ *  - Happy path: entry is saved, UUID is returned, and saved data equals input.
+ *  - Validation: for invalid input no repository writes happen.
  */
 final class AddEntryTest extends Unit
 {
-    /** @var int Max length for title (domain rule) */
-    private const TITLE_MAX = 200;
-
-    /** @var int Max length for body (domain rule) */
-    private const BODY_MAX  = 50000;
-
     /**
-     * Ensures AddEntry creates a domain Entry, calls repository->save(Entry)
-     * exactly once with correct data, and returns a UUID.
+     * Happy path: repository is called once, saved entry matches input,
+     * and the returned value looks like a non-empty UUID string.
      *
      * @return void
      */
     public function testHappyPathSavesEntryAndReturnsUuid(): void
     {
-        $title = 'My entry';
-        $body  = 'Meaningful body';
-        $date  = '2025-08-12';
-        $uuid  = '00000000-0000-4000-8000-000000000001';
-        $data = [
-            'title' => $title,
-            'body'  => $body,
-            'date'  => $date,
-        ];
+        // Arrange
+        $data = EntryHelper::getData(); // ['title' => ..., 'body' => ..., 'date' => ...]
         $repo = new FakeEntryRepository();
-        $repo->returnUuid = $uuid;
+        $uc   = new AddEntry($repo);
+        $req  = AddEntryRequest::fromArray($data);
 
-        $request = AddEntryRequest::fromArray($data);
-        $useCase = new AddEntry($repo);
+        // Act
+        $uuid = $uc->execute($req);
 
-        $result = $useCase->execute($request);
-
-        $saveCalls = $repo->saveCalls;
-        $this->assertSame(1, $saveCalls);
+        // Assert
+        $this->assertSame(1, $repo->saveCalls);
 
         /** @var Entry|null $saved */
         $saved = $repo->savedEntry;
         $this->assertInstanceOf(Entry::class, $saved);
+        $this->assertSame($data['title'], $saved->getTitle());
+        $this->assertSame($data['body'],  $saved->getBody());
+        $this->assertSame($data['date'],  $saved->getDate());
 
-        $savedTitle = $saved?->getTitle();
-        $savedBody  = $saved?->getBody();
-        $savedDate  = $saved?->getDate();
-
-        $this->assertSame($title, $savedTitle);
-        $this->assertSame($body,  $savedBody);
-        $this->assertSame($date,  $savedDate);
-
-        $returnedUuid = $result; // or $result->getData()['entryUuid'] if you choose a response object
-        $this->assertSame($uuid, $returnedUuid);
+        $this->assertIsString($uuid);
+        $this->assertNotEmpty($uuid);
+        // UUIDv4 format is covered in UuidGenerator tests; here we only require non-empty string.
     }
 
     /**
-     * Title must not be empty; repository->save() must not be called.
+     * Ensures that invalid input triggers ValidationException
+     * and that repository->save() is never called.
      *
+     * We use try/catch instead of expectException so that we can assert
+     * the repository call count after the failure.
+     *
+     * @dataProvider invalidInputProvider
+     *
+     * @param array<string,string> $overrides Fields to override in valid base data
      * @return void
      */
-    public function testEmptyTitleThrowsAndDoesNotTouchRepository(): void
+    public function testValidationErrorsDoNotTouchRepository(array $overrides): void
     {
-        $title = '';
-        $body  = 'Body present';
-        $date  = '2025-08-12';
-        $data = [
-            'title' => $title,
-            'body'  => $body,
-            'date'  => $date,
-        ];
+        // Arrange
+        $data = EntryHelper::getData();
+        $data = array_merge($data, $overrides);
+
         $repo = new FakeEntryRepository();
-        $request = AddEntryRequest::fromArray($data);
-        $useCase = new AddEntry($repo);
+        $uc   = new AddEntry($repo);
+        $req  = AddEntryRequest::fromArray($data);
 
-        $expected = ValidationException::class;
-        $this->expectException($expected);
-
-        $unused = $useCase->execute($request);
-
-        $saveCalls = $repo->saveCalls;
-        $this->assertSame(0, $saveCalls);
+        // Act + Assert
+        try {
+            $uc->execute($req);
+            $this->fail('Expected ValidationException was not thrown');
+        } catch (ValidationException $e) {
+            $this->assertSame(0, $repo->saveCalls);
+            $this->assertNull($repo->savedEntry);
+        }
     }
 
     /**
-     * Body must not be empty; repository->save() must not be called.
+     * Provides field overrides that make the request invalid.
      *
-     * @return void
+     * @return array<string,array<string,string>>
      */
-    public function testEmptyBodyThrowsAndDoesNotTouchRepository(): void
+    public function invalidInputProvider(): array
     {
-        $title = 'Valid title';
-        $body  = '';
-        $date  = '2025-08-12';
-        $data = [
-            'title' => $title,
-            'body'  => $body,
-            'date'  => $date,
+        return [
+            'empty title' => [[
+                'title' => '',
+            ]],
+            'empty body' => [[
+                'body'  => '',
+            ]],
+            'too long title' => [[
+                'title' => str_repeat('T', EntryConstraints::TITLE_MAX + 1),
+            ]],
+            'too long body' => [[
+                'body'  => str_repeat('B', EntryConstraints::BODY_MAX + 1),
+            ]],
+            'invalid date format' => [[
+                'date'  => '12-08-2025',
+            ]],
+            'invalid calendar date' => [[
+                'date'  => '2025-02-30',
+            ]],
+            'missing date' => [[
+                'date'  => '',
+            ]],
         ];
-        $repo = new FakeEntryRepository();
-        $request = AddEntryRequest::fromArray($data);
-        $useCase = new AddEntry($repo);
-
-        $expected = ValidationException::class;
-        $this->expectException($expected);
-
-        $unused = $useCase->execute($request);
-
-        $saveCalls = $repo->saveCalls;
-        $this->assertSame(0, $saveCalls);
-    }
-
-    /**
-     * Title exceeding TITLE_MAX must fail; repository->save() must not be called.
-     *
-     * @return void
-     */
-    public function testTooLongTitleThrowsAndDoesNotTouchRepository(): void
-    {
-        $title = str_repeat('T', self::TITLE_MAX + 1);
-        $body  = 'Body present';
-        $date  = '2025-08-12';
-        $data = [
-            'title' => $title,
-            'body'  => $body,
-            'date'  => $date,
-        ];
-        $repo = new FakeEntryRepository();
-        $request = AddEntryRequest::fromArray($data);
-        $useCase = new AddEntry($repo);
-
-        $expected = ValidationException::class;
-        $this->expectException($expected);
-
-        $unused = $useCase->execute($request);
-
-        $saveCalls = $repo->saveCalls;
-        $this->assertSame(0, $saveCalls);
-    }
-
-    /**
-     * Body exceeding BODY_MAX must fail; repository->save() must not be called.
-     *
-     * @return void
-     */
-    public function testTooLongBodyThrowsAndDoesNotTouchRepository(): void
-    {
-        $title = 'Valid title';
-        $body  = str_repeat('B', self::BODY_MAX + 1);
-        $date  = '2025-08-12';
-        $data = [
-            'title' => $title,
-            'body'  => $body,
-            'date'  => $date,
-        ];
-        $repo = new FakeEntryRepository();
-        $request = AddEntryRequest::fromArray($data);
-        $useCase = new AddEntry($repo);
-
-        $expected = ValidationException::class;
-        $this->expectException($expected);
-
-        $unused = $useCase->execute($request);
-
-        $saveCalls = $repo->saveCalls;
-        $this->assertSame(0, $saveCalls);
-    }
-
-    /**
-     * Invalid date format must fail; repository->save() must not be called.
-     *
-     * @return void
-     */
-    public function testInvalidDateFormatThrowsAndDoesNotTouchRepository(): void
-    {
-        $title = 'Valid title';
-        $body  = 'Valid body';
-        $date  = '12-08-2025';
-
-        $data = [
-            'title' => $title,
-            'body'  => $body,
-            'date'  => $date,
-        ];
-
-        $repo = new FakeEntryRepository();
-        $request = AddEntryRequest::fromArray($data);
-        $useCase = new AddEntry($repo);
-
-        $expected = ValidationException::class;
-        $this->expectException($expected);
-
-        $unused = $useCase->execute($request);
-
-        $saveCalls = $repo->saveCalls;
-        $this->assertSame(0, $saveCalls);
-    }
-
-    /**
-     * Invalid calendar date must fail; repository->save() must not be called.
-     *
-     * @return void
-     */
-    public function testInvalidCalendarDateThrowsAndDoesNotTouchRepository(): void
-    {
-        $title = 'Valid title';
-        $body  = 'Valid body';
-        $date  = '2025-02-30';
-
-        $data = [
-            'title' => $title,
-            'body'  => $body,
-            'date'  => $date,
-        ];
-
-        $repo = new FakeEntryRepository();
-        $request = AddEntryRequest::fromArray($data);
-        $useCase = new AddEntry($repo);
-
-        $expected = ValidationException::class;
-        $this->expectException($expected);
-
-        $unused = $useCase->execute($request);
-
-        $saveCalls = $repo->saveCalls;
-        $this->assertSame(0, $saveCalls);
-    }
-
-    /**
-     * Missing date must fail; repository->save() must not be called.
-     *
-     * @return void
-     */
-    public function testMissingDateThrowsAndDoesNotTouchRepository(): void
-    {
-        $title = 'Valid title';
-        $body  = 'Valid body';
-        $date  = '';
-        $data = [
-            'title' => $title,
-            'body'  => $body,
-            'date'  => $date,
-        ];
-        $repo = new FakeEntryRepository();
-        $request = AddEntryRequest::fromArray($data);
-        $useCase = new AddEntry($repo);
-
-        $expected = ValidationException::class;
-        $this->expectException($expected);
-
-        $unused = $useCase->execute($request);
-
-        $saveCalls = $repo->saveCalls;
-        $this->assertSame(0, $saveCalls);
     }
 }
