@@ -22,11 +22,13 @@ final class EntryRepositoryTest extends Unit
         $repoClass = EntryRepository::class;
         $repo      = new $repoClass($storage);
 
-        $title = 'Valid title';
-        $body  = 'Valid body';
-        $date  = '2025-08-13';
+        $data = [
+            'title' => 'Valid title',
+            'body'  => 'Valid body',
+            'date'  => '2025-08-13',
+        ];
 
-        $entry = new Entry($title, $body, $date);
+        $entry = Entry::fromArray($data);
 
         $uuid = $repo->save($entry);
 
