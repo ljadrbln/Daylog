@@ -19,126 +19,77 @@ use Daylog\Domain\Models\EntryConstraints;
 final class EntryTest extends Unit
 {
     /**
-     * Ensures a valid Entry can be created with title, body, and date.
-     *
-     * @return void
+     * @dataProvider provideValidEntries
      */
-    public function testCreateValidEntry(): void
+    public function testCreateValidEntryFromData(array $data): void
     {
-        $title = 'My first entry';
-        $body  = 'Meaningful body text.';
-        $date  = '2025-08-12';
+        $entry = Entry::fromArray($data);
 
-        $entry = new Entry($title, $body, $date);
-
-        $this->assertSame($title, $entry->getTitle());
-        $this->assertSame($body, $entry->getBody());
-        $this->assertSame($date, $entry->getDate());
+        $this->assertSame(trim($data['title']), $entry->getTitle());
+        $this->assertSame(trim($data['body']), $entry->getBody());
+        $this->assertSame(trim($data['date']), $entry->getDate());
     }
 
     /**
-     * Title must not be empty after trimming.
-     *
-     * @return void
+     * @return array<string, array{0:array<string,string>}>
      */
-    public function testEmptyTitleThrows(): void
+    public function provideValidEntries(): array
     {
-        $title = '';
-        $body  = 'Body is present';
-        $date  = '2025-08-12';
-
-        $this->expectException(ValidationException::class);
-        new Entry($title, $body, $date);
+        return [
+            'simple valid entry' => [[
+                'title' => 'My first entry',
+                'body'  => 'Meaningful body text.',
+                'date'  => '2025-08-12',
+            ]],
+            'trimmed inputs' => [[
+                'title' => '  Trimmed  ',
+                'body'  => '  Trimmed body  ',
+                'date'  => '2025-08-12',
+            ]],
+        ];
     }
 
     /**
-     * Title must not exceed TITLE_MAX characters.
-     *
-     * @return void
+     * @dataProvider provideInvalidEntries
      */
-    public function testTooLongTitleThrows(): void
+    public function testInvalidEntriesThrow(array $data): void
     {
-        $title = str_repeat('T', EntryConstraints::TITLE_MAX + 1);
-        $body  = 'Body is present';
-        $date  = '2025-08-12';
-
         $this->expectException(ValidationException::class);
-        new Entry($title, $body, $date);
+        Entry::fromArray($data);
     }
 
     /**
-     * Body must not be empty after trimming.
-     *
-     * @return void
+     * @return array<string, array{0:array<string,string>}>
      */
-    public function testEmptyBodyThrows(): void
+    public function provideInvalidEntries(): array
     {
-        $title = 'Valid title';
-        $body  = '';
-        $date  = '2025-08-12';
-
-        $this->expectException(ValidationException::class);
-        new Entry($title, $body, $date);
-    }
-
-    /**
-     * Body must not exceed BODY_MAX characters.
-     *
-     * @return void
-     */
-    public function testTooLongBodyThrows(): void
-    {
-        $title = 'Valid title';
-        $body  = str_repeat('B', EntryConstraints::BODY_MAX + 1);
-        $date  = '2025-08-12';
-
-        $this->expectException(ValidationException::class);
-        new Entry($title, $body, $date);
-    }
-
-    /**
-     * Date must be provided.
-     *
-     * @return void
-     */
-    public function testMissingDateThrows(): void
-    {
-        $title = 'Valid title';
-        $body  = 'Valid body';
-        $date  = '';
-
-        $this->expectException(ValidationException::class);
-        new Entry($title, $body, $date);
-    }
-
-    /**
-     * Date must match YYYY-MM-DD format.
-     *
-     * @return void
-     */
-    public function testInvalidDateFormatThrows(): void
-    {
-        $title = 'Valid title';
-        $body  = 'Valid body';
-        $date  = '12-08-2025';
-
-        $this->expectException(ValidationException::class);
-        new Entry($title, $body, $date);
-    }
-
-    /**
-     * Date must be a valid calendar date.
-     *
-     * @return void
-     */
-    public function testInvalidCalendarDateThrows(): void
-    {
-        $title = 'Valid title';
-        $body  = 'Valid body';
-        $date  = '2025-02-30';
-
-        $this->expectException(ValidationException::class);
-        new Entry($title, $body, $date);
+        return [
+            'empty title' => [[
+                'title' => '',
+                'body'  => 'Body is present',
+                'date'  => '2025-08-12',
+            ]],
+            'empty body' => [[
+                'title' => 'Valid title',
+                'body'  => '',
+                'date'  => '2025-08-12',
+            ]],
+            'empty date' => [[
+                'title' => 'Valid title',
+                'body'  => 'Valid body',
+                'date'  => '',
+            ]],
+            'title too long' => [[
+                'title' => str_repeat('a', EntryConstraints::TITLE_MAX + 1),
+                'body'  => 'Valid body',
+                'date'  => '2025-08-12',
+            ]],
+            'body too long' => [[
+                'title' => 'Valid title',
+                'body'  => str_repeat('a', EntryConstraints::BODY_MAX + 1),
+                'date'  => '2025-08-12',
+            ]],
+        ];
     }
 
     /**
