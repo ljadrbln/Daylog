@@ -21,12 +21,6 @@ final class EntryStorageTest extends Unit
         $storageClass = EntryStorage::class;
         $storage      = new $storageClass();
 
-        $data = [
-            'title' => 'Valid title',
-            'body'  => 'Valid body',
-            'date'  => '2025-08-13',
-        ];
-
         $data  = EntryHelper::getData();
         $entry = Entry::fromArray($data);
 
