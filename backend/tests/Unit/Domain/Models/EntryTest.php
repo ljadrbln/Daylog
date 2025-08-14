@@ -9,7 +9,6 @@ use Daylog\Domain\Models\Entry;
 use Daylog\Domain\Errors\ValidationException;
 use Daylog\Domain\Models\EntryConstraints;
 
-
 /**
  * Domain Model: Entry
  *
@@ -140,6 +139,24 @@ final class EntryTest extends Unit
 
         $this->expectException(ValidationException::class);
         new Entry($title, $body, $date);
+    }
+
+    /**
+     * @covers \Daylog\Domain\Models\Entry::fromArray
+     */
+    public function testCreateEntryFromArray(): void
+    {
+        $data = [
+            'title' => 'Array title',
+            'body'  => 'Array body',
+            'date'  => '2025-08-14',
+        ];
+
+        $entry = Entry::fromArray($data);
+
+        $this->assertSame($data['title'], $entry->getTitle());
+        $this->assertSame($data['body'], $entry->getBody());
+        $this->assertSame($data['date'], $entry->getDate());
     }
 }
 
