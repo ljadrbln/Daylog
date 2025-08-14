@@ -99,6 +99,64 @@ final class EntryTest extends Unit
     }
 
     /**
+     * @covers \Daylog\Domain\Models\Entry::equals
+     */
+    public function testEqualsReturnsTrueForSameValues(): void
+    {
+        /** @var array<string,string> $data */
+        $data = EntryHelper::getData();
+
+        $left  = Entry::fromArray($data);
+        $right = Entry::fromArray($data);
+
+        $result = $left->equals($right);
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @dataProvider provideNonEqualOverrides
+     * @covers \Daylog\Domain\Models\Entry::equals
+     *
+     * @param array<string,string> $overrides
+     */
+    public function testEqualsReturnsFalseWhenAnyFieldDiffers(array $overrides): void
+    {
+        /** @var array<string,string> $base */
+        $data = EntryHelper::getData();
+
+        $left  = Entry::fromArray($data);
+
+        $right = array_merge($data, $overrides);
+        $right = Entry::fromArray($right);
+
+        $result = $left->equals($right);
+        $this->assertFalse($result);
+    }
+
+    /**
+     * Provides field overrides that must make equals() return false.
+     *
+     * @return array<string, array{0: array<string,string>}>
+     */
+    public function provideNonEqualOverrides(): array
+    {
+        /** @var array<string,string> $base */
+        $base = EntryHelper::getData();
+
+        return [
+            'different title' => [[
+                'title' => $base['title'] . ' (v2)',
+            ]],
+            'different body' => [[
+                'body' => $base['body'] . ' (extended)',
+            ]],
+            'different date' => [[
+                'date' => '2025-08-13',
+            ]],
+        ];
+    }
+
+    /**
      * Surrounds the given string with a single leading and trailing double-space.
      *
      * Useful for simulating trimmed input values in tests.
