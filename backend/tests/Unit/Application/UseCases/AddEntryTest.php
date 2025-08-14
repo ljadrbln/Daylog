@@ -39,11 +39,15 @@ final class AddEntryTest extends Unit
         $body  = 'Meaningful body';
         $date  = '2025-08-12';
         $uuid  = '00000000-0000-4000-8000-000000000001';
-
+        $data = [
+            'title' => $title,
+            'body'  => $body,
+            'date'  => $date,
+        ];
         $repo = new FakeEntryRepository();
         $repo->returnUuid = $uuid;
 
-        $request = new AddEntryRequest($title, $body, $date);
+        $request = AddEntryRequest::fromArray($data);
         $useCase = new AddEntry($repo);
 
         $result = $useCase->execute($request);
@@ -77,9 +81,13 @@ final class AddEntryTest extends Unit
         $title = '';
         $body  = 'Body present';
         $date  = '2025-08-12';
-
+        $data = [
+            'title' => $title,
+            'body'  => $body,
+            'date'  => $date,
+        ];
         $repo = new FakeEntryRepository();
-        $request = new AddEntryRequest($title, $body, $date);
+        $request = AddEntryRequest::fromArray($data);
         $useCase = new AddEntry($repo);
 
         $expected = ValidationException::class;
@@ -101,9 +109,13 @@ final class AddEntryTest extends Unit
         $title = 'Valid title';
         $body  = '';
         $date  = '2025-08-12';
-
+        $data = [
+            'title' => $title,
+            'body'  => $body,
+            'date'  => $date,
+        ];
         $repo = new FakeEntryRepository();
-        $request = new AddEntryRequest($title, $body, $date);
+        $request = AddEntryRequest::fromArray($data);
         $useCase = new AddEntry($repo);
 
         $expected = ValidationException::class;
@@ -125,9 +137,13 @@ final class AddEntryTest extends Unit
         $title = str_repeat('T', self::TITLE_MAX + 1);
         $body  = 'Body present';
         $date  = '2025-08-12';
-
+        $data = [
+            'title' => $title,
+            'body'  => $body,
+            'date'  => $date,
+        ];
         $repo = new FakeEntryRepository();
-        $request = new AddEntryRequest($title, $body, $date);
+        $request = AddEntryRequest::fromArray($data);
         $useCase = new AddEntry($repo);
 
         $expected = ValidationException::class;
@@ -149,9 +165,13 @@ final class AddEntryTest extends Unit
         $title = 'Valid title';
         $body  = str_repeat('B', self::BODY_MAX + 1);
         $date  = '2025-08-12';
-
+        $data = [
+            'title' => $title,
+            'body'  => $body,
+            'date'  => $date,
+        ];
         $repo = new FakeEntryRepository();
-        $request = new AddEntryRequest($title, $body, $date);
+        $request = AddEntryRequest::fromArray($data);
         $useCase = new AddEntry($repo);
 
         $expected = ValidationException::class;
@@ -174,8 +194,14 @@ final class AddEntryTest extends Unit
         $body  = 'Valid body';
         $date  = '12-08-2025';
 
+        $data = [
+            'title' => $title,
+            'body'  => $body,
+            'date'  => $date,
+        ];
+
         $repo = new FakeEntryRepository();
-        $request = new AddEntryRequest($title, $body, $date);
+        $request = AddEntryRequest::fromArray($data);
         $useCase = new AddEntry($repo);
 
         $expected = ValidationException::class;
@@ -198,8 +224,14 @@ final class AddEntryTest extends Unit
         $body  = 'Valid body';
         $date  = '2025-02-30';
 
+        $data = [
+            'title' => $title,
+            'body'  => $body,
+            'date'  => $date,
+        ];
+
         $repo = new FakeEntryRepository();
-        $request = new AddEntryRequest($title, $body, $date);
+        $request = AddEntryRequest::fromArray($data);
         $useCase = new AddEntry($repo);
 
         $expected = ValidationException::class;
@@ -221,9 +253,13 @@ final class AddEntryTest extends Unit
         $title = 'Valid title';
         $body  = 'Valid body';
         $date  = '';
-
+        $data = [
+            'title' => $title,
+            'body'  => $body,
+            'date'  => $date,
+        ];
         $repo = new FakeEntryRepository();
-        $request = new AddEntryRequest($title, $body, $date);
+        $request = AddEntryRequest::fromArray($data);
         $useCase = new AddEntry($repo);
 
         $expected = ValidationException::class;
