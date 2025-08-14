@@ -42,6 +42,27 @@ class Entry
     }
 
     /**
+     * Compares this Entry with another Entry by value.
+     *
+     * Two entries are considered equal if:
+     * - Their titles are identical.
+     * - Their bodies are identical.
+     * - Their dates (YYYY-MM-DD) are identical.
+     *
+     * @param self $other The Entry instance to compare against.
+     * @return bool True if all comparable fields are equal, false otherwise.
+     */
+    public function equals(self $other): bool
+    {
+        $sameTitle = $this->getTitle() === $other->getTitle();
+        $sameBody  = $this->getBody()  === $other->getBody();
+        $sameDate  = $this->getDate()  === $other->getDate();
+
+        $isEqual = $sameTitle && $sameBody && $sameDate;
+        return $isEqual;
+    }    
+
+    /**
      * @param string $title
      * @param string $body
      * @param string $date YYYY-MM-DD

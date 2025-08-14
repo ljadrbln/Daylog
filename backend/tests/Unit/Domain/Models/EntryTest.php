@@ -151,7 +151,7 @@ final class EntryTest extends Unit
                 'body' => $base['body'] . ' (extended)',
             ]],
             'different date' => [[
-                'date' => '2025-08-13',
+                'date' => '2024-08-13',
             ]],
         ];
     }
