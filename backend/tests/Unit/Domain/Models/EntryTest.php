@@ -8,6 +8,7 @@ use Codeception\Test\Unit;
 use Daylog\Domain\Models\Entry;
 use Daylog\Domain\Errors\ValidationException;
 use Daylog\Domain\Models\EntryConstraints;
+use Daylog\Tests\Support\Helper\EntryHelper;
 
 /**
  * Domain Model: Entry
@@ -35,16 +36,14 @@ final class EntryTest extends Unit
      */
     public function provideValidEntries(): array
     {
+        $data = EntryHelper::getData();
+
         return [
-            'simple valid entry' => [[
-                'title' => 'My first entry',
-                'body'  => 'Meaningful body text.',
-                'date'  => '2025-08-12',
-            ]],
+            'simple valid entry' => [$data],
             'trimmed inputs' => [[
-                'title' => '  Trimmed  ',
-                'body'  => '  Trimmed body  ',
-                'date'  => '2025-08-12',
+                'title' => $this->surroundWithSpaces($data['title']),
+                'body'  => $this->surroundWithSpaces($data['body']),
+                'date'  => $this->surroundWithSpaces($data['date'])
             ]],
         ];
     }
@@ -52,9 +51,13 @@ final class EntryTest extends Unit
     /**
      * @dataProvider provideInvalidEntries
      */
-    public function testInvalidEntriesThrow(array $data): void
+    public function testInvalidEntriesThrow(array $overrides): void
     {
         $this->expectException(ValidationException::class);
+
+        $data = EntryHelper::getData();
+        $data = array_merge($data, $overrides);
+
         Entry::fromArray($data);
     }
 
@@ -66,28 +69,18 @@ final class EntryTest extends Unit
         return [
             'empty title' => [[
                 'title' => '',
-                'body'  => 'Body is present',
-                'date'  => '2025-08-12',
             ]],
             'empty body' => [[
-                'title' => 'Valid title',
-                'body'  => '',
-                'date'  => '2025-08-12',
+                'body' => '',
             ]],
             'empty date' => [[
-                'title' => 'Valid title',
-                'body'  => 'Valid body',
-                'date'  => '',
+                'date' => '',
             ]],
             'title too long' => [[
                 'title' => str_repeat('a', EntryConstraints::TITLE_MAX + 1),
-                'body'  => 'Valid body',
-                'date'  => '2025-08-12',
             ]],
             'body too long' => [[
-                'title' => 'Valid title',
-                'body'  => str_repeat('a', EntryConstraints::BODY_MAX + 1),
-                'date'  => '2025-08-12',
+                'body' => str_repeat('a', EntryConstraints::BODY_MAX + 1),
             ]],
         ];
     }
@@ -97,17 +90,26 @@ final class EntryTest extends Unit
      */
     public function testCreateEntryFromArray(): void
     {
-        $data = [
-            'title' => 'Array title',
-            'body'  => 'Array body',
-            'date'  => '2025-08-14',
-        ];
-
+        $data  = EntryHelper::getData();
         $entry = Entry::fromArray($data);
 
         $this->assertSame($data['title'], $entry->getTitle());
         $this->assertSame($data['body'], $entry->getBody());
         $this->assertSame($data['date'], $entry->getDate());
     }
+
+    /**
+     * Surrounds the given string with a single leading and trailing double-space.
+     *
+     * Useful for simulating trimmed input values in tests.
+     *
+     * @param string $value Original string value.
+     * @return string String surrounded with double spaces on both sides.
+     */
+    private function surroundWithSpaces(string $value): string
+    {
+        $value = sprintf('  %s  ', $value);
+        return $value;
+    }    
 }
 
