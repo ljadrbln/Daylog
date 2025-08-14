@@ -20,11 +20,13 @@ final class EntryStorageTest extends Unit
         $storageClass = EntryStorage::class;
         $storage      = new $storageClass();
 
-        $title = 'Valid title';
-        $body  = 'Valid body';
-        $date  = '2025-08-13';
+        $data = [
+            'title' => 'Valid title',
+            'body'  => 'Valid body',
+            'date'  => '2025-08-13',
+        ];
 
-        $entry = new Entry($title, $body, $date);
+        $entry = Entry::fromArray($data);
 
         $uuid = $storage->insert($entry);
 
