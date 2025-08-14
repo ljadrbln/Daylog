@@ -5,9 +5,12 @@ namespace Daylog\Tests\Unit\Domain\Models;
 
 use Codeception\Test\Unit;
 
-// These classes do not exist yet — the test will fail on the Red step.
 use Daylog\Domain\Models\Entry;
 use Daylog\Domain\Errors\ValidationException;
+
+// These classes do not exist yet — the test will fail on the Red step.
+use Daylog\Domain\Entries\EntryConstraints;
+
 
 /**
  * Domain Model: Entry
@@ -18,9 +21,6 @@ use Daylog\Domain\Errors\ValidationException;
  */
 final class EntryTest extends Unit
 {
-    private const TITLE_MAX = 200;
-    private const BODY_MAX  = 50000;
-
     /**
      * Ensures a valid Entry can be created with title, body, and date.
      *
@@ -61,7 +61,7 @@ final class EntryTest extends Unit
      */
     public function testTooLongTitleThrows(): void
     {
-        $title = str_repeat('T', self::TITLE_MAX + 1);
+        $title = str_repeat('T', EntryConstraints::TITLE_MAX + 1);
         $body  = 'Body is present';
         $date  = '2025-08-12';
 
@@ -92,7 +92,7 @@ final class EntryTest extends Unit
     public function testTooLongBodyThrows(): void
     {
         $title = 'Valid title';
-        $body  = str_repeat('B', self::BODY_MAX + 1);
+        $body  = str_repeat('B', EntryConstraints::BODY_MAX + 1);
         $date  = '2025-08-12';
 
         $this->expectException(ValidationException::class);
