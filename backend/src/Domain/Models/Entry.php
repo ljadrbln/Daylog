@@ -22,6 +22,26 @@ class Entry
     private string $date; // stored as 'YYYY-MM-DD'
 
     /**
+     * Create an Entry instance from an associative array.
+     *
+     * @param array{title:string, body:string, date:string} $data
+     *
+     * @return self
+     *
+     * @throws ValidationException
+     */
+    public static function fromArray(array $data): self
+    {
+        $title = $data['title'] ?? '';
+        $body  = $data['body'] ?? '';
+        $date  = $data['date'] ?? '';
+
+        $entry = new self($title, $body, $date);
+
+        return $entry;
+    }
+
+    /**
      * @param string $title
      * @param string $body
      * @param string $date YYYY-MM-DD
