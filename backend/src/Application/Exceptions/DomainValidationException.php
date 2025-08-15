@@ -4,12 +4,13 @@ declare(strict_types=1);
 namespace Daylog\Application\Exceptions;
 
 use RuntimeException;
+use Daylog\Application\Interfaces\InputValidationExceptionInterface;
 
 /**
  * Thrown when DTO passes transport checks but violates domain/business rules.
  * Carries a flat list of error codes/messages (no field keys).
  */
-final class DomainValidationException extends RuntimeException
+final class DomainValidationException extends RuntimeException implements InputValidationExceptionInterface
 {
     /** @var string[] */
     private array $errors;
@@ -30,5 +31,11 @@ final class DomainValidationException extends RuntimeException
     {
         $result = $this->errors;
         return $result;
+    }
+
+    /** @inheritDoc */
+    public function getCategory(): string
+    {
+        return 'domain';
     }
 }

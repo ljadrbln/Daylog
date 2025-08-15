@@ -4,12 +4,13 @@ declare(strict_types=1);
 namespace Daylog\Application\Exceptions;
 
 use RuntimeException;
+use Daylog\Application\Interfaces\InputValidationExceptionInterface;
 
 /**
  * Thrown when input fails transport-level validation:
  * missing required fields or wrong types before business rules are checked.
  */
-final class TransportValidationException extends RuntimeException
+final class TransportValidationException extends RuntimeException implements InputValidationExceptionInterface
 {
     /** @var string[] */
     private array $errors;
@@ -28,6 +29,13 @@ final class TransportValidationException extends RuntimeException
      */
     public function getErrors(): array
     {
-        return $this->errors;
+        $result = $this->errors;
+        return $result;
     }
+
+    /** @inheritDoc */
+    public function getCategory(): string
+    {
+        return 'transport';
+    }    
 }
