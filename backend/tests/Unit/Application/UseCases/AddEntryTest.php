@@ -6,9 +6,9 @@ namespace Daylog\Tests\Unit\Application\UseCases;
 use Codeception\Test\Unit;
 use Daylog\Application\DTO\Entries\AddEntryRequest;
 use Daylog\Application\DTO\Entries\AddEntryRequestInterface;
+use Daylog\Application\Validators\Entries\AddEntryValidatorInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\UseCases\Entries\AddEntry;
-use Daylog\Application\Validators\Entries\AddEntryValidator;
 use Daylog\Domain\Interfaces\EntryRepositoryInterface;
 use Daylog\Domain\Models\Entry;
 use Daylog\Tests\Support\Helper\EntryHelper;
@@ -34,12 +34,9 @@ final class AddEntryTest extends Unit
     {
         /** Arrange **/
         $data  = EntryHelper::getData();
-        $title = $data['title'];
-        $body  = $data['body'];
-        $date  = $data['date'];
 
         /** @var AddEntryRequestInterface $request */
-        $request = new AddEntryRequest($title, $body, $date);
+        $request = AddEntryRequest::fromArray($data);
 
         $repoClass = EntryRepositoryInterface::class;
         $repoMock  = $this->createMock($repoClass);
@@ -51,14 +48,13 @@ final class AddEntryTest extends Unit
             ->with($this->isInstanceOf(Entry::class))
             ->willReturn($expectedUuid);
 
-        $validatorClass = AddEntryValidator::class;
-        $validatorMock  = $this->createMock($validatorClass);
+        $validatorInterface = AddEntryValidatorInterface::class;
+        $validatorMock      = $this->createMock($validatorInterface);
 
         $validatorMock
             ->expects($this->once())
             ->method('validate')
-            ->with($request)
-            ->willReturn(null);
+            ->with($request);
 
         $uc = new AddEntry($repoMock, $validatorMock);
 
@@ -76,12 +72,9 @@ final class AddEntryTest extends Unit
     {
         /** Arrange **/
         $data  = EntryHelper::getData();
-        $title = $data['title'];
-        $body  = $data['body'];
-        $date  = $data['date'];
 
         /** @var AddEntryRequestInterface $request */
-        $request = new AddEntryRequest($title, $body, $date);
+        $request = AddEntryRequest::fromArray($data);
 
         $repoClass = EntryRepositoryInterface::class;
         $repoMock  = $this->createMock($repoClass);
@@ -90,8 +83,8 @@ final class AddEntryTest extends Unit
             ->expects($this->never())
             ->method('save');
 
-        $validatorClass = AddEntryValidator::class;
-        $validatorMock  = $this->createMock($validatorClass);
+        $validatorInterface = AddEntryValidatorInterface::class;
+        $validatorMock      = $this->createMock($validatorInterface);
 
         $exception = new DomainValidationException(['TITLE_REQUIRED']);
         $validatorMock

@@ -6,6 +6,7 @@ namespace Daylog\Application\Validators\Entries;
 use Daylog\Domain\Models\EntryConstraints;
 use Daylog\Application\DTO\Entries\AddEntryRequestInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
+use Daylog\Application\Validators\Entries\AddEntryValidatorInterface;
 
 /**
  * Validates business rules for AddEntry request.
@@ -17,7 +18,7 @@ use Daylog\Application\Exceptions\DomainValidationException;
  *
  * Transport-level checks (types/presence) are NOT performed here.
  */
-final class AddEntryValidator
+final class AddEntryValidator implements AddEntryValidatorInterface
 {
     /**
      * Validate domain rules. Aggregates all errors and throws once.
