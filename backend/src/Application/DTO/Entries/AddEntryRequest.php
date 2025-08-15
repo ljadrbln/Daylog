@@ -4,13 +4,10 @@ declare(strict_types=1);
 namespace Daylog\Application\DTO\Entries;
 
 /**
- * Class AddEntryRequest
- *
- * Immutable request DTO for UC-1 Add Entry.
- * Carries raw user input: title, body and logical date (YYYY-MM-DD).
+ * Immutable DTO for adding a new entry.
+ * Implements AddEntryRequestInterface.
  */
-
-final class AddEntryRequest
+final class AddEntryRequest implements AddEntryRequestInterface
 {
     /** @var string */
     private string $title;
@@ -22,13 +19,13 @@ final class AddEntryRequest
     private string $date;
 
     /**
-     * AddEntryRequest constructor.
+     * Private constructor. Use fromArray().
      *
-     * @param string $title Raw title input.
-     * @param string $body  Raw body input.
-     * @param string $date  Logical entry date in YYYY-MM-DD format.
+     * @param string $title
+     * @param string $body
+     * @param string $date
      */
-    public function __construct(string $title, string $body, string $date)
+    private function __construct(string $title, string $body, string $date)
     {
         $this->title = $title;
         $this->body  = $body;
@@ -56,7 +53,8 @@ final class AddEntryRequest
      */
     public function getTitle(): string
     {
-        return $this->title;
+        $result = $this->title;
+        return $result;
     }
 
     /**
@@ -64,7 +62,8 @@ final class AddEntryRequest
      */
     public function getBody(): string
     {
-        return $this->body;
+        $result = $this->body;
+        return $result;
     }
 
     /**
@@ -72,6 +71,7 @@ final class AddEntryRequest
      */
     public function getDate(): string
     {
-        return $this->date;
+        $result = $this->date;
+        return $result;
     }
 }
