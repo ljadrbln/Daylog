@@ -18,4 +18,6 @@ A journaling application built with clean architecture principles, following TDD
 - English for code, tests, commits, and documentation.
 
 See `/docs` for charter, requirements, and use cases.
+See `/docs/CONFIGURATION.md` for environment and DB setup.  
+See `/docs/TESTING.md` for testing conventions and running suites.
 
