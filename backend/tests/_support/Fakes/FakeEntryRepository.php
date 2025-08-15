@@ -5,37 +5,57 @@ namespace Daylog\Tests\Support\Fakes;
 
 use Daylog\Domain\Interfaces\EntryRepositoryInterface;
 use Daylog\Domain\Models\Entry;
+use Daylog\Domain\Services\UuidGenerator;
 
 /**
- * Class FakeEntryRepository
+ * Fake implementation of EntryRepositoryInterface for tests.
  *
- * Simple in-memory test double that records calls to save()
- * and returns a preconfigured UUID for assertions.
+ * Stores entries in memory and allows inspection of save() calls.
  */
 final class FakeEntryRepository implements EntryRepositoryInterface
 {
-    /** @var Entry|null */
-    public ?Entry $savedEntry = null;
+    /** @var Entry[] */
+    private array $entries = [];
 
     /** @var int */
-    public int $saveCalls = 0;
-
-    /** @var string */
-    public string $returnUuid = '00000000-0000-0000-0000-000000000000';
+    private int $saveCalls = 0;
 
     /**
-     * Persist the entry and return a UUID (preconfigured for tests).
+     * Saves the given entry to the in-memory storage.
      *
      * @param Entry $entry
-     * @return string
+     * @return string UUID of the saved entry.
      */
     public function save(Entry $entry): string
     {
+        $this->entries[] = $entry;
         $this->saveCalls++;
-        $this->savedEntry = $entry;
 
-        $uuid = $this->returnUuid;
+        $uuid = UuidGenerator::generate();
         return $uuid;
     }
-}
 
+    /**
+     * Returns the number of times save() has been called.
+     *
+     * @return int
+     */
+    public function getSaveCalls(): int
+    {
+        return $this->saveCalls;
+    }
+
+    /**
+     * Returns the last Entry instance passed to save(), or null if none.
+     *
+     * @return Entry|null
+     */
+    public function getLastSaved(): ?Entry
+    {
+        if (empty($this->entries)) {
+            return null;
+        }
+
+        return end($this->entries);
+    }
+}
