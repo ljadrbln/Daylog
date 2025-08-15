@@ -50,7 +50,8 @@ final class AddEntryRequestFactoryTest extends Unit
     public function testFromArrayThrowsOnInvalidTransportData(array $overrides): void
     {
         $factory = new AddEntryRequestFactory();
-        $data    = array_merge(EntryHelper::getData(), $overrides);
+        $data    = EntryHelper::getData();
+        $data    = array_merge($data, $overrides);
 
         $this->expectException(TransportValidationException::class);
         $factory->fromArray($data);
