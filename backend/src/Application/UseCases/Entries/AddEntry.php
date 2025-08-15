@@ -5,7 +5,6 @@ namespace Daylog\Application\UseCases\Entries;
 
 use Daylog\Application\Validators\Entries\AddEntryValidatorInterface;
 use Daylog\Application\DTO\Entries\AddEntryRequestInterface;
-use Daylog\Application\Validators\Entries\AddEntryValidator;
 use Daylog\Domain\Interfaces\EntryRepositoryInterface;
 use Daylog\Domain\Models\Entry;
 
