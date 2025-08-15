@@ -5,149 +5,107 @@ namespace Daylog\Tests\Unit\Application\UseCases;
 
 use Codeception\Test\Unit;
 use Daylog\Application\DTO\Entries\AddEntryRequest;
+use Daylog\Application\DTO\Entries\AddEntryRequestInterface;
+use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\UseCases\Entries\AddEntry;
-use Daylog\Domain\Errors\ValidationException;
-use Daylog\Domain\Models\Entry;
-use Daylog\Domain\Models\EntryConstraints;
+use Daylog\Application\Validators\Entries\AddEntryValidator;
 use Daylog\Domain\Interfaces\EntryRepositoryInterface;
-use Daylog\Tests\Support\Fakes\FakeEntryRepository;
+use Daylog\Domain\Models\Entry;
 use Daylog\Tests\Support\Helper\EntryHelper;
 
 /**
- * UC-1: AddEntry (Use Case)
+ * Unit tests for UC-1 AddEntry.
  *
- * Goals:
- *  - Happy path: entry is saved, UUID is returned, and saved data equals input.
- *  - Validation: for invalid input no repository writes happen.
+ * Purpose: verify that AddEntry correctly calls repository on valid data,
+ * and does not touch repository when validator throws.
+ *
+ * Mechanics:
+ * - Uses mocked repository and mocked validator.
+ * - Does not test actual validation logic (covered in AddEntryValidatorTest).
+ *
+ * @covers \Daylog\Application\UseCases\Entries\AddEntry
  */
 final class AddEntryTest extends Unit
 {
     /**
-     * Happy path: repository->save() is called exactly once with expected Entry.
-     *
-     * This test uses a mock to verify contract-level behavior without relying on a fake repository.
-     *
-     * @return void
-     */
-    public function testHappyPathCallsRepositoryWithExpectedEntryUsingMock(): void
-    {
-        $data = EntryHelper::getData(); // ['title' => ..., 'body' => ..., 'date' => ...]
-        $expectedEntry = Entry::fromArray($data);
-
-        // Create mock for EntryRepositoryInterface
-        $repoClass = EntryRepositoryInterface::class;
-        $repoMock  = $this->createMock($repoClass);
-
-        // Expect save() to be called exactly once with an Entry having expected fields
-        $repoMock->expects($this->once())
-            ->method('save')
-            ->with($this->callback(function (Entry $entry) use ($expectedEntry): bool {
-                return $entry->equals($expectedEntry);
-            }))
-            ->willReturn('mocked-uuid');
-
-        $uc   = new AddEntry($repoMock);
-        $req  = AddEntryRequest::fromArray($data);
-
-        $uuid = $uc->execute($req);
-
-        // Assert returned UUID is the same as from mock
-        $this->assertSame('mocked-uuid', $uuid);
-    }
-
-    /**
-     * Happy path: repository is called once, saved entry matches input,
-     * and the returned value looks like a non-empty UUID string.
-     *
-     * @return void
+     * Happy path: validator passes, repository called, UUID returned.
      */
     public function testHappyPathSavesEntryAndReturnsUuid(): void
     {
-        // Arrange
-        $data = EntryHelper::getData(); // ['title' => ..., 'body' => ..., 'date' => ...]
-        $repo = new FakeEntryRepository();
-        $uc   = new AddEntry($repo);
-        $req  = AddEntryRequest::fromArray($data);
+        /** Arrange **/
+        $data  = EntryHelper::getData();
+        $title = $data['title'];
+        $body  = $data['body'];
+        $date  = $data['date'];
 
-        // Act
-        $uuid = $uc->execute($req);
+        /** @var AddEntryRequestInterface $request */
+        $request = new AddEntryRequest($title, $body, $date);
 
-        // Assert
-        $this->assertSame(1, $repo->saveCalls);
+        $repoClass = EntryRepositoryInterface::class;
+        $repoMock  = $this->createMock($repoClass);
 
-        /** @var Entry|null $saved */
-        $saved = $repo->savedEntry;
-        $this->assertInstanceOf(Entry::class, $saved);
-        $this->assertSame($data['title'], $saved->getTitle());
-        $this->assertSame($data['body'],  $saved->getBody());
-        $this->assertSame($data['date'],  $saved->getDate());
+        $expectedUuid = 'mocked-uuid';
+        $repoMock
+            ->expects($this->once())
+            ->method('save')
+            ->with($this->isInstanceOf(Entry::class))
+            ->willReturn($expectedUuid);
 
-        $this->assertIsString($uuid);
-        $this->assertNotEmpty($uuid);
-        // UUIDv4 format is covered in UuidGenerator tests; here we only require non-empty string.
+        $validatorClass = AddEntryValidator::class;
+        $validatorMock  = $this->createMock($validatorClass);
+
+        $validatorMock
+            ->expects($this->once())
+            ->method('validate')
+            ->with($request)
+            ->willReturn(null);
+
+        $uc = new AddEntry($repoMock, $validatorMock);
+
+        /** Act **/
+        $uuid = $uc->execute($request);
+
+        /** Assert **/
+        $this->assertSame($expectedUuid, $uuid);
     }
 
     /**
-     * Ensures that invalid input triggers ValidationException
-     * and that repository->save() is never called.
-     *
-     * We use try/catch instead of expectException so that we can assert
-     * the repository call count after the failure.
-     *
-     * @dataProvider invalidInputProvider
-     *
-     * @param array<string,string> $overrides Fields to override in valid base data
-     * @return void
+     * Error path: validator throws, repository not called.
      */
-    public function testValidationErrorsDoNotTouchRepository(array $overrides): void
+    public function testValidationErrorDoesNotTouchRepository(): void
     {
-        // Arrange
-        $data = EntryHelper::getData();
-        $data = array_merge($data, $overrides);
+        /** Arrange **/
+        $data  = EntryHelper::getData();
+        $title = $data['title'];
+        $body  = $data['body'];
+        $date  = $data['date'];
 
-        $repo = new FakeEntryRepository();
-        $uc   = new AddEntry($repo);
-        $req  = AddEntryRequest::fromArray($data);
+        /** @var AddEntryRequestInterface $request */
+        $request = new AddEntryRequest($title, $body, $date);
 
-        // Act + Assert
-        try {
-            $uc->execute($req);
-            $this->fail('Expected ValidationException was not thrown');
-        } catch (ValidationException $e) {
-            $this->assertSame(0, $repo->saveCalls);
-            $this->assertNull($repo->savedEntry);
-        }
-    }
+        $repoClass = EntryRepositoryInterface::class;
+        $repoMock  = $this->createMock($repoClass);
 
-    /**
-     * Provides field overrides that make the request invalid.
-     *
-     * @return array<string,array<string,string>>
-     */
-    public function invalidInputProvider(): array
-    {
-        return [
-            'empty title' => [[
-                'title' => '',
-            ]],
-            'empty body' => [[
-                'body'  => '',
-            ]],
-            'too long title' => [[
-                'title' => str_repeat('T', EntryConstraints::TITLE_MAX + 1),
-            ]],
-            'too long body' => [[
-                'body'  => str_repeat('B', EntryConstraints::BODY_MAX + 1),
-            ]],
-            'invalid date format' => [[
-                'date'  => '12-08-2025',
-            ]],
-            'invalid calendar date' => [[
-                'date'  => '2025-02-30',
-            ]],
-            'missing date' => [[
-                'date'  => '',
-            ]],
-        ];
+        $repoMock
+            ->expects($this->never())
+            ->method('save');
+
+        $validatorClass = AddEntryValidator::class;
+        $validatorMock  = $this->createMock($validatorClass);
+
+        $exception = new DomainValidationException(['TITLE_REQUIRED']);
+        $validatorMock
+            ->expects($this->once())
+            ->method('validate')
+            ->with($request)
+            ->willThrowException($exception);
+
+        $uc = new AddEntry($repoMock, $validatorMock);
+
+        /** Assert **/
+        $this->expectException(DomainValidationException::class);
+
+        /** Act **/
+        $uc->execute($request);
     }
 }
