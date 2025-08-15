@@ -34,13 +34,14 @@ final class AddEntryValidatorTest extends Unit
     {
         $validator = new AddEntryValidator();
 
-        $base = EntryHelper::getData();
-        $dto  = AddEntryRequest::fromArray($base);
+        $data = EntryHelper::getData();
 
-        $validator->validate($dto);
+        /** @var AddEntryRequestInterface $request */
+        $request  = AddEntryRequest::fromArray($data);
 
-        $result = true;
-        $this->assertTrue($result);
+        $validator->validate($request);
+
+        $this->assertTrue(true);
     }
 
     /**
@@ -55,14 +56,15 @@ final class AddEntryValidatorTest extends Unit
     {
         $validator = new AddEntryValidator();
 
-        $base = EntryHelper::getData();
-        $data = array_merge($base, $overrides);
+        $data = EntryHelper::getData();
+        $data = array_merge($data, $overrides);
 
-        $dto = AddEntryRequest::fromArray($data);
+        /** @var AddEntryRequestInterface $request */
+        $request = AddEntryRequest::fromArray($data);
 
         $this->expectException(DomainValidationException::class);
 
-        $validator->validate($dto);
+        $validator->validate($request);
     }
 
     /**
