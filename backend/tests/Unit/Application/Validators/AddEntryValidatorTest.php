@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\Validators;
 
 use Codeception\Test\Unit;
+use Daylog\Domain\Models\EntryConstraints;
 use Daylog\Application\Validators\Entries\AddEntryValidator;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\DTO\Entries\AddEntryRequest;
@@ -78,8 +79,8 @@ final class AddEntryValidatorTest extends Unit
     public function provideInvalidDomainCases(): array
     {
         // Create «too longs» strings; actual limits will be detemined by validator.
-        $tooLongTitle = str_repeat('T', 201);     // expect TITLE_MAX = 200
-        $tooLongBody  = str_repeat('B', 50001);   // expect BODY_MAX  = 50000
+        $tooLongTitle = str_repeat('T', EntryConstraints::TITLE_MAX+1);  // expect TITLE_MAX = 200
+        $tooLongBody  = str_repeat('B', EntryConstraints::BODY_MAX+1);   // expect BODY_MAX  = 50000
 
         $cases = [
             'title empty'             => [['title' => '']],
