@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Infrastructure\Storage\Entry;
+namespace Daylog\Infrastructure\Storage\Entries;
 
-use Daylog\Domain\Interfaces\EntryStorageInterface;
-use Daylog\Domain\Models\Entry;
+use Daylog\Domain\Interfaces\Entries\EntryStorageInterface;
+use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Domain\Services\UuidGenerator;
 
 /**

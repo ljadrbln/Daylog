@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Infrastructure\Repositories;
+namespace Daylog\Infrastructure\Repositories\Entries;
 
-use Daylog\Domain\Interfaces\EntryRepositoryInterface;
-use Daylog\Domain\Interfaces\EntryStorageInterface;
-use Daylog\Domain\Models\Entry;
+use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
+use Daylog\Domain\Interfaces\Entries\EntryStorageInterface;
+use Daylog\Domain\Models\Entries\Entry;
 
 /**
  * Class EntryRepository
