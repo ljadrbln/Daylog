@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Domain\Models;
 
 use Codeception\Test\Unit;
-use Daylog\Domain\Models\Entry;
+use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Tests\Support\Helper\EntryHelper;
 
 /**

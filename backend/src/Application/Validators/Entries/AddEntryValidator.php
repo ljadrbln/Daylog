@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Daylog\Application\Validators\Entries;
 
-use Daylog\Domain\Models\EntryConstraints;
+use Daylog\Domain\Models\Entries\EntryConstraints;
 use Daylog\Application\DTO\Entries\AddEntryRequestInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\Validators\Entries\AddEntryValidatorInterface;

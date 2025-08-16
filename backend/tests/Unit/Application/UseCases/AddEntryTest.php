@@ -9,8 +9,8 @@ use Daylog\Application\DTO\Entries\AddEntryRequestInterface;
 use Daylog\Application\Validators\Entries\AddEntryValidatorInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\UseCases\Entries\AddEntry;
-use Daylog\Domain\Interfaces\EntryRepositoryInterface;
-use Daylog\Domain\Models\Entry;
+use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
+use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Tests\Support\Helper\EntryHelper;
 
 /**

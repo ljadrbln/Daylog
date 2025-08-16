@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Infrastructure\Repositories;
 
 use Codeception\Test\Unit;
-use Daylog\Domain\Models\Entry;
-use Daylog\Infrastructure\Repositories\EntryRepository;
+use Daylog\Domain\Models\Entries\Entry;
+use Daylog\Infrastructure\Repositories\Entries\EntryRepository;
 use Daylog\Tests\Support\Fakes\FakeEntryStorage;
 use Daylog\Tests\Support\Helper\EntryHelper;
 

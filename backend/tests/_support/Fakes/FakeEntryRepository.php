@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Support\Fakes;
 
-use Daylog\Domain\Interfaces\EntryRepositoryInterface;
-use Daylog\Domain\Models\Entry;
+use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
+use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Domain\Services\UuidGenerator;
 
 /**
