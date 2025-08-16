@@ -20,14 +20,18 @@ final class EntryHelper
      * @return array{title:string, body:string, date:string}
      */
     public static function getData(
-        string $title = 'Valid title',
-        string $body  = 'Valid body',
-        string $date  = '2025-08-13'
+        string $title     = 'Valid title',
+        string $body      = 'Valid body',
+        string $date      = '2025-08-13',
+        string $createdAt = '2025-08-13 12:00:00',
+        string $updatedAt = '2025-08-13 12:00:00'
     ): array {
         $data = [
             'title' => $title,
             'body'  => $body,
             'date'  => $date,
+            'created_at' => $createdAt,
+            'updated_at' => $updatedAt
         ];
 
         return $data;
