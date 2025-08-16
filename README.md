@@ -17,7 +17,7 @@ A journaling application built with clean architecture principles, following TDD
 - One TDD step = one commit (Conventional Commits).
 - English for code, tests, commits, and documentation.
 
-See `/docs` for charter, requirements, and use cases.
-See `/docs/CONFIGURATION.md` for environment and DB setup.  
-See `/docs/TESTING.md` for testing conventions and running suites.
+- See `/docs` for charter, requirements, and use cases.
+- See `/docs/CONFIGURATION.md` for environment and DB setup.  
+- See `/docs/TESTING.md` for testing conventions and running suites.
 
