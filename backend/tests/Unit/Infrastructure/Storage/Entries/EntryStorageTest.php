@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Tests\Unit\Infrastructure\Storage\Entry;
+namespace Daylog\Tests\Unit\Infrastructure\Storage\Entries;
 
 use Codeception\Test\Unit;
-use Daylog\Domain\Models\Entry;
+use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Domain\Services\UuidGenerator;
-use Daylog\Infrastructure\Storage\Entry\EntryStorage;
+use Daylog\Infrastructure\Storage\Entries\EntryStorage;
 use Daylog\Tests\Support\Helper\EntryHelper;
 
 /**
