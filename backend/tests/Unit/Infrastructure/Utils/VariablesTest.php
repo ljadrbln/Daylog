@@ -18,8 +18,10 @@ class VariablesTest extends Unit
      */
     public function testGetDBReturnsTestDatabaseUrl(): void
     {
-        putenv('DIARY_APP_ENV=test');
-        putenv('DIARY_TEST_DATABASE_URL=sqlite://test.db');
+        // Arrange: emulate production host
+        $_SERVER['HTTP_HOST'] = 'daylog.localhost.test';
+
+        putenv('DAYLOG_TEST_DATABASE_URL=sqlite://test.db');
 
         $value = Variables::getDB();
 
@@ -32,10 +34,10 @@ class VariablesTest extends Unit
     public function testGetDBReturnsProductionDatabaseUrl(): void
     {
         // Arrange: emulate production host
-        $_SERVER['HTTP_HOST'] = 'chikipooki.com';
+        $_SERVER['HTTP_HOST'] = 'daylog.localhost';
 
         // Setup production DB variable
-        putenv('DIARY_DATABASE_URL=mysql://root@localhost/db');
+        putenv('DAYLOG_DEV_DATABASE_URL=mysql://root@localhost/db');
 
         // Act
         $value = Variables::getDB();
