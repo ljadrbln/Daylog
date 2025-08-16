@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\Validators;
 
 use Codeception\Test\Unit;
-use Daylog\Domain\Models\EntryConstraints;
+use Daylog\Domain\Models\Entries\EntryConstraints;
 use Daylog\Application\Validators\Entries\AddEntryValidator;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\DTO\Entries\AddEntryRequest;
