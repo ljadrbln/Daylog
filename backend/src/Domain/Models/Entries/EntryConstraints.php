@@ -1,6 +1,6 @@
 <?php
 
-namespace Daylog\Domain\Models;
+namespace Daylog\Domain\Models\Entries;
 
 /**
  * Class EntryConstraints

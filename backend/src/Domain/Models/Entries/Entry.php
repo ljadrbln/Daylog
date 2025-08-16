@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Domain\Models;
+namespace Daylog\Domain\Models\Entries;
 
 /**
  * Domain Model: Entry

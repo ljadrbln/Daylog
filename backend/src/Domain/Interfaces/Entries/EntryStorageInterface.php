@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Domain\Interfaces;
+namespace Daylog\Domain\Interfaces\Entries;
 
-use Daylog\Domain\Models\Entry;
+use Daylog\Domain\Models\Entries\Entry;
 
 /**
  * Interface EntryStorageInterface
