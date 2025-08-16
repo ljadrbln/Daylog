@@ -9,7 +9,7 @@ use Daylog\Application\DTO\Entries\AddEntryRequest;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\UseCases\Entries\AddEntry;
 use Daylog\Application\Validators\Entries\AddEntryValidator;
-use Daylog\Domain\Models\Entry;
+use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Tests\Support\Helper\EntryHelper;
 use Daylog\Tests\Support\Fakes\FakeEntryRepository;
