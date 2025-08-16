@@ -46,7 +46,6 @@ Add variables:
 ``` bash
 export DAYLOG_DEV_DATABASE_URL="mysql://user:pass@127.0.0.1/daylog_dev"
 export DAYLOG_TEST_DATABASE_URL="mysql://user:pass@127.0.0.1/daylog_test"
-export DAYLOG_PROD_DATABASE_URL="mysql://user:pass@127.0.0.1/daylog_prod"
 ```
 
 Reload your shell session or run:
