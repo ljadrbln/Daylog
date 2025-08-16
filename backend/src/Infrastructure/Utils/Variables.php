@@ -13,8 +13,8 @@ class Variables
     public static function getDB(): ?string
     {
         $name = self::isTestEnv()
-            ? 'DIARY_TEST_DATABASE_URL'
-            : 'DIARY_DATABASE_URL';
+            ? 'DAYLOG_TEST_DATABASE_URL'
+            : 'DAYLOG_DEV_DATABASE_URL';
 
         $dsn = self::getEnv($name);
 
