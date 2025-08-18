@@ -49,21 +49,33 @@ final class ListEntriesResponse
         return $this->items;
     }
 
+    /**
+     * @return int
+     */
     public function getPage(): int
     {
         return $this->page;
     }
 
+    /**
+     * @return int
+     */
     public function getPerPage(): int
     {
         return $this->perPage;
     }
 
+    /**
+     * @return int
+     */
     public function getTotal(): int
     {
         return $this->total;
     }
 
+    /**
+     * @return int
+     */
     public function getPagesCount(): int
     {
         return $this->pagesCount;
