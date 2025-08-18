@@ -7,5 +7,11 @@ Create a new diary entry with title and body.
 
 ---
 
-*(More use cases will be added as the project evolves.)*
+## UC-2 List Entries
+Display a paginated list of entries with filters and sorting.
 
+**Details:** [UC-2-ListEntries.md](use-cases/UC-2-ListEntries.md)
+
+---
+
+*(More use cases will be added as the project evolves.)*
