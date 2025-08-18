@@ -43,5 +43,16 @@ final class EntryRepository implements EntryRepositoryInterface
             'createdAt' => $now,
             'updatedAt' => $now
         ];
+    }
+    
+    /**
+     * Fetches all entries from storage.
+     *
+     * @return Entry[]
+     */
+    public function fetchAll(): array
+    {
+        $result = $this->storage->fetchAll();
+        return $result;
     }    
 }

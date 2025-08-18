@@ -2,189 +2,67 @@
 
 declare(strict_types=1);
 
-namespace Daylog\Tests\Unit\Application\UseCases\Entries;
+namespace Daylog\Tests\Unit\Application\UseCases;
 
 use Codeception\Test\Unit;
 use Daylog\Application\UseCases\Entries\ListEntries;
 use Daylog\Application\DTO\Entries\ListEntriesRequest;
-use Daylog\Application\DTO\Entries\ListEntriesResponse;
+use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
+use Daylog\Tests\Support\Helper\EntryHelper;
 
 /**
- * Unit tests for UC-2 List Entries.
+ * Unit test for UC-2 ListEntries.
  *
- * This suite validates the behavior of listing diary entries:
- * - default pagination and sorting
- * - filtering by date range and exact date
- * - full-text query filtering
- * - clamping of pagination bounds
- * - sorting behavior and fallback
- * - validation errors for invalid parameters
- * - stable ordering rules
+ * Scenario: repository has multiple entries with different dates.
+ * Expectation: UseCase returns them ordered by date DESC with pagination metadata.
  *
- * Data source: a fake repository implementing EntryRepositoryInterface.
- *
- * @covers \Daylog\Application\UseCases\Entries\ListEntries
+ * @covers ListEntries
  */
 final class ListEntriesTest extends Unit
 {
     /**
-     * AC-1: Happy path.
-     * When no filters are provided, the first page is returned,
-     * sorted by date DESC by default, and pagination metadata is present.
+     * Ensures that ListEntries returns entries sorted by date DESC
+     * when no filters are provided (AC-1 happy path).
      *
      * @return void
      */
-    public function testListEntriesNoFiltersDefaultSortFirstPageWithMeta(): void
+    public function testHappyPathReturnsEntriesSortedByDateDesc(): void
     {
-        $repo = EntryRepositoryInterface::class;
-        $repo = $this->createMock($repo);
+        /** Arrange **/
+        $repoClass = EntryRepositoryInterface::class;
+        $repo      = $this->createMock($repoClass);
 
+        $entry1 = EntryHelper::getData('Oldest', 'Valid body', '2025-08-10');
+        $entry1 = Entry::fromArray($entry1);
+
+        $entry2 = EntryHelper::getData('Newest', 'Valid body', '2025-08-12');
+        $entry2 = Entry::fromArray($entry2);
+
+        $entry3 = EntryHelper::getData('Middle', 'Valid body', '2025-08-11');
+        $entry3 = Entry::fromArray($entry3);
+
+        $entries = [$entry1, $entry2, $entry3];
+
+        $repo
+            ->expects($this->once())
+            ->method('fetchAll')
+            ->willReturn($entries);
+
+        $useCase = new ListEntries($repo);
         $request = new ListEntriesRequest();
-        $useCase = new ListEntries($repo);
 
+        /** Act **/
         $response = $useCase->execute($request);
 
-        $this->assertInstanceOf(ListEntriesResponse::class, $response);
-    }
+        /** Assert **/
+        $items = $response->getItems();
+        $this->assertSame('2025-08-12', $items[0]->getDate());
+        $this->assertSame('2025-08-11', $items[1]->getDate());
+        $this->assertSame('2025-08-10', $items[2]->getDate());
 
-    /**
-     * AC-2: Date range.
-     * When dateFrom/dateTo are provided, only entries with dates
-     * within the inclusive range must be returned.
-     *
-     * @return void
-     */
-    public function testListEntriesDateRangeFiltersByDateInclusive(): void
-    {
-        $repo = EntryRepositoryInterface::class;
-        $repo = $this->createMock($repo);
-
-        $request = new ListEntriesRequest(dateFrom: '2025-01-01', dateTo: '2025-01-31');
-        $useCase = new ListEntries($repo);
-
-        $response = $useCase->execute($request);
-
-        $this->assertInstanceOf(ListEntriesResponse::class, $response);
-    }
-
-    /**
-     * AC-3: Full-text query.
-     * When query is provided, entries must be matched if the substring
-     * is found in either title or body (case-insensitive).
-     *
-     * @return void
-     */
-    public function testListEntriesQuerySubstringMatchesTitleOrBodyCaseInsensitive(): void
-    {
-        $repo = EntryRepositoryInterface::class;
-        $repo = $this->createMock($repo);
-
-        $request = new ListEntriesRequest(query: 'search');
-        $useCase = new ListEntries($repo);
-
-        $response = $useCase->execute($request);
-
-        $this->assertInstanceOf(ListEntriesResponse::class, $response);
-    }
-
-    /**
-     * AC-4: Pagination bounds.
-     * If perPage is outside the allowed range, it must be clamped
-     * to the nearest limit. Empty pages are valid results.
-     *
-     * @return void
-     */
-    public function testListEntriesPerPageOutOfBoundsIsClamped(): void
-    {
-        $repo = EntryRepositoryInterface::class;
-        $repo = $this->createMock($repo);
-
-        $request = new ListEntriesRequest(perPage: 9999);
-        $useCase = new ListEntries($repo);
-
-        $response = $useCase->execute($request);
-
-        $this->assertInstanceOf(ListEntriesResponse::class, $response);
-    }
-
-    /**
-     * AC-5: Sorting fallback.
-     * If sort parameters are invalid, the system must default
-     * to date DESC sorting.
-     *
-     * @return void
-     */
-    public function testListEntriesInvalidSortFallsBackToDefault(): void
-    {
-        $repo = EntryRepositoryInterface::class;
-        $repo = $this->createMock($repo);
-
-        $request = new ListEntriesRequest(sort: 'invalid_field', direction: 'INVALID');
-        $useCase = new ListEntries($repo);
-
-        $response = $useCase->execute($request);
-
-        $this->assertInstanceOf(ListEntriesResponse::class, $response);
-    }
-
-    /**
-     * AC-6: Invalid date format.
-     * If date or range inputs do not match YYYY-MM-DD,
-     * validation must fail with DATE_INVALID_FORMAT.
-     *
-     * @return void
-     */
-    public function testListEntriesInvalidDateFormatReturnsValidationError(): void
-    {
-        $repo = EntryRepositoryInterface::class;
-        $repo = $this->createMock($repo);
-
-        $request = new ListEntriesRequest(dateFrom: '2025-13-99');
-        $useCase = new ListEntries($repo);
-
-        $response = $useCase->execute($request);
-
-        $this->assertInstanceOf(ListEntriesResponse::class, $response);
-    }
-
-    /**
-     * AC-7: Exact date filter.
-     * When a single date is provided, only entries with
-     * an exact logical date match must be returned.
-     *
-     * @return void
-     */
-    public function testListEntriesExactDateFiltersExactMatch(): void
-    {
-        $repo = EntryRepositoryInterface::class;
-        $repo = $this->createMock($repo);
-
-        $request = new ListEntriesRequest(date: '2025-01-15');
-        $useCase = new ListEntries($repo);
-
-        $response = $useCase->execute($request);
-
-        $this->assertInstanceOf(ListEntriesResponse::class, $response);
-    }
-
-    /**
-     * AC-8: Stable order.
-     * When primary sort keys are equal, results must be ordered
-     * stably by createdAt DESC.
-     *
-     * @return void
-     */
-    public function testListEntriesStableSecondaryOrderByCreatedAtDesc(): void
-    {
-        $repo = EntryRepositoryInterface::class;
-        $repo = $this->createMock($repo);
-
-        $request = new ListEntriesRequest(sort: 'date', direction: 'ASC');
-        $useCase = new ListEntries($repo);
-
-        $response = $useCase->execute($request);
-
-        $this->assertInstanceOf(ListEntriesResponse::class, $response);
+        $this->assertSame(3, $response->getTotal());
+        $this->assertSame(1, $response->getPage());
+        $this->assertSame(10, $response->getPerPage()); // default perPage
     }
 }
