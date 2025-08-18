@@ -23,16 +23,35 @@ final class FakeEntryRepository implements EntryRepositoryInterface
     /**
      * Saves the given entry to the in-memory storage.
      *
-     * @param Entry $entry
-     * @return string UUID of the saved entry.
+     * Increments the save counter, stores the last saved entry,
+     * and returns an array with:
+     *  - id (string)       — generated UUID v4
+     *  - title (string)    — entry title
+     *  - body (string)     — entry body
+     *  - date (string)     — entry date
+     *  - createdAt (string)— ISO-8601 timestamp
+     *  - updatedAt (string)— ISO-8601 timestamp
+     *
+     * @param Entry $entry Entry to save
+     * @return array<string,string> Saved entry data
      */
-    public function save(Entry $entry): string
+    public function save(Entry $entry): array
     {
-        $this->entries[] = $entry;
+        $this->entries[]  = $entry;
         $this->saveCalls++;
 
-        $uuid = UuidGenerator::generate();
-        return $uuid;
+        $uuid      = UuidGenerator::generate();
+        $timestamp = (new \DateTimeImmutable())->format(DATE_ATOM);
+
+        $result = [
+            'id'        => $uuid,
+            'title'     => $entry->getTitle(),
+            'body'      => $entry->getBody(),
+            'date'      => $entry->getDate(),
+            'createdAt' => $timestamp,
+            'updatedAt' => $timestamp,
+        ];
+        return $result;
     }
 
     /**
