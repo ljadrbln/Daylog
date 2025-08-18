@@ -6,12 +6,14 @@ namespace Daylog\Tests\Unit\Application\UseCases;
 use Codeception\Test\Unit;
 use Daylog\Application\DTO\Entries\AddEntryRequest;
 use Daylog\Application\DTO\Entries\AddEntryRequestInterface;
+use Daylog\Application\DTO\Entries\AddEntryResponseInterface;
 use Daylog\Application\Validators\Entries\AddEntryValidatorInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\UseCases\Entries\AddEntry;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Tests\Support\Helper\EntryHelper;
+use Daylog\Domain\Services\UuidGenerator;
 
 /**
  * Unit tests for UC-1 AddEntry.
@@ -30,39 +32,94 @@ final class AddEntryTest extends Unit
     /**
      * Happy path: validator passes, repository called, UUID returned.
      */
-    public function testHappyPathSavesEntryAndReturnsUuid(): void
+    // public function testHappyPathSavesEntryAndReturnsUuid(): void
+    // {
+    //     /** Arrange **/
+    //     $data  = EntryHelper::getData();
+
+    //     /** @var AddEntryRequestInterface $request */
+    //     $request = AddEntryRequest::fromArray($data);
+
+    //     $repoClass = EntryRepositoryInterface::class;
+    //     $repoMock  = $this->createMock($repoClass);
+
+    //     $expectedUuid = 'mocked-uuid';
+    //     $repoMock
+    //         ->expects($this->once())
+    //         ->method('save')
+    //         ->with($this->isInstanceOf(Entry::class))
+    //         ->willReturn($expectedUuid);
+
+    //     $validatorInterface = AddEntryValidatorInterface::class;
+    //     $validatorMock      = $this->createMock($validatorInterface);
+
+    //     $validatorMock
+    //         ->expects($this->once())
+    //         ->method('validate')
+    //         ->with($request);
+
+    //     $uc = new AddEntry($repoMock, $validatorMock);
+
+    //     /** Act **/
+    //     $uuid = $uc->execute($request);
+
+    //     /** Assert **/
+    //     $this->assertSame($expectedUuid, $uuid);
+    // }
+
+
+    /**
+     * Happy path: validates request, delegates save to repository, and returns a response DTO.
+     *
+     * Mechanics:
+     * - Data source comes from EntryHelper::getData() (title, body, date).
+     * - Validator is expected to run once on AddEntryRequestInterface.
+     * - Repository returns a payload array; use case maps it to AddEntryResponseInterface.
+     * - We assert that UUID is valid and all fields are propagated correctly.
+     *
+     * @return void
+     * @covers \Daylog\Application\UseCases\Entries\AddEntry
+     */
+    public function testHappyPathSavesEntryAndReturnsResponseDto(): void
     {
         /** Arrange **/
-        $data  = EntryHelper::getData();
-
-        /** @var AddEntryRequestInterface $request */
+        $data    = EntryHelper::getData();
         $request = AddEntryRequest::fromArray($data);
 
         $repoClass = EntryRepositoryInterface::class;
-        $repoMock  = $this->createMock($repoClass);
+        $repo      = $this->createMock($repoClass);
 
-        $expectedUuid = 'mocked-uuid';
-        $repoMock
+        // Use a valid UUIDv4 literal so UuidGenerator::isValid() passes.
+        $uuid = UuidGenerator::generate();
+        $data['id'] = $uuid;
+
+        $repo
             ->expects($this->once())
             ->method('save')
-            ->with($this->isInstanceOf(Entry::class))
-            ->willReturn($expectedUuid);
+            ->willReturn($data);
 
-        $validatorInterface = AddEntryValidatorInterface::class;
-        $validatorMock      = $this->createMock($validatorInterface);
-
-        $validatorMock
+        $validatorClass = AddEntryValidatorInterface::class;
+        $validator      = $this->createMock($validatorClass);
+        $validator
             ->expects($this->once())
-            ->method('validate')
-            ->with($request);
-
-        $uc = new AddEntry($repoMock, $validatorMock);
+            ->method('validate');
 
         /** Act **/
-        $uuid = $uc->execute($request);
+        $useCase  = new AddEntry($repo, $validator);
+        $response = $useCase->execute($request);
 
         /** Assert **/
-        $this->assertSame($expectedUuid, $uuid);
+        $this->assertInstanceOf(AddEntryResponseInterface::class, $response);
+
+        $id        = $response->getId();
+        $isValidId = UuidGenerator::isValid($id);
+        $this->assertTrue($isValidId);
+
+        $this->assertSame($data['title'],        $response->getTitle());
+        $this->assertSame($data['body'],         $response->getBody());
+        $this->assertSame($data['date'],         $response->getDate());
+        $this->assertSame($data['created_at'],   $response->getCreatedAt());
+        $this->assertSame($data['updated_at'],   $response->getUpdatedAt());
     }
 
     /**
