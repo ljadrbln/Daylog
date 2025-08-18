@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 namespace Daylog\Application\DTO\Entries;
+use Daylog\Application\DTO\Entries\AddEntryRequestInterface;
 
 /**
  * Immutable DTO for adding a new entry.
