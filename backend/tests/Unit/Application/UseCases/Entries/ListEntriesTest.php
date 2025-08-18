@@ -8,7 +8,7 @@ use Codeception\Test\Unit;
 use Daylog\Application\UseCases\Entries\ListEntries;
 use Daylog\Application\DTO\Entries\ListEntriesRequest;
 use Daylog\Application\DTO\Entries\ListEntriesResponse;
-use Daylog\Domain\Interfaces\EntryRepositoryInterface;
+use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 
 /**
  * Unit tests for UC-2 List Entries.
