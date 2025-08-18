@@ -43,7 +43,8 @@ final class AddEntryIntegrationTest extends Unit
         $useCase   = new AddEntry($repo, $validator);
 
         /** Act **/
-        $uuid = $useCase->execute($request);
+        $response = $useCase->execute($request);
+        $uuid = $response->getId();
 
         /** Assert **/
         $isValid = UuidGenerator::isValid($uuid);
