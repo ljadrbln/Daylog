@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Daylog\Domain\Interfaces\Entries;
@@ -6,19 +7,21 @@ namespace Daylog\Domain\Interfaces\Entries;
 use Daylog\Domain\Models\Entries\Entry;
 
 /**
- * Interface EntryRepositoryInterface
- *
- * Defines persistence operations for Entry aggregates.
- * Implementations are Infrastructure-specific; this interface belongs to Domain.
+ * Repository contract for Entry persistence.
  */
 interface EntryRepositoryInterface
 {
     /**
-     * Persist the given Entry and return its UUID (string).
+     * Save a new Entry into storage.
      *
-     * @param Entry $entry Domain Entry to persist.
-     * @return string Non-empty UUID of the saved entry.
+     * @param Entry $entry
+     * @return array<string,string> Result with keys:
+     *                             - id (UUID v4)
+     *                             - title (string)
+     *                             - body (string)
+     *                             - date (YYYY-MM-DD)
+     *                             - createdAt (ISO-8601 UTC)
+     *                             - updatedAt (ISO-8601 UTC)
      */
-    public function save(Entry $entry): string;
+    public function save(Entry $entry): array;
 }
-
