@@ -5,6 +5,8 @@ namespace Daylog\Application\UseCases\Entries;
 
 use Daylog\Application\Validators\Entries\AddEntryValidatorInterface;
 use Daylog\Application\DTO\Entries\AddEntryRequestInterface;
+use Daylog\Application\DTO\Entries\AddEntryResponseInterface;
+use Daylog\Application\DTO\Entries\AddEntryResponse;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Domain\Models\Entries\Entry;
 
@@ -28,24 +30,26 @@ final class AddEntry
     /**
      * Execute the use case.
      *
-     * @param AddEntryRequestInterface $request Request DTO with title, body, date.
-     * @return string UUID of the newly created entry.
+     * @param AddEntryRequestInterface $request User input DTO.
+     *
+     * @return AddEntryResponseInterface Response DTO with id and timestamps.
      */
-    public function execute(AddEntryRequestInterface $request): string
+    public function execute(AddEntryRequestInterface $request): AddEntryResponseInterface
     {
         // Validate request per business rules
         $this->validator->validate($request);
 
-        $data = [
+        $entry = [
             'title' => trim($request->getTitle()),
             'body'  => trim($request->getBody()),
             'date'  => trim($request->getDate())
         ];
 
-        $entry = Entry::fromArray($data);
+        $entry  = Entry::fromArray($entry);
+        $data  = $this->repo->save($entry);
 
-        $uuid = $this->repo->save($entry);
+        $response = AddEntryResponse::fromArray($data);
 
-        return $uuid;
+        return $response;
     }
 }
