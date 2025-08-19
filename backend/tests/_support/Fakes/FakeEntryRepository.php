@@ -6,6 +6,7 @@ namespace Daylog\Tests\Support\Fakes;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Domain\Services\UuidGenerator;
+use Daylog\Infrastructure\Utils\Clock;
 
 /**
  * Fake implementation of EntryRepositoryInterface for tests.
@@ -40,17 +41,18 @@ final class FakeEntryRepository implements EntryRepositoryInterface
         $this->entries[]  = $entry;
         $this->saveCalls++;
 
-        $uuid      = UuidGenerator::generate();
-        $timestamp = (new \DateTimeImmutable())->format(DATE_ATOM);
+        $uuid = UuidGenerator::generate();
+        $now  = Clock::now();
 
         $result = [
             'id'        => $uuid,
             'title'     => $entry->getTitle(),
             'body'      => $entry->getBody(),
             'date'      => $entry->getDate(),
-            'createdAt' => $timestamp,
-            'updatedAt' => $timestamp,
+            'createdAt' => $now,
+            'updatedAt' => $now
         ];
+        
         return $result;
     }
 
@@ -98,7 +100,7 @@ final class FakeEntryRepository implements EntryRepositoryInterface
 
         foreach ($this->entries as $entry) {
             $id   = UuidGenerator::generate();
-            $now  = (new \DateTimeImmutable())->format(DATE_ATOM);
+            $now  = Clock::now();
 
             $row = [
                 'id'        => $id,
@@ -106,7 +108,7 @@ final class FakeEntryRepository implements EntryRepositoryInterface
                 'body'      => $entry->getBody(),
                 'date'      => $entry->getDate(),
                 'createdAt' => $now,
-                'updatedAt' => $now,
+                'updatedAt' => $now
             ];
 
             $rows[] = $row;
