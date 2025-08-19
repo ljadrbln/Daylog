@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace Daylog\Application\DTO\Entries;
+use Daylog\Application\DTO\Entries\ListEntriesResponseInterface;
 
 /**
  * Response DTO for UC-2 List Entries.
@@ -11,7 +12,7 @@ namespace Daylog\Application\DTO\Entries;
  *
  * @template T of object
  */
-final class ListEntriesResponse
+final class ListEntriesResponse implements ListEntriesResponseInterface
 {
     /** @var array<int, T> */
     private array $items;
