@@ -51,4 +51,47 @@ final class ListEntriesRequest
         $this->sort      = $sort;
         $this->direction = $direction;
     }
+
+    /**
+     * Return the requested page index (1-based).
+     *
+     * This accessor normalizes the value for safe consumption by the use case.
+     * Defaults to 1 when the underlying value is null, zero, or negative.
+     * Full bounds clamping (min/max) is handled by the UC-2 validator.
+     *
+     * @return int 1-based positive page index for pagination.
+     */
+    public function getPage(): int
+    {
+        /** @var int|null $raw */
+        $raw = $this->page ?? null;
+
+        $page = (int)($raw ?? 1);
+        if ($page < 1) {
+            $page = 1;
+        }
+
+        return $page;
+    }
+
+    /**
+     * Return the number of items per page.
+     *
+     * This accessor provides a safe default suitable for typical UIs.
+     * It does not enforce upper bounds; clamping is delegated to the UC-2 validator.
+     *
+     * @return int Positive items-per-page value (default: 10).
+     */
+    public function getPerPage(): int
+    {
+        /** @var int|null $raw */
+        $raw = $this->perPage ?? null;
+
+        $perPage = (int)($raw ?? 10);
+        if ($perPage < 1) {
+            $perPage = 10;
+        }
+
+        return $perPage;
+    }
 }
