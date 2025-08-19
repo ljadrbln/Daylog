@@ -20,27 +20,27 @@ final class ListEntriesRequest
     public string $sort;
     public string $direction;
 
-    /**
-     * Constructor with optional parameters and defaults.
+   /**
+     * Private constructor. Use fromArray().
      *
-     * @param string|null $dateFrom Lower bound for date filter (YYYY-MM-DD).
-     * @param string|null $dateTo   Upper bound for date filter (YYYY-MM-DD).
-     * @param string|null $date     Exact date filter (YYYY-MM-DD).
-     * @param string|null $query    Substring search in title/body.
-     * @param int         $page     Page number (default 1).
-     * @param int         $perPage  Items per page (default 10).
-     * @param string      $sort     Field to sort by (default "date").
-     * @param string      $direction Sort direction ASC|DESC (default DESC).
+     * @param ?string $dateFrom   Inclusive lower bound date (YYYY-MM-DD) or null.
+     * @param ?string $dateTo     Inclusive upper bound date (YYYY-MM-DD) or null.
+     * @param ?string $date       Exact date filter (YYYY-MM-DD) or null.
+     * @param ?string $query      Case-insensitive substring filter for title/body or null.
+     * @param int     $page       1-based page index (raw transport value).
+     * @param int     $perPage    Items per page (raw transport value).
+     * @param string  $sort       Sort field (e.g., 'date', 'createdAt', 'updatedAt').
+     * @param string  $direction  Sort direction ('ASC'|'DESC').
      */
-    public function __construct(
-        ?string $dateFrom = null,
-        ?string $dateTo = null,
-        ?string $date = null,
-        ?string $query = null,
-        int $page = 1,
-        int $perPage = 10,
-        string $sort = 'date',
-        string $direction = 'DESC'
+    private function __construct(
+        ?string $dateFrom,
+        ?string $dateTo,
+        ?string $date,
+        ?string $query,
+        int $page,
+        int $perPage,
+        string $sort,
+        string $direction
     ) {
         $this->dateFrom  = $dateFrom;
         $this->dateTo    = $dateTo;
@@ -51,6 +51,39 @@ final class ListEntriesRequest
         $this->sort      = $sort;
         $this->direction = $direction;
     }
+
+    /**
+     * Factory method to create a ListEntriesRequest from an associative array.
+     *
+     * @param array<string,mixed> $data Input array with optional keys:
+     *        dateFrom, dateTo, date, query, page, perPage, sort, direction.
+     * @return self
+     */
+    public static function fromArray(array $data): self
+    {
+        $dateFrom  = $data['dateFrom']  ?? null;
+        $dateTo    = $data['dateTo']    ?? null;
+        $date      = $data['date']      ?? null;
+        $query     = $data['query']     ?? null;
+        $page      = $data['page']      ?? 1;
+        $perPage   = $data['perPage']   ?? 10;
+        $sort      = $data['sort']      ?? 'date';
+        $direction = $data['direction'] ?? 'DESC';
+
+        $request = new self(
+            $dateFrom,
+            $dateTo,
+            $date,
+            $query,
+            $page,
+            $perPage,
+            $sort,
+            $direction
+        );
+
+        return $request;
+    }
+
 
     /**
      * Return the requested page index (1-based).

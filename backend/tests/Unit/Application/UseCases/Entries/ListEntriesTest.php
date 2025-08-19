@@ -54,8 +54,9 @@ final class ListEntriesTest extends Unit
             ->method('fetchAll')
             ->willReturn($entries);
 
+        $params  = [];
+        $request = ListEntriesRequest::fromArray($params);
         $useCase = new ListEntries($repo);
-        $request = new ListEntriesRequest();
 
         /** Act **/
         $response = $useCase->execute($request);
@@ -112,11 +113,20 @@ final class ListEntriesTest extends Unit
 
         $useCase = new ListEntries($repo);
 
-        $request            = new ListEntriesRequest();
-        $request->page      = 1;
-        $request->perPage   = 10;
-        $request->dateFrom  = '2025-08-10';
-        $request->dateTo    = '2025-08-12';
+        $page     = 1;
+        $perPage  = 10;
+        $dateFrom = '2025-08-10';
+        $dateTo   = '2025-08-12';
+
+        /** @var array<string,mixed> $params */
+        $params = [
+            'page'     => $page,
+            'perPage'  => $perPage,
+            'dateFrom' => $dateFrom,
+            'dateTo'   => $dateTo,
+        ];
+
+        $request = ListEntriesRequest::fromArray($params);
 
         /** Act **/
         $response = $useCase->execute($request);
