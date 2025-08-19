@@ -6,7 +6,7 @@ namespace Daylog\Infrastructure\Repositories\Entries;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Domain\Interfaces\Entries\EntryStorageInterface;
 use Daylog\Domain\Models\Entries\Entry;
-
+use Daylog\Infrastructure\Utils\Clock;
 /**
  * Class EntryRepository
  *
@@ -32,7 +32,7 @@ final class EntryRepository implements EntryRepositoryInterface
      */
     public function save(Entry $entry): array
     {
-        $now  = time();
+        $now  = Clock::now();
         $uuid = $this->storage->insert($entry);
 
         return [
