@@ -53,6 +53,9 @@ final class ListEntries
         /** Fetch all entries (filters/sort will be pushed down later when implemented) */
         $entries = $this->repository->fetchAll();
 
+        /** Apply filters BEFORE sorting/pagination */
+        $entries = $this->filterByDateRange($entries, $request);
+
         /** Sort by date DESC with stable secondary order by createdAt DESC */
         $callable = [$this, 'compareByDateDesc'];
         usort($entries, $callable);
@@ -77,16 +80,80 @@ final class ListEntries
         $pagesFloat = $perPage > 0 ? ($total / $perPage) : 0;
         $pagesCount = $perPage > 0 ? (int)ceil($pagesFloat) : 0;
 
-        /** Build response (no inline expressions in return) */
-        $response = new ListEntriesResponse(
-            $items,
-            $page,
-            $perPage,
-            $total,
-            $pagesCount
-        );
+        $data = [
+            'items'      => $items,
+            'page'       => $page,
+            'perPage'    => $perPage,
+            'total'      => $total,
+            'pagesCount' => $pagesCount
+        ];
+
+        $response = ListEntriesResponse::fromArray($data);
 
         return $response;
+    }
+
+    /**
+     * Filter entries by inclusive date range if provided.
+     *
+     * Mechanics:
+     * - Keep items where entry.date >= dateFrom (if set).
+     * - And entry.date <= dateTo (if set).
+     *
+     * @param list<Entry>                     $entries Source items.
+     * @param ListEntriesRequestInterface     $request Request with optional bounds.
+     *
+     * @return list<Entry> Filtered items (reindexed).
+     */
+    private function filterByDateRange(array $entries, ListEntriesRequestInterface $request): array
+    {
+        $from = $request->getDateFrom();
+        $to   = $request->getDateTo();
+
+        /** No bounds => no-op */
+        if ($from === null && $to === null) {
+            $result = $entries;
+            return $result;
+        }
+
+        $filtered = array_filter(
+            $entries,
+            function (Entry $e) use ($from, $to): bool {
+                return $this->isWithinDateRange($e, $from, $to);
+            }
+        );
+
+        $result = array_values($filtered);
+        return $result;
+    }    
+
+    /**
+     * Check if entry falls within the given inclusive date range.
+     *
+     * @param Entry       $entry Entry to check
+     * @param string|null $from  Lower bound date (YYYY-MM-DD) or null
+     * @param string|null $to    Upper bound date (YYYY-MM-DD) or null
+     * @return bool
+     */
+    private function isWithinDateRange(Entry $entry, ?string $from, ?string $to): bool
+    {
+        $dateStr = $entry->getDate();
+        $date    = new \DateTimeImmutable($dateStr);
+
+        $geFrom = true;
+        if ($from !== null) {
+            $fromDate = new \DateTimeImmutable($from);
+            $geFrom   = $date >= $fromDate;
+        }
+
+        $leTo = true;
+        if ($to !== null) {
+            $toDate = new \DateTimeImmutable($to);
+            $leTo   = $date <= $toDate;
+        }
+
+        $isInRange = $geFrom && $leTo;
+        return $isInRange;
     }
 
     /**
