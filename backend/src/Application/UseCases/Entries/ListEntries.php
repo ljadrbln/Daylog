@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Daylog\Application\UseCases\Entries;
 
 use Daylog\Application\DTO\Entries\ListEntriesRequest;
+use Daylog\Application\DTO\Entries\ListEntriesRequestInterface;
 use Daylog\Application\DTO\Entries\ListEntriesResponse;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Domain\Models\Entries\Entry;
@@ -42,11 +43,11 @@ final class ListEntries
      * 3) Apply simple pagination: 1-based page indexing, non-negative slicing.
      * 4) Build response DTO with items and metadata.
      *
-     * @param ListEntriesRequest $request Request containing pagination and (future) filters/sort.
+     * @param ListEntriesRequestInterface $request Request parameters.
      *
-     * @return ListEntriesResponse<Entry> A page of entries with deterministic ordering.
+     * @return ListEntriesResponse<\Daylog\Domain\Models\Entries\Entry>
      */
-    public function execute(ListEntriesRequest $request): ListEntriesResponse
+    public function execute(ListEntriesRequestInterface $request): ListEntriesResponse
     {
         /** Fetch all entries (filters/sort will be pushed down later when implemented) */
         $entries = $this->repository->fetchAll();

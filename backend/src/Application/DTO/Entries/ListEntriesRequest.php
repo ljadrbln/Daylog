@@ -3,13 +3,14 @@
 declare(strict_types=1);
 
 namespace Daylog\Application\DTO\Entries;
+use Daylog\Application\DTO\Entries\ListEntriesRequestInterface;
 
 /**
  * Request DTO for UC-2 List Entries.
  *
  * Contains filters, pagination, and sorting parameters.
  */
-final class ListEntriesRequest
+final class ListEntriesRequest implements ListEntriesRequestInterface
 {
     public ?string $dateFrom;
     public ?string $dateTo;
@@ -84,47 +85,59 @@ final class ListEntriesRequest
         return $request;
     }
 
-
-    /**
-     * Return the requested page index (1-based).
-     *
-     * This accessor normalizes the value for safe consumption by the use case.
-     * Defaults to 1 when the underlying value is null, zero, or negative.
-     * Full bounds clamping (min/max) is handled by the UC-2 validator.
-     *
-     * @return int 1-based positive page index for pagination.
-     */
-    public function getPage(): int
+    /** @return string|null */
+    public function getDateFrom(): ?string
     {
-        /** @var int|null $raw */
-        $raw = $this->page ?? null;
-
-        $page = (int)($raw ?? 1);
-        if ($page < 1) {
-            $page = 1;
-        }
-
-        return $page;
+        $result = $this->dateFrom;
+        return $result;
     }
 
-    /**
-     * Return the number of items per page.
-     *
-     * This accessor provides a safe default suitable for typical UIs.
-     * It does not enforce upper bounds; clamping is delegated to the UC-2 validator.
-     *
-     * @return int Positive items-per-page value (default: 10).
-     */
+    /** @return string|null */
+    public function getDateTo(): ?string
+    {
+        $result = $this->dateTo;
+        return $result;
+    }
+
+    /** @return string|null */
+    public function getDate(): ?string
+    {
+        $result = $this->date;
+        return $result;
+    }
+
+    /** @return string|null */
+    public function getQuery(): ?string
+    {
+        $result = $this->query;
+        return $result;
+    }
+
+    /** @return int */
+    public function getPage(): int
+    {
+        $result = $this->page;
+        return $result;
+    }
+
+    /** @return int */
     public function getPerPage(): int
     {
-        /** @var int|null $raw */
-        $raw = $this->perPage ?? null;
+        $result = $this->perPage;
+        return $result;
+    }
 
-        $perPage = (int)($raw ?? 10);
-        if ($perPage < 1) {
-            $perPage = 10;
-        }
+    /** @return string */
+    public function getSort(): string
+    {
+        $result = $this->sort;
+        return $result;
+    }
 
-        return $perPage;
+    /** @return string */
+    public function getDirection(): string
+    {
+        $result = $this->direction;
+        return $result;
     }
 }
