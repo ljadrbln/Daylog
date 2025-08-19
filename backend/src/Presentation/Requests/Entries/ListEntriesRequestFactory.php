@@ -30,7 +30,7 @@ final class ListEntriesRequestFactory
      *
      * @throws TransportValidationException When any provided field has a wrong type.
      */
-    public static function createFromArray(array $params): ListEntriesRequest
+    public static function fromArray(array $params): ListEntriesRequest
     {
         /** Collect transport errors */
         $errors = [];
