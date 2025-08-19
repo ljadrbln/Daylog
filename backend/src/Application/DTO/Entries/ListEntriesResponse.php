@@ -22,13 +22,15 @@ final class ListEntriesResponse implements ListEntriesResponseInterface
     private int $pagesCount;
 
     /**
+     * Private constructor. Use fromArray().
+     * 
      * @param array<int, T> $items      List of entries (may be empty).
      * @param int           $page       Current page.
      * @param int           $perPage    Items per page.
      * @param int           $total      Total items count.
      * @param int           $pagesCount Total number of pages.
      */
-    public function __construct(
+    private function __construct(
         array $items,
         int $page,
         int $perPage,
@@ -40,6 +42,23 @@ final class ListEntriesResponse implements ListEntriesResponseInterface
         $this->perPage    = $perPage;
         $this->total      = $total;
         $this->pagesCount = $pagesCount;
+    }
+
+    /**
+     * Factory method to create a response from an associative array.
+     *
+     * @param array<string,string> $data Keys: id, title, body, date, createdAt, updatedAt.
+     * @return self
+     */
+    public static function fromArray(array $data): self
+    {
+        $items      = $data['items']      ?? [];
+        $page       = $data['page']       ?? 1;
+        $perPage    = $data['perPage']    ?? 10;
+        $total      = $data['total']      ?? 0;
+        $pagesCount = $data['pagesCount'] ?? 1;
+
+        return new self($items, $page, $perPage, $total, $pagesCount);
     }
 
     /**
