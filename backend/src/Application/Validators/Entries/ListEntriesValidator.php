@@ -31,7 +31,11 @@ use Daylog\Domain\Services\DateService;
 final class ListEntriesValidator implements ListEntriesValidatorInterface
 {
     /** @var int */
+    private const QUERY_MAX = 30;
+
+    /** @var int */
     private const PER_PAGE_MIN = 1;
+
     /** @var int */
     private const PER_PAGE_MAX = 100;
 
@@ -59,6 +63,7 @@ final class ListEntriesValidator implements ListEntriesValidatorInterface
         $errors = $this->validatePerPage($req, $errors);
         $errors = $this->validateSort($req, $errors);
         $errors = $this->validateDirection($req, $errors);
+        $errors = $this->validateQuery($req, $errors);
 
         if ($errors !== []) {
             throw new DomainValidationException($errors);
@@ -81,14 +86,14 @@ final class ListEntriesValidator implements ListEntriesValidatorInterface
         if ($dateFrom !== null) {
             $isValid = DateService::isValidLocalDate($dateFrom);
             if ($isValid === false) {
-                $errors[] = 'DATE_FROM_INVALID';
+                $errors[] = 'DATE_INVALID';
             }
         }
 
         if ($dateTo !== null) {
             $isValid = DateService::isValidLocalDate($dateTo);
             if ($isValid === false) {
-                $errors[] = 'DATE_TO_INVALID';
+                $errors[] = 'DATE_INVALID';
             }
         }
 
@@ -202,6 +207,33 @@ final class ListEntriesValidator implements ListEntriesValidatorInterface
 
         if ($isAllowed === false) {
             $errors[] = 'DIRECTION_INVALID';
+        }
+
+        return $errors;
+    }    
+
+    /**
+     * Validate filters relevant to search query.
+     *
+     * @param ListEntriesRequestInterface $req
+     * @param string[]                    $errors
+     * @return string[]
+     */
+    private function validateQuery(ListEntriesRequestInterface $req, array $errors): array
+    {
+        $query = $req->getQuery();
+        $query = $query ?? '';
+        $query = trim($query);
+
+        $length = mb_strlen($query);
+
+        if ($length === 0) {
+            return $errors;
+        }
+
+        $max = self::QUERY_MAX;
+        if ($length > $max) {
+            $errors[] = 'QUERY_TOO_LONG';
         }
 
         return $errors;

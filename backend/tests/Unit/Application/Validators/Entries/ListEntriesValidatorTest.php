@@ -27,7 +27,7 @@ final class ListEntriesValidatorTest extends Unit
     }
 
     /**
-     * AC-1: Valid request passes without exception.
+     * AC-1: Valid request passes without exception (validator-level happy path)
      *
      * @return void
      */
@@ -41,7 +41,7 @@ final class ListEntriesValidatorTest extends Unit
     }
 
     /**
-     * AC-2: Invalid dates raise DATE_INVALID.
+     * AC-6: Invalid date input raises DATE_INVALID.
      *
      * @dataProvider invalidDateProvider
      * @return void
@@ -91,6 +91,7 @@ final class ListEntriesValidatorTest extends Unit
             'dateFrom' => '2025-08-31',
             'dateTo'   => '2025-08-01',
         ]);
+
         $request = ListEntriesRequest::fromArray($data);
 
         $this->expectException(DomainValidationException::class);
@@ -183,6 +184,100 @@ final class ListEntriesValidatorTest extends Unit
             'date has time suffix'      => [['date' => '2025-08-02T00:00:00']],
             'date has wrong separator'  => [['date' => '2025/08/02']],
             'date has no zero padding'  => [['date' => '2025-8-2']],
+        ];
+    }
+
+    /**
+     * AC-3: `query` within 0..30 (post-trim) must pass without exception.
+     *
+     * Mechanics:
+     * - Empty string means "no filter".
+     * - Trimming applies before length check (BR-3).
+     * - Boundary 30 chars is allowed.
+     *
+     * @dataProvider validQueryProvider
+     *
+     * @return void
+     */
+    public function testValidQueryPassesValidation(array $overrides): void
+    {
+        $data    = ListEntriestHelper::getData();
+        $data    = array_merge($data, $overrides);
+
+        /** @var ListEntriesRequest $request */
+        $request = ListEntriesRequest::fromArray($data);
+
+        $this->validator->validate($request);
+        $this->assertTrue(true);
+    }
+
+    /**
+     * AF-4: `query` longer than 30 (after trimming) must raise QUERY_TOO_LONG.
+     *
+     * Notes:
+     * - We only assert the exception class here; specific error code is asserted
+     *   elsewhere in integration or can be added if DomainValidationException
+     *   exposes error codes accessor.
+     *
+     * @dataProvider invalidQueryProvider
+     *
+     * @return void
+     */
+    public function testQueryTooLongThrowsException(array $overrides): void
+    {
+        $data    = ListEntriestHelper::getData();
+        $data    = array_merge($data, $overrides);
+
+        /** @var ListEntriesRequest $request */
+        $request = ListEntriesRequest::fromArray($data);
+
+        $exceptionClass = DomainValidationException::class;
+        $this->expectException($exceptionClass);
+
+        $this->validator->validate($request);
+    }
+
+    /**
+     * Provides valid query inputs according to UC-2:
+     * - Empty and spaces-only become "no filter".
+     * - Trim applies before length check.
+     * - Boundary length 30 is allowed.
+     *
+     * @return array<string,array{0:array<string,mixed>}>
+     */
+    public function validQueryProvider(): array
+    {
+        $exact30 = str_repeat('a', 30);
+
+        return [
+            'empty string'             => [['query' => '']],
+            'spaces only (trim→empty)' => [['query' => '     ']],
+            'short word'               => [['query' => 'summer']],
+            'boundary length 30'       => [['query' => $exact30]],
+            'trimmed within limit'     => [['query' => '  june  ']],
+        ];
+    }
+
+    /**
+     * Provides invalid query inputs that exceed 30 chars after trimming.
+     *
+     * Cases:
+     * - ASCII 31 chars.
+     * - Multibyte 31 chars (mb_strlen check).
+     * - Trimmed still > 30.
+     *
+     * @return array<string,array{0:array<string,mixed>}>
+     */
+    public function invalidQueryProvider(): array
+    {
+        $ascii31     = str_repeat('x', 31);
+        $multibyte31 = str_repeat('Я', 31);
+        $trimmed31   = '  ' . str_repeat('a', 31) . '  ';
+
+        return [
+            'ascii length 31'         => [['query' => $ascii31]],
+            'multibyte length 31'     => [['query' => $multibyte31]],
+            'trimmed remains > 30'    => [['query' => $trimmed31]],
         ];
     }
 }
