@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Daylog\Presentation\Requests\Entries;
 
 use Daylog\Application\DTO\Entries\ListEntriesRequest;
+use Daylog\Application\DTO\Entries\ListEntriesRequestInterface;
 use Daylog\Application\Exceptions\TransportValidationException;
 
 /**
@@ -26,11 +27,11 @@ final class ListEntriesRequestFactory
      *
      * @param array<string, mixed> $params Raw transport payload.
      *
-     * @return ListEntriesRequest Normalized DTO for the use case.
+     * @return ListEntriesRequestInterface Normalized DTO for the use case.
      *
      * @throws TransportValidationException When any provided field has a wrong type.
      */
-    public static function fromArray(array $params): ListEntriesRequest
+    public static function fromArray(array $params): ListEntriesRequestInterface
     {
         /** Collect transport errors */
         $errors = [];
