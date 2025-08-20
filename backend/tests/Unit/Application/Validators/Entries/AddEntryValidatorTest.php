@@ -85,12 +85,12 @@ final class AddEntryValidatorTest extends Unit
         $tooLongBody  = str_repeat('B', EntryConstraints::BODY_MAX+1);   // expect BODY_MAX  = 50000
 
         $cases = [
-            'title empty'             => [['title' => '']],
-            'title too long'          => [['title' => $tooLongTitle]],
-            'body empty'              => [['body'  => '']],
-            'body too long'           => [['body'  => $tooLongBody]],
-            'date invalid format'     => [['date'  => '15-08-2025']],
-            'date invalid calendar'   => [['date'  => '2025-02-30']],
+            'title is empty'             => [['title' => '']],
+            'title is too long'          => [['title' => $tooLongTitle]],
+            'body is empty'              => [['body'  => '']],
+            'body is too long'           => [['body'  => $tooLongBody]],
+            'date is invalid format'     => [['date'  => '15-08-2025']],
+            'date is invalid calendar'   => [['date'  => '2025-02-30']],
         ];
 
         return $cases;

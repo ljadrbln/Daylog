@@ -75,25 +75,25 @@ final class ListEntriesRequestFactoryTest extends Unit
     {
         $cases = [
             // Required fields: missing (null) or wrong type
-            'page_missing'        => [['page' => null]],
-            'perPage_missing'     => [['perPage' => null]],
-            'sort_missing'        => [['sort' => null]],
-            'direction_missing'   => [['direction' => null]],
-            'page_not_int'        => [['page' => '1']],
-            'perPage_not_int'     => [['perPage' => '10']],
-            'sort_not_string'     => [['sort' => 123]],
-            'direction_not_string'=> [['direction' => false]],
+            'page is missing'            => [['page' => null]],
+            'perPage is missing'         => [['perPage' => null]],
+            'sort is missing'            => [['sort' => null]],
+            'direction is missing'       => [['direction' => null]],
+            'page is not int'            => [['page' => '1']],
+            'perPage is not int'         => [['perPage' => '10']],
+            'sort is not string'         => [['sort' => 123]],
+            'direction is not string'    => [['direction' => false]],
 
             // Optional filters: wrong type when provided
-            'dateFrom_not_string' => [['dateFrom' => 20250813]],
-            'dateTo_not_string'   => [['dateTo' => 20250813]],
-            'date_not_string'     => [['date' => 20250813]],
-            'query_not_string'    => [['query' => ['oops']]],
+            'dateFrom is not string'     => [['dateFrom' => 20250813]],
+            'dateTo is not string'       => [['dateTo' => 20250813]],
+            'date is not string'         => [['date' => 20250813]],
+            'query is not string'        => [['query' => ['oops']]],
 
             // Multiple violations at once (order of checks verified in dedicated test if needed)
-            'page_and_perPage'    => [['page' => 'x', 'perPage' => 'y']],
-            'sort_and_direction'  => [['sort' => 7, 'direction' => 0]],
-            'all_wrong'           => [[
+            'page and perPage invalid'   => [['page' => 'x', 'perPage' => 'y']],
+            'sort and direction invalid' => [['sort' => 7, 'direction' => 0]],
+            'all fields wrong'           => [[
                 'page'      => 'p',
                 'perPage'   => 'pp',
                 'sort'      => 0,

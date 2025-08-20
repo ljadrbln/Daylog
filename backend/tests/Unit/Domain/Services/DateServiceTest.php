@@ -46,11 +46,11 @@ final class DateServiceTest extends Unit
     public function validDateProvider(): array
     {
         $cases = [
-            'simple_valid'        => ['2025-08-20'],
-            'edge_new_year_eve'   => ['1999-12-31'],
-            'leap_year_feb_29'    => ['2024-02-29'], // leap year OK
-            'month_with_30_days'  => ['2025-04-30'],
-            'month_with_31_days'  => ['2025-01-31'],
+            'simple valid date'       => ['2025-08-20'],
+            'edge case new year eve'  => ['1999-12-31'],
+            'leap year feb 29'        => ['2024-02-29'], // leap year OK
+            'month with 30 days'      => ['2025-04-30'],
+            'month with 31 days'      => ['2025-01-31'],
         ];
 
         return $cases;
@@ -65,20 +65,20 @@ final class DateServiceTest extends Unit
     {
         $cases = [
             // Calendar-invalid
-            'not_leap_feb_29'     => ['2025-02-29'],
-            'month_13'            => ['2025-13-02'],
-            'month_00'            => ['2025-00-10'],
-            'day_00'              => ['2025-11-00'],
-            'day_32'              => ['2025-11-32'],
+            'date is feb 29 on non-leap year' => ['2025-02-29'],
+            'date has month 13'               => ['2025-13-02'],
+            'date has month 00'               => ['2025-00-10'],
+            'date has day 00'                 => ['2025-11-00'],
+            'date has day 32'                 => ['2025-11-32'],
 
             // Non-strict formats (must be zero-padded Y-m-d, no extras)
-            'no_zero_padding'     => ['2025-8-2'],
-            'wrong_order'         => ['20-08-2025'],
-            'wrong_separator'     => ['2025/08/02'],
-            'leading_space'       => [' 2025-08-02'],
-            'trailing_space'      => ['2025-08-02 '],
-            'with_time_suffix'    => ['2025-08-02T00:00:00'],
-            'empty'               => [''],
+            'date has no zero padding'        => ['2025-8-2'],
+            'date has wrong order'            => ['20-08-2025'],
+            'date has wrong separator'        => ['2025/08/02'],
+            'date has leading space'          => [' 2025-08-02'],
+            'date has trailing space'         => ['2025-08-02 '],
+            'date has time suffix'            => ['2025-08-02T00:00:00'],
+            'date is empty'                   => [''],
         ];
 
         return $cases;

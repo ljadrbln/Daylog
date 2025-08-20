@@ -85,17 +85,18 @@ final class ListEntriesValidatorTest extends Unit
     public function invalidDateProvider(): array
     {
         return [
-            'bad_from_format' => [[
+            'from date is invalid format' => [[
                 'dateFrom' => '2025-8-1',
                 'dateTo'   => '2025-08-31',
             ]],
-            'bad_to_format' => [[
+            'to date is invalid format' => [[
                 'dateFrom' => '2025-08-01',
                 'dateTo'   => '31-08-2025',
             ]],
-            'nonexistent_day' => [[
+            'date is nonexistent day' => [[
                 'dateFrom' => '2025-02-29',
             ]],
         ];
+
     }
 }
