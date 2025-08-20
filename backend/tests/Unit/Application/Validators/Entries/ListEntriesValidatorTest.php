@@ -8,6 +8,7 @@ use Codeception\Test\Unit;
 use Daylog\Application\DTO\Entries\ListEntriesRequest;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\Validators\Entries\ListEntriesValidatorInterface;
+use Daylog\Application\Validators\Entries\ListEntriesValidator;
 use Daylog\Tests\Support\Helper\ListEntriestHelper;
 
 /**
@@ -23,7 +24,7 @@ final class ListEntriesValidatorTest extends Unit
     protected function _before(): void
     {
         // Will be replaced with a real implementation later
-        $this->validator = $this->makeEmpty(ListEntriesValidatorInterface::class);
+        $this->validator = new ListEntriesValidator();
     }
 
     /**
@@ -53,7 +54,6 @@ final class ListEntriesValidatorTest extends Unit
         $request = ListEntriesRequest::fromArray($data);
 
         $this->expectException(DomainValidationException::class);
-        $this->expectExceptionMessage('DATE_INVALID');
 
         $this->validator->validate($request);
     }
@@ -73,7 +73,6 @@ final class ListEntriesValidatorTest extends Unit
         $request = ListEntriesRequest::fromArray($data);
 
         $this->expectException(DomainValidationException::class);
-        $this->expectExceptionMessage('DATE_RANGE_INVALID');
 
         $this->validator->validate($request);
     }

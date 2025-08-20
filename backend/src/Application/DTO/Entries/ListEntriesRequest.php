@@ -21,7 +21,7 @@ final class ListEntriesRequest implements ListEntriesRequestInterface
     public string $sort;
     public string $direction;
 
-   /**
+    /**
      * Private constructor. Use fromArray().
      *
      * @param ?string $dateFrom   Inclusive lower bound date (YYYY-MM-DD) or null.
