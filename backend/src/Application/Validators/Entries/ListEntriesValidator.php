@@ -14,6 +14,12 @@ use Daylog\Domain\Services\DateService;
  */
 final class ListEntriesValidator implements ListEntriesValidatorInterface
 {
+    /** @var string[] */
+    private const ALLOWED_SORT_FIELDS = ['date', 'createdAt', 'updatedAt'];
+
+    /** @var string[] */
+    private const ALLOWED_DIRECTIONS = ['ASC', 'DESC'];
+
     /**
      * @inheritDoc
      */
@@ -23,8 +29,11 @@ final class ListEntriesValidator implements ListEntriesValidatorInterface
 
         $dateFrom  = $req->getDateFrom();
         $dateTo    = $req->getDateTo();
+        $date      = $req->getDate();
         $page      = $req->getPage();
         $perPage   = $req->getPerPage();
+        $sort      = $req->getSort();
+        $direction = $req->getDirection();        
 
         // DateFrom rules
         if ($dateFrom !== null) {
@@ -41,6 +50,14 @@ final class ListEntriesValidator implements ListEntriesValidatorInterface
                 $errors[] = 'DATE_INVALID';
             }
         }
+
+        // Exact Date rules
+        if ($date !== null) {
+            $isValid = DateService::isValidLocalDate($date);
+            if ($isValid === false) {
+                $errors[] = 'DATE_INVALID';
+            }
+        }        
 
         // Date range rule
         if ($dateFrom !== null && $dateTo !== null) {
@@ -60,6 +77,16 @@ final class ListEntriesValidator implements ListEntriesValidatorInterface
         // PerPage rules
         if ($perPage < 1 || $perPage > 100) {
             $errors[] = 'PER_PAGE_INVALID';
+        }
+
+        // Sort rules
+        if (!in_array($sort, self::ALLOWED_SORT_FIELDS, true)) {
+            $errors[] = 'SORT_INVALID';
+        }
+
+        // Direction rules
+        if (!in_array($direction, self::ALLOWED_DIRECTIONS, true)) {
+            $errors[] = 'DIRECTION_INVALID';
         }
 
         if ($errors !== []) {
