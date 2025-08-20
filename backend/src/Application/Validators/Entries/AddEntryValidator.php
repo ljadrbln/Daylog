@@ -33,32 +33,65 @@ final class AddEntryValidator implements AddEntryValidatorInterface
     {
         $errors = [];
 
-        $title = $req->getTitle();
-        $body  = $req->getBody();
-        $date  = $req->getDate();
+        $errors = $this->validateTitle($req, $errors);
+        $errors = $this->validateBody($req, $errors);
+        $errors = $this->validateDate($req, $errors);
 
-        // Title rules
+        if ($errors !== []) {
+            throw new DomainValidationException($errors);
+        }
+    }
+
+    /**
+     * @param AddEntryRequestInterface $req
+     * @param string[]                 $errors
+     * @return string[]
+     */
+    private function validateTitle(AddEntryRequestInterface $req, array $errors): array
+    {
+        $title = $req->getTitle();
+
         if ($title === '') {
             $errors[] = 'TITLE_EMPTY';
         } elseif (mb_strlen($title) > EntryConstraints::TITLE_MAX) {
             $errors[] = 'TITLE_TOO_LONG';
         }
 
-        // Body rules
+        return $errors;
+    }
+
+    /**
+     * @param AddEntryRequestInterface $req
+     * @param string[]                 $errors
+     * @return string[]
+     */
+    private function validateBody(AddEntryRequestInterface $req, array $errors): array
+    {
+        $body = $req->getBody();
+
         if ($body === '') {
             $errors[] = 'BODY_EMPTY';
         } elseif (mb_strlen($body) > EntryConstraints::BODY_MAX) {
             $errors[] = 'BODY_TOO_LONG';
         }
 
-        // Date rules (strict ISO local date, via Domain service)
-        $isValidDate = DateService::isValidLocalDate($date);
-        if ($isValidDate === false) {
+        return $errors;
+    }
+
+    /**
+     * @param AddEntryRequestInterface $req
+     * @param string[]                 $errors
+     * @return string[]
+     */
+    private function validateDate(AddEntryRequestInterface $req, array $errors): array
+    {
+        $date = $req->getDate();
+
+        $isValid = DateService::isValidLocalDate($date);
+        if ($isValid === false) {
             $errors[] = 'DATE_INVALID';
         }
 
-        if ($errors !== []) {
-            throw new DomainValidationException($errors);
-        }
+        return $errors;
     }
 }
