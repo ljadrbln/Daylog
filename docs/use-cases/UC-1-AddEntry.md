@@ -7,12 +7,26 @@ Create a new diary entry in a single-user environment.
 - Application is running.
 - The system will receive `title`, `body`, and `date` (YYYY-MM-DD).
 
+## Parameters & Limits
+- `title`: string. See BR-1 (length after trimming) and BR-3 (trimming).
+- `body`: string. See BR-2 (length after trimming) and BR-3 (trimming).
+- `date`: string. See BR-6 (YYYY-MM-DD, valid calendar date).
+
 ## Main Success Scenario
 1. The system receives `title`, `body`, and `date`.
 2. The system validates inputs according to global business rules (BR-1..BR-3, BR-6).
 3. The system creates a new Entry with an immutable EntryId, the given `date`, `createdAt`, and `updatedAt`.
 4. The system persists the Entry.
 5. The system returns the new EntryId.
+
+## Alternative / Error Flows
+- **AF-1**: Empty title → `TITLE_REQUIRED`.
+- **AF-2**: Title exceeds limit → `TITLE_TOO_LONG`.
+- **AF-3**: Empty body → `BODY_REQUIRED`.
+- **AF-4**: Body exceeds limit → `BODY_TOO_LONG`.
+- **AF-5**: Missing date → `DATE_REQUIRED`.
+- **AF-6**: Invalid date format (not strict `YYYY-MM-DD`) → `DATE_INVALID_FORMAT`.
+- **AF-7**: Invalid calendar date (e.g., 2025-02-30) → `DATE_INVALID`.
 
 ## Postconditions
 - A new Entry exists in storage with valid timestamps.
@@ -24,7 +38,6 @@ Create a new diary entry in a single-user environment.
 - BR-3 Trimming.
 - BR-4 Timestamps consistency & monotonicity.
 - BR-6 Entry date format and validity.
-
 
 ## Acceptance Criteria
 - **AC-1 (happy path)**: Given a non-empty title and body within limits, when adding an entry, then the system returns a new id and the entry is persisted with correct timestamps.
