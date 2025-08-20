@@ -59,25 +59,6 @@ final class ListEntriesValidatorTest extends Unit
     }
 
     /**
-     * AC-3: dateFrom > dateTo raises DATE_RANGE_INVALID.
-     *
-     * @return void
-     */
-    public function testDateRangeInvalidThrowsException(): void
-    {
-        $data    = ListEntriestHelper::getData();
-        $data    = array_merge($data, [
-            'dateFrom' => '2025-08-31',
-            'dateTo'   => '2025-08-01',
-        ]);
-        $request = ListEntriesRequest::fromArray($data);
-
-        $this->expectException(DomainValidationException::class);
-
-        $this->validator->validate($request);
-    }
-
-    /**
      * Invalid date payloads.
      *
      * @return array<string,array{0:array<string,mixed>}>
@@ -97,6 +78,118 @@ final class ListEntriesValidatorTest extends Unit
                 'dateFrom' => '2025-02-29',
             ]],
         ];
+    }    
 
+    /**
+     * AC-3: dateFrom > dateTo raises DATE_RANGE_INVALID.
+     *
+     * @return void
+     */
+    public function testDateRangeInvalidThrowsException(): void
+    {
+        $data    = ListEntriestHelper::getData();
+        $data    = array_merge($data, [
+            'dateFrom' => '2025-08-31',
+            'dateTo'   => '2025-08-01',
+        ]);
+        $request = ListEntriesRequest::fromArray($data);
+
+        $this->expectException(DomainValidationException::class);
+
+        $this->validator->validate($request);
+    }
+
+    /**
+     * AC-4: invalid pagination throws PAGE_INVALID / PER_PAGE_INVALID.
+     *
+     * @dataProvider invalidPaginationProvider
+     */
+    public function testInvalidPaginationThrowsException(array $overrides): void
+    {
+        $validator = new ListEntriesValidator();
+
+        $data = ListEntriestHelper::getData();
+        $data = array_merge($data, $overrides);
+
+        /** @var ListEntriesRequestInterface $request */
+        $request = ListEntriesRequest::fromArray($data);
+
+        $this->expectException(DomainValidationException::class);
+
+        $validator->validate($request);
+    }
+
+    /** @return array<string,array{0:array<string,mixed>}> */
+    public function invalidPaginationProvider(): array
+    {
+        return [
+            'page is less than 1'      => [['page' => 0]],
+            'page is negative'         => [['page' => -1]],
+            'perPage is zero'          => [['perPage' => 0]],
+            'perPage is too big'       => [['perPage' => 101]],
+        ];
+    }
+
+    /**
+     * AC-5: invalid sort or direction throws SORT_INVALID / DIRECTION_INVALID.
+     *
+     * @dataProvider invalidSortProvider
+     */
+    public function testInvalidSortThrowsException(array $overrides): void
+    {
+        $validator = new ListEntriesValidator();
+
+        $data = ListEntriestHelper::getData();
+        $data = array_merge($data, $overrides);
+
+        /** @var ListEntriesRequestInterface $request */
+        $request = ListEntriesRequest::fromArray($data);
+
+        $this->expectException(DomainValidationException::class);
+
+        $validator->validate($request);
+    }
+
+    /** @return array<string,array{0:array<string,mixed>}> */
+    public function invalidSortProvider(): array
+    {
+        return [
+            'sort is unknown field'      => [['sort' => 'title']],
+            'sort is empty string'       => [['sort' => '']],
+            'direction is unknown value' => [['direction' => 'DOWN']],
+            'direction is empty string'  => [['direction' => '']],
+        ];
+    }
+
+    /**
+     * AC-6: invalid exact date throws DATE_INVALID.
+     *
+     * @dataProvider invalidExactDateProvider
+     */
+    public function testInvalidExactDateThrowsException(array $overrides): void
+    {
+        $validator = new ListEntriesValidator();
+
+        $data = ListEntriestHelper::getData();
+        $data = array_merge($data, $overrides);
+
+        /** @var ListEntriesRequestInterface $request */
+        $request = ListEntriesRequest::fromArray($data);
+
+        $this->expectException(DomainValidationException::class);
+
+        $validator->validate($request);
+    }
+
+    /** @return array<string,array{0:array<string,mixed>}> */
+    public function invalidExactDateProvider(): array
+    {
+        return [
+            'date has invalid format'   => [['date' => '15-08-2025']],
+            'date is nonexistent day'   => [['date' => '2025-02-30']],
+            'date has time suffix'      => [['date' => '2025-08-02T00:00:00']],
+            'date has wrong separator'  => [['date' => '2025/08/02']],
+            'date has no zero padding'  => [['date' => '2025-8-2']],
+        ];
     }
 }
