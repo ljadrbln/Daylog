@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Daylog\Application\Validators\Entries;
 
+use Daylog\Domain\Services\DateService;
 use Daylog\Domain\Models\Entries\EntryConstraints;
 use Daylog\Application\DTO\Entries\AddEntryRequestInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
@@ -50,28 +51,14 @@ final class AddEntryValidator implements AddEntryValidatorInterface
             $errors[] = 'BODY_TOO_LONG';
         }
 
-        // Date rules
-        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
-            $errors[] = 'DATE_INVALID_FORMAT';
-        } elseif (!$this->isValidCalendarDate($date)) {
-            $errors[] = 'DATE_INVALID_CALENDAR';
+        // Date rules (strict ISO local date, via Domain service)
+        $isValidDate = DateService::isValidLocalDate($date);
+        if ($isValidDate === false) {
+            $errors[] = 'DATE_INVALID';
         }
 
         if ($errors !== []) {
             throw new DomainValidationException($errors);
         }
-    }
-
-    /**
-     * Check that the ISO date is a valid calendar date.
-     *
-     * @param string $isoDate YYYY-MM-DD
-     * @return bool
-     */
-    private function isValidCalendarDate(string $isoDate): bool
-    {
-        [$y, $m, $d] = array_map('intval', explode('-', $isoDate));
-        $result = checkdate($m, $d, $y);
-        return $result;
     }
 }
