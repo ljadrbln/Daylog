@@ -14,7 +14,7 @@ Display a paginated list of diary entries in a single-user environment, with opt
 4. The system returns a result page with: `items`, `total`, `page`, `perPage`, `pagesCount`.
 
 ## Alternative / Error Flows
-- **AF-1**: Invalid date format → validation error `DATE_INVALID_FORMAT`.
+- **AF-1**: Invalid date → validation error `DATE_INVALID`.
 - **AF-2**: `perPage` below minimum or above maximum → clamped to allowed bounds.
 - **AF-3**: No matching results → return an empty list with valid pagination metadata.
 
@@ -33,6 +33,6 @@ Display a paginated list of diary entries in a single-user environment, with opt
 - **AC-3 (full-text query)**: With `query`, entries are returned if either `title` or `body` contains the substring, case-insensitive.
 - **AC-4 (pagination bounds)**: If `perPage` is outside limits, it is clamped to allowed values. Empty pages are valid.
 - **AC-5 (sorting)**: Sorting is supported by `date`, `createdAt`, `updatedAt` with `ASC|DESC`. Invalid values fall back to `date DESC`.
-- **AC-6 (invalid date format)**: A non-`YYYY-MM-DD` date input causes `DATE_INVALID_FORMAT`.
+- **AC-6 (invalid date)**: Any date that is not a strict `YYYY-MM-DD` **or** is not a real calendar date causes `DATE_INVALID`.
 - **AC-7 (single date)**: With `date=YYYY-MM-DD`, only entries with an exact logical date match are returned.
 - **AC-8 (stable order)**: When sort keys are equal, a stable secondary order by `createdAt DESC` is applied.
