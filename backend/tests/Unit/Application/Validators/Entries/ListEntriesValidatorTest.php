@@ -23,7 +23,6 @@ final class ListEntriesValidatorTest extends Unit
 
     protected function _before(): void
     {
-        // Will be replaced with a real implementation later
         $this->validator = new ListEntriesValidator();
     }
 
@@ -106,8 +105,6 @@ final class ListEntriesValidatorTest extends Unit
      */
     public function testInvalidPaginationThrowsException(array $overrides): void
     {
-        $validator = new ListEntriesValidator();
-
         $data = ListEntriestHelper::getData();
         $data = array_merge($data, $overrides);
 
@@ -116,7 +113,7 @@ final class ListEntriesValidatorTest extends Unit
 
         $this->expectException(DomainValidationException::class);
 
-        $validator->validate($request);
+        $this->validator->validate($request);
     }
 
     /** @return array<string,array{0:array<string,mixed>}> */
@@ -137,8 +134,6 @@ final class ListEntriesValidatorTest extends Unit
      */
     public function testInvalidSortThrowsException(array $overrides): void
     {
-        $validator = new ListEntriesValidator();
-
         $data = ListEntriestHelper::getData();
         $data = array_merge($data, $overrides);
 
@@ -147,7 +142,7 @@ final class ListEntriesValidatorTest extends Unit
 
         $this->expectException(DomainValidationException::class);
 
-        $validator->validate($request);
+        $this->validator->validate($request);
     }
 
     /** @return array<string,array{0:array<string,mixed>}> */
@@ -168,8 +163,6 @@ final class ListEntriesValidatorTest extends Unit
      */
     public function testInvalidExactDateThrowsException(array $overrides): void
     {
-        $validator = new ListEntriesValidator();
-
         $data = ListEntriestHelper::getData();
         $data = array_merge($data, $overrides);
 
@@ -178,7 +171,7 @@ final class ListEntriesValidatorTest extends Unit
 
         $this->expectException(DomainValidationException::class);
 
-        $validator->validate($request);
+        $this->validator->validate($request);
     }
 
     /** @return array<string,array{0:array<string,mixed>}> */

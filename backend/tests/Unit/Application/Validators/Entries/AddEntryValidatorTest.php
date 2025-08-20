@@ -6,6 +6,7 @@ namespace Daylog\Tests\Unit\Application\Validators\Entries;
 use Codeception\Test\Unit;
 use Daylog\Domain\Models\Entries\EntryConstraints;
 use Daylog\Application\Validators\Entries\AddEntryValidator;
+use Daylog\Application\Validators\Entries\AddEntryValidatorInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\DTO\Entries\AddEntryRequest;
 use Daylog\Application\DTO\Entries\AddEntryRequestInterface;
@@ -25,6 +26,14 @@ use Daylog\Tests\Support\Helper\EntryHelper;
  */
 final class AddEntryValidatorTest extends Unit
 {
+    /** @var AddEntryValidatorInterface */
+    private AddEntryValidatorInterface $validator;
+
+    protected function _before(): void
+    {
+        $this->validator = new AddEntryValidator();
+    }
+
     /**
      * AC-1: Valid DTO passes validation (no exception).
      *
@@ -32,14 +41,12 @@ final class AddEntryValidatorTest extends Unit
      */
     public function testValidatePassesOnValidData(): void
     {
-        $validator = new AddEntryValidator();
-
         $data = EntryHelper::getData();
 
         /** @var AddEntryRequestInterface $request */
         $request  = AddEntryRequest::fromArray($data);
 
-        $validator->validate($request);
+        $this->validator->validate($request);
 
         $this->assertTrue(true);
     }
@@ -54,8 +61,6 @@ final class AddEntryValidatorTest extends Unit
      */
     public function testValidateThrowsOnDomainViolations(array $overrides): void
     {
-        $validator = new AddEntryValidator();
-
         $data = EntryHelper::getData();
         $data = array_merge($data, $overrides);
 
@@ -64,7 +69,7 @@ final class AddEntryValidatorTest extends Unit
 
         $this->expectException(DomainValidationException::class);
 
-        $validator->validate($request);
+        $this->validator->validate($request);
     }
 
     /**
