@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Tests\Unit\Application\Validators;
+namespace Daylog\Tests\Unit\Application\Validators\Entries;
 
 use Codeception\Test\Unit;
 use Daylog\Domain\Models\Entries\EntryConstraints;
