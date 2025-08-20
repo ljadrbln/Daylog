@@ -7,16 +7,33 @@ Display a paginated list of diary entries in a single-user environment, with opt
 - Application is running.
 - The system may contain zero or more entries.
 
+## Parameters & Limits
+- `page`: integer ≥ 1. Defaults to 1.
+- `perPage`: integer. Clamped to range 1..100. Defaults to 20.
+- `sort`: field ∈ {`date`, `createdAt`, `updatedAt`} × direction ∈ {`ASC`, `DESC`}. Defaults to `date DESC`. Invalid values → fallback to `date DESC`.
+- `date`: string. See BR-6 (YYYY-MM-DD, valid calendar date).
+- `dateFrom` / `dateTo`: strings. See BR-6. Inclusive range.
+- `query`: string, 0..30 chars (after trimming). Empty string means “no filter”. Case-insensitive substring match in `title` and `body`.
+
 ## Main Success Scenario
 1. The system receives parameters: `page`, `perPage`, `sort` (field and direction), and optional filters (`dateFrom`, `dateTo`, `date`, `query` for title/body).
 2. The system validates and normalizes inputs (date formats, perPage bounds).
 3. The system retrieves matching entries from storage.
 4. The system returns a result page with: `items`, `total`, `page`, `perPage`, `pagesCount`.
 
+## Parameters & Limits
+- `page`: integer ≥ 1. Defaults to 1.
+- `perPage`: integer. Clamped to range 1..100. Defaults to 20.
+- `sort`: field ∈ {`date`, `createdAt`, `updatedAt`} × direction ∈ {`ASC`, `DESC`}. Defaults to `date DESC`. Invalid values → fallback to `date DESC`.
+- `date`: string, format `YYYY-MM-DD`, valid calendar date. Exact match filter.
+- `dateFrom` / `dateTo`: strings, same format as `date`. Define inclusive range.
+- `query`: string, 0..30 chars (after trimming). Empty string means “no filter”. Case-insensitive substring match in `title` and `body`.
+
 ## Alternative / Error Flows
 - **AF-1**: Invalid date → validation error `DATE_INVALID`.
 - **AF-2**: `perPage` below minimum or above maximum → clamped to allowed bounds.
 - **AF-3**: No matching results → return an empty list with valid pagination metadata.
+- **AF-4**: `query` longer than 30 chars (after trimming) → validation error `QUERY_TOO_LONG`.
 
 ## Postconditions
 - The system returns a consistent and stable view of entries.
@@ -36,3 +53,4 @@ Display a paginated list of diary entries in a single-user environment, with opt
 - **AC-6 (invalid date)**: Any date that is not a strict `YYYY-MM-DD` **or** is not a real calendar date causes `DATE_INVALID`.
 - **AC-7 (single date)**: With `date=YYYY-MM-DD`, only entries with an exact logical date match are returned.
 - **AC-8 (stable order)**: When sort keys are equal, a stable secondary order by `createdAt DESC` is applied.
+- **AC-9 (query length)**: Given `query` longer than 30 chars (after trimming), validation fails with `QUERY_TOO_LONG`.
