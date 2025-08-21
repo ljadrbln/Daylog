@@ -15,8 +15,8 @@ use Daylog\Tests\Support\Helper\EntryHelper;
  * Unit tests for UC-2 ListEntries.
  *
  * This suite verifies:
- * 1) AC-1 (happy path): default sort by date DESC with pagination metadata.
- * 2) AC-2 (date range): inclusive filtering by dateFrom/dateTo with date DESC order.
+ * 1) Scenario 1: default sort (happy path) pagination: default sort by date DESC with pagination metadata.
+ * 2) Scenario 2: inclusive date range: inclusive filtering by dateFrom/dateTo with date DESC order.
  *
  * Notes:
  * - Storage is responsible for timestamps; domain Entry exposes logical date only.
@@ -28,7 +28,7 @@ final class ListEntriesTest extends Unit
 {
     /**
      * Ensures that ListEntries returns entries sorted by date DESC
-     * when no filters are provided (AC-1 happy path).
+     * when no filters are provided (happy path).
      *
      * @return void
      */
