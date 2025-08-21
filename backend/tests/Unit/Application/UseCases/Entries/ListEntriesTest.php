@@ -73,7 +73,7 @@ final class ListEntriesTest extends Unit
     }
 
     /**
-     * Ensures inclusive date range filtering (AC-2):
+     * Scenario: inclusive date range filtering (see UC-2 ListEntries — date range):
      * given dateFrom/dateTo, only entries with logical date within [from..to] are returned,
      * ordered by date DESC; pagination metadata remains consistent.
      *

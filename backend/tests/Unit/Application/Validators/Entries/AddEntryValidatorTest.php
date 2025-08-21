@@ -52,7 +52,7 @@ final class AddEntryValidatorTest extends Unit
     }
 
     /**
-     * AC-2..AC-n: Invalid business rules cause DomainValidationException.
+     * Validation rules: invalid business input yields DomainValidationException.
      *
      * @dataProvider provideInvalidDomainCases
      *
