@@ -26,3 +26,4 @@ These rules apply across the system unless a use case specifies otherwise.
 - The date must be a valid calendar date and not empty.
 - The date is independent from timestamps (`createdAt`, `updatedAt`) and represents the logical date of the entry.
 
+Implementation note: strict calendar date validation is implemented by DateService::isValidLocalDate().

@@ -15,7 +15,7 @@ use Daylog\Domain\Services\DateService;
 final class DateServiceTest extends Unit
 {
     /**
-     * AC-1: Valid strict dates return true.
+     * Requirement (BR-6): Valid strict dates return true.
      *
      * @dataProvider validDateProvider
      * @return void
@@ -27,7 +27,7 @@ final class DateServiceTest extends Unit
     }
 
     /**
-     * AC-2: Invalid dates or non-strict formats return false.
+     * Requirement (BR-6): Invalid dates or non-strict formats return false.
      *
      * @dataProvider invalidDateProvider
      * @return void
