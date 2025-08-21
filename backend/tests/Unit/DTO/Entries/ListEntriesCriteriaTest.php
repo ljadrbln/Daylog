@@ -5,6 +5,7 @@ namespace Daylog\Tests\Unit\Application\DTO\Entries;
 use Codeception\Test\Unit;
 use Daylog\Application\DTO\Entries\ListEntriesCriteria;
 use Daylog\Application\DTO\Entries\ListEntriesRequestInterface;
+use Daylog\Tests\Support\Helper\ListEntriesHelper;
 
 /**
  * Tests for ListEntriesCriteria mapping and normalization.
@@ -27,46 +28,47 @@ final class ListEntriesCriteriaTest extends Unit
      */
     public function testFromRequestReturnsMappedValues(): void
     {
-        $page     = 2;
-        $perPage  = 20;
-        $fromDate = '2025-08-01';
-        $toDate   = '2025-08-21';
-        $query    = 'notes';
+        /** Arrange **/
+        $filters = [
+            'dateFrom' => '2025-08-01',
+            'dateTo'   => '2025-08-21',
+            'date'     => '2025-08-15',
+            'query'    => 'notes',
+        ];
 
-        $reqClass = ListEntriesRequestInterface::class;
-        $req      = $this->createMock($reqClass);
-        $req
-            ->method('getPage')
-            ->willReturn($page);
-        $req
-            ->method('getPerPage')
-            ->willReturn($perPage);
-        $req
-            ->method('getDateFrom')
-            ->willReturn($fromDate);
-        $req
-            ->method('getDateTo')
-            ->willReturn($toDate);
-        $req
-            ->method('getQuery')
-            ->willReturn($query);
+        $base = ListEntriesHelper::getData();
+        $data = ListEntriesHelper::withFilters($base, $filters);
 
-        $criteria = ListEntriesCriteria::fromRequest($req);
+        $request = ListEntriesHelper::buildRequest($data);
 
+        /** Act **/
+        $criteria = ListEntriesCriteria::fromRequest($request);
+
+        /** Assert **/
         $actualPage = $criteria->getPage();
-        $this->assertSame($page, $actualPage);
+        $this->assertSame($base['page'], $actualPage);
 
         $actualPerPage = $criteria->getPerPage();
-        $this->assertSame($perPage, $actualPerPage);
+        $this->assertSame($base['perPage'], $actualPerPage);
 
         $actualFrom = $criteria->getDateFrom();
-        $this->assertSame($fromDate, $actualFrom);
+        $this->assertSame($filters['dateFrom'], $actualFrom);
 
         $actualTo = $criteria->getDateTo();
-        $this->assertSame($toDate, $actualTo);
+        $this->assertSame($filters['dateTo'], $actualTo);
+
+        $actualDate = $criteria->getDate();
+        $this->assertSame($filters['date'], $actualDate);
 
         $actualQuery = $criteria->getQuery();
-        $this->assertSame($query, $actualQuery);
+        $this->assertSame($filters['query'], $actualQuery);
+
+        $sortDescriptor = $criteria->getSortDescriptor();
+        $expectedSort   = [
+            ['field' => $base['sort'],  'direction' => $base['direction']],
+            ['field' => 'createdAt',    'direction' => 'DESC'],
+        ];
+        $this->assertSame($expectedSort, $sortDescriptor);
     }
 
     /**
@@ -81,47 +83,28 @@ final class ListEntriesCriteriaTest extends Unit
      */
     public function testDefaultsAndNormalizationAreApplied(): void
     {
-        $page     = 0;
-        $perPage  = 0;
-        $fromDate = '';
-        $toDate   = null;
-        $query    = '   ';
+        // invalid            
+        $page    = 0;
+        $perPage = 0;
 
-        $reqClass = ListEntriesRequestInterface::class;
-        $req      = $this->createMock($reqClass);
-        $req
-            ->method('getPage')
-            ->willReturn($page);
-        $req
-            ->method('getPerPage')
-            ->willReturn($perPage);
-        $req
-            ->method('getDateFrom')
-            ->willReturn($fromDate);
-        $req
-            ->method('getDateTo')
-            ->willReturn($toDate);
-        $req
-            ->method('getQuery')
-            ->willReturn($query);
+        $filters = [
+            'dateFrom' => '',      // empty string → null
+            'dateTo'   => null,    // null → null
+            'query'    => '   ',   // only spaces → null
+        ];
 
-        $criteria = ListEntriesCriteria::fromRequest($req);
+        $base = ListEntriesHelper::getData($page, $perPage);
+        $data = ListEntriesHelper::withFilters($base, $filters);
 
-        $actualPage = $criteria->getPage();
-        $this->assertSame(1, $actualPage);
+        $request  = ListEntriesHelper::buildRequest($data);
+        $criteria = ListEntriesCriteria::fromRequest($request);
 
-        $actualPerPage = $criteria->getPerPage();
-        $this->assertSame(10, $actualPerPage);
-
-        $actualFrom = $criteria->getDateFrom();
-        $this->assertNull($actualFrom);
-
-        $actualTo = $criteria->getDateTo();
-        $this->assertNull($actualTo);
-
-        $actualQuery = $criteria->getQuery();
-        $this->assertNull($actualQuery);
-    }
+        $this->assertSame(1, $criteria->getPage());
+        $this->assertSame(10, $criteria->getPerPage());
+        $this->assertNull($criteria->getDateFrom());
+        $this->assertNull($criteria->getDateTo());
+        $this->assertNull($criteria->getQuery());
+    }    
 
     /**
      * Query is trimmed but not otherwise transformed.
@@ -133,27 +116,15 @@ final class ListEntriesCriteriaTest extends Unit
      */
     public function testQueryIsTrimmed(): void
     {
-        $query = '  project alpha  beta  ';
+        $filters = [
+            'query' => '  project alpha  beta  '
+        ];
 
-        $reqClass = ListEntriesRequestInterface::class;
-        $req      = $this->createMock($reqClass);
-        $req
-            ->method('getPage')
-            ->willReturn(1);
-        $req
-            ->method('getPerPage')
-            ->willReturn(10);
-        $req
-            ->method('getDateFrom')
-            ->willReturn(null);
-        $req
-            ->method('getDateTo')
-            ->willReturn(null);
-        $req
-            ->method('getQuery')
-            ->willReturn($query);
+        $base = ListEntriesHelper::getData();
+        $data = ListEntriesHelper::withFilters($base, $filters);
+        $request = ListEntriesHelper::buildRequest($data);
 
-        $criteria = ListEntriesCriteria::fromRequest($req);
+        $criteria = ListEntriesCriteria::fromRequest($request);
 
         $actualQuery = $criteria->getQuery();
         $this->assertSame('project alpha  beta', $actualQuery);
@@ -169,25 +140,10 @@ final class ListEntriesCriteriaTest extends Unit
      */
     public function testSortDescriptorIsFixed(): void
     {
-        $reqClass = ListEntriesRequestInterface::class;
-        $req      = $this->createMock($reqClass);
-        $req
-            ->method('getPage')
-            ->willReturn(1);
-        $req
-            ->method('getPerPage')
-            ->willReturn(10);
-        $req
-            ->method('getDateFrom')
-            ->willReturn(null);
-        $req
-            ->method('getDateTo')
-            ->willReturn(null);
-        $req
-            ->method('getQuery')
-            ->willReturn(null);
+        $data = ListEntriesHelper::getData();
+        $request = ListEntriesHelper::buildRequest($data);
 
-        $criteria = ListEntriesCriteria::fromRequest($req);
+        $criteria = ListEntriesCriteria::fromRequest($request);
 
         $sort = $criteria->getSortDescriptor();
         $this->assertSame(
