@@ -4,8 +4,8 @@ namespace Daylog\Tests\Unit\Application\DTO\Entries;
 
 use Codeception\Test\Unit;
 use Daylog\Application\DTO\Entries\ListEntriesCriteria;
-use Daylog\Application\DTO\Entries\ListEntriesRequestInterface;
 use Daylog\Tests\Support\Helper\ListEntriesHelper;
+use Daylog\Domain\Models\Entries\ListEntriesConstraints;
 
 /**
  * Tests for ListEntriesCriteria mapping and normalization.
@@ -99,8 +99,14 @@ final class ListEntriesCriteriaTest extends Unit
         $request  = ListEntriesHelper::buildRequest($data);
         $criteria = ListEntriesCriteria::fromRequest($request);
 
-        $this->assertSame(1, $criteria->getPage());
-        $this->assertSame(10, $criteria->getPerPage());
+        $expectedPage = ListEntriesConstraints::PAGE_MIN;
+        $actualPage   = $criteria->getPage();
+        $this->assertSame($expectedPage, $actualPage);
+
+        $expectedPerPage = ListEntriesConstraints::PER_PAGE_DEFAULT;
+        $actualPerPage   = $criteria->getPerPage();
+        $this->assertSame($expectedPerPage, $actualPerPage);
+
         $this->assertNull($criteria->getDateFrom());
         $this->assertNull($criteria->getDateTo());
         $this->assertNull($criteria->getQuery());
@@ -141,17 +147,11 @@ final class ListEntriesCriteriaTest extends Unit
     public function testSortDescriptorIsFixed(): void
     {
         $data = ListEntriesHelper::getData();
-        $request = ListEntriesHelper::buildRequest($data);
-
+        
+        $request  = ListEntriesHelper::buildRequest($data);
         $criteria = ListEntriesCriteria::fromRequest($request);
 
         $sort = $criteria->getSortDescriptor();
-        $this->assertSame(
-            [
-                ['field' => 'date',      'direction' => 'DESC'],
-                ['field' => 'createdAt', 'direction' => 'DESC'],
-            ],
-            $sort
-        );
+        $this->assertSame(ListEntriesConstraints::SORT_DESCRIPTOR, $sort);
     }
 }

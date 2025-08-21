@@ -23,6 +23,9 @@ use Daylog\Application\DTO\Entries\ListEntriesRequest;
  *  ]);
  *  $request = ListEntriesHelper::buildRequest($data);
  */
+
+use Daylog\Domain\Models\Entries\ListEntriesConstraints;
+
 final class ListEntriesHelper
 {
     /**
@@ -44,10 +47,11 @@ final class ListEntriesHelper
      * }
      */
     public static function getData(
-        int $page = 1,
-        int $perPage = 10,
-        string $sort = 'date',
-        string $direction = 'DESC'
+        int $page           = ListEntriesConstraints::PAGE_MIN,
+        int $perPage        = ListEntriesConstraints::PER_PAGE_DEFAULT,
+        string $sort        = ListEntriesConstraints::SORT_FIELD_DEFAULT,
+        string $direction   = ListEntriesConstraints::SORT_DIR_DEFAULT
+
     ): array {
         $data = [
             'page'      => $page,

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Daylog\Application\DTO\Entries;
 
+use Daylog\Domain\Models\Entries\ListEntriesConstraints;
 use Daylog\Application\DTO\Entries\ListEntriesRequestInterface;
 
 /**
@@ -189,8 +190,8 @@ final class ListEntriesCriteria
         $page = $req->getPage();
         $page = (int)$page;
 
-        if ($page < 1) {
-            $page = 1;
+        if ($page < ListEntriesConstraints::PAGE_MIN) {
+            $page = ListEntriesConstraints::PAGE_MIN;
         }
 
         return $page;
@@ -207,10 +208,10 @@ final class ListEntriesCriteria
         $perPage = $req->getPerPage();
         $perPage = (int)$perPage;
 
-        if ($perPage < 1) {
-            $perPage = 10;
-        } elseif ($perPage > 100) {
-            $perPage = 100;
+        if ($perPage < ListEntriesConstraints::PER_PAGE_MIN) {
+            $perPage = ListEntriesConstraints::PER_PAGE_DEFAULT;
+        } elseif ($perPage > ListEntriesConstraints::PER_PAGE_MAX) {
+            $perPage = ListEntriesConstraints::PER_PAGE_MAX;
         }
 
         return $perPage;
