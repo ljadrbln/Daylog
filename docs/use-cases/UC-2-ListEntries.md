@@ -26,6 +26,7 @@ Display a paginated list of diary entries in a single-user environment, with opt
 - **AF-2**: `perPage` below minimum or above maximum → clamped to allowed bounds.
 - **AF-3**: No matching results → return an empty list with valid pagination metadata.
 - **AF-4**: `query` longer than 30 chars (after trimming) → validation error `QUERY_TOO_LONG`.
+- **AF-5**: `dateFrom > dateTo` → validation error `DATE_RANGE_INVALID`.
 
 ## Postconditions
 - The system returns a consistent and stable view of entries.
@@ -46,3 +47,4 @@ Display a paginated list of diary entries in a single-user environment, with opt
 - **AC-7 (single date)**: With `date=YYYY-MM-DD`, only entries with an exact logical date match are returned.
 - **AC-8 (stable order)**: When sort keys are equal, a stable secondary order by `createdAt DESC` is applied.
 - **AC-9 (query length)**: Given `query` longer than 30 chars (after trimming), validation fails with `QUERY_TOO_LONG`.
+- **AC-10 (date range order)**: Given `dateFrom > dateTo`, validation fails with `DATE_RANGE_INVALID`.
