@@ -9,7 +9,7 @@ use Daylog\Application\DTO\Entries\ListEntriesRequest;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\Validators\Entries\ListEntriesValidatorInterface;
 use Daylog\Application\Validators\Entries\ListEntriesValidator;
-use Daylog\Tests\Support\Helper\ListEntriestHelper;
+use Daylog\Tests\Support\Helper\ListEntriesHelper;
 
 /**
  * @covers \Daylog\Application\Validators\Entries\ListEntriesValidatorInterface
@@ -33,7 +33,7 @@ final class ListEntriesValidatorTest extends Unit
      */
     public function testValidRequestPasses(): void
     {
-        $data    = ListEntriestHelper::getData();
+        $data    = ListEntriesHelper::getData();
         $request = ListEntriesRequest::fromArray($data);
 
         $this->validator->validate($request);
@@ -48,7 +48,7 @@ final class ListEntriesValidatorTest extends Unit
      */
     public function testInvalidDatesThrowException(array $overrides): void
     {
-        $data    = ListEntriestHelper::getData();
+        $data    = ListEntriesHelper::getData();
         $data    = array_merge($data, $overrides);
         $request = ListEntriesRequest::fromArray($data);
 
@@ -86,7 +86,7 @@ final class ListEntriesValidatorTest extends Unit
      */
     public function testDateRangeInvalidThrowsException(): void
     {
-        $data    = ListEntriestHelper::getData();
+        $data    = ListEntriesHelper::getData();
         $data    = array_merge($data, [
             'dateFrom' => '2025-08-31',
             'dateTo'   => '2025-08-01',
@@ -106,7 +106,7 @@ final class ListEntriesValidatorTest extends Unit
      */
     public function testInvalidPaginationThrowsException(array $overrides): void
     {
-        $data = ListEntriestHelper::getData();
+        $data = ListEntriesHelper::getData();
         $data = array_merge($data, $overrides);
 
         /** @var ListEntriesRequestInterface $request */
@@ -135,7 +135,7 @@ final class ListEntriesValidatorTest extends Unit
      */
     public function testInvalidSortThrowsException(array $overrides): void
     {
-        $data = ListEntriestHelper::getData();
+        $data = ListEntriesHelper::getData();
         $data = array_merge($data, $overrides);
 
         /** @var ListEntriesRequestInterface $request */
@@ -164,7 +164,7 @@ final class ListEntriesValidatorTest extends Unit
      */
     public function testInvalidExactDateThrowsException(array $overrides): void
     {
-        $data = ListEntriestHelper::getData();
+        $data = ListEntriesHelper::getData();
         $data = array_merge($data, $overrides);
 
         /** @var ListEntriesRequestInterface $request */
@@ -201,7 +201,7 @@ final class ListEntriesValidatorTest extends Unit
      */
     public function testValidQueryPassesValidation(array $overrides): void
     {
-        $data    = ListEntriestHelper::getData();
+        $data    = ListEntriesHelper::getData();
         $data    = array_merge($data, $overrides);
 
         /** @var ListEntriesRequest $request */
@@ -225,7 +225,7 @@ final class ListEntriesValidatorTest extends Unit
      */
     public function testQueryTooLongThrowsException(array $overrides): void
     {
-        $data    = ListEntriestHelper::getData();
+        $data    = ListEntriesHelper::getData();
         $data    = array_merge($data, $overrides);
 
         /** @var ListEntriesRequest $request */

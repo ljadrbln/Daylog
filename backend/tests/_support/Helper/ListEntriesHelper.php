@@ -8,7 +8,7 @@ namespace Daylog\Tests\Support\Helper;
  * Use this to avoid duplication of the default valid payload when
  * constructing ListEntriesRequest via ListEntriesRequest::fromArray().
  */
-final class ListEntriestHelper
+final class ListEntriesHelper
 {
     /**
      * Return a valid baseline payload for ListEntriesRequest.

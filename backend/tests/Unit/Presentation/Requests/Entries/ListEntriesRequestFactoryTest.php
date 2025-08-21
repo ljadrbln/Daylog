@@ -7,7 +7,7 @@ namespace Daylog\Tests\Unit\Application\DTO\Entries;
 use Codeception\Test\Unit;
 use Daylog\Presentation\Requests\Entries\ListEntriesRequestFactory;
 use Daylog\Application\DTO\Entries\ListEntriesRequestInterface;
-use Daylog\Tests\Support\Helper\ListEntriestHelper;
+use Daylog\Tests\Support\Helper\ListEntriesHelper;
 use Daylog\Application\Exceptions\TransportValidationException;
 
 /**
@@ -32,7 +32,7 @@ final class ListEntriesRequestFactoryTest extends Unit
     {
         /** Arrange **/
         $factory = new ListEntriesRequestFactory();
-        $input   = ListEntriestHelper::getData();
+        $input   = ListEntriesHelper::getData();
 
         $dto = $factory->fromArray($input);
 
@@ -54,7 +54,7 @@ final class ListEntriesRequestFactoryTest extends Unit
     public function testFromArrayThrowsOnInvalidTransportData(array $overrides): void
     {
         $factory = new ListEntriesRequestFactory();
-        $data    = ListEntriestHelper::getData();
+        $data    = ListEntriesHelper::getData();
         $data    = array_merge($data, $overrides);
 
         $this->expectException(TransportValidationException::class);
