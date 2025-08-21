@@ -22,7 +22,7 @@ use Daylog\Tests\Support\Helper\EntryHelper;
 final class AddEntryRequestFactoryTest extends Unit
 {
     /**
-     * AC-1: Given valid input, returns a DTO with mapped values.
+     * Happy path: Given valid input, returns a DTO with mapped values.
      *
      * @return void
      */
@@ -40,7 +40,7 @@ final class AddEntryRequestFactoryTest extends Unit
     }
 
     /**
-     * AC-2..AC-n: For invalid type or missing field, throws TransportValidationException.
+     * Transport validation errors: For invalid type or missing field, throws TransportValidationException.
      *
      * @dataProvider provideInvalidTransportData
      *

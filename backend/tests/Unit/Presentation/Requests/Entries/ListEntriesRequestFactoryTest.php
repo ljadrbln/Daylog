@@ -24,7 +24,7 @@ use Daylog\Application\Exceptions\TransportValidationException;
 final class ListEntriesRequestFactoryTest extends Unit
 {
     /**
-     * AC-1: Given valid input, returns a DTO with mapped values.
+     * Happy path: Given valid input, returns a DTO with mapped values.
      *
      * @return void
      */
@@ -44,7 +44,7 @@ final class ListEntriesRequestFactoryTest extends Unit
     }
 
     /**
-     * AC-2..AC-n: For invalid type or missing field, throws TransportValidationException.
+     * Transport validation errors: For invalid type or missing field, throws TransportValidationException.
      *
      * @dataProvider provideInvalidTransportData
      *
