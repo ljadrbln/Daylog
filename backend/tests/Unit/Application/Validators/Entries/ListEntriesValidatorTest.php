@@ -27,7 +27,7 @@ final class ListEntriesValidatorTest extends Unit
     }
 
     /**
-     * AC-1: Valid request passes without exception (validator-level happy path)
+     * Validation rule: Valid request passes without exception (validator-level happy path)
      *
      * @return void
      */
@@ -41,7 +41,7 @@ final class ListEntriesValidatorTest extends Unit
     }
 
     /**
-     * AC-6: Invalid date input raises DATE_INVALID.
+     * Validation rule: Invalid date input raises DATE_INVALID.
      *
      * @dataProvider invalidDateProvider
      * @return void
@@ -80,7 +80,7 @@ final class ListEntriesValidatorTest extends Unit
     }    
 
     /**
-     * AC-3: dateFrom > dateTo raises DATE_RANGE_INVALID.
+     * Validation rule: dateFrom > dateTo raises DATE_RANGE_INVALID.
      *
      * @return void
      */
@@ -100,7 +100,7 @@ final class ListEntriesValidatorTest extends Unit
     }
 
     /**
-     * AC-4: invalid pagination throws PAGE_INVALID / PER_PAGE_INVALID.
+     * Validation rule: invalid pagination throws PAGE_INVALID / PER_PAGE_INVALID.
      *
      * @dataProvider invalidPaginationProvider
      */
@@ -129,7 +129,7 @@ final class ListEntriesValidatorTest extends Unit
     }
 
     /**
-     * AC-5: invalid sort or direction throws SORT_INVALID / DIRECTION_INVALID.
+     * Validation rule: invalid sort or direction throws SORT_INVALID / DIRECTION_INVALID.
      *
      * @dataProvider invalidSortProvider
      */
@@ -158,7 +158,7 @@ final class ListEntriesValidatorTest extends Unit
     }
 
     /**
-     * AC-6: invalid exact date throws DATE_INVALID.
+     * Validation rule: invalid exact date throws DATE_INVALID.
      *
      * @dataProvider invalidExactDateProvider
      */
@@ -188,7 +188,7 @@ final class ListEntriesValidatorTest extends Unit
     }
 
     /**
-     * AC-3: `query` within 0..30 (post-trim) must pass without exception.
+     * Validation rule: `query` within 0..30 (post-trim) must pass without exception.
      *
      * Mechanics:
      * - Empty string means "no filter".

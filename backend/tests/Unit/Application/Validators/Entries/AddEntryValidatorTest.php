@@ -35,7 +35,7 @@ final class AddEntryValidatorTest extends Unit
     }
 
     /**
-     * AC-1: Valid DTO passes validation (no exception).
+     * Validation rule: Valid DTO passes validation (no exception).
      *
      * @return void
      */
