@@ -15,12 +15,12 @@ use Daylog\Application\DTO\Entries\ListEntriesRequestInterface;
  *  - trims and normalizes query (empty -> null);
  *  - converts empty date strings to null, leaving valid YYYY-MM-DD as-is.
  *
- * @covers \Daylog\Application\Queries\Entries\ListEntriesCriteria
+ * @covers \Daylog\Application\DTO\Entries\ListEntriesCriteria
  */
 final class ListEntriesCriteriaTest extends Unit
 {
     /**
-     * AC-1: Given a valid request, returns a criteria with mapped values.
+     * Given a valid request, returns a criteria with mapped values.
      *
      * Data source: a stub of ListEntriesRequestInterface.
      * We check the getters for exact values without additional validation.
@@ -59,10 +59,10 @@ final class ListEntriesCriteriaTest extends Unit
         $actualPerPage = $criteria->getPerPage();
         $this->assertSame($perPage, $actualPerPage);
 
-        $actualFrom = $criteria->getFromDate();
+        $actualFrom = $criteria->getDateFrom();
         $this->assertSame($fromDate, $actualFrom);
 
-        $actualTo = $criteria->getToDate();
+        $actualTo = $criteria->getDateTo();
         $this->assertSame($toDate, $actualTo);
 
         $actualQuery = $criteria->getQuery();
@@ -70,7 +70,7 @@ final class ListEntriesCriteriaTest extends Unit
     }
 
     /**
-     * AC-2: Defaults are applied when request has empty/zero values.
+     * Defaults are applied when request has empty/zero values.
      *
      * Mechanics:
      *  - page default -> 1
@@ -113,10 +113,10 @@ final class ListEntriesCriteriaTest extends Unit
         $actualPerPage = $criteria->getPerPage();
         $this->assertSame(10, $actualPerPage);
 
-        $actualFrom = $criteria->getFromDate();
+        $actualFrom = $criteria->getDateFrom();
         $this->assertNull($actualFrom);
 
-        $actualTo = $criteria->getToDate();
+        $actualTo = $criteria->getDateTo();
         $this->assertNull($actualTo);
 
         $actualQuery = $criteria->getQuery();
@@ -124,7 +124,7 @@ final class ListEntriesCriteriaTest extends Unit
     }
 
     /**
-     * AF-1: Query is trimmed but not otherwise transformed.
+     * Query is trimmed but not otherwise transformed.
      *
      * Cases:
      *  - leading/trailing spaces are removed;
@@ -160,7 +160,7 @@ final class ListEntriesCriteriaTest extends Unit
     }
 
     /**
-     * AC-3: Sorting strategy is fixed to business default.
+     * Sorting strategy is fixed to business default.
      *
      * Mechanics:
      *  - Primary: date DESC;
