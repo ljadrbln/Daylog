@@ -15,7 +15,7 @@ use Daylog\Domain\Models\Entries\Entry;
  * UC-2: List Entries.
  *
  * Returns a paginated, deterministically sorted list of entries.
- * Default sort is by logical `date DESC` with a stable secondary order by `createdAt DESC` (AC-8).
+ * Default sort is by logical `date DESC` with a stable secondary order by `createdAt DESC`.
  * Request may later include filters (date range, single date, query) and custom sort, which will be
  * added incrementally via TDD.
  *
@@ -40,7 +40,7 @@ final class ListEntries
      *
      * Mechanics:
      * 1) Fetch all entries from repository.
-     * 2) Sort by `date DESC`, then by `createdAt DESC` for stable order (AC-8).
+     * 2) Sort by `date DESC`, then by `createdAt DESC` for stable order.
      * 3) Apply simple pagination: 1-based page indexing, non-negative slicing.
      * 4) Build response DTO with items and metadata.
      *
