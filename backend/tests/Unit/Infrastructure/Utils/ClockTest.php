@@ -12,7 +12,7 @@ use DateTimeImmutable;
 /**
  * Unit test for infrastructure time source (Clock).
  *
- * Ensures Clock::now() returns current time in UTC, formatted as ISO-8601 (BR-4).
+ * Ensures Clock::now() returns current time in UTC, formatted as ISO-8601 (BR-2).
  * Mechanics:
  *  - Parse result with PHP's ISO-8601 format (DateTime::ATOM).
  *  - Verify UTC offset (+00:00) and zero seconds offset.

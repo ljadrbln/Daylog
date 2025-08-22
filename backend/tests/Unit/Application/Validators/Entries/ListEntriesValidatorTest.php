@@ -192,7 +192,7 @@ final class ListEntriesValidatorTest extends Unit
      *
      * Mechanics:
      * - Empty string means "no filter".
-     * - Trimming applies before length check (BR-3).
+     * - Trimming applies before length check (BR-1).
      * - Boundary 30 chars is allowed.
      *
      * @dataProvider validQueryProvider

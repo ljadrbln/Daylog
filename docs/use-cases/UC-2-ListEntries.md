@@ -11,8 +11,8 @@ Display a paginated list of diary entries in a single-user environment, with opt
 - `page`: integer ≥ 1. Defaults to 1.
 - `perPage`: integer. Clamped to range 1..100. Defaults to 20.
 - `sort`: field ∈ {`date`, `createdAt`, `updatedAt`} × direction ∈ {`ASC`, `DESC`}. Defaults to `date DESC`. Invalid values → fallback to `date DESC`.
-- `date`: string. See BR-6 (YYYY-MM-DD, valid calendar date).
-- `dateFrom` / `dateTo`: strings. See BR-6. Inclusive range.
+- `date`: string. See BR-2 (YYYY-MM-DD, valid calendar date).
+- `dateFrom` / `dateTo`: strings. See BR-2. Inclusive range.
 - `query`: string, 0..30 chars (after trimming). Empty string means “no filter”. Case-insensitive substring match in `title` and `body`.
 
 ## Main Success Scenario
@@ -33,9 +33,9 @@ Display a paginated list of diary entries in a single-user environment, with opt
 - Sorting and pagination are deterministic.
 
 ## Business Rules (referencing globals)
-- BR-3 Input trimming applies to string filters.
-- BR-4 Timestamps consistency (sorting by `createdAt`/`updatedAt` must respect invariants).
-- BR-6 Entry date is used for filtering by logical entry date (distinct from timestamps).
+- BR-1 Input trimming applies to string filters.
+- BR-2 Timestamps consistency (sorting by `createdAt`/`updatedAt` must respect invariants).
+- BR-2 Entry date is used for filtering by logical entry date (distinct from timestamps).
 
 ## Acceptance Criteria
 - **AC-1 (happy path)**: With no filters, the first page is returned, sorted by `date DESC` by default, including pagination metadata.

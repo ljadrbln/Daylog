@@ -28,7 +28,7 @@ use Daylog\Domain\Models\Entries\ListEntriesConstraints;
  *
  * References:
  *  - UC-2 List Entries (see docs/UC-2-ListEntries.md)
- *  - Business Rules BR-3, BR-4, BR-6
+ *  - Business Rules (see docs/BUSINESS_RULES.md)
  */
 final class ListEntriesValidator implements ListEntriesValidatorInterface
 {

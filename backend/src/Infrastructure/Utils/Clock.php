@@ -10,7 +10,7 @@ use DateTimeZone;
 /**
  * Provides a single source of current time in UTC.
  *
- * Used across the system to satisfy BR-4 (timestamps consistency): all timestamps
+ * Used across the system to satisfy BR-2 (timestamps consistency): all timestamps
  * must be stored in UTC and formatted as ISO-8601 with an explicit offset.
  * Example:
  *  $nowIso = Clock::now(); // "2025-08-19T11:30:45+00:00"
