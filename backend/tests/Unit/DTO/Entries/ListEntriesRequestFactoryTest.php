@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\DTO\Entries;
 
 use Codeception\Test\Unit;
-use Daylog\Presentation\Requests\Entries\ListEntriesRequestFactory;
+use Daylog\Application\DTO\Entries\ListEntriesRequestFactory;
 use Daylog\Application\DTO\Entries\ListEntriesRequestInterface;
 use Daylog\Tests\Support\Helper\ListEntriesHelper;
 use Daylog\Application\Exceptions\TransportValidationException;
@@ -18,7 +18,7 @@ use Daylog\Application\Exceptions\TransportValidationException;
  * types of required fields (`page`, `perPage`, `sort`, `direction`), but does not enforce
  * business rules (those are validated separately in Application layer).
  *
- * @covers \Daylog\Presentation\Requests\ListEntriesRequestFactory
+ * @covers \Daylog\Application\DTO\Entries\ListEntriesRequestFactory
  */
 
 final class ListEntriesRequestFactoryTest extends Unit
@@ -37,6 +37,7 @@ final class ListEntriesRequestFactoryTest extends Unit
         $dto = $factory->fromArray($input);
 
         $this->assertInstanceOf(ListEntriesRequestInterface::class, $dto);
+        
         $this->assertSame($input['page'],      $dto->getPage());
         $this->assertSame($input['perPage'],   $dto->getPerPage());
         $this->assertSame($input['sort'],      $dto->getSort());
