@@ -6,30 +6,35 @@ namespace Daylog\Presentation\Requests\Entries;
 
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequest;
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequestInterface;
+use Daylog\Application\Normalization\Entries\ListEntriesInputNormalizer;
 use Daylog\Application\Exceptions\TransportValidationException;
 
 /**
- * Factory for UC-2 ListEntries request (transport-level only).
+ * Builds ListEntriesRequest DTO from raw transport input.
  *
  * Purpose:
- * Convert raw transport payload (query/body) into a ListEntriesRequest.
- * This factory performs ONLY type checks:
- * - integers: page, perPage;
- * - strings:  dateFrom, dateTo, date, query, sort, direction.
+ * - Perform transport-level type checks (scalars or null) and raise TransportValidationException on violations.
+ * - Delegate UC-2 normalization to the application normalizer.
+ * - Construct a typed DTO using explicit local variables (no inline literals).
  *
- * It does not trim, normalize, or validate formats. Business validation
- * (date format, ranges, clamping) must be handled by the UC-2 validator.
+ * Notes:
+ * - Normalizer is created locally; DI is not required in this setup.
+ * - Business validation (formats, ranges) is out of scope for this factory.
  */
 final class ListEntriesRequestFactory
 {
     /**
-     * Build ListEntriesRequest from a raw array with transport-level type checks.
+     * Create a DTO from a raw associative map.
      *
-     * @param array<string, mixed> $params Raw transport payload.
+     * Mechanics:
+     * 1) Verify known fields are scalar or null (transport guarantee).
+     * 2) Normalize via ListEntriesInputNormalizer.
+     * 3) Pass normalized scalars to the request DTO.
      *
-     * @return ListEntriesRequestInterface Normalized DTO for the use case.
+     * @param array<string,mixed> $params Raw transport map (e.g., query/body).
+     * @return ListEntriesRequestInterface Typed request DTO for UC-2.
      *
-     * @throws TransportValidationException When any provided field has a wrong type.
+     * @throws TransportValidationException When any known field is non-scalar.
      */
     public static function fromArray(array $params): ListEntriesRequestInterface
     {
@@ -85,19 +90,10 @@ final class ListEntriesRequestFactory
             throw $exception;
         }
 
-        // Call DTO factory method
-        $data = [
-            'dateFrom'  => $rawDateFrom,
-            'dateTo'    => $rawDateTo,
-            'date'      => $rawDate,
-            'query'     => $rawQuery,
-            'page'      => $rawPage,
-            'perPage'   => $rawPerPage,
-            'sort'      => $rawSort,
-            'direction' => $rawDirection
-        ];
-
-        $request = ListEntriesRequest::fromArray($data);
+        $normalizer = new ListEntriesInputNormalizer();
+        $normalized = $normalizer->normalize($params);
+        
+        $request = ListEntriesRequest::fromArray($normalized);
 
         return $request;
     }

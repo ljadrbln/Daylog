@@ -7,6 +7,7 @@ namespace Daylog\Tests\Unit\Application\Validators\Entries;
 use Codeception\Test\Unit;
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequest;
 use Daylog\Application\Exceptions\DomainValidationException;
+use Daylog\Application\UseCases\Entries\ListEntries;
 use Daylog\Application\Validators\Entries\ListEntries\ListEntriesValidatorInterface;
 use Daylog\Application\Validators\Entries\ListEntries\ListEntriesValidator;
 use Daylog\Tests\Support\Helper\ListEntriesHelper;
@@ -34,7 +35,7 @@ final class ListEntriesValidatorTest extends Unit
     public function testValidRequestPasses(): void
     {
         $data    = ListEntriesHelper::getData();
-        $request = ListEntriesRequest::fromArray($data);
+        $request = ListEntriesHelper::buildRequest($data);
 
         $this->validator->validate($request);
         $this->assertTrue(true);
@@ -50,7 +51,7 @@ final class ListEntriesValidatorTest extends Unit
     {
         $data    = ListEntriesHelper::getData();
         $data    = array_merge($data, $overrides);
-        $request = ListEntriesRequest::fromArray($data);
+        $request = ListEntriesHelper::buildRequest($data);
 
         $this->expectException(DomainValidationException::class);
 
@@ -92,7 +93,7 @@ final class ListEntriesValidatorTest extends Unit
             'dateTo'   => '2025-08-01',
         ]);
 
-        $request = ListEntriesRequest::fromArray($data);
+        $request = ListEntriesHelper::buildRequest($data);
 
         $this->expectException(DomainValidationException::class);
 
@@ -108,9 +109,8 @@ final class ListEntriesValidatorTest extends Unit
     {
         $data = ListEntriesHelper::getData();
         $data = array_merge($data, $overrides);
-
-        /** @var ListEntriesRequestInterface $request */
-        $request = ListEntriesRequest::fromArray($data);
+        
+        $request = ListEntriesHelper::buildRequest($data);
 
         $this->expectException(DomainValidationException::class);
 
@@ -137,9 +137,8 @@ final class ListEntriesValidatorTest extends Unit
     {
         $data = ListEntriesHelper::getData();
         $data = array_merge($data, $overrides);
-
-        /** @var ListEntriesRequestInterface $request */
-        $request = ListEntriesRequest::fromArray($data);
+        
+        $request = ListEntriesHelper::buildRequest($data);
 
         $this->expectException(DomainValidationException::class);
 
@@ -166,9 +165,8 @@ final class ListEntriesValidatorTest extends Unit
     {
         $data = ListEntriesHelper::getData();
         $data = array_merge($data, $overrides);
-
-        /** @var ListEntriesRequestInterface $request */
-        $request = ListEntriesRequest::fromArray($data);
+        
+        $request = ListEntriesHelper::buildRequest($data);
 
         $this->expectException(DomainValidationException::class);
 
@@ -203,9 +201,8 @@ final class ListEntriesValidatorTest extends Unit
     {
         $data    = ListEntriesHelper::getData();
         $data    = array_merge($data, $overrides);
-
-        /** @var ListEntriesRequest $request */
-        $request = ListEntriesRequest::fromArray($data);
+        
+        $request = ListEntriesHelper::buildRequest($data);
 
         $this->validator->validate($request);
         $this->assertTrue(true);
@@ -227,9 +224,8 @@ final class ListEntriesValidatorTest extends Unit
     {
         $data    = ListEntriesHelper::getData();
         $data    = array_merge($data, $overrides);
-
-        /** @var ListEntriesRequest $request */
-        $request = ListEntriesRequest::fromArray($data);
+        
+        $request = ListEntriesHelper::buildRequest($data);
 
         $exceptionClass = DomainValidationException::class;
         $this->expectException($exceptionClass);

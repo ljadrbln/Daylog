@@ -65,8 +65,8 @@ final class ListEntriesCriteriaTest extends Unit
 
         $sortDescriptor = $criteria->getSortDescriptor();
         $expectedSort   = [
-            ['field' => $base['sort'],  'direction' => $base['direction']],
-            ['field' => 'createdAt',    'direction' => 'DESC'],
+            ['field' => $base['sortField'], 'direction' => $base['sortDir']],
+            ['field' => 'createdAt',        'direction' => 'DESC'],
         ];
         $this->assertSame($expectedSort, $sortDescriptor);
     }

@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases\Entries;
 
 use Codeception\Test\Unit;
-use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequest;
 use Daylog\Application\UseCases\Entries\ListEntries;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Tests\Support\Helper\EntryHelper;
+use Daylog\Tests\Support\Helper\ListEntriesHelper;
 
 /**
  * Unit tests for UC-2 ListEntries.
@@ -54,8 +54,9 @@ final class ListEntriesTest extends Unit
             ->method('fetchAll')
             ->willReturn($entries);
 
-        $params  = [];
-        $request = ListEntriesRequest::fromArray($params);
+        $data    = ListEntriesHelper::getData();
+        $request = ListEntriesHelper::buildRequest($data);
+
         $useCase = new ListEntries($repo);
 
         /** Act **/
@@ -126,7 +127,8 @@ final class ListEntriesTest extends Unit
             'dateTo'   => $dateTo,
         ];
 
-        $request = ListEntriesRequest::fromArray($params);
+        $data    = ListEntriesHelper::getData();
+        $request = ListEntriesHelper::buildRequest($data);
 
         /** Act **/
         $response = $useCase->execute($request);

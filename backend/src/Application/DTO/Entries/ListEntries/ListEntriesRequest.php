@@ -6,138 +6,196 @@ namespace Daylog\Application\DTO\Entries\ListEntries;
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequestInterface;
 
 /**
- * Request DTO for UC-2 List Entries.
+ * UC-2 List Entries request DTO (normalized).
  *
- * Contains filters, pagination, and sorting parameters.
+ * Purpose:
+ * Carries normalized, typed parameters for listing entries across
+ * application boundaries. Contains no transport parsing and no normalization.
+ *
+ * Notes:
+ * - Values must be pre-normalized by Application layer (e.g., ListEntriesInputNormalizer).
+ * - The object is immutable from the caller perspective (no setters).
  */
 final class ListEntriesRequest implements ListEntriesRequestInterface
 {
-    public ?string $dateFrom;
-    public ?string $dateTo;
-    public ?string $date;
-    public ?string $query;
-    public int $page;
-    public int $perPage;
-    public string $sort;
-    public string $direction;
+    /** @var int Current page (1-based). */
+    private int $page;
+
+    /** @var int Page size within allowed bounds. */
+    private int $perPage;
+
+    /** @var string Primary sort field (validated, e.g. 'date', 'createdAt'). */
+    private string $sortField;
+
+    /** @var string Sort direction ('ASC'|'DESC'). */
+    private string $sortDir;
+
+    /** @var string|null Inclusive range start (YYYY-MM-DD) or null. */
+    private ?string $dateFrom;
+
+    /** @var string|null Inclusive range end (YYYY-MM-DD) or null. */
+    private ?string $dateTo;
+
+    /** @var string|null Exact logical date (YYYY-MM-DD) or null. */
+    private ?string $date;
+
+    /** @var string|null Normalized free-text query or null. */
+    private ?string $query;
 
     /**
      * Private constructor. Use fromArray().
      *
+     * Construct a DTO with already-normalized values.
+     *
+     * Intended usage: the Presentation factory performs transport checks and delegates
+     * normalization to the Application normalizer, then passes values here unchanged.
+     * 
      * @param ?string $dateFrom   Inclusive lower bound date (YYYY-MM-DD) or null.
      * @param ?string $dateTo     Inclusive upper bound date (YYYY-MM-DD) or null.
      * @param ?string $date       Exact date filter (YYYY-MM-DD) or null.
      * @param ?string $query      Case-insensitive substring filter for title/body or null.
      * @param int     $page       1-based page index (raw transport value).
      * @param int     $perPage    Items per page (raw transport value).
-     * @param string  $sort       Sort field (e.g., 'date', 'createdAt', 'updatedAt').
-     * @param string  $direction  Sort direction ('ASC'|'DESC').
+     * @param string  $sortField  Sort field (e.g., 'date', 'createdAt', 'updatedAt').
+     * @param string  $sortDir    Sort direction ('ASC'|'DESC').
      */
     private function __construct(
+        int $page,
+        int $perPage,
+        string $sortField,
+        string $sortDir,
         ?string $dateFrom,
         ?string $dateTo,
         ?string $date,
-        ?string $query,
-        int $page,
-        int $perPage,
-        string $sort,
-        string $direction
+        ?string $query
     ) {
+        $this->page      = $page;
+        $this->perPage   = $perPage;
+        $this->sortField = $sortField;
+        $this->sortDir   = $sortDir;        
         $this->dateFrom  = $dateFrom;
         $this->dateTo    = $dateTo;
         $this->date      = $date;
         $this->query     = $query;
-        $this->page      = $page;
-        $this->perPage   = $perPage;
-        $this->sort      = $sort;
-        $this->direction = $direction;
     }
 
     /**
      * Factory method to create a ListEntriesRequest from an associative array.
      *
      * @param array<string,mixed> $data Input array with optional keys:
-     *        dateFrom, dateTo, date, query, page, perPage, sort, direction.
+     *        page, perPage, sortField, sortDir, dateFrom, dateTo, date, query.
      * @return self
      */
     public static function fromArray(array $data): self
     {
-        $dateFrom  = $data['dateFrom']  ?? null;
-        $dateTo    = $data['dateTo']    ?? null;
-        $date      = $data['date']      ?? null;
-        $query     = $data['query']     ?? null;
-        $page      = $data['page']      ?? 1;
-        $perPage   = $data['perPage']   ?? 10;
-        $sort      = $data['sort']      ?? 'date';
-        $direction = $data['direction'] ?? 'DESC';
+        $page      = $data['page'];
+        $perPage   = $data['perPage'];
+        $sortField = $data['sortField'];
+        $sortDir   = $data['sortDir'];                
+        $dateFrom  = $data['dateFrom'];
+        $dateTo    = $data['dateTo'];
+        $date      = $data['date'];
+        $query     = $data['query'];
 
         $request = new self(
+            $page,
+            $perPage,
+            $sortField,
+            $sortDir,
             $dateFrom,
             $dateTo,
             $date,
-            $query,
-            $page,
-            $perPage,
-            $sort,
-            $direction
+            $query
         );
 
         return $request;
-    }
+    }    
 
-    /** @return string|null */
-    public function getDateFrom(): ?string
-    {
-        $result = $this->dateFrom;
-        return $result;
-    }
-
-    /** @return string|null */
-    public function getDateTo(): ?string
-    {
-        $result = $this->dateTo;
-        return $result;
-    }
-
-    /** @return string|null */
-    public function getDate(): ?string
-    {
-        $result = $this->date;
-        return $result;
-    }
-
-    /** @return string|null */
-    public function getQuery(): ?string
-    {
-        $result = $this->query;
-        return $result;
-    }
-
-    /** @return int */
+    /**
+     * Get current page (1-based).
+     *
+     * @return int
+     */
     public function getPage(): int
     {
         $result = $this->page;
         return $result;
     }
 
-    /** @return int */
+    /**
+     * Get page size.
+     *
+     * @return int
+     */
     public function getPerPage(): int
     {
         $result = $this->perPage;
         return $result;
     }
 
-    /** @return string */
+    /**
+     * Get primary sort field.
+     *
+     * @return string
+     */
     public function getSort(): string
     {
-        $result = $this->sort;
+        $result = $this->sortField;
         return $result;
     }
 
-    /** @return string */
+    /**
+     * Get sort direction.
+     *
+     * @return string 'ASC'|'DESC'
+     */
     public function getDirection(): string
     {
-        $result = $this->direction;
+        $result = $this->sortDir;
+        return $result;
+    }
+
+    /**
+     * Get exact logical date.
+     *
+     * @return string|null YYYY-MM-DD or null.
+     */
+    public function getDate(): ?string
+    {
+        $result = $this->date;
+        return $result;
+    }
+
+    /**
+     * Get inclusive range start.
+     *
+     * @return string|null YYYY-MM-DD or null.
+     */
+    public function getDateFrom(): ?string
+    {
+        $result = $this->dateFrom;
+        return $result;
+    }
+
+    /**
+     * Get inclusive range end.
+     *
+     * @return string|null YYYY-MM-DD or null.
+     */
+    public function getDateTo(): ?string
+    {
+        $result = $this->dateTo;
+        return $result;
+    }
+
+    /**
+     * Get normalized free-text query.
+     *
+     * @return string|null Trimmed text or null.
+     */
+    public function getQuery(): ?string
+    {
+        $result = $this->query;
         return $result;
     }
 }

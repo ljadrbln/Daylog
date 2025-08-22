@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Support\Helper;
 
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequest;
+use Daylog\Application\Normalization\Entries\ListEntriesInputNormalizer;
 
 /**
  * Helper for creating valid ListEntries request payloads in tests.
@@ -36,28 +37,28 @@ final class ListEntriesHelper
      *
      * @param int    $page      Default page number
      * @param int    $perPage   Default items per page
-     * @param string $sort      Default sort field: 'date'|'createdAt'|'updatedAt'
-     * @param string $direction Default sort direction: 'ASC'|'DESC'
+     * @param string $sortField Default sort field: 'date'|'createdAt'|'updatedAt'
+     * @param string $sortDir   Default sort direction: 'ASC'|'DESC'
      *
      * @return array{
      *     page:int,
      *     perPage:int,
-     *     sort:string,
-     *     direction:string
+     *     sortField:string,
+     *     sortDir:string
      * }
      */
     public static function getData(
         int $page           = ListEntriesConstraints::PAGE_MIN,
         int $perPage        = ListEntriesConstraints::PER_PAGE_DEFAULT,
-        string $sort        = ListEntriesConstraints::SORT_FIELD_DEFAULT,
-        string $direction   = ListEntriesConstraints::SORT_DIR_DEFAULT
+        string $sortField   = ListEntriesConstraints::SORT_FIELD_DEFAULT,
+        string $sortDir     = ListEntriesConstraints::SORT_DIR_DEFAULT
 
     ): array {
         $data = [
             'page'      => $page,
             'perPage'   => $perPage,
-            'sort'      => $sort,
-            'direction' => $direction,
+            'sortField' => $sortField,
+            'sortDir'   => $sortDir,
         ];
 
         return $data;
@@ -94,7 +95,10 @@ final class ListEntriesHelper
      */
     public static function buildRequest(array $data): ListEntriesRequest
     {
-        $request = ListEntriesRequest::fromArray($data);
+        $normalizer = new ListEntriesInputNormalizer();
+        $normalized = $normalizer->normalize($data);
+
+        $request = ListEntriesRequest::fromArray($normalized);
         return $request;
     }
 }
