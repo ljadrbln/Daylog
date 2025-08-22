@@ -5,30 +5,44 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\Validators\Entries;
 
 use Codeception\Test\Unit;
-use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequest;
 use Daylog\Application\Exceptions\DomainValidationException;
-use Daylog\Application\UseCases\Entries\ListEntries;
-use Daylog\Application\Validators\Entries\ListEntries\ListEntriesValidatorInterface;
 use Daylog\Application\Validators\Entries\ListEntries\ListEntriesValidator;
+use Daylog\Application\Validators\Entries\ListEntries\ListEntriesValidatorInterface;
 use Daylog\Tests\Support\Helper\ListEntriesHelper;
 
 /**
- * @covers \Daylog\Application\Validators\Entries\ListEntriesValidatorInterface
+ * Unit test for ListEntriesValidator (UC-2).
  *
- * RED stage: business rules validation for ListEntries.
+ * Purpose:
+ * Validates business rules that remain after normalization:
+ * - strict/local date validity, date range ordering, query length.
+ *
+ * Scope:
+ * Pagination and sorting are enforced by the normalizer and are not re-validated here.
+ *
+ * @covers \Daylog\Application\Validators\Entries\ListEntries\ListEntriesValidator
  */
 final class ListEntriesValidatorTest extends Unit
 {
     /** @var ListEntriesValidatorInterface */
     private ListEntriesValidatorInterface $validator;
 
+    /**
+     * Prepare SUT.
+     *
+     * @return void
+     */
     protected function _before(): void
     {
         $this->validator = new ListEntriesValidator();
     }
 
     /**
-     * Validation rule: Valid request passes without exception (validator-level happy path)
+     * Validation rule: valid request passes without exception (happy path).
+     *
+     * Mechanics:
+     * - Build request via ListEntriesHelper (normalization performed inside buildRequest()).
+     * - Validator must not throw when dates are absent and query within limits.
      *
      * @return void
      */
@@ -42,10 +56,15 @@ final class ListEntriesValidatorTest extends Unit
     }
 
     /**
-     * Validation rule: Invalid date input raises DATE_INVALID.
+     * Validation rule: invalid date inputs raise DATE_INVALID.
      *
-     * @dataProvider invalidDateProvider
+     * Mechanics:
+     * - Provide transport-level bad formats or non-existent dates.
+     * - Normalized DTO still carries these values; validator must reject them.
+     *
+     * @param array<string,mixed> $overrides
      * @return void
+     * @dataProvider invalidDateProvider
      */
     public function testInvalidDatesThrowException(array $overrides): void
     {
@@ -53,155 +72,114 @@ final class ListEntriesValidatorTest extends Unit
         $data    = array_merge($data, $overrides);
         $request = ListEntriesHelper::buildRequest($data);
 
-        $this->expectException(DomainValidationException::class);
+        $exception = DomainValidationException::class;
+        $this->expectException($exception);
 
         $this->validator->validate($request);
     }
 
     /**
-     * Invalid date payloads.
+     * Invalid date payloads (bad format or calendar-invalid).
      *
      * @return array<string,array{0:array<string,mixed>}>
      */
     public function invalidDateProvider(): array
     {
-        return [
-            'from date is invalid format' => [[
+        $cases = [
+            'from date invalid format' => [[
                 'dateFrom' => '2025-8-1',
                 'dateTo'   => '2025-08-31',
             ]],
-            'to date is invalid format' => [[
+            'to date invalid format' => [[
                 'dateFrom' => '2025-08-01',
                 'dateTo'   => '31-08-2025',
             ]],
-            'date is nonexistent day' => [[
+            'dateFrom nonexistent day' => [[
                 'dateFrom' => '2025-02-29',
             ]],
         ];
-    }    
+
+        return $cases;
+    }
 
     /**
      * Validation rule: dateFrom > dateTo raises DATE_RANGE_INVALID.
+     *
+     * Mechanics:
+     * - Both dates valid but in the wrong order -> validator must throw.
      *
      * @return void
      */
     public function testDateRangeInvalidThrowsException(): void
     {
-        $data    = ListEntriesHelper::getData();
-        $data    = array_merge($data, [
+        $data = ListEntriesHelper::getData();
+
+        $overrides = [
             'dateFrom' => '2025-08-31',
             'dateTo'   => '2025-08-01',
-        ]);
-
-        $request = ListEntriesHelper::buildRequest($data);
-
-        $this->expectException(DomainValidationException::class);
-
-        $this->validator->validate($request);
-    }
-
-    /**
-     * Validation rule: invalid pagination throws PAGE_INVALID / PER_PAGE_INVALID.
-     *
-     * @dataProvider invalidPaginationProvider
-     */
-    public function testInvalidPaginationThrowsException(array $overrides): void
-    {
-        $data = ListEntriesHelper::getData();
-        $data = array_merge($data, $overrides);
-        
-        $request = ListEntriesHelper::buildRequest($data);
-
-        $this->expectException(DomainValidationException::class);
-
-        $this->validator->validate($request);
-    }
-
-    /** @return array<string,array{0:array<string,mixed>}> */
-    public function invalidPaginationProvider(): array
-    {
-        return [
-            'page is less than 1'      => [['page' => 0]],
-            'page is negative'         => [['page' => -1]],
-            'perPage is zero'          => [['perPage' => 0]],
-            'perPage is too big'       => [['perPage' => 101]],
         ];
-    }
 
-    /**
-     * Validation rule: invalid sort or direction throws SORT_INVALID / DIRECTION_INVALID.
-     *
-     * @dataProvider invalidSortProvider
-     */
-    public function testInvalidSortThrowsException(array $overrides): void
-    {
-        $data = ListEntriesHelper::getData();
-        $data = array_merge($data, $overrides);
-        
+        $data    = array_merge($data, $overrides);
         $request = ListEntriesHelper::buildRequest($data);
 
-        $this->expectException(DomainValidationException::class);
+        $exception = DomainValidationException::class;
+        $this->expectException($exception);
 
         $this->validator->validate($request);
-    }
-
-    /** @return array<string,array{0:array<string,mixed>}> */
-    public function invalidSortProvider(): array
-    {
-        return [
-            'sort is unknown field'      => [['sort' => 'title']],
-            'sort is empty string'       => [['sort' => '']],
-            'direction is unknown value' => [['direction' => 'DOWN']],
-            'direction is empty string'  => [['direction' => '']],
-        ];
     }
 
     /**
      * Validation rule: invalid exact date throws DATE_INVALID.
      *
+     * @param array<string,mixed> $overrides
+     * @return void
      * @dataProvider invalidExactDateProvider
      */
     public function testInvalidExactDateThrowsException(array $overrides): void
     {
-        $data = ListEntriesHelper::getData();
-        $data = array_merge($data, $overrides);
-        
+        $data    = ListEntriesHelper::getData();
+        $data    = array_merge($data, $overrides);
         $request = ListEntriesHelper::buildRequest($data);
 
-        $this->expectException(DomainValidationException::class);
+        $exception = DomainValidationException::class;
+        $this->expectException($exception);
 
         $this->validator->validate($request);
     }
 
-    /** @return array<string,array{0:array<string,mixed>}> */
+    /**
+     * Invalid exact date payloads (strict YYYY-MM-DD required).
+     *
+     * @return array<string,array{0:array<string,mixed>}>
+     */
     public function invalidExactDateProvider(): array
     {
-        return [
-            'date has invalid format'   => [['date' => '15-08-2025']],
-            'date is nonexistent day'   => [['date' => '2025-02-30']],
-            'date has time suffix'      => [['date' => '2025-08-02T00:00:00']],
-            'date has wrong separator'  => [['date' => '2025/08/02']],
-            'date has no zero padding'  => [['date' => '2025-8-2']],
+        $cases = [
+            'date invalid format'  => [['date' => '15-08-2025']],
+            'date nonexistent day' => [['date' => '2025-02-30']],
+            'date has time suffix' => [['date' => '2025-08-02T00:00:00']],
+            'wrong separator'      => [['date' => '2025/08/02']],
+            'no zero padding'      => [['date' => '2025-8-2']],
         ];
+
+        return $cases;
     }
 
     /**
      * Validation rule: `query` within 0..30 (post-trim) must pass without exception.
      *
      * Mechanics:
-     * - Empty string means "no filter".
-     * - Trimming applies before length check (BR-1).
-     * - Boundary 30 chars is allowed.
+     * - Empty and spaces-only mean "no filter".
+     * - Boundary length 30 is allowed.
      *
-     * @dataProvider validQueryProvider
-     *
+     * @param array<string,mixed> $overrides
      * @return void
+     * @dataProvider validQueryProvider
      */
     public function testValidQueryPassesValidation(array $overrides): void
     {
         $data    = ListEntriesHelper::getData();
         $data    = array_merge($data, $overrides);
-        
         $request = ListEntriesHelper::buildRequest($data);
 
         $this->validator->validate($request);
@@ -211,33 +189,24 @@ final class ListEntriesValidatorTest extends Unit
     /**
      * AF-4: `query` longer than 30 (after trimming) must raise QUERY_TOO_LONG.
      *
-     * Notes:
-     * - We only assert the exception class here; specific error code is asserted
-     *   elsewhere in integration or can be added if DomainValidationException
-     *   exposes error codes accessor.
-     *
-     * @dataProvider invalidQueryProvider
-     *
+     * @param array<string,mixed> $overrides
      * @return void
+     * @dataProvider invalidQueryProvider
      */
     public function testQueryTooLongThrowsException(array $overrides): void
     {
         $data    = ListEntriesHelper::getData();
         $data    = array_merge($data, $overrides);
-        
         $request = ListEntriesHelper::buildRequest($data);
 
-        $exceptionClass = DomainValidationException::class;
-        $this->expectException($exceptionClass);
+        $exception = DomainValidationException::class;
+        $this->expectException($exception);
 
         $this->validator->validate($request);
     }
 
     /**
-     * Provides valid query inputs according to UC-2:
-     * - Empty and spaces-only become "no filter".
-     * - Trim applies before length check.
-     * - Boundary length 30 is allowed.
+     * Provides valid query inputs according to UC-2.
      *
      * @return array<string,array{0:array<string,mixed>}>
      */
@@ -245,22 +214,19 @@ final class ListEntriesValidatorTest extends Unit
     {
         $exact30 = str_repeat('a', 30);
 
-        return [
+        $rows = [
             'empty string'             => [['query' => '']],
             'spaces only (trim→empty)' => [['query' => '     ']],
             'short word'               => [['query' => 'summer']],
             'boundary length 30'       => [['query' => $exact30]],
             'trimmed within limit'     => [['query' => '  june  ']],
         ];
+
+        return $rows;
     }
 
     /**
      * Provides invalid query inputs that exceed 30 chars after trimming.
-     *
-     * Cases:
-     * - ASCII 31 chars.
-     * - Multibyte 31 chars (mb_strlen check).
-     * - Trimmed still > 30.
      *
      * @return array<string,array{0:array<string,mixed>}>
      */
@@ -270,10 +236,12 @@ final class ListEntriesValidatorTest extends Unit
         $multibyte31 = str_repeat('Я', 31);
         $trimmed31   = '  ' . str_repeat('a', 31) . '  ';
 
-        return [
-            'ascii length 31'         => [['query' => $ascii31]],
-            'multibyte length 31'     => [['query' => $multibyte31]],
-            'trimmed remains > 30'    => [['query' => $trimmed31]],
+        $rows = [
+            'ascii length 31'      => [['query' => $ascii31]],
+            'multibyte length 31'  => [['query' => $multibyte31]],
+            'trimmed still > 30'   => [['query' => $trimmed31]],
         ];
+
+        return $rows;
     }
 }
