@@ -9,6 +9,8 @@ use Daylog\Application\DTO\Entries\ListEntriesRequestInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Domain\Services\DateService;
 
+use Daylog\Domain\Models\Entries\ListEntriesConstraints;
+
 /**
  * Validates business rules for ListEntries request.
  *
@@ -30,21 +32,6 @@ use Daylog\Domain\Services\DateService;
  */
 final class ListEntriesValidator implements ListEntriesValidatorInterface
 {
-    /** @var int */
-    private const QUERY_MAX = 30;
-
-    /** @var int */
-    private const PER_PAGE_MIN = 1;
-
-    /** @var int */
-    private const PER_PAGE_MAX = 100;
-
-    /** @var string[] */
-    private const ALLOWED_SORT_FIELDS = ['date', 'createdAt', 'updatedAt'];
-
-    /** @var string[] */
-    private const ALLOWED_DIRECTIONS = ['ASC', 'DESC'];
-
     /**
      * Validate domain rules. Aggregates all errors and throws once.
      *
@@ -160,8 +147,8 @@ final class ListEntriesValidator implements ListEntriesValidatorInterface
     {
         $perPage = $req->getPerPage();
 
-        $isTooSmall = ($perPage < self::PER_PAGE_MIN);
-        $isTooBig   = ($perPage > self::PER_PAGE_MAX);
+        $isTooSmall = ($perPage < ListEntriesConstraints::PER_PAGE_MIN);
+        $isTooBig   = ($perPage > ListEntriesConstraints::PER_PAGE_MAX);
 
         if ($isTooSmall || $isTooBig) {
             $errors[] = 'PER_PAGE_INVALID';
@@ -181,7 +168,7 @@ final class ListEntriesValidator implements ListEntriesValidatorInterface
     {
         $sort = $req->getSort();
 
-        $allowed   = self::ALLOWED_SORT_FIELDS;
+        $allowed   = ListEntriesConstraints::ALLOWED_SORT_FIELDS;
         $isAllowed = in_array($sort, $allowed, true);
 
         if ($isAllowed === false) {
@@ -202,7 +189,7 @@ final class ListEntriesValidator implements ListEntriesValidatorInterface
     {
         $direction = $req->getDirection();
 
-        $allowed   = self::ALLOWED_DIRECTIONS;
+        $allowed   = ListEntriesConstraints::ALLOWED_SORT_DIRS;
         $isAllowed = in_array($direction, $allowed, true);
 
         if ($isAllowed === false) {
@@ -231,7 +218,7 @@ final class ListEntriesValidator implements ListEntriesValidatorInterface
             return $errors;
         }
 
-        $max = self::QUERY_MAX;
+        $max = ListEntriesConstraints::QUERY_MAX;
         if ($length > $max) {
             $errors[] = 'QUERY_TOO_LONG';
         }

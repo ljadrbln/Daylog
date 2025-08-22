@@ -22,12 +22,6 @@ use Daylog\Application\DTO\Entries\ListEntriesRequestInterface;
  */
 final class ListEntriesCriteria
 {
-    /** @var string[] */
-    private const ALLOWED_SORT_FIELDS = ['date', 'createdAt', 'updatedAt'];
-
-    /** @var string[] */
-    private const ALLOWED_SORT_DIRS = ['ASC', 'DESC'];
-
     /** @var int */
     private int $page;
 
@@ -180,7 +174,7 @@ final class ListEntriesCriteria
     }
 
     /**
-     * Normalize page: default to 1 when < 1.
+     * Normalize page: default to ListEntriesConstraints::PAGE_MIN when < ListEntriesConstraints::PAGE_MIN.
      *
      * @param ListEntriesRequestInterface $req
      * @return int
@@ -198,7 +192,8 @@ final class ListEntriesCriteria
     }
 
     /**
-     * Normalize perPage: default 10, clamp to [1..100].
+     * Normalize perPage: default ListEntriesConstraints::PER_PAGE_DEFAULT, 
+     * clamp to [ListEntriesConstraints::PER_PAGE_MIN..ListEntriesConstraints::PER_PAGE_MAX].
      *
      * @param ListEntriesRequestInterface $req
      * @return int
@@ -294,15 +289,15 @@ final class ListEntriesCriteria
     private static function normalizeSort(ListEntriesRequestInterface $req): array
     {
         $fieldRaw = $req->getSort();
-        $field    = in_array($fieldRaw, self::ALLOWED_SORT_FIELDS, true) 
+        $field    = in_array($fieldRaw, ListEntriesConstraints::ALLOWED_SORT_FIELDS, true) 
             ? $fieldRaw 
-            : 'date';
+            : ListEntriesConstraints::SORT_FIELD_DEFAULT;
 
         $dirRaw   = $req->getDirection();
         $dirUpper = strtoupper($dirRaw);
-        $dir      = in_array($dirUpper, self::ALLOWED_SORT_DIRS, true) 
+        $dir      = in_array($dirUpper, ListEntriesConstraints::ALLOWED_SORT_DIRS, true) 
             ? $dirUpper 
-            : 'DESC';
+            : ListEntriesConstraints::SORT_DIR_DEFAULT;
 
         return [$field, $dir];
     }
