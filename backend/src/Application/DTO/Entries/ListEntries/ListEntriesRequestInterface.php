@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Daylog\Application\DTO\Entries;
+namespace Daylog\Application\DTO\Entries\ListEntries;
 
 /**
  * Contract for UC-2 ListEntries request DTO.

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Daylog\Application\UseCases\Entries;
 
-use Daylog\Application\DTO\Entries\ListEntriesRequestInterface;
-use Daylog\Application\DTO\Entries\ListEntriesResponseInterface;
-use Daylog\Application\DTO\Entries\ListEntriesResponse;
+use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequestInterface;
+use Daylog\Application\DTO\Entries\ListEntries\ListEntriesResponseInterface;
+use Daylog\Application\DTO\Entries\ListEntries\ListEntriesResponse;
 
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Domain\Models\Entries\Entry;

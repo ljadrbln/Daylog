@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-namespace Daylog\Application\DTO\Entries;
-use Daylog\Application\DTO\Entries\ListEntriesRequestInterface;
+namespace Daylog\Application\DTO\Entries\ListEntries;
+use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequestInterface;
 
 /**
  * Request DTO for UC-2 List Entries.

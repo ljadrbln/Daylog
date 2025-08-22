@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Daylog\Application\DTO\Entries;
+namespace Daylog\Application\DTO\Entries\ListEntries;
 
 use Daylog\Domain\Models\Entries\ListEntriesConstraints;
-use Daylog\Application\DTO\Entries\ListEntriesRequestInterface;
+use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequestInterface;
 
 /**
  * Immutable criteria DTO for UC-2 List Entries.

@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\Validators\Entries;
 
 use Codeception\Test\Unit;
-use Daylog\Application\DTO\Entries\ListEntriesRequest;
+use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequest;
 use Daylog\Application\Exceptions\DomainValidationException;
-use Daylog\Application\Validators\Entries\ListEntriesValidatorInterface;
-use Daylog\Application\Validators\Entries\ListEntriesValidator;
+use Daylog\Application\Validators\Entries\ListEntries\ListEntriesValidatorInterface;
+use Daylog\Application\Validators\Entries\ListEntries\ListEntriesValidator;
 use Daylog\Tests\Support\Helper\ListEntriesHelper;
 
 /**

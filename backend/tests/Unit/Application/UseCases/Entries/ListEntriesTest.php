@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases\Entries;
 
 use Codeception\Test\Unit;
-use Daylog\Application\DTO\Entries\ListEntriesRequest;
+use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequest;
 use Daylog\Application\UseCases\Entries\ListEntries;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Domain\Models\Entries\Entry;

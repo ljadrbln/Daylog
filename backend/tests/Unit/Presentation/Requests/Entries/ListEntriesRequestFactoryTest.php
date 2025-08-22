@@ -6,7 +6,7 @@ namespace Daylog\Tests\Unit\Application\DTO\Entries;
 
 use Codeception\Test\Unit;
 use Daylog\Presentation\Requests\Entries\ListEntriesRequestFactory;
-use Daylog\Application\DTO\Entries\ListEntriesRequestInterface;
+use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequestInterface;
 use Daylog\Tests\Support\Helper\ListEntriesHelper;
 use Daylog\Application\Exceptions\TransportValidationException;
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Support\Helper;
 
-use Daylog\Application\DTO\Entries\ListEntriesRequest;
+use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequest;
 
 /**
  * Helper for creating valid ListEntries request payloads in tests.

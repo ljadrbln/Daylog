@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Daylog\Application\Validators\Entries;
+namespace Daylog\Application\Validators\Entries\ListEntries;
 
 use DateTimeImmutable;
-use Daylog\Application\DTO\Entries\ListEntriesRequestInterface;
+use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequestInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Domain\Services\DateService;
 

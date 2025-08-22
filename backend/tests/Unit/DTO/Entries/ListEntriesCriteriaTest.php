@@ -3,7 +3,7 @@
 namespace Daylog\Tests\Unit\Application\DTO\Entries;
 
 use Codeception\Test\Unit;
-use Daylog\Application\DTO\Entries\ListEntriesCriteria;
+use Daylog\Application\DTO\Entries\ListEntries\ListEntriesCriteria;
 use Daylog\Tests\Support\Helper\ListEntriesHelper;
 use Daylog\Domain\Models\Entries\ListEntriesConstraints;
 
