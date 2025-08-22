@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Presentation\Requests\Entries;
 
-use Daylog\Application\DTO\Entries\AddEntryRequest;
-use Daylog\Application\DTO\Entries\AddEntryRequestInterface;
+use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
+use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
 use Daylog\Application\Exceptions\TransportValidationException;
 
 /**

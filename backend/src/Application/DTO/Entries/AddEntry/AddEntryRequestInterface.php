@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Application\DTO\Entries;
+namespace Daylog\Application\DTO\Entries\AddEntry;
 
 /**
  * Interface AddEntryRequestInterface

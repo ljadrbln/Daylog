@@ -5,11 +5,11 @@ namespace Daylog\Tests\Unit\Application\Validators\Entries;
 
 use Codeception\Test\Unit;
 use Daylog\Domain\Models\Entries\EntryConstraints;
-use Daylog\Application\Validators\Entries\AddEntryValidator;
-use Daylog\Application\Validators\Entries\AddEntryValidatorInterface;
+use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
+use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
+use Daylog\Application\Validators\Entries\AddEntry\AddEntryValidator;
+use Daylog\Application\Validators\Entries\AddEntry\AddEntryValidatorInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
-use Daylog\Application\DTO\Entries\AddEntryRequest;
-use Daylog\Application\DTO\Entries\AddEntryRequestInterface;
 use Daylog\Tests\Support\Helper\EntryHelper;
 
 /**

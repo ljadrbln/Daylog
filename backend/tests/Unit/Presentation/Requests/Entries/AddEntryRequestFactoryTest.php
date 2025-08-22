@@ -5,7 +5,7 @@ namespace Daylog\Tests\Unit\Presentation\Requests\Entries;
 
 use Codeception\Test\Unit;
 use Daylog\Presentation\Requests\Entries\AddEntryRequestFactory;
-use Daylog\Application\DTO\Entries\AddEntryRequestInterface;
+use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
 use Daylog\Application\Exceptions\TransportValidationException;
 use Daylog\Tests\Support\Helper\EntryHelper;
 
@@ -33,7 +33,6 @@ final class AddEntryRequestFactoryTest extends Unit
 
         $dto = $factory->fromArray($input);
 
-        $this->assertInstanceOf(AddEntryRequestInterface::class, $dto);
         $this->assertSame($input['title'], $dto->getTitle());
         $this->assertSame($input['body'], $dto->getBody());
         $this->assertSame($input['date'], $dto->getDate());

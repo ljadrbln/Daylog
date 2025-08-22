@@ -3,10 +3,11 @@ declare(strict_types=1);
 
 namespace Daylog\Application\UseCases\Entries;
 
-use Daylog\Application\Validators\Entries\AddEntryValidatorInterface;
-use Daylog\Application\DTO\Entries\AddEntryRequestInterface;
-use Daylog\Application\DTO\Entries\AddEntryResponseInterface;
-use Daylog\Application\DTO\Entries\AddEntryResponse;
+use Daylog\Application\DTO\Entries\AddEntry\AddEntryResponse;
+use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
+use Daylog\Application\DTO\Entries\AddEntry\AddEntryResponseInterface;
+
+use Daylog\Application\Validators\Entries\AddEntry\AddEntryValidatorInterface;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Domain\Models\Entries\Entry;
 

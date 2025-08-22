@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Application\Validators\Entries;
+namespace Daylog\Application\Validators\Entries\AddEntry;
 
-use Daylog\Application\DTO\Entries\AddEntryRequestInterface;
+use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 
 /**

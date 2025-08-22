@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Application\DTO\Entries;
-use Daylog\Application\DTO\Entries\AddEntryRequestInterface;
+namespace Daylog\Application\DTO\Entries\AddEntry;
+use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
 
 /**
  * Immutable DTO for adding a new entry.

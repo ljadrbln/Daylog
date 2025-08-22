@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Application\Validators\Entries;
+namespace Daylog\Application\Validators\Entries\AddEntry;
 
 use Daylog\Domain\Services\DateService;
 use Daylog\Domain\Models\Entries\EntryConstraints;
-use Daylog\Application\DTO\Entries\AddEntryRequestInterface;
+use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
-use Daylog\Application\Validators\Entries\AddEntryValidatorInterface;
+use Daylog\Application\Validators\Entries\AddEntry\AddEntryValidatorInterface;
 
 /**
  * Validates business rules for AddEntry request.
