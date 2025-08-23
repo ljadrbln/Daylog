@@ -64,13 +64,14 @@ final class ListEntriesTest extends Unit
 
         /** Assert **/
         $items = $response->getItems();
-        $this->assertSame('2025-08-12', $items[0]->getDate());
-        $this->assertSame('2025-08-11', $items[1]->getDate());
-        $this->assertSame('2025-08-10', $items[2]->getDate());
+        $this->assertSame($entry2->getDate(), $items[0]->getDate());
+        $this->assertSame($entry3->getDate(), $items[1]->getDate());
+        $this->assertSame($entry1->getDate(), $items[2]->getDate());
 
-        $this->assertSame(3, $response->getTotal());
-        $this->assertSame(1, $response->getPage());
-        $this->assertSame(10, $response->getPerPage()); // default perPage
+        $this->assertSame(count($entries),        $response->getTotal());
+        $this->assertSame($request->getPage(),    $response->getPage());
+        $this->assertSame($request->getPerPage(), $response->getPerPage());
+        $this->assertSame(1,                      $response->getPagesCount());
     }
 
     /**
@@ -114,19 +115,6 @@ final class ListEntriesTest extends Unit
 
         $useCase = new ListEntries($repo);
 
-        $page     = 1;
-        $perPage  = 10;
-        $dateFrom = '2025-08-10';
-        $dateTo   = '2025-08-12';
-
-        /** @var array<string,mixed> $params */
-        $params = [
-            'page'     => $page,
-            'perPage'  => $perPage,
-            'dateFrom' => $dateFrom,
-            'dateTo'   => $dateTo,
-        ];
-
         $data    = ListEntriesHelper::getData();
         $request = ListEntriesHelper::buildRequest($data);
 
@@ -136,19 +124,15 @@ final class ListEntriesTest extends Unit
         /** Assert **/
         $items = $response->getItems();
 
-        $this->assertCount(3, $items);
-        $this->assertSame('2025-08-12', $items[0]->getDate());
-        $this->assertSame('2025-08-11', $items[1]->getDate());
-        $this->assertSame('2025-08-10', $items[2]->getDate());
+        $this->assertCount(4, $items);
+        $this->assertSame($entry4->getDate(), $items[0]->getDate());
+        $this->assertSame($entry3->getDate(), $items[1]->getDate());
+        $this->assertSame($entry2->getDate(), $items[2]->getDate());
+        $this->assertSame($entry1->getDate(), $items[3]->getDate());
 
-        $total     = $response->getTotal();
-        $page      = $response->getPage();
-        $perPage   = $response->getPerPage();
-        $pagesCnt  = $response->getPagesCount();
-
-        $this->assertSame(3, $total);
-        $this->assertSame(1, $page);
-        $this->assertSame(10, $perPage);
-        $this->assertSame(1, $pagesCnt);
+        $this->assertSame(count($entries),          $response->getTotal());
+        $this->assertSame($request->getPage(),      $response->getPage());
+        $this->assertSame($request->getPerPage(),   $response->getPerPage());
+        $this->assertSame(1,                        $response->getPagesCount());
     }
 }
