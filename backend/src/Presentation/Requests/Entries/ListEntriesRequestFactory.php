@@ -24,77 +24,184 @@ use Daylog\Application\Exceptions\TransportValidationException;
 final class ListEntriesRequestFactory
 {
     /**
-     * Create a DTO from a raw associative map.
+     * Factory for ListEntriesRequest from raw transport params.
      *
-     * Mechanics:
-     * 1) Verify known fields are scalar or null (transport guarantee).
-     * 2) Normalize via ListEntriesInputNormalizer.
-     * 3) Pass normalized scalars to the request DTO.
+     * Performs transport-level validation only:
+     * - Missing/null is allowed.
+     * - Reject invalid types (non-numeric for page/perPage, non-string for strings).
+     * - No business rules here.
      *
      * @param array<string,mixed> $params Raw transport map (e.g., query/body).
      * @return ListEntriesRequestInterface Typed request DTO for UC-2.
      *
      * @throws TransportValidationException When any known field is non-scalar.
-     */
+    */
     public static function fromArray(array $params): ListEntriesRequestInterface
     {
-        /** Collect transport errors */
         $errors = [];
 
-        /** Read raw values */
-        $rawPage      = $params['page']      ?? null;
-        $rawPerPage   = $params['perPage']   ?? null;
-        $rawDateFrom  = $params['dateFrom']  ?? null;
-        $rawDateTo    = $params['dateTo']    ?? null;
-        $rawDate      = $params['date']      ?? null;
-        $rawQuery     = $params['query']     ?? null;
-        $rawSort      = $params['sort']      ?? null;
-        $rawDirection = $params['direction'] ?? null;
+        $errors = self::validatePage($params, $errors);
+        $errors = self::validatePerPage($params, $errors);
+        $errors = self::validateSortField($params, $errors);
+        $errors = self::validateSortDir($params, $errors);
+        $errors = self::validateDateFrom($params, $errors);
+        $errors = self::validateDateTo($params, $errors);
+        $errors = self::validateDate($params, $errors);
+        $errors = self::validateQuery($params, $errors);
 
-        /** Type checks (transport-level only) */
-        if (!is_int($rawPage)) {
-            $errors[] = 'PAGE_MUST_BE_INT';
-        }
-
-        if (!is_int($rawPerPage)) {
-            $errors[] = 'PER_PAGE_MUST_BE_INT';
-        }
-
-        if (!is_string($rawSort)) {
-            $errors[] = 'SORT_MUST_BE_STRING';
-        }
-        
-        if (!is_string($rawDirection)) {
-            $errors[] = 'DIRECTION_MUST_BE_STRING';
-        }
-
-        if (!is_null($rawDateFrom) && !is_string($rawDateFrom)) {
-            $errors[] = 'DATE_FROM_MUST_BE_STRING';
-        }
-
-        if (!is_null($rawDateTo) && !is_string($rawDateTo)) {
-            $errors[] = 'DATE_TO_MUST_BE_STRING';
-        }
-
-        if (!is_null($rawDate) && !is_string($rawDate)) {
-            $errors[] = 'DATE_MUST_BE_STRING';
-        }
-
-        if (!is_null($rawQuery) && !is_string($rawQuery)) {
-            $errors[] = 'QUERY_MUST_BE_STRING';
-        }
-
-        /** Throw on transport errors */
         if ($errors !== []) {
-            $exception = new TransportValidationException($errors);
-            throw $exception;
+            throw new TransportValidationException($errors);
         }
 
         $normalizer = new ListEntriesInputNormalizer();
         $normalized = $normalizer->normalize($params);
-        
-        $request = ListEntriesRequest::fromArray($normalized);
 
+        $request = ListEntriesRequest::fromArray($normalized);
         return $request;
     }
+
+    /**
+     * Validate page param: must be numeric if provided.
+     *
+     * @param array<string,mixed> $params
+     * @param string[] $errors
+     * @return string[]
+     */
+    private static function validatePage(array $params, array $errors): array
+    {
+        $raw = $params['page'] ?? null;
+
+        if (!is_null($raw) && !is_numeric($raw)) {
+            $errors[] = 'PAGE_MUST_BE_NUMERIC';
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Validate perPage param: must be numeric if provided.
+     *
+     * @param array<string,mixed> $params
+     * @param string[] $errors
+     * @return string[]
+     */
+    private static function validatePerPage(array $params, array $errors): array
+    {
+        $raw = $params['perPage'] ?? null;
+
+        if (!is_null($raw) && !is_numeric($raw)) {
+            $errors[] = 'PER_PAGE_MUST_BE_NUMERIC';
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Validate sort param: must be string if provided.
+     *
+     * @param array<string,mixed> $params
+     * @param string[] $errors
+     * @return string[]
+     */
+    private static function validateSortField(array $params, array $errors): array
+    {
+        $raw = $params['sortField'] ?? null;
+
+        if (!is_null($raw) && !is_string($raw)) {
+            $errors[] = 'SORT_FIELD_MUST_BE_STRING';
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Validate direction param: must be string if provided.
+     *
+     * @param array<string,mixed> $params
+     * @param string[] $errors
+     * @return string[]
+     */
+    private static function validateSortDir(array $params, array $errors): array
+    {
+        $raw = $params['sortDir'] ?? null;
+
+        if (!is_null($raw) && !is_string($raw)) {
+            $errors[] = 'DIRECTION_MUST_BE_STRING';
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Validate dateFrom param: must be string if provided.
+     *
+     * @param array<string,mixed> $params
+     * @param string[] $errors
+     * @return string[]
+     */
+    private static function validateDateFrom(array $params, array $errors): array
+    {
+        $raw = $params['dateFrom'] ?? null;
+
+        if (!is_null($raw) && !is_string($raw)) {
+            $errors[] = 'DATE_FROM_MUST_BE_STRING';
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Validate dateTo param: must be string if provided.
+     *
+     * @param array<string,mixed> $params
+     * @param string[] $errors
+     * @return string[]
+     */
+    private static function validateDateTo(array $params, array $errors): array
+    {
+        $raw = $params['dateTo'] ?? null;
+
+        if (!is_null($raw) && !is_string($raw)) {
+            $errors[] = 'DATE_TO_MUST_BE_STRING';
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Validate date param: must be string if provided.
+     *
+     * @param array<string,mixed> $params
+     * @param string[] $errors
+     * @return string[]
+     */
+    private static function validateDate(array $params, array $errors): array
+    {
+        $raw = $params['date'] ?? null;
+
+        if (!is_null($raw) && !is_string($raw)) {
+            $errors[] = 'DATE_MUST_BE_STRING';
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Validate query param: must be string if provided.
+     *
+     * @param array<string,mixed> $params
+     * @param string[] $errors
+     * @return string[]
+     */
+    private static function validateQuery(array $params, array $errors): array
+    {
+        $raw = $params['query'] ?? null;
+
+        if (!is_null($raw) && !is_string($raw)) {
+            $errors[] = 'QUERY_MUST_BE_STRING';
+        }
+
+        return $errors;
+    }
+
 }
