@@ -17,7 +17,8 @@ interface EntryStorageInterface
      * Insert the given Entry and return generated UUID.
      *
      * @param Entry $entry Entry to be persisted.
+     * @param string $now   Current timestamp (UTC, ISO 8601).
      * @return string Generated UUID for the new record.
      */
-    public function insert(Entry $entry): string;
+    public function insert(Entry $entry, string $now): string;
 }
