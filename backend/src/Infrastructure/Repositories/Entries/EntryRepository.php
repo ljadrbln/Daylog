@@ -32,7 +32,7 @@ final class EntryRepository implements EntryRepositoryInterface
     public function save(Entry $entry): array
     {
         $now  = Clock::now();
-        $uuid = $this->storage->insert($entry);
+        $uuid = $this->storage->insert($entry, $now);
 
         return [
             'id'        => $uuid,
