@@ -7,6 +7,7 @@ namespace Daylog\Tests\Unit\Application\UseCases\Entries;
 use Codeception\Test\Unit;
 use Daylog\Application\UseCases\Entries\ListEntries;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
+use Daylog\Application\Validators\Entries\ListEntries\ListEntriesValidatorInterface;
 use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Tests\Support\Helper\EntryHelper;
 use Daylog\Tests\Support\Helper\ListEntriesHelper;
@@ -49,24 +50,43 @@ final class ListEntriesTest extends Unit
 
         $entries = [$entry1, $entry2, $entry3];
 
+        $page     = 1;
+        $perPage  = 10;
+        $total    = count($entries);
+        $pagesCnt = (int)ceil($total / $perPage);
+
+        $pageResult = [
+            'items'      => $entries,
+            'total'      => $total,
+            'page'       => $page,
+            'perPage'    => $perPage,
+            'pagesCount' => $pagesCnt,
+        ];
+
         $repo
             ->expects($this->once())
-            ->method('fetchAll')
-            ->willReturn($entries);
+            ->method('findByCriteria')
+            ->willReturn($pageResult);
+
+        $validatorClass = ListEntriesValidatorInterface::class;
+        $validator      = $this->createMock($validatorClass);
+        $validator
+            ->expects($this->once())
+            ->method('validate');
+
+        $useCase = new ListEntries($repo, $validator);
 
         $data    = ListEntriesHelper::getData();
         $request = ListEntriesHelper::buildRequest($data);
-
-        $useCase = new ListEntries($repo);
 
         /** Act **/
         $response = $useCase->execute($request);
 
         /** Assert **/
         $items = $response->getItems();
-        $this->assertSame($entry2->getDate(), $items[0]->getDate());
-        $this->assertSame($entry3->getDate(), $items[1]->getDate());
-        $this->assertSame($entry1->getDate(), $items[2]->getDate());
+        $this->assertSame($entry1->getDate(), $items[0]->getDate());
+        $this->assertSame($entry2->getDate(), $items[1]->getDate());
+        $this->assertSame($entry3->getDate(), $items[2]->getDate());
 
         $this->assertSame(count($entries),        $response->getTotal());
         $this->assertSame($request->getPage(),    $response->getPage());
@@ -108,12 +128,31 @@ final class ListEntriesTest extends Unit
 
         $entries = [$entry1, $entry2, $entry3, $entry4];
 
+        $page     = 1;
+        $perPage  = 10;
+        $total    = count($entries);
+        $pagesCnt = (int)ceil($total / $perPage);
+
+        $pageResult = [
+            'items'      => $entries,
+            'total'      => $total,
+            'page'       => $page,
+            'perPage'    => $perPage,
+            'pagesCount' => $pagesCnt,
+        ];
+
         $repo
             ->expects($this->once())
-            ->method('fetchAll')
-            ->willReturn($entries);
+            ->method('findByCriteria')
+            ->willReturn($pageResult);
 
-        $useCase = new ListEntries($repo);
+        $validatorClass = ListEntriesValidatorInterface::class;
+        $validator      = $this->createMock($validatorClass);
+        $validator
+            ->expects($this->once())
+            ->method('validate');
+
+        $useCase = new ListEntries($repo, $validator);
 
         $data    = ListEntriesHelper::getData();
         $request = ListEntriesHelper::buildRequest($data);
@@ -125,10 +164,10 @@ final class ListEntriesTest extends Unit
         $items = $response->getItems();
 
         $this->assertCount(4, $items);
-        $this->assertSame($entry4->getDate(), $items[0]->getDate());
-        $this->assertSame($entry3->getDate(), $items[1]->getDate());
-        $this->assertSame($entry2->getDate(), $items[2]->getDate());
-        $this->assertSame($entry1->getDate(), $items[3]->getDate());
+        $this->assertSame($entry1->getDate(), $items[0]->getDate());
+        $this->assertSame($entry2->getDate(), $items[1]->getDate());
+        $this->assertSame($entry3->getDate(), $items[2]->getDate());
+        $this->assertSame($entry4->getDate(), $items[3]->getDate());
 
         $this->assertSame(count($entries),          $response->getTotal());
         $this->assertSame($request->getPage(),      $response->getPage());

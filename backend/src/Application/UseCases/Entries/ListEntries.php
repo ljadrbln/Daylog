@@ -5,175 +5,82 @@ declare(strict_types=1);
 namespace Daylog\Application\UseCases\Entries;
 
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequestInterface;
-use Daylog\Application\DTO\Entries\ListEntries\ListEntriesResponseInterface;
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesResponse;
-
+use Daylog\Application\DTO\Entries\ListEntries\ListEntriesResponseInterface;
+use Daylog\Application\Validators\Entries\ListEntries\ListEntriesValidatorInterface;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
-use Daylog\Domain\Models\Entries\Entry;
+use Daylog\Domain\Models\Entries\ListEntriesCriteria;
 
 /**
- * UC-2: List Entries.
+ * UC-2: List Entries (Application layer).
  *
- * Returns a paginated, deterministically sorted list of entries.
- * Default sort is by logical `date DESC` with a stable secondary order by `createdAt DESC`.
- * Request may later include filters (date range, single date, query) and custom sort, which will be
- * added incrementally via TDD.
+ * Purpose:
+ * Orchestrate the listing flow for entries:
+ * - run business validation over normalized request DTO;
+ * - translate Application DTO to Domain Criteria;
+ * - delegate data retrieval to the repository;
+ * - build a typed response DTO with items and pagination metadata.
  *
- * @template T of Entry
+ * Notes:
+ * - Sorting, filtering, and pagination are applied by the repository based on Domain Criteria.
+ * - The use case remains thin and does not perform data-processing logic itself.
  */
 final class ListEntries
 {
+    /** @var EntryRepositoryInterface */
     private EntryRepositoryInterface $repository;
+
+    /** @var ListEntriesValidatorInterface */
+    private ListEntriesValidatorInterface $validator;
 
     /**
      * Constructor.
      *
-     * @param EntryRepositoryInterface $repository Repository abstraction for entries fetching.
+     * @param EntryRepositoryInterface       $repository Repository abstraction for entries fetching.
+     * @param ListEntriesValidatorInterface  $validator  Business validator for UC-2 parameters.
      */
-    public function __construct(EntryRepositoryInterface $repository)
-    {
+    public function __construct(
+        EntryRepositoryInterface $repository,
+        ListEntriesValidatorInterface $validator
+    ) {
         $this->repository = $repository;
+        $this->validator  = $validator;
     }
 
     /**
-     * Execute the use case.
+     * Execute UC-2 with a normalized request DTO.
      *
      * Mechanics:
-     * 1) Fetch all entries from repository.
-     * 2) Sort by `date DESC`, then by `createdAt DESC` for stable order.
-     * 3) Apply simple pagination: 1-based page indexing, non-negative slicing.
-     * 4) Build response DTO with items and metadata.
+     * 1) Run business validation (date format, query length, etc.).
+     * 2) Map request to Domain Criteria (primary + stable secondary sort inside criteria).
+     * 3) Fetch a page from repository.
+     * 4) Build and return a typed response DTO.
      *
-     * @param ListEntriesRequestInterface  $request  Request parameters (filters, paging, sort).
-     *
-     * @return ListEntriesResponseInterface Response carrying items and pagination meta.
+     * @param ListEntriesRequestInterface $request Normalized request parameters (filters, paging, sort).
+     * @return ListEntriesResponseInterface Response with items and pagination meta.
      */
     public function execute(ListEntriesRequestInterface $request): ListEntriesResponseInterface
     {
-        /** Fetch all entries (filters/sort will be pushed down later when implemented) */
-        $entries = $this->repository->fetchAll();
+        $this->validator->validate($request);
 
-        /** Apply filters BEFORE sorting/pagination */
-        $entries = $this->filterByDateRange($entries, $request);
+        $criteria = ListEntriesCriteria::fromRequest($request);
+        $page = $this->repository->findByCriteria($criteria);
 
-        /** Sort by date DESC with stable secondary order by createdAt DESC */
-        $callable = [$this, 'compareByDateDesc'];
-        usort($entries, $callable);
-
-        /** Pagination inputs */
-        $page    = $request->getPage();     // expected to be >= 1 by validator/DTO default
-        $perPage = $request->getPerPage();  // expected to be within bounds (clamped elsewhere later)
-
-        /** Compute slice boundaries (1-based page => 0-based offset) */
-        $offset = ($page - 1) * $perPage;
-        if ($offset < 0) {
-            $offset = 0;
-        }
-
-        /** Total before slicing */
-        $total = count($entries);
-
-        /** Slice current page; empty slice is valid */
-        $items = array_slice($entries, $offset, $perPage);
-
-        /** Pages count (at least 1 page when total>0, else 0 to signal empty dataset) */
-        $pagesFloat = $perPage > 0 ? ($total / $perPage) : 0;
-        $pagesCount = $perPage > 0 ? (int)ceil($pagesFloat) : 0;
+        $items      = $page['items'];
+        $total      = $page['total'];
+        $pageNum    = $page['page'];
+        $perPage    = $page['perPage'];
+        $pagesCount = $page['pagesCount'];
 
         $data = [
             'items'      => $items,
-            'page'       => $page,
+            'page'       => $pageNum,
             'perPage'    => $perPage,
             'total'      => $total,
-            'pagesCount' => $pagesCount
+            'pagesCount' => $pagesCount,
         ];
 
         $response = ListEntriesResponse::fromArray($data);
-
         return $response;
-    }
-
-    /**
-     * Filter entries by inclusive date range if provided.
-     *
-     * Mechanics:
-     * - Keep items where entry.date >= dateFrom (if set).
-     * - And entry.date <= dateTo (if set).
-     *
-     * @param list<Entry>                     $entries Source items.
-     * @param ListEntriesRequestInterface     $request Request with optional bounds.
-     *
-     * @return list<Entry> Filtered items (reindexed).
-     */
-    private function filterByDateRange(array $entries, ListEntriesRequestInterface $request): array
-    {
-        $from = $request->getDateFrom();
-        $to   = $request->getDateTo();
-
-        /** No bounds => no-op */
-        if ($from === null && $to === null) {
-            $result = $entries;
-            return $result;
-        }
-
-        $filtered = array_filter(
-            $entries,
-            function (Entry $e) use ($from, $to): bool {
-                return $this->isWithinDateRange($e, $from, $to);
-            }
-        );
-
-        $result = array_values($filtered);
-        return $result;
-    }    
-
-    /**
-     * Check if entry falls within the given inclusive date range.
-     *
-     * @param Entry       $entry Entry to check
-     * @param string|null $from  Lower bound date (YYYY-MM-DD) or null
-     * @param string|null $to    Upper bound date (YYYY-MM-DD) or null
-     * @return bool
-     */
-    private function isWithinDateRange(Entry $entry, ?string $from, ?string $to): bool
-    {
-        $dateStr = $entry->getDate();
-        $date    = new \DateTimeImmutable($dateStr);
-
-        $geFrom = true;
-        if ($from !== null) {
-            $fromDate = new \DateTimeImmutable($from);
-            $geFrom   = $date >= $fromDate;
-        }
-
-        $leTo = true;
-        if ($to !== null) {
-            $toDate = new \DateTimeImmutable($to);
-            $leTo   = $date <= $toDate;
-        }
-
-        $isInRange = $geFrom && $leTo;
-        return $isInRange;
-    }
-
-    /**
-     * Comparator for entries: primary by logical date DESC, secondary by createdAt DESC.
-     *
-     * Assumptions:
-     * - Entry::getDate() returns ISO date 'YYYY-MM-DD' (string) — string compare is safe.
-     * - Entry::getCreatedAt() returns ISO-8601 datetime (string) — lexical compare preserves order.
-     *
-     * @param Entry $a Left operand.
-     * @param Entry $b Right operand.
-     *
-     * @return int Negative if $a should go before $b, positive if after, zero if equal.
-     */
-    private function compareByDateDesc(Entry $a, Entry $b): int
-    {
-        $dateA = $a->getDate();
-        $dateB = $b->getDate();
-
-        $result = strcmp($dateB, $dateA);
-        return $result;
     }
 }

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Daylog\Infrastructure\Repositories\Entries;
 
+use Daylog\Domain\Models\Entries\ListEntriesCriteria;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Domain\Interfaces\Entries\EntryStorageInterface;
 use Daylog\Domain\Models\Entries\Entry;
@@ -55,4 +56,8 @@ final class EntryRepository implements EntryRepositoryInterface
         $result = $this->storage->fetchAll();
         return $result;
     }    
+
+    public function findByCriteria(ListEntriesCriteria $criteria): array {
+        return [];
+    }
 }

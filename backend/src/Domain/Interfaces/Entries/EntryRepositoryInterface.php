@@ -5,9 +5,15 @@ declare(strict_types=1);
 namespace Daylog\Domain\Interfaces\Entries;
 
 use Daylog\Domain\Models\Entries\Entry;
+use Daylog\Domain\Models\Entries\ListEntriesCriteria;
 
 /**
- * Repository contract for Entry persistence.
+ * Repository contract for Entries.
+ *
+ * Purpose:
+ * Define read operations to retrieve entries. For UC-2 the primary
+ * method is criteria-based pagination, where sorting/filtering/paging
+ * are applied in the infrastructure implementation.
  */
 interface EntryRepositoryInterface
 {
@@ -24,6 +30,25 @@ interface EntryRepositoryInterface
      *                             - updatedAt (ISO-8601 UTC)
      */
     public function save(Entry $entry): array;
+
+    /**
+     * Fetch a paginated page of entries by domain criteria.
+     *
+     * Mechanics:
+     * - Apply filters from ListEntriesCriteria (date/dateFrom/dateTo/query).
+     * - Apply sorting (primary from criteria + stable secondary createdAt DESC).
+     * - Apply pagination (page/perPage).
+     *
+     * @param ListEntriesCriteria $criteria Domain query object.
+     * @return array{
+     *     items:      list<Entry>,
+     *     total:      int,
+     *     page:       int,
+     *     perPage:    int,
+     *     pagesCount: int
+     * }
+     */
+    public function findByCriteria(ListEntriesCriteria $criteria): array;
 
     /**
      * Return all entries for read-side use cases.
