@@ -36,15 +36,16 @@ final class ListEntriesRequestFactoryTest extends Unit
 
         $dto = $factory->fromArray($input);
 
-        $this->assertInstanceOf(ListEntriesRequestInterface::class, $dto);
-        $this->assertSame($input['page'],      $dto->getPage());
-        $this->assertSame($input['perPage'],   $dto->getPerPage());
-        $this->assertSame($input['sort'],      $dto->getSort());
-        $this->assertSame($input['direction'], $dto->getDirection());
+        $this->assertSame($input['page'],       $dto->getPage());
+        $this->assertSame($input['perPage'],    $dto->getPerPage());
+        $this->assertSame($input['sortField'],  $dto->getSort());
+        $this->assertSame($input['sortDir'],    $dto->getDirection());
     }
 
     /**
-     * Transport validation errors: For invalid type or missing field, throws TransportValidationException.
+     * Transport validation errors: for invalid TYPE only, throws TransportValidationException.
+     * Missing/null is allowed and handled by the normalizer.
+     *
      *
      * @dataProvider provideInvalidTransportData
      *
@@ -62,49 +63,55 @@ final class ListEntriesRequestFactoryTest extends Unit
     }
 
     /**
-     * Provides overrides that break transport-level type checks.
-     *
-     * Notes:
-     * - To simulate a missing required key (page/perPage/sort/direction),
-     *   pass null. The factory reads raw via `?? null`; null is not an int/string → error.
-     * - Optional filters are nullable; wrong type should trigger errors when present.
+     * Contract:
+     * - page, perPage: allow null/missing; when provided, must be numeric (is_numeric).
+     * - sortField, sortDir: allow null/missing; when provided, must be scalar (no arrays/objects).
+     * - dateFrom, dateTo, date, query: allow null/missing; when provided, must be scalar.
      *
      * @return array<string, array{0: array<string,mixed>}>
      */
     public static function provideInvalidTransportData(): array
     {
         $cases = [
-            // Required fields: missing (null) or wrong type
-            'page is missing'            => [['page' => null]],
-            'perPage is missing'         => [['perPage' => null]],
-            'sort is missing'            => [['sort' => null]],
-            'direction is missing'       => [['direction' => null]],
-            'page is not int'            => [['page' => '1']],
-            'perPage is not int'         => [['perPage' => '10']],
-            'sort is not string'         => [['sort' => 123]],
-            'direction is not string'    => [['direction' => false]],
+            // page/perPage: invalid when provided and NOT numeric
+            'page is not numeric (bool)'       => [['page' => true]],
+            'page is not numeric (array)'      => [['page' => []]],
+            'page is not numeric (object)'     => [['page' => (object)['x' => 1]]],
+            'perPage is not numeric (bool)'    => [['perPage' => false]],
+            'perPage is not numeric (array)'   => [['perPage' => ['10']]],
+            'perPage is not numeric (object)'  => [['perPage' => (object)['y' => 1]]],
 
-            // Optional filters: wrong type when provided
-            'dateFrom is not string'     => [['dateFrom' => 20250813]],
-            'dateTo is not string'       => [['dateTo' => 20250813]],
-            'date is not string'         => [['date' => 20250813]],
-            'query is not string'        => [['query' => ['oops']]],
+            // sort/direction: invalid when provided and NOT scalar
+            'sort is not scalar (array)'       => [['sortField' => ['date']]],
+            'sort is not scalar (object)'      => [['sortField' => (object)['v' => 'date']]],
+            'direction is not scalar (array)'  => [['sortDir' => ['DESC']]],
+            'direction is not scalar (object)' => [['sortDir' => (object)['v' => 'DESC']]],
 
-            // Multiple violations at once (order of checks verified in dedicated test if needed)
-            'page and perPage invalid'   => [['page' => 'x', 'perPage' => 'y']],
-            'sort and direction invalid' => [['sort' => 7, 'direction' => 0]],
-            'all fields wrong'           => [[
-                'page'      => 'p',
-                'perPage'   => 'pp',
-                'sort'      => 0,
-                'direction' => 1,
-                'dateFrom'  => 123,
-                'dateTo'    => 456,
-                'date'      => 789,
-                'query'     => ['q'],
-            ]],
+            // optional filters: invalid when provided and NOT scalar
+            'dateFrom is not scalar (array)'   => [['dateFrom' => ['2025-08-13']]],
+            'dateFrom is not scalar (object)'  => [['dateFrom' => (object)['v' => '2025-08-13']]],
+            'dateTo is not scalar (array)'     => [['dateTo' => ['2025-08-13']]],
+            'dateTo is not scalar (object)'    => [['dateTo' => (object)['v' => '2025-08-13']]],
+            'date is not scalar (array)'       => [['date' => ['2025-08-13']]],
+            'date is not scalar (object)'      => [['date' => (object)['v' => '2025-08-13']]],
+            'query is not scalar (array)'      => [['query' => ['oops']]],
+            'query is not scalar (object)'     => [['query' => (object)['v' => 'oops']]],
+
+            // multiple violations at once
+            'page and perPage invalid'         => [['page' => [], 'perPage' => true]],
+            'sort and direction invalid'       => [['sortField' => ['x'], 'direction' => (object)['v' => 'DESC']]],
+            'all fields wrong'                 => [[
+                'page'      => (object)['p' => 1],
+                'perPage'   => [],
+                'sortField' => ['date'],
+                'sortDir'   => (object)['v' => 'DESC'],
+                'dateFrom'  => ['2025-08-13'],
+                'dateTo'    => (object)['v' => '2025-08-13'],
+                'date'      => [],
+                'query'     => (object)['v' => 'q'],
+            ]]
         ];
 
         return $cases;
-    }    
+    }
 }
