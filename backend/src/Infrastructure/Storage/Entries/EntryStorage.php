@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Daylog\Infrastructure\Storage\Entries;
 
+use Daylog\Infrastructure\Storage\Entries\EntryModel;
 use Daylog\Domain\Interfaces\Entries\EntryStorageInterface;
 use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Domain\Services\UuidGenerator;
@@ -18,12 +19,26 @@ final class EntryStorage implements EntryStorageInterface
     /**
      * Insert the given Entry and return generated UUID.
      *
-     * @param Entry $entry Entry to persist (ignored in the minimal version).
+     * @param Entry  $entry Domain entry to persist.
+     * @param string $now   Current timestamp (UTC, ISO 8601).
      * @return string Generated UUID (v4).
      */
-    public function insert(Entry $entry): string
+    public function insert(Entry $entry, string $now): string
     {
         $uuid = UuidGenerator::generate();
+
+        $data = [
+            'id'        => $uuid,
+            'date'      => $entry->getDate(),
+            'title'     => $entry->getTitle(),
+            'body'      => $entry->getBody(),
+            'createdAt' => $now,
+            'updatedAt' => $now
+        ];
+
+        $model = new EntryModel();
+        $model->create($data);
+
         return $uuid;
     }
 }
