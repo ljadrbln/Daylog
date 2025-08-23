@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Support\Fakes;
 
+use Daylog\Domain\Models\Entries\ListEntriesCriteria;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Domain\Services\UuidGenerator;
@@ -79,4 +80,69 @@ final class FakeEntryRepository implements EntryRepositoryInterface
 
         return end($this->entries);
     }
+
+    /**
+     * Find entries by Domain Criteria.
+     *
+     * @param ListEntriesCriteria $criteria
+     * @return array{
+     *     items:      list<Entry>,
+     *     total:      int,
+     *     page:       int,
+     *     perPage:    int,
+     *     pagesCount: int
+     * }
+     */
+    public function findByCriteria(ListEntriesCriteria $criteria): array
+    {
+        $page    = $criteria->getPage();
+        $perPage = $criteria->getPerPage();
+
+        // 1) (Optional) Filters — включи при необходимости:
+        $pool = $this->items;
+
+        // 2) Sorting: date DESC, then createdAt DESC (stable)
+        $cmp = function (Entry $a, Entry $b): int {
+            $dateA = $a->getDate();
+            $dateB = $b->getDate();
+
+            $primary = strcmp($dateB, $dateA);
+            if ($primary !== 0) {
+                $result = $primary;
+                return $result;
+            }
+
+            $createdA = $a->getCreatedAt();
+            $createdB = $b->getCreatedAt();
+
+            $secondary = strcmp($createdB, $createdA);
+            $result    = $secondary;
+            return $result;
+        };
+
+        usort($pool, $cmp);
+
+        // 3) Pagination
+        $total   = count($pool);
+        $offset  = ($page - 1) * $perPage;
+        if ($offset < 0) {
+            $offset = 0;
+        }
+
+        $slice       = array_slice($pool, $offset, $perPage);
+        $pagesCount  = $perPage > 0 ? (int)ceil($total / $perPage) : 0;
+
+        $items = array_values($slice);
+
+        $result = [
+            'items'      => $items,
+            'total'      => $total,
+            'page'       => $page,
+            'perPage'    => $perPage,
+            'pagesCount' => $pagesCount,
+        ];
+
+        return $result;
+    }
+
 }

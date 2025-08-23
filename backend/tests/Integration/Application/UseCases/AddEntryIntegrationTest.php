@@ -4,11 +4,11 @@ declare(strict_types=1);
 namespace Daylog\Tests\Integration\Application\UseCases;
 
 use Codeception\Test\Unit;
-use Daylog\Application\DTO\Entries\AddEntryRequestInterface;
-use Daylog\Application\DTO\Entries\AddEntryRequest;
+use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
+use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\UseCases\Entries\AddEntry;
-use Daylog\Application\Validators\Entries\AddEntryValidator;
+use Daylog\Application\Validators\Entries\AddEntry\AddEntryValidator;
 use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Tests\Support\Helper\EntryHelper;
