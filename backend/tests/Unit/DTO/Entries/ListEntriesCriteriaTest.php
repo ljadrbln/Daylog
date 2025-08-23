@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\DTO\Entries;
 
@@ -8,23 +9,29 @@ use Daylog\Tests\Support\Helper\ListEntriesHelper;
 use Daylog\Domain\Models\Entries\ListEntriesConstraints;
 
 /**
- * Tests for ListEntriesCriteria mapping and normalization.
+ * Unit tests for Domain ListEntriesCriteria (UC-2).
  *
- * This suite verifies that the criteria:
- *  - maps request fields 1:1 without business validation;
- *  - applies defaults for page/perPage;
- *  - trims and normalizes query (empty -> null);
- *  - converts empty date strings to null, leaving valid YYYY-MM-DD as-is.
+ * Purpose:
+ * Verify that the Domain Criteria acts as a thin immutable value object:
+ * it copies already-normalized values from the Request DTO without re-normalization
+ * and exposes a stable two-level sort descriptor (primary from request + secondary createdAt DESC).
  *
- * @covers \Daylog\Application\DTO\Entries\ListEntriesCriteria
+ * Mechanics:
+ * - Data source: a stub implementing ListEntriesRequestInterface (via ListEntriesHelper).
+ * - We assert 1:1 field mapping and fixed secondary sort only.
+ *
+ * @covers \Daylog\Domain\Models\Entries\ListEntriesCriteria
  */
 final class ListEntriesCriteriaTest extends Unit
 {
     /**
-     * Given a valid request, returns a criteria with mapped values.
+     * Given a valid, normalized request, Criteria maps fields 1:1.
      *
-     * Data source: a stub of ListEntriesRequestInterface.
-     * We check the getters for exact values without additional validation.
+     * Data source:
+     * - Base values from ListEntriesHelper::getData()
+     * - Filters override a subset of fields
+     *
+     * We verify getters and the full sort descriptor.
      */
     public function testFromRequestReturnsMappedValues(): void
     {
@@ -65,93 +72,108 @@ final class ListEntriesCriteriaTest extends Unit
 
         $sortDescriptor = $criteria->getSortDescriptor();
         $expectedSort   = [
-            ['field' => $base['sortField'], 'direction' => $base['sortDir']],
-            ['field' => 'createdAt',        'direction' => 'DESC'],
+            ['field' => $base['sortField'], 'direction' => $base['sortDir']], // primary from request
+            ['field' => 'createdAt',        'direction' => 'DESC'],            // stable secondary
         ];
         $this->assertSame($expectedSort, $sortDescriptor);
     }
 
     /**
-     * Defaults are applied when request has empty/zero values.
+     * Defaults and normalization are preserved (but not performed here).
      *
-     * Mechanics:
-     *  - page default -> 1
-     *  - perPage default -> 10 (tunable)
-     *  - empty dates ('') -> null
-     *  - null dates -> null
-     *  - query '' or "   " -> null (after trim)
+     * Scenario:
+     * - Request carries invalid/empty values which were already normalized upstream.
+     * - Criteria must simply reflect those normalized values without changes.
+     *
+     * Checks:
+     * - page: given < PAGE_MIN → clamped to PAGE_MIN
+     * - perPage: given < PER_PAGE_MIN → clamped to PER_PAGE_MIN
+     * - dates: empty/null → null
+     * - query: spaces-only → null (after upstream trim)
      */
-    public function testDefaultsAndNormalizationAreApplied(): void
+    public function testDefaultsAndNormalizationArePreservedFromRequest(): void
     {
-        // invalid            
-        $page    = 0;
-        $perPage = 0;
+        /** Arrange **/
+        $page    = 0; // invalid, upstream → PAGE_MIN
+        $perPage = 0; // invalid, upstream → PER_PAGE_MIN (NOT DEFAULT)
 
         $filters = [
-            'dateFrom' => '',      // empty string → null
-            'dateTo'   => null,    // null → null
-            'query'    => '   ',   // only spaces → null
+            'dateFrom' => '',
+            'dateTo'   => null,
+            'query'    => '   ',
         ];
 
-        $base = ListEntriesHelper::getData($page, $perPage);
-        $data = ListEntriesHelper::withFilters($base, $filters);
+        $base    = ListEntriesHelper::getData($page, $perPage);
+        $data    = ListEntriesHelper::withFilters($base, $filters);
+        $request = ListEntriesHelper::buildRequest($data);
 
-        $request  = ListEntriesHelper::buildRequest($data);
+        /** Act **/
         $criteria = ListEntriesCriteria::fromRequest($request);
 
+        /** Assert **/
         $expectedPage = ListEntriesConstraints::PAGE_MIN;
-        $actualPage   = $criteria->getPage();
-        $this->assertSame($expectedPage, $actualPage);
+        $this->assertSame($expectedPage, $criteria->getPage());
 
-        $expectedPerPage = ListEntriesConstraints::PER_PAGE_DEFAULT;
-        $actualPerPage   = $criteria->getPerPage();
-        $this->assertSame($expectedPerPage, $actualPerPage);
+        $expectedPerPage = ListEntriesConstraints::PER_PAGE_MIN;
+        $this->assertSame($expectedPerPage, $criteria->getPerPage());
 
         $this->assertNull($criteria->getDateFrom());
         $this->assertNull($criteria->getDateTo());
         $this->assertNull($criteria->getQuery());
-    }    
+    }
+
 
     /**
-     * Query is trimmed but not otherwise transformed.
+     * Query is trimmed upstream and preserved as-is by Criteria.
      *
      * Cases:
-     *  - leading/trailing spaces are removed;
-     *  - inner spaces preserved;
-     *  - non-empty after trim remains as-is.
+     * - Leading/trailing spaces are removed upstream.
+     * - Inner spaces are preserved.
+     * - Non-empty after trim remains intact.
      */
-    public function testQueryIsTrimmed(): void
+    public function testQueryIsPreservedAfterUpstreamTrim(): void
     {
+        /** Arrange **/
         $filters = [
             'query' => '  project alpha  beta  '
         ];
 
-        $base = ListEntriesHelper::getData();
-        $data = ListEntriesHelper::withFilters($base, $filters);
+        $base    = ListEntriesHelper::getData();
+        $data    = ListEntriesHelper::withFilters($base, $filters);
         $request = ListEntriesHelper::buildRequest($data);
 
+        /** Act **/
         $criteria = ListEntriesCriteria::fromRequest($request);
 
+        /** Assert **/
         $actualQuery = $criteria->getQuery();
         $this->assertSame('project alpha  beta', $actualQuery);
     }
 
     /**
-     * Sorting strategy is fixed to business default.
+     * Sorting descriptor exposes primary from request + stable secondary (createdAt DESC).
      *
      * Mechanics:
-     *  - Primary: date DESC;
-     *  - Secondary (stable): createdAt DESC.
-     * The criteria exposes a read-only descriptor for repositories.
+     * - Primary comes directly from the normalized request (field + direction).
+     * - Secondary is always fixed to createdAt DESC for stability.
      */
-    public function testSortDescriptorIsFixed(): void
+    public function testSortDescriptorPrimaryFromRequestAndSecondaryStable(): void
     {
+        /** Arrange **/
         $data = ListEntriesHelper::getData();
-        
         $request  = ListEntriesHelper::buildRequest($data);
+
+        /** Act **/
         $criteria = ListEntriesCriteria::fromRequest($request);
 
+        /** Assert **/
         $sort = $criteria->getSortDescriptor();
-        $this->assertSame(ListEntriesConstraints::SORT_DESCRIPTOR, $sort);
+
+        $expected = [
+            ['field' => $data['sortField'], 'direction' => $data['sortDir']],
+            ['field' => 'createdAt',        'direction' => 'DESC'],
+        ];
+
+        $this->assertSame($expected, $sort);
     }
 }
