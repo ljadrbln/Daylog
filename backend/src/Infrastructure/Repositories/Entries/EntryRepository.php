@@ -28,9 +28,7 @@ final class EntryRepository implements EntryRepositoryInterface
         $this->storage = $storage;
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function save(Entry $entry): array
     {
         $now  = Clock::now();
@@ -45,18 +43,8 @@ final class EntryRepository implements EntryRepositoryInterface
             'updatedAt' => $now
         ];
     }
-    
-    /**
-     * Fetches all entries from storage.
-     *
-     * @return Entry[]
-     */
-    public function fetchAll(): array
-    {
-        $result = $this->storage->fetchAll();
-        return $result;
-    }    
 
+    /** @inheritDoc */
     public function findByCriteria(ListEntriesCriteria $criteria): array {
         return [];
     }

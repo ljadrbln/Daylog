@@ -79,42 +79,4 @@ final class FakeEntryRepository implements EntryRepositoryInterface
 
         return end($this->entries);
     }
-
-    /**
-     * Return in-memory snapshot of saved entries as normalized rows.
-     *
-     * Each row contains:
-     * - id (string, UUID v4)
-     * - title (string)
-     * - body (string)
-     * - date (string, YYYY-MM-DD)
-     * - createdAt (string, ISO-8601 UTC)
-     * - updatedAt (string, ISO-8601 UTC)
-     *
-     * @return array<int, array<string, string>>
-     */
-    public function fetchAll(): array
-    {
-        /** @var array<int, array<string, string>> $rows */
-        $rows = [];
-
-        foreach ($this->entries as $entry) {
-            $id   = UuidGenerator::generate();
-            $now  = Clock::now();
-
-            $row = [
-                'id'        => $id,
-                'title'     => $entry->getTitle(),
-                'body'      => $entry->getBody(),
-                'date'      => $entry->getDate(),
-                'createdAt' => $now,
-                'updatedAt' => $now
-            ];
-
-            $rows[] = $row;
-        }
-
-        return $rows;
-    }
-
 }

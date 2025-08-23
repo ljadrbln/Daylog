@@ -49,16 +49,4 @@ interface EntryRepositoryInterface
      * }
      */
     public function findByCriteria(ListEntriesCriteria $criteria): array;
-
-    /**
-     * Return all entries for read-side use cases.
-     *
-     * The write-side (save) stays unchanged; this method exists to let read use cases
-     * (e.g., ListEntries) obtain a snapshot of entries to filter/sort/paginate in application layer.
-     *
-     * @return array<int, array<string, string>> List of normalized entry rows with keys:
-     *                                           id, title, body, date, createdAt, updatedAt.
-     */
-    public function fetchAll(): array;
-
 }
