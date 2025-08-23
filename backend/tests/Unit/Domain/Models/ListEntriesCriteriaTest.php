@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Tests\Unit\Application\DTO\Entries;
+namespace Daylog\Tests\Unit\Application\Domain\Models;
 
 use Codeception\Test\Unit;
-use Daylog\Application\DTO\Entries\ListEntries\ListEntriesCriteria;
+use Daylog\Domain\Models\Entries\ListEntriesCriteria;
 use Daylog\Tests\Support\Helper\ListEntriesHelper;
 use Daylog\Domain\Models\Entries\ListEntriesConstraints;
 

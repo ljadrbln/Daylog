@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Daylog\Application\DTO\Entries\ListEntries;
+namespace Daylog\Domain\Models\Entries;
 
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequestInterface;
 
