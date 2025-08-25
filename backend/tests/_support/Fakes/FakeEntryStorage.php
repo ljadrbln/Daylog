@@ -5,6 +5,7 @@ namespace Daylog\Tests\Support\Fakes;
 
 use Daylog\Domain\Interfaces\Entries\EntryStorageInterface;
 use Daylog\Domain\Models\Entries\Entry;
+use Daylog\Domain\Models\Entries\ListEntriesCriteria;
 
 /**
  * FakeEntryStorage
@@ -23,13 +24,8 @@ final class FakeEntryStorage implements EntryStorageInterface
     /** @var string */
     public string $returnUuid = '11111111-1111-1111-1111-111111111111';
 
-    /**
-     * Insert entry and return preconfigured UUID.
-     *
-     * @param Entry $entry
-     * @return string
-     */
-    public function insert(Entry $entry): string
+    /** @inheritDoc */
+    public function insert(Entry $entry, string $now): string
     {
         $this->insertCalls++;
         $this->lastInserted = $entry;
@@ -37,4 +33,9 @@ final class FakeEntryStorage implements EntryStorageInterface
         $uuid = $this->returnUuid;
         return $uuid;
     }
+
+    /** @inheritDoc */
+    public function findByCriteria(ListEntriesCriteria $criteria): array {
+        return [];
+    }    
 }
