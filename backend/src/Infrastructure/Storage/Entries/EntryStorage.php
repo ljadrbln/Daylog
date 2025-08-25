@@ -210,11 +210,23 @@ final class EntryStorage implements EntryStorageInterface
      */
     private function buildF3Options(ListEntriesCriteria $criteria): array
     {
-        $descriptors = $criteria->getSortDescriptor();
+        $descriptors = $criteria->getSortDescriptor(); // [['field'=>'date|createdAt|updatedAt','direction'=>'ASC|DESC'], ...]
+
+        $fieldMap = [
+            'date'      => 'date',
+            'createdAt' => 'created_at',
+            'updatedAt' => 'updated_at',
+        ];
 
         $parts = [];
         foreach ($descriptors as $desc) {
-            $parts[] = $desc['field'] . ' ' . $desc['direction'];
+            $fieldDomain = $desc['field'];
+            $dirVar      = $desc['direction'];
+
+            $fieldDb = $fieldMap[$fieldDomain] ?? $fieldDomain;
+
+            $part = sprintf('%s %s', $fieldDb, $dirVar);
+            $parts[] = $part;
         }
 
         $order = implode(', ', $parts);
