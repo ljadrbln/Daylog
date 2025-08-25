@@ -64,36 +64,6 @@ final class EntryStorage implements EntryStorageInterface
      * Retrieve entries by UC-2 criteria with pagination.
      *
      * Mechanics:
-     * - Delegates the entire query construction and execution to EntryModel::findByCriteria().
-     * - Keeps storage thin and framework-agnostic.
-     *
-     * @param ListEntriesCriteria $criteria Normalized criteria from validator.
-     * @return array{
-     *     items: array<int, array{
-     *         id:string,
-     *         date:string,
-     *         title:string,
-     *         body:string,
-     *         createdAt:string,
-     *         updatedAt:string
-     *     }>,
-     *     total:int,
-     *     page:int,
-     *     perPage:int,
-     *     pagesCount:int
-     * }
-     */
-    public function findByCriteria1(ListEntriesCriteria $criteria): array
-    {
-        $result = $this->model->findByCriteria($criteria);
-
-        return $result;
-    }
-
-    /**
-     * Retrieve entries by UC-2 criteria with pagination.
-     *
-     * Mechanics:
      * - Build F3 $filter and $options via dedicated helpers.
      * - Delegate to EntryModel::find()/count() and map rows to array shape.
      *
