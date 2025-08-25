@@ -8,6 +8,7 @@ use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Domain\Interfaces\Entries\EntryStorageInterface;
 use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Infrastructure\Utils\Clock;
+
 /**
  * Class EntryRepository
  *
@@ -34,7 +35,7 @@ final class EntryRepository implements EntryRepositoryInterface
         $now  = Clock::now();
         $uuid = $this->storage->insert($entry, $now);
 
-        return [
+        $entry = [
             'id'        => $uuid,
             'date'      => $entry->getDate(),
             'title'     => $entry->getTitle(),
@@ -42,10 +43,38 @@ final class EntryRepository implements EntryRepositoryInterface
             'createdAt' => $now,
             'updatedAt' => $now
         ];
+
+        return $entry;
     }
 
-    /** @inheritDoc */
-    public function findByCriteria(ListEntriesCriteria $criteria): array {
-        return [];
+    /**
+     * Fetch a page of entries by criteria (UC-2).
+     *
+     * Mechanics:
+     * - Delegates to storage which applies filters (date/dateFrom/dateTo/query),
+     *   sorting (field + direction with stable secondary order), and pagination
+     *   (LIMIT/OFFSET) directly in SQL for performance and determinism.
+     * - Returns result as an associative array with page metadata.
+     *
+     * Expected result shape:
+     * - items: Entry[] mapped to arrays for presentation boundary
+     * - total: int total number of matching items (without pagination)
+     * - page: int current page (echo from criteria)
+     * - perPage: int current page size (echo from criteria)
+     * - pagesCount: int ceil(total / perPage)
+     *
+     * @param ListEntriesCriteria $criteria Normalized criteria (validated upstream).
+     * @return array{
+     *     items: array<int, array{id:string,date:string,title:string,body:string,createdAt:string,updatedAt:string}>,
+     *     total: int,
+     *     page: int,
+     *     perPage: int,
+     *     pagesCount: int
+     * }
+     */
+    public function findByCriteria(ListEntriesCriteria $criteria): array
+    {
+        $result = $this->storage->findByCriteria($criteria);
+        return $result;
     }
 }

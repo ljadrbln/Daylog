@@ -65,7 +65,7 @@ final class ListEntriesCriteria
         $primaryField = $req->getSort();
         $primaryDir   = $req->getDirection();
 
-        $secondaryField = 'createdAt';
+        $secondaryField = 'created_at';
         $secondaryDir   = 'DESC';
 
         $sort = [

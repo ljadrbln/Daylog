@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 namespace Daylog\Application\DTO\Entries\ListEntries;
+
+use Daylog\Application\DTO\Entries\ListEntries\ListEntriesItem;
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesResponseInterface;
 
 /**
@@ -58,7 +60,13 @@ final class ListEntriesResponse implements ListEntriesResponseInterface
         $total      = $data['total']      ?? 0;
         $pagesCount = $data['pagesCount'] ?? 1;
 
-        return new self($items, $page, $perPage, $total, $pagesCount);
+        $mapped = [];
+        foreach ($items as $item) {
+            $item = ListEntriesItem::fromArray($item);
+            $mapped[] = $item;
+        }
+
+        return new self($mapped, $page, $perPage, $total, $pagesCount);
     }
 
     /**
