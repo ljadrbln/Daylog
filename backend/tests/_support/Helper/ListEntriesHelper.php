@@ -6,6 +6,7 @@ namespace Daylog\Tests\Support\Helper;
 
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequest;
 use Daylog\Application\Normalization\Entries\ListEntriesInputNormalizer;
+use Daylog\Domain\Models\Entries\ListEntriesConstraints;
 
 /**
  * Helper for creating valid ListEntries request payloads in tests.
@@ -24,8 +25,6 @@ use Daylog\Application\Normalization\Entries\ListEntriesInputNormalizer;
  *  ]);
  *  $request = ListEntriesHelper::buildRequest($data);
  */
-
-use Daylog\Domain\Models\Entries\ListEntriesConstraints;
 
 final class ListEntriesHelper
 {
