@@ -24,8 +24,8 @@ final class AddEntry
      * @param AddEntryValidatorInterface $validator Validator for business rules.
      */
     public function __construct(
-        private EntryRepositoryInterface $repo,
-        private AddEntryValidatorInterface $validator
+        private EntryRepositoryInterface    $repo,
+        private AddEntryValidatorInterface  $validator
     ) {}
 
     /**
