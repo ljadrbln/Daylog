@@ -8,6 +8,7 @@ use Daylog\Domain\Interfaces\Entries\EntryStorageInterface;
 use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Domain\Models\Entries\ListEntriesCriteria;
 use Daylog\Domain\Services\UuidGenerator;
+use Daylog\Infrastructure\Storage\Entries\EntryFieldMapper;
 
 /**
  * Class EntryStorage
@@ -91,7 +92,8 @@ final class EntryStorage implements EntryStorageInterface
 
         $items = [];
         foreach ($rows as $row) {
-            $items[] = $this->mapDbRowToDtoShape($row);
+            $mapped = EntryFieldMapper::fromDbRow($row);
+            $items[] = $mapped;
         }
 
         $result = [
@@ -174,25 +176,7 @@ final class EntryStorage implements EntryStorageInterface
     private function buildF3Options(ListEntriesCriteria $criteria): array
     {
         $descriptors = $criteria->getSortDescriptor(); // [['field'=>'date|createdAt|updatedAt','direction'=>'ASC|DESC'], ...]
-
-        $fieldMap = [
-            'date'      => 'date',
-            'createdAt' => 'created_at',
-            'updatedAt' => 'updated_at',
-        ];
-
-        $parts = [];
-        foreach ($descriptors as $desc) {
-            $fieldDomain = $desc['field'];
-            $dirVar      = $desc['direction'];
-
-            $fieldDb = $fieldMap[$fieldDomain] ?? $fieldDomain;
-
-            $part = sprintf('%s %s', $fieldDb, $dirVar);
-            $parts[] = $part;
-        }
-
-        $order = implode(', ', $parts);
+        $order = EntryFieldMapper::buildOrder($descriptors);
 
         $page    = $criteria->getPage();
         $perPage = $criteria->getPerPage();
@@ -205,30 +189,5 @@ final class EntryStorage implements EntryStorageInterface
         ];
 
         return $options;
-    }
-
-    /**
-     * Map DB row (snake_case) to DTO shape (camelCase).
-     *
-     * Source keys:
-     *  - id, date, title, body, created_at, updated_at
-     * Target keys (for ListEntriesItem::fromArray):
-     *  - id, date, title, body, createdAt, updatedAt
-     *
-     * @param array{id:string,date:string,title:string,body:string,created_at:string,updated_at:string} $row
-     * @return array{id:string,date:string,title:string,body:string,createdAt:string,updatedAt:string}
-     */
-    private function mapDbRowToDtoShape(array $row): array
-    {
-        $mapped = [
-            'id'        => $row['id'],
-            'date'      => $row['date'],
-            'title'     => $row['title'],
-            'body'      => $row['body'],
-            'createdAt' => $row['created_at'],
-            'updatedAt' => $row['updated_at'],
-        ];
-
-        return $mapped;
     }
 }
