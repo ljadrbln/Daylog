@@ -5,9 +5,7 @@ namespace Daylog\Tests\Integration\Infrastructure\Storage\Entry;
 
 use Codeception\Test\Unit;
 use Daylog\Infrastructure\Storage\Entries\EntryModel;
-use Daylog\Domain\Services\UuidGenerator;
-use Daylog\Infrastructure\Utils\Variables;
-use Daylog\Infrastructure\Utils\DSNParser;
+use Daylog\Configuration\Bootstrap\SqlFactory;
 use Daylog\Infrastructure\Storage\Entries\EntryFieldMapper;
 use DB\SQL;
 
@@ -33,12 +31,10 @@ final class EntryModelTest extends Unit
      */
     protected function _before(): void
     {
-        $dsnString = Variables::getDB();
-        [$dsn, $user, $pass] = DSNParser::parse($dsnString);
+        $this->db = SqlFactory::get();
 
-        /** @var SQL $db */
-        $db = new SQL($dsn, $user, $pass);
-        $this->db = $db;
+        $sql = 'DELETE FROM entries';
+        $this->db->exec($sql);
     }
 
     /**
@@ -71,6 +67,3 @@ final class EntryModelTest extends Unit
         $this->assertSame($data['date'],  $fetched['date']);
     }    
 }
-
-
-
