@@ -8,6 +8,7 @@ use Daylog\Infrastructure\Storage\Entries\EntryModel;
 use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Infrastructure\Utils\Variables;
 use Daylog\Infrastructure\Utils\DSNParser;
+use Daylog\Infrastructure\Storage\Entries\EntryFieldMapper;
 use DB\SQL;
 
 use Daylog\Tests\Support\Helper\EntryTestData;
@@ -53,11 +54,11 @@ final class EntryModelTest extends Unit
         /** @var EntryModel $model */
         $model = new EntryModel($this->db);
 
-        $uuid = UuidGenerator::generate();
 
         /** @var array<string,string> $data */
-        $data  = EntryTestData::getOne();
-        $data['id']= $uuid;
+        $data = EntryTestData::getOne();
+        $data = EntryFieldMapper::toDbRow($data);
+        $uuid = $data['id'];
 
         $model->create($data);
 
