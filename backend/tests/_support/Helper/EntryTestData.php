@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Support\Helper;
 
+use Daylog\Domain\Services\UuidGenerator;
+
 /**
  * Test data builder for Entry in camelCase shape (Application-wide, except Storage).
  *
@@ -37,7 +39,10 @@ final class EntryTestData
         $finalCreatedAt = $createdAt ?? $defaultTs;
         $finalUpdatedAt = $updatedAt ?? $finalCreatedAt;
 
+        $id = UuidGenerator::generate();
+
         $payload = [
+            'id'        => $id,
             'title'     => $title,
             'body'      => $body,
             'date'      => $date,
