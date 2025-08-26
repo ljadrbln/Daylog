@@ -7,7 +7,7 @@ use Codeception\Test\Unit;
 use Daylog\Presentation\Requests\Entries\AddEntryRequestFactory;
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
 use Daylog\Application\Exceptions\TransportValidationException;
-use Daylog\Tests\Support\Helper\EntryHelper;
+use Daylog\Tests\Support\Helper\EntryTestData;
 
 /**
  * Unit tests for AddEntryRequestFactory.
@@ -29,7 +29,7 @@ final class AddEntryRequestFactoryTest extends Unit
     public function testFromArrayReturnsDtoOnValidInput(): void
     {
         $factory = new AddEntryRequestFactory();
-        $input   = EntryHelper::getData();
+        $input   = EntryTestData::getOne();
 
         $dto = $factory->fromArray($input);
 
@@ -49,7 +49,7 @@ final class AddEntryRequestFactoryTest extends Unit
     public function testFromArrayThrowsOnInvalidTransportData(array $overrides): void
     {
         $factory = new AddEntryRequestFactory();
-        $data    = EntryHelper::getData();
+        $data    = EntryTestData::getOne();
         $data    = array_merge($data, $overrides);
 
         $this->expectException(TransportValidationException::class);

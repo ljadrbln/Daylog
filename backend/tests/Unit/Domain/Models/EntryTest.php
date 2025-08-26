@@ -5,7 +5,7 @@ namespace Daylog\Tests\Unit\Domain\Models;
 
 use Codeception\Test\Unit;
 use Daylog\Domain\Models\Entries\Entry;
-use Daylog\Tests\Support\Helper\EntryHelper;
+use Daylog\Tests\Support\Helper\EntryTestData;
 
 /**
  * Unit-test for the Entry domain model.
@@ -23,7 +23,7 @@ final class EntryTest extends Unit
 {
     public function testConstructAndGetters(): void
     {
-        $data  = EntryHelper::getData(); // returns valid title/body/date
+        $data  = EntryTestData::getOne(); // returns valid title/body/date
         $entry = Entry::fromArray($data);
 
         $expectedTitle = $data['title'];

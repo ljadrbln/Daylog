@@ -10,7 +10,7 @@ use Daylog\Infrastructure\Utils\Variables;
 use Daylog\Infrastructure\Utils\DSNParser;
 use DB\SQL;
 
-use Daylog\Tests\Support\Helper\EntryHelper;
+use Daylog\Tests\Support\Helper\EntryTestData;
 
 /**
  * Class EntryModelTest
@@ -56,7 +56,7 @@ final class EntryModelTest extends Unit
         $uuid = UuidGenerator::generate();
 
         /** @var array<string,string> $data */
-        $data  = EntryHelper::getData();
+        $data  = EntryTestData::getOne();
         $data['id']= $uuid;
 
         $model->create($data);

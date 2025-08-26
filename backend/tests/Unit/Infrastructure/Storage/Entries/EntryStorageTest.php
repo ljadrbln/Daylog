@@ -8,7 +8,7 @@ use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Infrastructure\Storage\Entries\EntryModel;
 use Daylog\Infrastructure\Storage\Entries\EntryStorage;
 use Daylog\Domain\Services\UuidGenerator;
-use Daylog\Tests\Support\Helper\EntryHelper;
+use Daylog\Tests\Support\Helper\EntryTestData;
 
 /**
  * Class EntryStorageTest
@@ -46,7 +46,7 @@ final class EntryStorageTest extends Unit
 
         $storage = new EntryStorage($model);
 
-        $data  = EntryHelper::getData();
+        $data  = EntryTestData::getOne();
         $entry = Entry::fromArray($data);
 
         $now = '2025-08-12 10:00:00';

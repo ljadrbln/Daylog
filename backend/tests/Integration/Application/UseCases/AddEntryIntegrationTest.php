@@ -11,7 +11,7 @@ use Daylog\Application\UseCases\Entries\AddEntry;
 use Daylog\Application\Validators\Entries\AddEntry\AddEntryValidator;
 use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Domain\Services\UuidGenerator;
-use Daylog\Tests\Support\Helper\EntryHelper;
+use Daylog\Tests\Support\Helper\EntryTestData;
 use Daylog\Tests\Support\Fakes\FakeEntryRepository;
 
 /**
@@ -33,7 +33,7 @@ final class AddEntryIntegrationTest extends Unit
     public function testHappyPathPersistsAndReturnsUuid(): void
     {
         /** Arrange **/
-        $data = EntryHelper::getData();
+        $data = EntryTestData::getOne();
 
         /** @var AddEntryRequestInterface $request */
         $request = AddEntryRequest::fromArray($data);
@@ -63,7 +63,7 @@ final class AddEntryIntegrationTest extends Unit
     public function testValidatorErrorDoesNotTouchRepository(): void
     {
         /** Arrange **/
-        $data  = EntryHelper::getData();
+        $data  = EntryTestData::getOne();
         $data['title'] = ''; // invalid: empty title
 
         /** @var AddEntryRequestInterface $request */

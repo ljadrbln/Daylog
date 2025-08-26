@@ -10,7 +10,7 @@ use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
 use Daylog\Application\Validators\Entries\AddEntry\AddEntryValidator;
 use Daylog\Application\Validators\Entries\AddEntry\AddEntryValidatorInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
-use Daylog\Tests\Support\Helper\EntryHelper;
+use Daylog\Tests\Support\Helper\EntryTestData;
 
 /**
  * Unit tests for AddEntryValidator (domain-level validation).
@@ -41,7 +41,7 @@ final class AddEntryValidatorTest extends Unit
      */
     public function testValidatePassesOnValidData(): void
     {
-        $data = EntryHelper::getData();
+        $data = EntryTestData::getOne();
 
         /** @var AddEntryRequestInterface $request */
         $request  = AddEntryRequest::fromArray($data);
@@ -61,7 +61,7 @@ final class AddEntryValidatorTest extends Unit
      */
     public function testValidateThrowsOnDomainViolations(array $overrides): void
     {
-        $data = EntryHelper::getData();
+        $data = EntryTestData::getOne();
         $data = array_merge($data, $overrides);
 
         /** @var AddEntryRequestInterface $request */

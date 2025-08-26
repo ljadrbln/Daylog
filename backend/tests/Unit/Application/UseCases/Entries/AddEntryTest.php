@@ -13,7 +13,7 @@ use Daylog\Application\Validators\Entries\AddEntry\AddEntryValidatorInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\UseCases\Entries\AddEntry;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
-use Daylog\Tests\Support\Helper\EntryHelper;
+use Daylog\Tests\Support\Helper\EntryTestData;
 use Daylog\Domain\Services\UuidGenerator;
 
 /**
@@ -34,7 +34,7 @@ final class AddEntryTest extends Unit
      * Happy path: validates request, delegates save to repository, and returns a response DTO.
      *
      * Mechanics:
-     * - Data source comes from EntryHelper::getData() (title, body, date).
+     * - Data source comes from EntryTestData::getOne() (title, body, date).
      * - Validator is expected to run once on AddEntryRequestInterface.
      * - Repository returns a payload array; use case maps it to AddEntryResponseInterface.
      * - We assert that UUID is valid and all fields are propagated correctly.
@@ -45,7 +45,7 @@ final class AddEntryTest extends Unit
     public function testHappyPathSavesEntryAndReturnsResponseDto(): void
     {
         /** Arrange **/
-        $data    = EntryHelper::getData();
+        $data    = EntryTestData::getOne();
         $request = AddEntryRequest::fromArray($data);
 
         $repoClass = EntryRepositoryInterface::class;
@@ -71,17 +71,15 @@ final class AddEntryTest extends Unit
         $response = $useCase->execute($request);
 
         /** Assert **/
-        $this->assertInstanceOf(AddEntryResponseInterface::class, $response);
-
         $id        = $response->getId();
         $isValidId = UuidGenerator::isValid($id);
         $this->assertTrue($isValidId);
 
-        $this->assertSame($data['title'],        $response->getTitle());
-        $this->assertSame($data['body'],         $response->getBody());
-        $this->assertSame($data['date'],         $response->getDate());
-        $this->assertSame($data['created_at'],   $response->getCreatedAt());
-        $this->assertSame($data['updated_at'],   $response->getUpdatedAt());
+        $this->assertSame($data['title'],     $response->getTitle());
+        $this->assertSame($data['body'],      $response->getBody());
+        $this->assertSame($data['date'],      $response->getDate());
+        $this->assertSame($data['createdAt'], $response->getCreatedAt());
+        $this->assertSame($data['updatedAt'], $response->getUpdatedAt());
     }
 
     /**
@@ -90,7 +88,7 @@ final class AddEntryTest extends Unit
     public function testValidationErrorDoesNotTouchRepository(): void
     {
         /** Arrange **/
-        $data  = EntryHelper::getData();
+        $data  = EntryTestData::getOne();
 
         /** @var AddEntryRequestInterface $request */
         $request = AddEntryRequest::fromArray($data);

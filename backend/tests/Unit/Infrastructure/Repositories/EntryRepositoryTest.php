@@ -7,7 +7,7 @@ use Codeception\Test\Unit;
 use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Infrastructure\Repositories\Entries\EntryRepository;
 use Daylog\Tests\Support\Fakes\FakeEntryStorage;
-use Daylog\Tests\Support\Helper\EntryHelper;
+use Daylog\Tests\Support\Helper\EntryTestData;
 
 /**
  * Class EntryRepositoryTest
@@ -41,7 +41,7 @@ final class EntryRepositoryTest extends Unit
         $storage = new FakeEntryStorage();
         $repo    = new EntryRepository($storage);
 
-        $data  = EntryHelper::getData();
+        $data  = EntryTestData::getOne();
         $entry = Entry::fromArray($data);
 
         $result = $repo->save($entry);
