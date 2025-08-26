@@ -6,7 +6,7 @@ namespace Daylog\Tests\Support\Fixture;
 
 use DB\SQL;
 use Daylog\Infrastructure\Storage\Entries\EntryFieldMapper;
-use Daylog\Tests\Support\Helper\EntryRowHelper;
+use Daylog\Tests\Support\Helper\EntryTestData;
 
 /**
  * Fixture for preparing Entry rows in the database during integration tests.
@@ -64,7 +64,7 @@ final class EntryFixture
      */
     public static function insertRows(int $numberOfRows, int $step = 0): array
     {
-        $rows = EntryRowHelper::generateRows($numberOfRows, $step);
+        $rows = EntryTestData::getMany($numberOfRows, $step);
 
         for ($i = 0; $i < count($rows); $i++) {
             $row = $rows[$i];
