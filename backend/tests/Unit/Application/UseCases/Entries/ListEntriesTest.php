@@ -10,7 +10,6 @@ use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Application\Validators\Entries\ListEntries\ListEntriesValidatorInterface;
 use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Tests\Support\Helper\EntryTestData;
-use Daylog\Tests\Support\Helper\EntryRowHelper;
 use Daylog\Tests\Support\Helper\ListEntriesHelper;
 
 /**
@@ -39,7 +38,7 @@ final class ListEntriesTest extends Unit
         /** Arrange **/
         $total = 3;
         $step  = 1;
-        $rows = EntryRowHelper::generateRows($total, $step);
+        $rows = EntryTestData::getMany($total, $step);
 
         $page     = 1;
         $perPage  = 10;
@@ -106,7 +105,7 @@ final class ListEntriesTest extends Unit
         /** Arrange **/
         $total = 4;
         $step  = 1;
-        $rows = EntryRowHelper::generateRows($total, $step);        
+        $rows = EntryTestData::getMany($total, $step);        
 
         $page     = 1;
         $perPage  = 10;
