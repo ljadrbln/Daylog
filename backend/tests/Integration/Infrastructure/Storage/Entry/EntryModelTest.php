@@ -71,3 +71,6 @@ final class EntryModelTest extends Unit
         $this->assertSame($data['date'],  $fetched['date']);
     }    
 }
+
+
+
