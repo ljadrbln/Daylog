@@ -30,61 +30,96 @@ use Daylog\Domain\Services\UuidGenerator;
  */
 final class EntryFixture
 {
+    /** @var SQL|null Shared DB instance for convenience methods */
+    private static ?SQL $db = null;
+
     /**
-     * Insert entries into DB by logical dates.
+     * Set shared DB instance used by convenience methods.
      *
-     * @param SQL               $db           DB connection
-     * @param array<int,string> $dates        List of dates in YYYY-MM-DD format
-     * @param string            $defaultTitle Title to use unless overridden
-     * @param string            $defaultBody  Body to use unless overridden
-     * @return array<int,Row>   Inserted rows with generated UUIDs
+     * @param SQL $db Active SQL connection.
+     * @return void
      */
-    public static function insertByDates(SQL $db, array $dates, string $defaultTitle, string $defaultBody): array
+    public static function setDb(SQL $db): void
     {
-        $rows = [];
+        self::$db = $db;
+        return;
+    }
 
-        foreach ($dates as $date) {
-            $id = UuidGenerator::generate();
-            $ts = $date . ' 10:00:00';
-
-            $row = [
-                'id'         => $id,
-                'title'      => $defaultTitle,
-                'body'       => $defaultBody,
-                'date'       => $date,
-                'created_at' => $ts,
-                'updated_at' => $ts,
-            ];
-
-            $rows[] = $row;
+    /**
+     * Insert N rows with dates generated from a deterministic base.
+     *
+     * Scenario:
+     * - Quickly seed a number of entries for integration tests.
+     * - Dates are spaced by $step days: base, base+step, base+2*step, ...
+     * Mechanics:
+     * - Builds a list of YYYY-MM-DD dates and delegates to insertByDates().
+     *
+     * @param int     $numberOfRows Positive number of rows to insert (≥ 1).
+     * @param int     $step         Day step between consecutive dates (can be 0).
+     * @return array<int,Row>       Inserted rows with generated UUIDs.
+     */
+    public static function insertRows(int $numberOfRows, int $step = 0): array
+    {
+        if ($numberOfRows < 1) {
+            $message = 'numberOfRows must be >= 1.';
+            throw new \InvalidArgumentException($message);
         }
 
-        $sql = 'INSERT INTO entries (id, title, body, date, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)';
-        foreach ($rows as $row) {
-            $params = [
-                $row['id'],
-                $row['title'],
-                $row['body'],
-                $row['date'],
-                $row['created_at'],
-                $row['updated_at'],
-            ];
+        $baseDate = date('Y-m-d');
+        $title    = 'Valid title';
+        $body     = 'Valid body';
 
-            $db->exec($sql, $params);
+        for ($i = 0; $i < $numberOfRows; $i++) {
+            $delta   = $i * $step;
+            $ts      = strtotime($baseDate . ' +' . $delta . ' day');
+            $dateStr = date('Y-m-d', $ts);
+
+            $row = self::insertRow($dateStr, $title, $body);
+            $rows[] = $row;
         }
 
         return $rows;
     }
 
+    /**
+     * Insert entries into DB by logical dates.
+     *
+     * @param string                  $dateStr      Date in YYYY-MM-DD format
+     * @param string                  $defaultTitle Title to use unless overridden
+     * @param string                  $defaultBody  Body to use unless overridden
+     * @return array<string,string>   Inserted rows with generated UUIDs
+     */
+    private static function insertRow(string $dateStr, string $defaultTitle, string $defaultBody): array
+    {
+        $id = UuidGenerator::generate();
+        $ts = sprintf('%s 10:00:00', $dateStr);
+        
+        $row = [
+            'id'         => $id,
+            'title'      => $defaultTitle,
+            'body'       => $defaultBody,
+            'date'       => $dateStr,
+            'created_at' => $ts,
+            'updated_at' => $ts,
+        ];
+
+        $sql = 'INSERT INTO entries (id, title, body, date, created_at, updated_at) 
+                VALUES (:id, :title, :body, :date, :created_at, :updated_at)';
+
+        self::$db->exec($sql, $row);
+
+        return $row;
+    }    
+
+
    /**
      * Update allowed fields of an entry by id.
      *
-     * @param SQL                    $db     Database connection.
      * @param string                 $id     UUID v4 of the entry to update.
      * @param array<string,string>   $patch  Allowed keys: 'title', 'body', 'date', 'created_at', 'updated_at'.
      * @return void
      */
-    public static function updateById(SQL $db, string $id, array $patch): void
+    public static function updateById(string $id, array $patch): void
     {
         $allowed = ['title', 'body', 'date', 'created_at', 'updated_at'];
 
@@ -115,7 +150,7 @@ final class EntryFixture
         $sql = 'UPDATE entries SET ' . $setClause . ' WHERE id = ?';
         $params[] = $id;
 
-        $db->exec($sql, $params);
+        self::$db->exec($sql, $params);
         return;
     }    
 }

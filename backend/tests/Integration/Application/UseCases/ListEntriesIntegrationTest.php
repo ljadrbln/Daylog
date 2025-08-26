@@ -37,18 +37,22 @@ final class ListEntriesIntegrationTest extends Unit
     private ListEntries $useCase;
 
     /**
-     * Prepare database and provider-wired use case before each test.
+     * Prepare shared DB and wire the use case.
+     *
+     * Mechanics:
+     * - Obtain SQL via SqlFactory (single source of truth).
+     * - Store locally for direct SQL asserts if needed.
+     * - Register DB in EntryFixture to avoid passing it every call.
      *
      * @return void
      */
     protected function _before(): void
     {
         $db = SqlFactory::get();
-        $this->db = $db;
+        EntryFixture::setDb($db);
 
-        // Clean slate
-        $truncate = 'DELETE FROM entries';
-        $this->db->exec($truncate);
+        $sql = 'DELETE FROM entries';
+        $db->exec($sql);
 
         $useCase = ListEntriesProvider::useCase();
         $this->useCase = $useCase;
@@ -75,17 +79,9 @@ final class ListEntriesIntegrationTest extends Unit
     public function testHappyPathReturnsFirstPageSortedByDateDesc(): void
     {
         // Arrange: insert three rows via fixture
-        $dates = ['2025-08-10', '2025-08-11', '2025-08-12'];
-
-        $defaultTitle = 'Valid title';
-        $defaultBody  = 'Valid body';
-
-        EntryFixture::insertByDates(
-            $this->db,
-            $dates,
-            $defaultTitle,
-            $defaultBody
-        );
+        $rowsCount = 3;
+        $datesStep = 1;
+        $rows = EntryFixture::insertRows($rowsCount, $datesStep);
 
         // Request with defaults (no filters)
         $data    = ListEntriesHelper::getData();
@@ -97,14 +93,14 @@ final class ListEntriesIntegrationTest extends Unit
         // Assert: order and meta
         $items = $response->getItems();
 
-        $this->assertCount(3, $items);
-        $this->assertSame($dates[2], $items[0]->getDate());
-        $this->assertSame($dates[1], $items[1]->getDate());
-        $this->assertSame($dates[0], $items[2]->getDate());
+        $this->assertCount($rowsCount, $items);
+        $this->assertSame($rows[2]['date'], $items[0]->getDate());
+        $this->assertSame($rows[1]['date'], $items[1]->getDate());
+        $this->assertSame($rows[0]['date'], $items[2]->getDate());
 
-        $this->assertSame(3,                      $response->getTotal());
-        $this->assertSame($request->getPage(),    $response->getPage());
-        $this->assertSame($request->getPerPage(), $response->getPerPage());
+        $this->assertSame($rowsCount,               $response->getTotal());
+        $this->assertSame($request->getPage(),      $response->getPage());
+        $this->assertSame($request->getPerPage(),   $response->getPerPage());
 
         $expectedPages = 1;
         $this->assertSame($expectedPages, $response->getPagesCount());
@@ -128,22 +124,12 @@ final class ListEntriesIntegrationTest extends Unit
     public function testDateRangeInclusiveReturnsMatchingItems(): void
     {
         // Arrange: insert three rows via fixture
-        $dates = ['2025-08-10', '2025-08-11', '2025-08-12'];
+        $rows = EntryFixture::insertRows(3, 1);
 
-        $defaultTitle = 'Valid title';
-        $defaultBody  = 'Valid body';
-
-        EntryFixture::insertByDates(
-            $this->db,
-            $dates,
-            $defaultTitle,
-            $defaultBody
-        );
-
-        // Request with inclusive date range [10..11]
+        // Request with inclusive date range [[0]..[1]]
         $data             = ListEntriesHelper::getData();
-        $data['dateFrom'] = '2025-08-10';
-        $data['dateTo']   = '2025-08-11';
+        $data['dateFrom'] = $rows[0]['date'];
+        $data['dateTo']   = $rows[1]['date'];
 
         $request  = ListEntriesHelper::buildRequest($data);
         $response = $this->useCase->execute($request);
@@ -178,26 +164,14 @@ final class ListEntriesIntegrationTest extends Unit
     public function testQueryFiltersTitleOrBodyCaseInsensitive(): void
     {
         // Arrange: seed three dates via fixture
-        $date1 = '2025-08-10';
-        $date2 = '2025-08-11';
-        $date3 = '2025-08-12';
-
-        $defaultTitle = 'Valid title';
-        $defaultBody  = 'Valid body';
-
-        $rows = EntryFixture::insertByDates(
-            $this->db,
-            [$date1, $date2, $date3],
-            $defaultTitle,
-            $defaultBody
-        );
+        $rows = EntryFixture::insertRows(3, 1);
 
         $id1 = $rows[0]['id'];
         $id2 = $rows[1]['id'];
 
         // Adjust specific rows to craft title/body matches for query
-        EntryFixture::updateById($this->db, $id1, ['title' => 'Alpha note']);
-        EntryFixture::updateById($this->db, $id2, ['body'  => 'This body has aLpHa inside']);
+        EntryFixture::updateById($id1, ['title' => 'Alpha note']);
+        EntryFixture::updateById($id2, ['body'  => 'This body has aLpHa inside']);
 
         // Request with query
         $data  = ListEntriesHelper::getData();
@@ -207,12 +181,12 @@ final class ListEntriesIntegrationTest extends Unit
         $request  = ListEntriesHelper::buildRequest($data);
         $response = $this->useCase->execute($request);
 
-        // Assert: two hits (date2: body match; date1: title match), ordered by date DESC
+        // Assert: two hits (body match; title match), ordered by date DESC
         $items = $response->getItems();
 
         $this->assertCount(2, $items);
-        $this->assertSame($date2, $items[0]->getDate());
-        $this->assertSame($date1, $items[1]->getDate());
+        $this->assertSame($rows[1]['date'], $items[0]->getDate());
+        $this->assertSame($rows[0]['date'], $items[1]->getDate());
     }
 
     /**
@@ -339,12 +313,7 @@ final class ListEntriesIntegrationTest extends Unit
     public function testStableSecondaryOrderByCreatedAtDescWhenPrimaryEqual(): void
     {
         // Arrange: same date for all rows
-        $date  = '2025-08-12';
-        $dates = [$date, $date, $date];
-        $title = 'Valid title';
-        $body  = 'Valid body';
-
-        $rows = EntryFixture::insertByDates($this->db, $dates, $title, $body);
+        $rows = EntryFixture::insertRows(3, 0);
 
         $id1 = $rows[0]['id'];
         $c1 = '2025-08-12 10:00:00'; 
@@ -359,9 +328,9 @@ final class ListEntriesIntegrationTest extends Unit
         $u3 = '2025-08-12 12:01:00';
 
         // Distinct timestamps to define the stable secondary order
-        EntryFixture::updateById($this->db, $id1, ['created_at' => $c1, 'updated_at' => $u1]);
-        EntryFixture::updateById($this->db, $id2, ['created_at' => $c2, 'updated_at' => $u2]);
-        EntryFixture::updateById($this->db, $id3, ['created_at' => $c3, 'updated_at' => $u3]);
+        EntryFixture::updateById($id1, ['created_at' => $c1, 'updated_at' => $u1]);
+        EntryFixture::updateById($id2, ['created_at' => $c2, 'updated_at' => $u2]);
+        EntryFixture::updateById($id3, ['created_at' => $c3, 'updated_at' => $u3]);
 
         // Primary sort: date DESC (all equal) → tiebreaker should be createdAt DESC
         $sort = 'date,DESC';
@@ -399,15 +368,9 @@ final class ListEntriesIntegrationTest extends Unit
     public function testEmptyPageBeyondBoundaryReturnsNoItemsWithValidMeta(): void
     {
         // Arrange: three rows via fixture
-        $date1 = '2025-08-10';
-        $date2 = '2025-08-11';
-        $date3 = '2025-08-12';
-
-        $dates = [$date1, $date2, $date3];
-        $title = 'Valid title';
-        $body  = 'Valid body';
-
-        EntryFixture::insertByDates($this->db, $dates, $title, $body);
+        $rowsCount = 3;
+        $datesStep = 1;
+        EntryFixture::insertRows($rowsCount, $datesStep);
 
         // Request page beyond boundary: perPage=2 → pagesCount=2; request page=3
         $perPage = 2;
@@ -424,11 +387,11 @@ final class ListEntriesIntegrationTest extends Unit
         $items = $response->getItems();
 
         $this->assertCount(0, $items);
-        $this->assertSame(count($dates), $response->getTotal());
-        $this->assertSame($perPage,      $response->getPerPage());
-        $this->assertSame($page,         $response->getPage());
+        $this->assertSame($rowsCount, $response->getTotal());
+        $this->assertSame($perPage,   $response->getPerPage());
+        $this->assertSame($page,      $response->getPage());
 
-        $expectedPages = (int) ceil(count($dates) / $perPage);
+        $expectedPages = (int) ceil($rowsCount / $perPage);
         $this->assertSame($expectedPages, $response->getPagesCount());
     }
 }
