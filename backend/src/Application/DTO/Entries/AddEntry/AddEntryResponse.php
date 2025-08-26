@@ -58,8 +58,8 @@ final class AddEntryResponse implements AddEntryResponseInterface
         $title     = $data['title']     ?? '';
         $body      = $data['body']      ?? '';
         $date      = $data['date']      ?? '';
-        $createdAt = $data['created_at'] ?? '';
-        $updatedAt = $data['updated_at'] ?? '';
+        $createdAt = $data['createdAt'] ?? '';
+        $updatedAt = $data['updatedAt'] ?? '';
 
         return new self($id, $title, $body, $date, $createdAt, $updatedAt);
     }
