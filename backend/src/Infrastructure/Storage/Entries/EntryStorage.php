@@ -84,22 +84,15 @@ final class EntryStorage implements EntryStorageInterface
         $filter  = $this->buildF3Filter($criteria);
         $options = $this->buildF3Options($criteria);
 
-        $rows  = $this->model->find($filter, $options);
-        $total = $this->model->count($filter);
+        $rows  = $this->model->findRows($filter, $options);
+        $total = $this->model->countRows($filter);
+
+        $pagesCount = (int) ceil($total / $perPage);
 
         $items = [];
         foreach ($rows as $row) {
-            $items[] = [
-                'id'        => $row->id,
-                'date'      => $row->date,
-                'title'     => $row->title,
-                'body'      => $row->body,
-                'createdAt' => $row->created_at,
-                'updatedAt' => $row->updated_at,
-            ];
+            $items[] = $this->mapDbRowToDtoShape($row);
         }
-
-        $pagesCount = (int) ceil($total / $perPage);
 
         $result = [
             'items'      => $items,
@@ -212,5 +205,30 @@ final class EntryStorage implements EntryStorageInterface
         ];
 
         return $options;
+    }
+
+    /**
+     * Map DB row (snake_case) to DTO shape (camelCase).
+     *
+     * Source keys:
+     *  - id, date, title, body, created_at, updated_at
+     * Target keys (for ListEntriesItem::fromArray):
+     *  - id, date, title, body, createdAt, updatedAt
+     *
+     * @param array{id:string,date:string,title:string,body:string,created_at:string,updated_at:string} $row
+     * @return array{id:string,date:string,title:string,body:string,createdAt:string,updatedAt:string}
+     */
+    private function mapDbRowToDtoShape(array $row): array
+    {
+        $mapped = [
+            'id'        => $row['id'],
+            'date'      => $row['date'],
+            'title'     => $row['title'],
+            'body'      => $row['body'],
+            'createdAt' => $row['created_at'],
+            'updatedAt' => $row['updated_at'],
+        ];
+
+        return $mapped;
     }
 }
