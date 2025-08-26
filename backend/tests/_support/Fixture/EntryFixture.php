@@ -46,6 +46,16 @@ final class EntryFixture
     }
 
     /**
+     * Get shared DB instance used by convenience methods.
+     *
+     * @return SQL
+     */
+    public static function getDb(): SQL
+    {
+        return self::$db;
+    }    
+
+    /**
      * Insert N rows with dates generated from a deterministic base.
      *
      * Scenario:
