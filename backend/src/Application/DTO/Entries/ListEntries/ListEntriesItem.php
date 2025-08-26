@@ -21,15 +21,6 @@ namespace Daylog\Application\DTO\Entries\ListEntries;
  * - body:      string
  * - createdAt: string "YYYY-MM-DD HH:MM:SS" (UTC)
  * - updatedAt: string "YYYY-MM-DD HH:MM:SS" (UTC)
- *
- * @psalm-type EntryRow=array{
- *   id: string,
- *   date: string,
- *   title: string,
- *   body: string,
- *   createdAt: string,
- *   updatedAt: string
- * }
  */
 final class ListEntriesItem
 {
@@ -91,7 +82,7 @@ final class ListEntriesItem
      * @return self
      */
     public static function fromArray(array $row): self
-    {
+    {        
         $id        = (string) $row['id'];
         $date      = (string) $row['date'];
         $title     = (string) $row['title'];

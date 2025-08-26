@@ -17,9 +17,6 @@ use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequestInterface;
  * Mechanics:
  * - Builds from a normalized ListEntriesRequestInterface via fromRequest().
  * - Stores values as-is; validators handle business rules elsewhere.
- *
- * @psalm-type SortItem=array{field:string, direction:'ASC'|'DESC'}
- * @psalm-type SortList=array<int, SortItem>
  */
 final class ListEntriesCriteria
 {
@@ -78,12 +75,12 @@ final class ListEntriesCriteria
     }
 
     /**
-     * @param int                                       $page
-     * @param int                                       $perPage
-     * @param string|null                               $dateFrom
-     * @param string|null                               $dateTo
-     * @param string|null                               $date
-     * @param string|null                               $query
+     * @param int         $page
+     * @param int         $perPage
+     * @param string|null $dateFrom
+     * @param string|null $dateTo
+     * @param string|null $date
+     * @param string|null $query
      * @param array<int, array{field:string, direction:'ASC'|'DESC'}> $sort
      */
     private function __construct(
