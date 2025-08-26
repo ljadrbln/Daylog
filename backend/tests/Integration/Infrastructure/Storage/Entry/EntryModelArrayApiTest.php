@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Daylog\Tests\Integration\Infrastructure\Storage\Entries;
 
 use Codeception\Test\Unit;
-use DB\SQL;
 use Daylog\Infrastructure\Storage\Entries\EntryModel;
 use Daylog\Configuration\Bootstrap\SqlFactory;
 use Daylog\Tests\Support\Fixture\EntryFixture;
@@ -24,9 +23,6 @@ use Daylog\Tests\Support\Fixture\EntryFixture;
  */
 final class EntryModelArrayApiTest extends Unit
 {
-    /** @var SQL */
-    private SQL $db;
-
     /**
      * Prepare shared DB and clean state.
      *
@@ -52,12 +48,12 @@ final class EntryModelArrayApiTest extends Unit
      */
     public function testFindRowsReturnsPlainArraysWithSnakeCase(): void
     {
-        EntryFixture::insertRows(3, 1);
+        $rows = EntryFixture::insertRows(3, 2);
 
         $db    = EntryFixture::getDb();
         $model = new EntryModel($db);
 
-        $filter  = ['date >= ? AND date <= ?', '2025-01-01', '2025-12-31'];
+        $filter  = ['date >= ? AND date <= ?', $rows[0]['date'], $rows[2]['date']];
         $options = ['order' => 'date DESC, created_at DESC', 'limit' => 10, 'offset' => 0];
 
         $rows = $model->findRows($filter, $options);
