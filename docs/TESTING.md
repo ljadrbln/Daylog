@@ -17,12 +17,29 @@ Point the Codeception Db module to the PDO triple produced by the DSN parsing st
 
 ## Test data helpers
 
-### EntryHelper
+### EntryTestData
 Generates valid baseline payloads for entries to reduce duplication.
 Use it in unit tests and data providers as the default “happy path” input, then override fields under test.
 
 ```php
-$data = EntryHelper::getData(); // returns a valid array
+public static function getOne(
+    string $title = 'Valid title',
+    string $body = 'Valid body',
+    string $date = '2025-08-13',
+    ?string $createdAt = null,
+    ?string $updatedAt = null
+): array;
+
+public static function getMany(
+    int $count,
+    int $stepDays = 0,
+    string $title = 'Valid title',
+    string $body = 'Valid body',
+    string $startDate = '2025-08-13'
+): array;
+
+$data = EntryTestData::getOne();
+$rows = EntryTestData::getMany(2);
 ```
 
 ## Data Providers
