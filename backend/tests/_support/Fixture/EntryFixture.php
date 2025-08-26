@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Daylog\Tests\Support\Fixture;
 
 use DB\SQL;
-use Daylog\Domain\Services\UuidGenerator;
+use Daylog\Infrastructure\Storage\Entries\EntryFieldMapper;
+use Daylog\Tests\Support\Helper\EntryRowHelper;
 
 /**
  * Fixture for preparing Entry rows in the database during integration tests.
@@ -42,7 +43,6 @@ final class EntryFixture
     public static function setDb(SQL $db): void
     {
         self::$db = $db;
-        return;
     }
 
     /**
@@ -58,34 +58,17 @@ final class EntryFixture
     /**
      * Insert N rows with dates generated from a deterministic base.
      *
-     * Scenario:
-     * - Quickly seed a number of entries for integration tests.
-     * - Dates are spaced by $step days: base, base+step, base+2*step, ...
-     * Mechanics:
-     * - Builds a list of YYYY-MM-DD dates and delegates to insertByDates().
-     *
      * @param int     $numberOfRows Positive number of rows to insert (≥ 1).
      * @param int     $step         Day step between consecutive dates (can be 0).
      * @return array<int,Row>       Inserted rows with generated UUIDs.
      */
     public static function insertRows(int $numberOfRows, int $step = 0): array
     {
-        if ($numberOfRows < 1) {
-            $message = 'numberOfRows must be >= 1.';
-            throw new \InvalidArgumentException($message);
-        }
+        $rows = EntryRowHelper::generateRows($numberOfRows, $step);
 
-        $baseDate = date('Y-m-d');
-        $title    = 'Valid title';
-        $body     = 'Valid body';
-
-        for ($i = 0; $i < $numberOfRows; $i++) {
-            $delta   = $i * $step;
-            $ts      = strtotime($baseDate . ' +' . $delta . ' day');
-            $dateStr = date('Y-m-d', $ts);
-
-            $row = self::insertRow($dateStr, $title, $body);
-            $rows[] = $row;
+        for ($i = 0; $i < count($rows); $i++) {
+            $row = $rows[$i];
+            self::insertRow($row);
         }
 
         return $rows;
@@ -94,33 +77,19 @@ final class EntryFixture
     /**
      * Insert entries into DB by logical dates.
      *
-     * @param string                  $dateStr      Date in YYYY-MM-DD format
-     * @param string                  $defaultTitle Title to use unless overridden
-     * @param string                  $defaultBody  Body to use unless overridden
-     * @return array<string,string>   Inserted rows with generated UUIDs
+     * @param array $row Entry data row
+     * @return void
      */
-    private static function insertRow(string $dateStr, string $defaultTitle, string $defaultBody): array
+    private static function insertRow(array $row): void
     {
-        $id = UuidGenerator::generate();
-        $ts = sprintf('%s 10:00:00', $dateStr);
-        
-        $row = [
-            'id'         => $id,
-            'title'      => $defaultTitle,
-            'body'       => $defaultBody,
-            'date'       => $dateStr,
-            'created_at' => $ts,
-            'updated_at' => $ts,
-        ];
-
         $sql = 'INSERT INTO entries (id, title, body, date, created_at, updated_at) 
                 VALUES (:id, :title, :body, :date, :created_at, :updated_at)';
 
-        self::$db->exec($sql, $row);
+        // Normalize payload to DB shape (snake_case).
+        $dbRow = EntryFieldMapper::toDbRow($row);
 
-        return $row;
+        self::$db->exec($sql, $dbRow);
     }    
-
 
    /**
      * Update allowed fields of an entry by id.
