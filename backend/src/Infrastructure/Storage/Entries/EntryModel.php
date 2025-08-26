@@ -26,6 +26,37 @@ class EntryModel extends AbstractModel {
     }
 
     /**
+     * Return plain arrays (snake_case DB fields) for the given filter/options.
+     *
+     * @param array<int,string>|null $filter
+     * @param array{order:string,limit:int,offset:int} $options
+     * @return array<int,array{id:string,date:string,title:string,body:string,created_at:string,updated_at:string}>
+     */
+    public function findRows(?array $filter, array $options): array
+    {
+        $rows = $this->find($filter, $options);
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] = $row->cast();
+        }
+
+        return $result;
+    }
+
+    /**
+     * Count rows for the given filter.
+     *
+     * @param array<int,string>|null $filter
+     * @return int
+     */
+    public function countRows(?array $filter): int
+    {
+        $total = $this->count($filter);
+        return $total;
+    }
+
+    /**
      * Get one row by UUID as a plain array.
      *
      * Mechanics:
