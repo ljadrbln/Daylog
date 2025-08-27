@@ -10,7 +10,6 @@ use Daylog\Configuration\Providers\Entries\ListEntriesProvider;
 use Daylog\Application\UseCases\Entries\ListEntries;
 use Daylog\Tests\Support\Helper\ListEntriesHelper;
 use Daylog\Tests\Support\Fixture\EntryFixture;
-use DB\SQL;
 
 /**
  * @covers \Daylog\Configuration\Providers\Entries\ListEntriesProvider
@@ -30,9 +29,6 @@ use DB\SQL;
  */
 final class ListEntriesIntegrationTest extends Unit
 {
-    /** @var SQL */
-    private SQL $db;
-
     /** @var ListEntries */
     private ListEntries $useCase;
 
@@ -66,7 +62,7 @@ final class ListEntriesIntegrationTest extends Unit
      *  using a real DB wiring and minimal fixtures.
      *
      * Mechanics:
-     *  - Prepare DB state via EntryFixture::insertByDates() for three consecutive dates.
+     *  - Prepare DB state via EntryFixture::insertRows($rowsCount, $datesStep) for three consecutive dates.
      *  - Build a default request (no filters).
      *  - Execute UC-2 and assert item order and pagination meta.
      *
@@ -115,7 +111,7 @@ final class ListEntriesIntegrationTest extends Unit
      *
      * Mechanics:
      *  - Prepare three entries with dates 2025-08-10, 2025-08-11, 2025-08-12
-     *    using EntryFixture::insertByDates().
+     *    using EntryFixture::insertRows($rowsCount, $datesStep).
      *  - Request with dateFrom=2025-08-10 and dateTo=2025-08-11.
      *  - Expect exactly two items: 2025-08-11, 2025-08-10.
      *
@@ -190,7 +186,6 @@ final class ListEntriesIntegrationTest extends Unit
     }
 
     /**
-     * @skip
      * @covers \Daylog\Configuration\Providers\Entries\ListEntriesProvider
      * @covers \Daylog\Application\UseCases\Entries\ListEntries
      *
@@ -210,18 +205,7 @@ final class ListEntriesIntegrationTest extends Unit
     public function testSortingByCreatedAtAndUpdatedAtAscDesc(): void
     {
         // Arrange: seed 3 rows with the same logical date
-        $date         = '2025-08-12';
-        $dates        = [$date, $date, $date];
-
-        $defaultTitle = 'Valid title';
-        $defaultBody  = 'Valid body';
-
-        $rows = EntryFixture::insertByDates(
-            $this->db,
-            $dates,
-            $defaultTitle,
-            $defaultBody
-        );
+        $rows = EntryFixture::insertRows(3, 0);
 
         $id1 = $rows[0]['id'];
         $c1 = '2025-08-12 10:00:00';
@@ -236,27 +220,27 @@ final class ListEntriesIntegrationTest extends Unit
         $u3 = '2025-08-12 12:05:00';
 
         // Set distinct created_at/updated_at to exercise sorting
-        EntryFixture::updateById($this->db, $id1, ['created_at' => $c1, 'updated_at' => $u1]);
-        EntryFixture::updateById($this->db, $id2, ['created_at' => $c2, 'updated_at' => $u2]);
-        EntryFixture::updateById($this->db, $id3, ['created_at' => $c3, 'updated_at' => $u3]);
+        EntryFixture::updateById($id1, ['created_at' => $c1, 'updated_at' => $u1]);
+        EntryFixture::updateById($id2, ['created_at' => $c2, 'updated_at' => $u2]);
+        EntryFixture::updateById($id3, ['created_at' => $c3, 'updated_at' => $u3]);
 
         // Sort by createdAt ASC
-        $sort1 = 'createdAt,ASC';
         $data1 = ListEntriesHelper::getData();
-        $data1['sort'] = $sort1;
+        $data1['sortField'] = 'createdAt';
+        $data1['sortDir']   = 'ASC';
 
         $req1   = ListEntriesHelper::buildRequest($data1);
         $res1   = $this->useCase->execute($req1);
         $items1 = $res1->getItems();
 
-        //$this->assertSame($id1, $items1[0]->getId());
-        //$this->assertSame($id2, $items1[1]->getId());
-        //$this->assertSame($id3, $items1[2]->getId());
+        $this->assertSame($id1, $items1[0]->getId());
+        $this->assertSame($id2, $items1[1]->getId());
+        $this->assertSame($id3, $items1[2]->getId());
 
         // Sort by createdAt DESC
-        $sort2 = 'createdAt, DESC';
         $data2 = ListEntriesHelper::getData();
-        $data2['sort'] = $sort2;
+        $data2['sortField'] = 'createdAt';
+        $data2['sortDir']   = 'DESC';
 
         $req2   = ListEntriesHelper::buildRequest($data2);
         $res2   = $this->useCase->execute($req2);
@@ -267,22 +251,22 @@ final class ListEntriesIntegrationTest extends Unit
         $this->assertSame($id1, $items2[2]->getId());
 
         // Sort by updatedAt ASC
-        $sort3 = 'updatedAt, ASC';
         $data3 = ListEntriesHelper::getData();
-        $data3['sort'] = $sort3;
+        $data3['sortField'] = 'updatedAt';
+        $data3['sortDir']   = 'ASC';
 
         $req3   = ListEntriesHelper::buildRequest($data3);
         $res3   = $this->useCase->execute($req3);
         $items3 = $res3->getItems();
 
-        //$this->assertSame($id1, $items3[0]->getId());
-        //$this->assertSame($id2, $items3[1]->getId());
-        //$this->assertSame($id3, $items3[2]->getId());
+        $this->assertSame($id1, $items3[0]->getId());
+        $this->assertSame($id2, $items3[1]->getId());
+        $this->assertSame($id3, $items3[2]->getId());
 
         // Sort by updatedAt DESC
-        $sort4 = 'updatedAt, DESC';
         $data4 = ListEntriesHelper::getData();
-        $data4['sort'] = $sort4;
+        $data4['sortField'] = 'updatedAt';
+        $data4['sortDir']   = 'DESC';
 
         $req4   = ListEntriesHelper::buildRequest($data4);
         $res4   = $this->useCase->execute($req4);
@@ -304,7 +288,7 @@ final class ListEntriesIntegrationTest extends Unit
      *  when primary keys are equal (all items share the same 'date').
      *
      * Mechanics:
-     *  - Seed three rows with the same logical date via EntryFixture::insertByDates().
+     *  - Seed three rows with the same logical date via EntryFixture::insertRows($rowsCount, $datesStep).
      *  - Adjust created_at/updated_at to distinct values (10:00, 11:00, 12:00).
      *  - Sort by date DESC (primary equal) → expect createdAt DESC as tiebreaker.
      *
@@ -370,6 +354,7 @@ final class ListEntriesIntegrationTest extends Unit
         // Arrange: three rows via fixture
         $rowsCount = 3;
         $datesStep = 1;
+      
         EntryFixture::insertRows($rowsCount, $datesStep);
 
         // Request page beyond boundary: perPage=2 → pagesCount=2; request page=3

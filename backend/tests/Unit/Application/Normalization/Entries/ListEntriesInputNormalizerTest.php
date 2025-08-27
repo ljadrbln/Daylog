@@ -260,7 +260,7 @@ final class ListEntriesInputNormalizerTest extends Unit
      */
     public function testSortFieldNormalization(string $in, string $expected): void
     {
-        $input = ['sort' => $in];
+        $input = ['sortField' => $in];
 
         $normalizer = new ListEntriesInputNormalizer();
         $normalized  = $normalizer->normalize($input);
