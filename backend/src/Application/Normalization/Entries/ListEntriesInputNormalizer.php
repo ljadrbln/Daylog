@@ -124,7 +124,7 @@ final class ListEntriesInputNormalizer
     /**
      * Normalize sort field: validate against allow-list, fallback to default.
      *
-     * Assumes scalar/null for 'sort'. Missing/null -> SORT_FIELD_DEFAULT.
+     * Assumes scalar/null for 'sortField'. Missing/null -> SORT_FIELD_DEFAULT.
      * If provided value is not in ALLOWED_SORT_FIELDS -> fallback to default.
      *
      * @param array<string,mixed> $input
@@ -132,7 +132,7 @@ final class ListEntriesInputNormalizer
      */
     private function normalizeSortField(array $input): string
     {
-        $raw       = $input['sort'] ?? null;
+        $raw       = $input['sortField'] ?? null;
         $candidate = ListEntriesConstraints::SORT_FIELD_DEFAULT;
 
         if (!is_null($raw)) {
@@ -153,7 +153,7 @@ final class ListEntriesInputNormalizer
     /**
      * Normalize sort direction: uppercase and validate; fallback to default.
      *
-     * Assumes scalar/null for 'direction'. Missing/null -> SORT_DIR_DEFAULT.
+     * Assumes scalar/null for 'sortDir'. Missing/null -> SORT_DIR_DEFAULT.
      * Converts to uppercase and checks against ALLOWED_SORT_DIRS.
      * Invalid values fall back to SORT_DIR_DEFAULT.
      *
@@ -162,7 +162,7 @@ final class ListEntriesInputNormalizer
      */
     private function normalizeSortDir(array $input): string
     {
-        $raw   = $input['direction'] ?? null;
+        $raw   = $input['sortDir'] ?? null;
         $upper = ListEntriesConstraints::SORT_DIR_DEFAULT;
 
         if (!is_null($raw)) {
