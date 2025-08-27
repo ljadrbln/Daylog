@@ -8,3 +8,8 @@ parameters:
     - backend/src
     - backend/tests
   treatPhpDocTypesAsCertain: true
+
+  ignoreErrors:
+    -
+      message: '#^Dynamic call to static method PHPUnit.*\(\)\.$#'
+      path: backend/tests/*
