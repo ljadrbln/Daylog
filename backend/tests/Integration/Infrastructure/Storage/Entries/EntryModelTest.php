@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Tests\Integration\Infrastructure\Storage\Entry;
+namespace Daylog\Tests\Integration\Infrastructure\Storage\Entries;
 
 use Codeception\Test\Unit;
 use Daylog\Infrastructure\Storage\Entries\EntryModel;
