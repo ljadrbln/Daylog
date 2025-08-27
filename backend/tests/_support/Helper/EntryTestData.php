@@ -14,6 +14,10 @@ use Daylog\Domain\Services\UuidGenerator;
  */
 final class EntryTestData
 {
+    private const DEFAULT_DATE  = '2025-02-12';
+    private const DEFAULT_TITLE = 'Valid title';
+    private const DEFAULT_BODY  = 'Valid body';
+
     /**
      * Build a single payload representing an Entry.
      *
@@ -22,15 +26,22 @@ final class EntryTestData
      *
      * @param string      $title     Non-empty trimmed title (see BR-1/BR-3).
      * @param string      $body      Non-empty body within limits (see BR-2).
-     * @param string      $date      Logical date YYYY-MM-DD (see BR-6).
+     * @param string      $date      Logical date YYYY-MM-DD (see ENTRY-BR-4).
      * @param string|null $createdAt Optional timestamp ISO-8601-like "YYYY-MM-DD HH:MM:SS".
      * @param string|null $updatedAt Optional timestamp ISO-8601-like "YYYY-MM-DD HH:MM:SS".
-     * @return Array      DTO-like associative array in camelCase.
+     * @return array{
+     *      id:string, 
+     *      title:string, 
+     *      body:string, 
+     *      date:string, 
+     *      createdAt:string, 
+     *      updatedAt:string
+     * }
      */
     public static function getOne(
-        string $title = 'Valid title',
-        string $body = 'Valid body',
-        string $date = '2025-08-13',
+        string $title = self::DEFAULT_TITLE,
+        string $body  = self::DEFAULT_BODY,
+        string $date  = self::DEFAULT_DATE,
         ?string $createdAt = null,
         ?string $updatedAt = null
     ): array {
@@ -64,14 +75,21 @@ final class EntryTestData
      * @param string $title     Base title for all items.
      * @param string $body      Base body for all items.
      * @param string $startDate Starting logical date YYYY-MM-DD.
-     * @return array<int, Array>
+     * @return array<int, array{
+     *      id:string, 
+     *      title:string, 
+     *      body:string, 
+     *      date:string, 
+     *      createdAt:string, 
+     *      updatedAt:string
+     * }>
      */
     public static function getMany(
         int $count,
-        int $stepDays = 0,
-        string $title = 'Valid title',
-        string $body = 'Valid body',
-        string $startDate = '2025-08-13'
+        int $stepDays     = 0,
+        string $title     = self::DEFAULT_TITLE,
+        string $body      = self::DEFAULT_BODY,
+        string $startDate = self::DEFAULT_DATE
     ): array {
         $items = [];
 
