@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Daylog\Tests\Integration\Application\UseCases;
+namespace Daylog\Tests\Integration\Application\UseCases\Entries;
 
 use Codeception\Test\Unit;
 use Daylog\Configuration\Bootstrap\SqlFactory;
