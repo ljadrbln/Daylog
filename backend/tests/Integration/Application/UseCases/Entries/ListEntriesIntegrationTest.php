@@ -55,7 +55,7 @@ final class ListEntriesIntegrationTest extends Unit
     }
 
     /**
-     * Happy path: returns first page sorted by date DESC with correct meta.
+     * AC-1 Happy path: returns first page sorted by date DESC with correct meta.
      *
      * Purpose:
      *  Verify default ordering by logical date (DESC) and consistent pagination metadata
@@ -192,141 +192,172 @@ final class ListEntriesIntegrationTest extends Unit
      * AC-5: sorting by createdAt and updatedAt (ASC/DESC) is supported.
      *
      * Purpose:
-     *  Verify that the 'sort' parameter changes ordering according to UC-2 rules
-     *  for both timestamp fields and both directions using real DB wiring.
+     *   Verify that the 'sort' parameter changes ordering according to UC-2 rules
+     *   for both timestamp fields and both directions using real DB wiring.
      *
      * Mechanics:
-     *  - Seed three rows with the same logical 'date'.
-     *  - Adjust created_at/updated_at per row to form clear ASC/DESC orders.
-     *  - Sort by createdAt ASC/DESC; then by updatedAt ASC/DESC; assert deterministic order.
+     *   - Seed three rows with the same logical 'date'.
+     *   - Adjust created_at/updated_at per row to form clear ASC/DESC orders.
+     *   - Run with (field, dir, expected order markers) from dataProvider.
+     *   - Replace markers with real UUIDs inside the test before asserting.
      *
+     * @dataProvider provideSortingScenarios
+     * @param string                 $sortField       One of: createdAt|updatedAt
+     * @param 'ASC'|'DESC'           $sortDir         Sort direction
+     * @param array<int,string>      $expectedMarkers Expected order using markers: id1|id2|id3
      * @return void
      */
-    public function testSortingByCreatedAtAndUpdatedAtAscDesc(): void
-    {
+    public function testSortingByCreatedAtAndUpdatedAtAscDesc(
+        string $sortField,
+        string $sortDir,
+        array $expectedMarkers
+    ): void {
         // Arrange: seed 3 rows with the same logical date
         $rows = EntryFixture::insertRows(3, 0);
 
         $id1 = $rows[0]['id'];
-        $c1 = '2025-08-12 10:00:00';
-        $u1 = '2025-08-12 10:05:00';
+        $c1  = '2025-08-12 10:00:00';
+        $u1  = '2025-08-12 10:05:00';
 
         $id2 = $rows[1]['id'];
-        $c2 = '2025-08-12 11:00:00';
-        $u2 = '2025-08-12 11:05:00';
+        $c2  = '2025-08-12 11:00:00';
+        $u2  = '2025-08-12 11:05:00';
 
         $id3 = $rows[2]['id'];
-        $c3 = '2025-08-12 12:00:00';
-        $u3 = '2025-08-12 12:05:00';
+        $c3  = '2025-08-12 12:00:00';
+        $u3  = '2025-08-12 12:05:00';
 
-        // Set distinct created_at/updated_at to exercise sorting
         EntryFixture::updateById($id1, ['created_at' => $c1, 'updated_at' => $u1]);
         EntryFixture::updateById($id2, ['created_at' => $c2, 'updated_at' => $u2]);
         EntryFixture::updateById($id3, ['created_at' => $c3, 'updated_at' => $u3]);
 
-        // Sort by createdAt ASC
-        $data1 = ListEntriesHelper::getData();
-        $data1['sortField'] = 'createdAt';
-        $data1['sortDir']   = 'ASC';
+        // Replace expected order markers with real UUIDs
+        $expected = $this->resolveExpectedOrder($expectedMarkers, $id1, $id2, $id3);
 
-        $req1   = ListEntriesHelper::buildRequest($data1);
-        $res1   = $this->useCase->execute($req1);
-        $items1 = $res1->getItems();
+        // Act
+        $data          = ListEntriesHelper::getData();
+        $field         = $sortField;
+        $dir           = $sortDir;
+        $data['sortField'] = $field;
+        $data['sortDir']   = $dir;
 
-        $this->assertSame($id1, $items1[0]->getId());
-        $this->assertSame($id2, $items1[1]->getId());
-        $this->assertSame($id3, $items1[2]->getId());
+        $req   = ListEntriesHelper::buildRequest($data);
+        $res   = $this->useCase->execute($req);
+        $items = $res->getItems();
 
-        // Sort by createdAt DESC
-        $data2 = ListEntriesHelper::getData();
-        $data2['sortField'] = 'createdAt';
-        $data2['sortDir']   = 'DESC';
+        // Assert
+        $this->assertSame($expected[0], $items[0]->getId());
+        $this->assertSame($expected[1], $items[1]->getId());
+        $this->assertSame($expected[2], $items[2]->getId());
+    }
 
-        $req2   = ListEntriesHelper::buildRequest($data2);
-        $res2   = $this->useCase->execute($req2);
-        $items2 = $res2->getItems();
+    /**
+     * Provide scenarios for sorting by createdAt/updatedAt ASC/DESC.
+     *
+     * Each case returns [field, direction, expected order markers].
+     * Markers are symbolic ('id1','id2','id3') and are resolved to real UUIDs
+     * inside the test to avoid coupling the provider to runtime-generated values.
+     *
+     * @return array<string, array{0:string,1:'ASC'|'DESC',2:array<int,string>}>
+     */
+    public function provideSortingScenarios(): array
+    {
+        $cases = [
+            'createdAt ASC returns oldest first'            => ['createdAt', 'ASC',  ['id1', 'id2', 'id3']],
+            'createdAt DESC returns newest first'           => ['createdAt', 'DESC', ['id3', 'id2', 'id1']],
+            'updatedAt ASC returns earliest updates first'  => ['updatedAt', 'ASC',  ['id1', 'id2', 'id3']],
+            'updatedAt DESC returns latest updates first'   => ['updatedAt', 'DESC', ['id3', 'id2', 'id1']],
+        ];
 
-        $this->assertSame($id3, $items2[0]->getId());
-        $this->assertSame($id2, $items2[1]->getId());
-        $this->assertSame($id1, $items2[2]->getId());
+        return $cases;
+    }
 
-        // Sort by updatedAt ASC
-        $data3 = ListEntriesHelper::getData();
-        $data3['sortField'] = 'updatedAt';
-        $data3['sortDir']   = 'ASC';
+    /**
+     * Resolve expected order markers to real UUIDs generated at runtime.
+     *
+     * Scenario:
+     *  - Input markers come from dataProvider ('id1','id2','id3').
+     *  - This method maps them to actual UUIDs produced by EntryFixture::insertRows().
+     *
+     * Cases:
+     *  - 'id1' → $id1
+     *  - 'id2' → $id2
+     *  - 'id3' → $id3
+     *
+     * @param array<int,string> $markers List of 'id1'|'id2'|'id3'.
+     * @param string            $id1     UUID of the first seeded row.
+     * @param string            $id2     UUID of the second seeded row.
+     * @param string            $id3     UUID of the third seeded row.
+     * @return array<int,string>         Expected UUID order for assertions.
+     */
+    private function resolveExpectedOrder(array $markers, string $id1, string $id2, string $id3): array
+    {
+        $map = [
+            'id1' => $id1,
+            'id2' => $id2,
+            'id3' => $id3,
+        ];
 
-        $req3   = ListEntriesHelper::buildRequest($data3);
-        $res3   = $this->useCase->execute($req3);
-        $items3 = $res3->getItems();
+        $expected = [];
+        for ($i = 0; $i < count($markers); $i++) {
+            $marker   = $markers[$i];
+            $expected[] = $map[$marker];
+        }
 
-        $this->assertSame($id1, $items3[0]->getId());
-        $this->assertSame($id2, $items3[1]->getId());
-        $this->assertSame($id3, $items3[2]->getId());
-
-        // Sort by updatedAt DESC
-        $data4 = ListEntriesHelper::getData();
-        $data4['sortField'] = 'updatedAt';
-        $data4['sortDir']   = 'DESC';
-
-        $req4   = ListEntriesHelper::buildRequest($data4);
-        $res4   = $this->useCase->execute($req4);
-        $items4 = $res4->getItems();
-
-        $this->assertSame($id3, $items4[0]->getId());
-        $this->assertSame($id2, $items4[1]->getId());
-        $this->assertSame($id1, $items4[2]->getId());
+        return $expected;
     }
 
     /**
      * @covers \Daylog\Configuration\Providers\Entries\ListEntriesProvider
      * @covers \Daylog\Application\UseCases\Entries\ListEntries
      *
-     * AC-8: stable secondary order when primary sort keys are equal.
+     * AC-8: When sort keys are equal, a stable secondary order by createdAt DESC is applied.
      *
      * Purpose:
-     *  Guarantee deterministic order via stable secondary sort by createdAt DESC
-     *  when primary keys are equal (all items share the same 'date').
+     *   Verify that when the primary sort field yields equal values for all items,
+     *   the list is deterministically ordered by the stable secondary key: createdAt DESC.
      *
      * Mechanics:
-     *  - Seed three rows with the same logical date via EntryFixture::insertRows($rowsCount, $datesStep).
-     *  - Adjust created_at/updated_at to distinct values (10:00, 11:00, 12:00).
-     *  - Sort by date DESC (primary equal) → expect createdAt DESC as tiebreaker.
+     *   - Seed three rows with the same logical 'date' (primary sort key: 'date' → equal).
+     *   - Assign strictly increasing created_at timestamps (10:00:00, 11:00:00, 12:00:00).
+     *   - Equalize updated_at to remove incidental effects.
+     *   - Sort by 'date' (ASC). Expect order by createdAt DESC: id3, id2, id1.
      *
      * @return void
      */
-    public function testStableSecondaryOrderByCreatedAtDescWhenPrimaryEqual(): void
+    public function testStableSecondaryOrderWhenPrimarySortKeysAreEqual(): void
     {
-        // Arrange: same date for all rows
+        // Arrange: three entries share the same 'date' (primary key equal by design)
         $rows = EntryFixture::insertRows(3, 0);
 
         $id1 = $rows[0]['id'];
-        $c1 = '2025-08-12 10:00:00'; 
-        $u1 = '2025-08-12 10:01:00';
-        
         $id2 = $rows[1]['id'];
-        $c2 = '2025-08-12 11:00:00'; 
-        $u2 = '2025-08-12 11:01:00';
-        
         $id3 = $rows[2]['id'];
-        $c3 = '2025-08-12 12:00:00'; 
-        $u3 = '2025-08-12 12:01:00';
 
-        // Distinct timestamps to define the stable secondary order
-        EntryFixture::updateById($id1, ['created_at' => $c1, 'updated_at' => $u1]);
-        EntryFixture::updateById($id2, ['created_at' => $c2, 'updated_at' => $u2]);
-        EntryFixture::updateById($id3, ['created_at' => $c3, 'updated_at' => $u3]);
+        // created_at strictly increasing to make DESC order unambiguous
+        $c1 = '2025-08-12 10:00:00';
+        $c2 = '2025-08-12 11:00:00';
+        $c3 = '2025-08-12 12:00:00';
 
-        // Primary sort: date DESC (all equal) → tiebreaker should be createdAt DESC
-        $sort = 'date,DESC';
+        // updated_at equalized to avoid affecting the outcome
+        $u  = '2025-08-12 13:00:00';
+
+        EntryFixture::updateById($id1, ['created_at' => $c1, 'updated_at' => $u]);
+        EntryFixture::updateById($id2, ['created_at' => $c2, 'updated_at' => $u]);
+        EntryFixture::updateById($id3, ['created_at' => $c3, 'updated_at' => $u]);
+
+        // Act: primary sort key is 'date' (all equal) → must fall back to createdAt DESC
         $data = ListEntriesHelper::getData();
-        $data['sort'] = $sort;
+        $field = 'date';
+        $dir   = 'ASC';
+        $data['sortField'] = $field;
+        $data['sortDir']   = $dir;
 
-        $request  = ListEntriesHelper::buildRequest($data);
-        $response = $this->useCase->execute($request);
+        $req   = ListEntriesHelper::buildRequest($data);
+        $res   = $this->useCase->execute($req);
+        $items = $res->getItems();
 
-        // Assert stable secondary order by createdAt DESC
-        $items = $response->getItems();
-
+        // Assert: stable secondary order by createdAt DESC → id3, id2, id1
         $this->assertSame($id3, $items[0]->getId());
         $this->assertSame($id2, $items[1]->getId());
         $this->assertSame($id1, $items[2]->getId());
