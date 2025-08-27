@@ -204,9 +204,9 @@ final class ListEntriesInputNormalizerTest extends Unit
         $input = [$key => ''];
 
         $normalizer = new ListEntriesInputNormalizer();
-        $norm       = $normalizer->normalize($input);
+        $normalized = $normalizer->normalize($input);
 
-        $this->assertNull($norm[$key]);
+        $this->assertNull($normalized [$key]);
     }
 
     /**
@@ -220,10 +220,10 @@ final class ListEntriesInputNormalizerTest extends Unit
         $input = ['date' => '2025-08-15'];
 
         $normalizer = new ListEntriesInputNormalizer();
-        $norm       = $normalizer->normalize($input);
+        $normalized = $normalizer->normalize($input);
 
         $expectedDate = '2025-08-15';
-        $this->assertSame($expectedDate, $norm['date']);
+        $this->assertSame($expectedDate, $normalized['date']);
     }
 
     /**
@@ -263,9 +263,9 @@ final class ListEntriesInputNormalizerTest extends Unit
         $input = ['sort' => $in];
 
         $normalizer = new ListEntriesInputNormalizer();
-        $norm       = $normalizer->normalize($input);
+        $normalized  = $normalizer->normalize($input);
 
-        $this->assertSame($expected, $norm['sortField']);
+        $this->assertSame($expected, $normalized['sortField']);
     }
 
     /**
@@ -303,11 +303,11 @@ final class ListEntriesInputNormalizerTest extends Unit
      */
     public function testSortDirNormalization(string $in, string $expected): void
     {
-        $input = ['direction' => $in];
+        $input = ['sortDir' => $in];
 
         $normalizer = new ListEntriesInputNormalizer();
-        $norm       = $normalizer->normalize($input);
+        $normalized = $normalizer->normalize($input);
 
-        $this->assertSame($expected, $norm['sortDir']);
+        $this->assertSame($expected, $normalized['sortDir']);
     }
 }
