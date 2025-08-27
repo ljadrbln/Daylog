@@ -86,16 +86,16 @@ final class ListEntriesCriteriaTest extends Unit
      * - Criteria must simply reflect those normalized values without changes.
      *
      * Checks:
-     * - page: given < PAGE_MIN → clamped to PAGE_MIN
-     * - perPage: given < PER_PAGE_MIN → clamped to PER_PAGE_MIN
-     * - dates: empty/null → null
-     * - query: spaces-only → null (after upstream trim)
+     * - page: given < PAGE_MIN => clamped to PAGE_MIN
+     * - perPage: given < PER_PAGE_MIN => clamped to PER_PAGE_MIN
+     * - dates: empty/null => null
+     * - query: spaces-only => null (after upstream trim)
      */
     public function testDefaultsAndNormalizationArePreservedFromRequest(): void
     {
         /** Arrange **/
-        $page    = 0; // invalid, upstream → PAGE_MIN
-        $perPage = 0; // invalid, upstream → PER_PAGE_MIN (NOT DEFAULT)
+        $page    = 0; // invalid, upstream => PAGE_MIN
+        $perPage = 0; // invalid, upstream => PER_PAGE_MIN (NOT DEFAULT)
 
         $filters = [
             'dateFrom' => '',

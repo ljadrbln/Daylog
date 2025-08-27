@@ -97,7 +97,7 @@ final class EntryFieldMapperTest extends Unit
      * Map a full DB row (snake_case) to DTO shape (camelCase).
      *
      * Scenarios:
-     * - All required keys present → each converted as expected.
+     * - All required keys present => each converted as expected.
      * - Extra unknown keys preserved and re-keyed via fromDbField (pass-through).
      *
      * @return void

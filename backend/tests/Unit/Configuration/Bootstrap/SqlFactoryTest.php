@@ -18,8 +18,8 @@ use DB\SQL;
  *    yields a value that DSNParser::parse() can convert to a PDO triple.
  *
  * Cases:
- *  - get() twice → same instance (reference equality).
- *  - reset() → next get() returns a different instance.
+ *  - get() twice => same instance (reference equality).
+ *  - reset() => next get() returns a different instance.
  * 
  * @covers \Daylog\Configuration\Bootstrap\SqlFactory
  */

@@ -216,7 +216,7 @@ final class ListEntriesValidatorTest extends Unit
 
         $rows = [
             'empty string'             => [['query' => '']],
-            'spaces only (trim→empty)' => [['query' => '     ']],
+            'spaces only (trim=>empty)' => [['query' => '     ']],
             'short word'               => [['query' => 'summer']],
             'boundary length 30'       => [['query' => $exact30]],
             'trimmed within limit'     => [['query' => '  june  ']],
