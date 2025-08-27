@@ -56,12 +56,19 @@ final class EntryFixture
     }    
 
     /**
-     * Insert N rows with dates generated from a deterministic base.
+     * Insert N rows with deterministic dates for integration tests.
      *
-     * @param int     $numberOfRows Positive number of rows to insert (≥ 1).
-     * @param int     $step         Day step between consecutive dates (can be 0).
-     * @return array<int,Row>       Inserted rows with generated UUIDs.
-     */
+     * @param int $numberOfRows Positive number (>=1).
+     * @param int $step         Day step between consecutive dates (can be 0).
+     * @return list<array{
+     *   id: string,
+     *   date: string,
+     *   title: string,
+     *   body: string,
+     *   createdAt: string,
+     *   updatedAt: string
+     * }>
+     */    
     public static function insertRows(int $numberOfRows, int $step = 0): array
     {
         $rows = EntryTestData::getMany($numberOfRows, $step);
