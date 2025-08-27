@@ -77,18 +77,25 @@ final class ListEntriesItem
     /**
      * Factory method: build a ListEntriesItem from a storage/repository row.
      *
-     * @param array<string,mixed> $row Associative array with keys:
-     *                                 id, date, title, body, createdAt, updatedAt.
-     * @return self
+     * @param array{
+     *     id: string,
+     *     date: string,
+     *     title: string,
+     *     body: string,
+     *     createdAt: string,
+     *     updatedAt: string
+     * } $row Associative array with storage values.
+     *
+     * @return self New instance constructed from the given row.
      */
     public static function fromArray(array $row): self
     {        
-        $id        = (string) $row['id'];
-        $date      = (string) $row['date'];
-        $title     = (string) $row['title'];
-        $body      = (string) $row['body'];
-        $createdAt = (string) $row['createdAt'];
-        $updatedAt = (string) $row['updatedAt'];
+        $id        = $row['id'];
+        $date      = $row['date'];
+        $title     = $row['title'];
+        $body      = $row['body'];
+        $createdAt = $row['createdAt'];
+        $updatedAt = $row['updatedAt'];
 
         $listEntryItem = new self(
             $id,

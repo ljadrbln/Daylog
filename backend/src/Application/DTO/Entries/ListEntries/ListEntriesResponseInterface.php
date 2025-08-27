@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace Daylog\Application\DTO\Entries\ListEntries;
 
-use Daylog\Domain\Models\Entries\Entry;
-
 /**
- * Contract for UC-2 ListEntries response DTO.
+ * Transport contract for UC-2 List Entries.
  *
- * Enables the use case to return any implementation that exposes the same API,
- * simplifying testing and future evolution (e.g., different read-models).
- *
- * @template T of Entry
+ * This interface is a presentation-facing contract that carries a read-model
+ * (ListEntriesItem) and pagination metadata from the Use Case to the Presenter/View.
+ * It is intentionally non-generic because this UC returns a fixed read-model.
  */
 interface ListEntriesResponseInterface
 {
     /**
-     * @return list<Entry> Items on the current page (domain models or read-models).
+     * Get the list of read-model items.
+     *
+     * @return list<ListEntriesItem> Non-associative list of immutable items.
      */
     public function getItems(): array;
 

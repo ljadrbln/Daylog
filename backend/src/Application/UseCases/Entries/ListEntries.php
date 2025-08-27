@@ -65,7 +65,7 @@ final class ListEntries
 
         $criteria = ListEntriesCriteria::fromRequest($request);
         $page = $this->repository->findByCriteria($criteria);
-
+var_dump($page);exit;
         $items      = $page['items'];
         $total      = $page['total'];
         $pageNum    = $page['page'];

@@ -82,20 +82,34 @@ final class ListEntriesRequest implements ListEntriesRequestInterface
     /**
      * Factory method to create a ListEntriesRequest from an associative array.
      *
-     * @param array<string,mixed> $data Input array with optional keys:
-     *        page, perPage, sortField, sortDir, dateFrom, dateTo, date, query.
-     * @return self
+     * This factory expects already-normalized values produced by the Presentation
+     * factory + Application normalizer. Required keys must be present; optional
+     * keys may be omitted and will default to null.
+     *
+     * @param array{
+     *     page: int,
+     *     perPage: int,
+     *     sortField: 'date'|'createdAt'|'updatedAt',
+     *     sortDir: 'ASC'|'DESC',
+     *     dateFrom?: string,
+     *     dateTo?: string,
+     *     date?: string,
+     *     query?: string
+     * } $data Normalized request parameters.
+     *
+     * @return self New instance created from the given array.
      */
     public static function fromArray(array $data): self
     {
         $page      = $data['page'];
         $perPage   = $data['perPage'];
         $sortField = $data['sortField'];
-        $sortDir   = $data['sortDir'];                
-        $dateFrom  = $data['dateFrom'];
-        $dateTo    = $data['dateTo'];
-        $date      = $data['date'];
-        $query     = $data['query'];
+        $sortDir   = $data['sortDir'];
+
+        $dateFrom  = $data['dateFrom'] ?? null;
+        $dateTo    = $data['dateTo']   ?? null;
+        $date      = $data['date']     ?? null;
+        $query     = $data['query']    ?? null;
 
         $request = new self(
             $page,
@@ -109,7 +123,7 @@ final class ListEntriesRequest implements ListEntriesRequestInterface
         );
 
         return $request;
-    }    
+    }
 
     /**
      * Get current page (1-based).

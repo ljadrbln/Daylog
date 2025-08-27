@@ -10,13 +10,12 @@ use Daylog\Application\DTO\Entries\ListEntries\ListEntriesResponseInterface;
 /**
  * Response DTO for UC-2 List Entries.
  *
- * Holds the resulting items and pagination metadata.
- *
- * @template T of object
+ * Carries a list of ListEntriesItem and pagination metadata from the Use Case
+ * to the Presentation layer. Construct via fromArray() using repository output.
  */
 final class ListEntriesResponse implements ListEntriesResponseInterface
 {
-    /** @var array<int, T> */
+    /** @var list<ListEntriesItem> */
     private array $items;
     private int $page;
     private int $perPage;
@@ -25,12 +24,12 @@ final class ListEntriesResponse implements ListEntriesResponseInterface
 
     /**
      * Private constructor. Use fromArray().
-     * 
-     * @param array<int, T> $items      List of entries (may be empty).
-     * @param int           $page       Current page.
-     * @param int           $perPage    Items per page.
-     * @param int           $total      Total items count.
-     * @param int           $pagesCount Total number of pages.
+     *
+     * @param list<ListEntriesItem> $items    List of items (may be empty).
+     * @param int                   $page     Current page (1-based).
+     * @param int                   $perPage  Items per page.
+     * @param int                   $total    Total items count.
+     * @param int                   $pagesCount Total number of pages.
      */
     private function __construct(
         array $items,
@@ -47,34 +46,58 @@ final class ListEntriesResponse implements ListEntriesResponseInterface
     }
 
     /**
-     * Factory method to create a response from an associative array.
+     * Factory method to create a response from repository output.
      *
-     * @param array<string,string> $data Keys: id, title, body, date, createdAt, updatedAt.
+     * @param array{
+     *     items: list<array{
+     *         id: string,
+     *         date: string,
+     *         title: string,
+     *         body: string,
+     *         createdAt: string,
+     *         updatedAt: string
+     *     }>,
+     *     total: int,
+     *     page: int,
+     *     perPage: int,
+     *     pagesCount: int
+     * } $data Normalized repository result.
+     *
      * @return self
      */
     public static function fromArray(array $data): self
     {
-        $items      = $data['items']      ?? [];
-        $page       = $data['page']       ?? 1;
-        $perPage    = $data['perPage']    ?? 10;
-        $total      = $data['total']      ?? 0;
-        $pagesCount = $data['pagesCount'] ?? 1;
+        /** @var list<ListEntriesItem> $items */
+        $items = [];
 
-        $mapped = [];
-        foreach ($items as $item) {
-            $item = ListEntriesItem::fromArray($item);
-            $mapped[] = $item;
+        foreach ($data['items'] as $row) {
+            $item = ListEntriesItem::fromArray($row);
+            $items[] = $item;
         }
 
-        return new self($mapped, $page, $perPage, $total, $pagesCount);
+        $page       = $data['page'];
+        $perPage    = $data['perPage'];
+        $total      = $data['total'];
+        $pagesCount = $data['pagesCount'];
+
+        $response = new self(
+            $items,
+            $page,
+            $perPage,
+            $total,
+            $pagesCount
+        );
+
+        return $response;
     }
 
     /**
-     * @return array<int, T>
+     * @return list<ListEntriesItem>
      */
     public function getItems(): array
     {
-        return $this->items;
+        $items = $this->items;
+        return $items;
     }
 
     /**
@@ -82,7 +105,8 @@ final class ListEntriesResponse implements ListEntriesResponseInterface
      */
     public function getPage(): int
     {
-        return $this->page;
+        $page = $this->page;
+        return $page;
     }
 
     /**
@@ -90,7 +114,8 @@ final class ListEntriesResponse implements ListEntriesResponseInterface
      */
     public function getPerPage(): int
     {
-        return $this->perPage;
+        $perPage = $this->perPage;
+        return $perPage;
     }
 
     /**
@@ -98,7 +123,8 @@ final class ListEntriesResponse implements ListEntriesResponseInterface
      */
     public function getTotal(): int
     {
-        return $this->total;
+        $total = $this->total;
+        return $total;
     }
 
     /**
@@ -106,6 +132,7 @@ final class ListEntriesResponse implements ListEntriesResponseInterface
      */
     public function getPagesCount(): int
     {
-        return $this->pagesCount;
+        $pagesCount = $this->pagesCount;
+        return $pagesCount;
     }
 }
