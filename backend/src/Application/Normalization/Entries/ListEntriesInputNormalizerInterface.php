@@ -32,8 +32,8 @@ interface ListEntriesInputNormalizerInterface
     /**
      * Normalize raw transport input for UC-2 List Entries.
      *
-     * @param array<string,mixed> $input Raw map (e.g. parsed query/body).
-     * @return TNormalized Normalized map for constructing the request DTO.
+     * @param array<string,mixed>   $input Raw map (e.g. parsed query/body).
+     * @return TNormalized          Normalized map for constructing the request DTO.
      */
     public function normalize(array $input): array;
 }

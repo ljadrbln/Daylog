@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\Normalization\Entries;
 
 use Codeception\Test\Unit;
-use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
 use Daylog\Application\Normalization\Entries\AddEntryInputNormalizer;
 use Daylog\Domain\Services\DateService;
 use Daylog\Domain\Services\UuidGenerator;
@@ -81,15 +80,20 @@ final class AddEntryInputNormalizerTest extends Unit
      */
     public function testFieldNormalization(string $in, string $expected, string $field): void
     {
+        /**
+         * @var array{
+         *     title:string,
+         *     body:string,
+         *     date:string
+         * } $data Raw transport map (e.g., $_GET or JSON).
+         */
         $data = ['title' => 'T', 'body'  => 'B', 'date'  => '2025-08-28'];
         $data[$field] = $in;
 
-        $request = AddEntryRequest::fromArray($data);
+        $normalizer = new AddEntryInputNormalizer(); 
+        $normalized = $normalizer->normalize($data);
 
-        $normalizer = new AddEntryInputNormalizer();
-        $payload    = $normalizer->normalize($request);
-
-        $this->assertSame($expected, $payload[$field]);
+        $this->assertSame($expected, $normalized[$field]);
     }
 
     /**
@@ -102,7 +106,8 @@ final class AddEntryInputNormalizerTest extends Unit
      * - timestamps are equal on creation.
      *
      * @return void
-     * @covers \Daylog\Application\Normalization\Entries\AddEntryInputNormalizerInterface::normalize
+     * @covers \Daylog\Application\Normalization\Entries\AddEntryInputNormalizer
+     * 
      */
     public function testTechnicalFieldsAreGeneratedAndConsistent(): void
     {
@@ -112,10 +117,8 @@ final class AddEntryInputNormalizerTest extends Unit
             'date'  => ' 2025-08-28 ',
         ];
 
-        $request = AddEntryRequest::fromArray($data);
-
         $normalizer = new AddEntryInputNormalizer();
-        $normalized = $normalizer->normalize($request);
+        $normalized = $normalizer->normalize($data);
 
         // UUID v4
         $id        = $normalized['id'];

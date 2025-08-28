@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Presentation\Requests\Entries;
 
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
+use Daylog\Application\Normalization\Entries\AddEntryInputNormalizer;
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
 use Daylog\Application\Exceptions\TransportValidationException;
 
@@ -32,34 +33,32 @@ final class AddEntryRequestFactory
      * - No business validation is performed here (length limits, trimming, date format).
      * - This factory only ensures transport correctness for UC-1 Add Entry.
      *
-     * @param array<string,mixed> $input Raw transport map (e.g., JSON body).
+     * @param array{
+     *     title:string,
+     *     body:string,
+     *     date:string
+     * } $params Raw transport map (e.g., $_GET or JSON).
+     * 
      * @return AddEntryRequestInterface Typed request DTO for UC-1.
      *
      * @throws TransportValidationException When any known field is missing or has invalid type.
      */
-    public static function fromArray(array $input): AddEntryRequestInterface
+    public static function fromArray(array $params): AddEntryRequestInterface
     {
         $errors = [];
 
-        $errors = self::validateTitle($input, $errors);
-        $errors = self::validateBody($input, $errors);
-        $errors = self::validateDate($input, $errors);
+        $errors = self::validateTitle($params, $errors);
+        $errors = self::validateBody($params, $errors);
+        $errors = self::validateDate($params, $errors);
 
         if ($errors !== []) {
             throw new TransportValidationException($errors);
         }
 
-        $title = $input['title'];
-        $body  = $input['body'];
-        $date  = $input['date'];
+        $normalizer = new AddEntryInputNormalizer();
+        $normalized = $normalizer->normalize($params);
 
-        $data = [
-            'title' => $title,
-            'body'  => $body,
-            'date'  => $date,
-        ];
-
-        $request = AddEntryRequest::fromArray($data);
+        $request = AddEntryRequest::fromArray($normalized);
         return $request;
     }
 

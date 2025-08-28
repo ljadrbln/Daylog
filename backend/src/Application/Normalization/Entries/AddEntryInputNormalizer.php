@@ -33,8 +33,13 @@ final class AddEntryInputNormalizer
 {
     /**
      * Normalize Add Entry request into a strict payload.
-     *
-     * @param AddEntryRequestInterface $request DTO with title, body, date.
+     * 
+     * @param array{
+     *     title:string,
+     *     body:string,
+     *     date:string
+     * } $input Raw transport map (e.g., $_GET or JSON).
+     * 
      * @return array{
      *     id:string,
      *     title:string,
@@ -44,12 +49,12 @@ final class AddEntryInputNormalizer
      *     updatedAt:string
      * }
      */
-    public function normalize(AddEntryRequestInterface $request): array
+    public function normalize(array $input): array
     {
         // Trim input fields
-        $title = trim($request->getTitle());
-        $body  = trim($request->getBody());
-        $date  = trim($request->getDate());
+        $title = $this->normalizeTitle($input);
+        $body  = $this->normalizeBody($input);
+        $date  = $this->normalizeDate($input);
 
         // Technical fields (Domain-level services; no Infrastructure calls here)
         $id  = UuidGenerator::generate();
@@ -67,4 +72,61 @@ final class AddEntryInputNormalizer
 
         return $payload;
     }
+
+    /**
+     * Normalize title: trim entry title.
+     *
+     * @param array{
+     *     title:string,
+     *     body:string,
+     *     date:string
+     * } $input Raw transport map (e.g., $_GET or JSON).
+     * 
+     * @return string
+     */
+    private function normalizeTitle(array $input): string
+    {
+        $title = $input['title'];
+        $title = trim($title);
+
+        return $title;
+    }
+
+    /**
+     * Normalize body: trim entry body.
+     *
+     * @param array{
+     *     title:string,
+     *     body:string,
+     *     date:string
+     * } $input Raw transport map (e.g., $_GET or JSON).
+     * 
+     * @return string
+     */
+    private function normalizeBody(array $input): string
+    {
+        $body = $input['body'];
+        $body = trim($body);
+
+        return $body;
+    }
+
+    /**
+     * Normalize date: trim entry date.
+     *
+     * @param array{
+     *     title:string,
+     *     body:string,
+     *     date:string
+     * } $input Raw transport map (e.g., $_GET or JSON).
+     * 
+     * @return string
+     */
+    private function normalizeDate(array $input): string
+    {
+        $date = $input['date'];
+        $date = trim($date);
+
+        return $date;
+    }    
 }
