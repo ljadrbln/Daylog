@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Daylog\Infrastructure\Utils;
+namespace Daylog\Domain\Services;
 
 use DateTimeImmutable;
 use DateTimeZone;
