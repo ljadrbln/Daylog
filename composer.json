@@ -24,7 +24,12 @@
   },
   "autoload": {
     "psr-4": {
-      "Daylog\\": "backend/src/",
+      "Daylog\\": "backend/src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Daylog\\Tests\\": "backend/tests/",
       "Daylog\\Tests\\Support\\": "backend/tests/_support/"
     }
   },
