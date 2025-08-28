@@ -7,7 +7,8 @@ use Daylog\Domain\Models\Entries\ListEntriesCriteria;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Domain\Interfaces\Entries\EntryStorageInterface;
 use Daylog\Domain\Models\Entries\Entry;
-use Daylog\Infrastructure\Utils\Clock;
+use Daylog\Domain\Services\Clock;
+
 
 /**
  * Class EntryRepository
