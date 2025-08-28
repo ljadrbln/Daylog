@@ -8,6 +8,7 @@ use Codeception\Test\Unit;
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryResponseInterface;
+use Daylog\Application\Normalization\Entries\AddEntryInputNormalizer;
 
 use Daylog\Application\Validators\Entries\AddEntry\AddEntryValidatorInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
@@ -44,21 +45,20 @@ final class AddEntryTest extends Unit
      */
     public function testHappyPathSavesEntryAndReturnsResponseDto(): void
     {
-        /** Arrange **/
-        $data    = EntryTestData::getOne();
-        $request = AddEntryRequest::fromArray($data);
+        // Arrange
+        $data  = EntryTestData::getOne();
+        
+        $normalizer = new AddEntryInputNormalizer();
+        $normalized = $normalizer->normalize($data);
 
+        $request = AddEntryRequest::fromArray($normalized);
+var_dump($normalized);exit;
         $repoClass = EntryRepositoryInterface::class;
         $repo      = $this->createMock($repoClass);
 
-        // Use a valid UUIDv4 literal so UuidGenerator::isValid() passes.
-        $uuid = UuidGenerator::generate();
-        $data['id'] = $uuid;
-
         $repo
             ->expects($this->once())
-            ->method('save')
-            ->willReturn($data);
+            ->method('save');
 
         $validatorClass = AddEntryValidatorInterface::class;
         $validator      = $this->createMock($validatorClass);
@@ -66,7 +66,7 @@ final class AddEntryTest extends Unit
             ->expects($this->once())
             ->method('validate');
 
-        /** Act **/
+        // Act
         $useCase  = new AddEntry($repo, $validator);
         $response = $useCase->execute($request);
 
