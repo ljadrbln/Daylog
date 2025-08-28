@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Daylog\Tests\Unit\Infrastructure\Utils\Clock;
+namespace Daylog\Tests\Unit\Infrastructure\Utils;
 
 use Codeception\Test\Unit;
 use Daylog\Infrastructure\Utils\Clock;

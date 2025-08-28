@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Daylog\Tests\Unit\Application\DTO\Entries;
+namespace Daylog\Tests\Unit\Presentation\Requests\Entries;
 
 use Codeception\Test\Unit;
 use Daylog\Presentation\Requests\Entries\ListEntriesRequestFactory;

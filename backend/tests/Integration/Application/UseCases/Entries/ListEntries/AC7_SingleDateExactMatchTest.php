@@ -24,7 +24,7 @@ use Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries\BaseListEn
  * @covers \Daylog\Configuration\Providers\Entries\ListEntriesProvider
  * @covers \Daylog\Application\UseCases\Entries\ListEntries
  */
-final class ListEntriesIntegrationTest extends BaseListEntriesIntegrationTest
+final class AC7_SingleDateExactMatchTest extends BaseListEntriesIntegrationTest
 {
     /** 
      * AC-7: Single-date filter returns only exact logical-date matches (ordered by date DESC). 
