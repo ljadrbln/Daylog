@@ -6,53 +6,74 @@ namespace Daylog\Domain\Models\Entries;
 /**
  * Domain Model: Entry
  *
- * Holds validated data for a diary entry. In this design the domain model assumes
- * that input validation is performed upstream (DTO factory + Application validators).
- * This class does not throw validation exceptions for user input; it keeps invariants
- * internally and exposes simple getters.
+ * Holds validated data for a diary entry including identity and timestamps.
+ * Validation is performed upstream (DTO factory + Application validators).
+ * Invariants enforced by callers:
+ * - On creation, a single snapshot time is used: createdAt == updatedAt.
+ * - Timestamps are pre-formatted strings (e.g., ISO-8601 or app-agreed format).
  */
 final class Entry
 {
+    private string $id;
     private string $title;
     private string $body;
-    private string $date;
+    private string $date;     
+    private string $createdAt;
+    private string $updatedAt;
 
     /**
      * Create an Entry with already validated values.
      *
-     * The caller (DTO factory + validators) must guarantee:
-     * - title/body are trimmed and within BR limits;
-     * - date is a valid YYYY-MM-DD.
-     *
-     * @param string $title Pre-validated, trimmed title
-     * @param string $body  Pre-validated, trimmed body
-     * @param string $date  Pre-validated date in YYYY-MM-DD
+     * Caller guarantees that inputs are pre-validated and trimmed.
+     * A single snapshot time is passed via $now and applied to both timestamps.
+     * 
+     * @param string $id    UUID (generated upstream)
+     * @param string $title Pre-validated title
+     * @param string $body  Pre-validated body
+     * @param string $date  Logical date in YYYY-MM-DD
+     * @param string $now   Snapshot timestamp for createdAt/updatedAt
      */
-    private function __construct(string $title, string $body, string $date)
+    private function __construct(string $id, string $title, string $body, string $date, string $now)
     {
+        $this->id    = $id;
         $this->title = $title;
         $this->body  = $body;
         $this->date  = $date;
+        $this->createdAt = $now;
+        $this->updatedAt = $now;
     }
 
     /**
      * Factory from array. Assumes values are pre-validated upstream.
      *
-     * @param array{title:string, body:string, date:string} $data
+     * @param array{
+     *   id:string,
+     *   title:string,
+     *   body:string,
+     *   date:string,
+     *   createdAt:string,
+     *   updatedAt:string
+     * } $data
+     * 
      * @return self
      */
     public static function fromArray(array $data): self
     {
+        $id    = $data['id'];
         $title = $data['title'];
         $body  = $data['body'];
         $date  = $data['date'];
+        $createdAt = $data['createdAt'];
+        $updatedAt = $data['updatedAt'];
 
-        $entry = new self($title, $body, $date);
+        $entry = new self($id, $title, $body, $date, $createdAt, $updatedAt);
 
         return $entry;
     }
 
-    /**
+   /**
+     * Title getter.
+     *
      * @return string
      */
     public function getTitle(): string
@@ -62,6 +83,8 @@ final class Entry
     }
 
     /**
+     * Body getter.
+     *
      * @return string
      */
     public function getBody(): string
@@ -71,11 +94,46 @@ final class Entry
     }
 
     /**
+     * Logical date getter.
+     *
      * @return string
      */
     public function getDate(): string
     {
         $result = $this->date;
+        return $result;
+    }
+
+    /**
+     * Identity getter (UUID).
+     *
+     * @return string
+     */
+    public function getId(): string
+    {
+        $result = $this->id;
+        return $result;
+    }
+
+    /**
+     * Creation timestamp getter.
+     *
+     * @return string
+     */
+    public function getCreatedAt(): string
+    {
+        $result = $this->createdAt;
+        return $result;
+    }
+
+    /**
+     * Update timestamp getter.
+     *
+     * @return string
+     */
+    public function getUpdatedAt(): string
+    {
+        $result = $this->updatedAt;
         return $result;
     }
 }
