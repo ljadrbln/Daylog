@@ -42,10 +42,7 @@ abstract class BaseListEntriesIntegrationTest extends Unit
         // Register DB in fixtures
         $db = SqlFactory::get();
         EntryFixture::setDb($db);
-
-        // Clean table
-        $sql = 'DELETE FROM entries';
-        $db->exec($sql);
+        EntryFixture::cleanTable();
 
         // Use case
         $provider = ListEntriesProvider::class;
@@ -53,4 +50,14 @@ abstract class BaseListEntriesIntegrationTest extends Unit
 
         $this->useCase = $useCase;
     }
+
+    /**
+     * Ensure DB table is clean after each test and release overrides.
+     *
+     * @return void
+     */
+    protected function _after(): void
+    {
+        EntryFixture::cleanTable();
+    }    
 }
