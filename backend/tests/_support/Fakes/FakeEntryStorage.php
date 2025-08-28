@@ -34,8 +34,41 @@ final class FakeEntryStorage implements EntryStorageInterface
         return $uuid;
     }
 
-    /** @inheritDoc */
-    public function findByCriteria(ListEntriesCriteria $criteria): array {
-        return [];
-    }    
+    /** 
+     * {@inheritDoc} 
+     * 
+     * This fake ignores all criteria and always returns an empty page
+     * with correct pagination metadata (items=[], total=0, page=1, perPage=20, pagesCount=0).
+     * Useful for unit tests that only assert interaction with storage,
+     * not actual filtering or pagination logic.
+     */
+    public function findByCriteria(ListEntriesCriteria $criteria): array
+    {
+        /** @var array<int, array{
+         *   id: string,
+         *   date: string,
+         *   title: string,
+         *   body: string,
+         *   createdAt: string,
+         *   updatedAt: string
+         * }> $items
+         */
+        $items = [];
+
+        // UC-2 defaults: page=1, perPage=20; empty result ⇒ total=0, pagesCount=0.
+        $total      = 0;
+        $page       = 1;
+        $perPage    = 20;
+        $pagesCount = 0;
+
+        $result = [
+            'items'      => $items,
+            'total'      => $total,
+            'page'       => $page,
+            'perPage'    => $perPage,
+            'pagesCount' => $pagesCount,
+        ];
+
+        return $result;
+    }
 }
