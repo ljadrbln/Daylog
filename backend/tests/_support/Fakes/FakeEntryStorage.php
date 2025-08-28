@@ -25,13 +25,10 @@ final class FakeEntryStorage implements EntryStorageInterface
     public string $returnUuid = '11111111-1111-1111-1111-111111111111';
 
     /** @inheritDoc */
-    public function insert(Entry $entry, string $now): string
+    public function insert(Entry $entry): void
     {
         $this->insertCalls++;
         $this->lastInserted = $entry;
-
-        $uuid = $this->returnUuid;
-        return $uuid;
     }
 
     /** 
