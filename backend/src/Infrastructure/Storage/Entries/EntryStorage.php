@@ -70,7 +70,7 @@ final class EntryStorage implements EntryStorageInterface
      *
      * @param ListEntriesCriteria $criteria Normalized criteria from validator.
      * @return array{
-     *     items: array<int, array{id:string,date:string,title:string,body:string,createdAt:string,updatedAt:string}>,
+     *     items: array<int, array{id:string,title:string,body:string,date:string,createdAt:string,updatedAt:string}>,
      *     total: int,
      *     page: int,
      *     perPage: int,

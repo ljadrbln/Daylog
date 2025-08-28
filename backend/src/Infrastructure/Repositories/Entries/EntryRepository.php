@@ -65,7 +65,7 @@ final class EntryRepository implements EntryRepositoryInterface
      *
      * @param ListEntriesCriteria $criteria Normalized criteria (validated upstream).
      * @return array{
-     *     items: array<int, array{id:string,date:string,title:string,body:string,createdAt:string,updatedAt:string}>,
+     *     items: list<Entry>,
      *     total: int,
      *     page: int,
      *     perPage: int,
@@ -75,6 +75,21 @@ final class EntryRepository implements EntryRepositoryInterface
     public function findByCriteria(ListEntriesCriteria $criteria): array
     {
         $result = $this->storage->findByCriteria($criteria);
+
+        $rawItems = array_values($result['items']);
+
+        /** @var list<Entry> $entries */
+        $entries = [];
+
+        for($i=0; $i<count($rawItems); $i++) {
+            $item = $rawItems[$i];
+            $item = Entry::fromArray($item);
+
+            $entries[] = $item;
+        }
+
+        $result['items'] = $entries;
+
         return $result;
     }
 }
