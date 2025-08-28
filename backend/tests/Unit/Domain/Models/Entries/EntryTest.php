@@ -8,30 +8,41 @@ use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Tests\Support\Helper\EntryTestData;
 
 /**
- * Unit-test for the Entry domain model.
+ * Unit test for the Entry domain model (creation path).
  *
- * Verifies that the model holds pre-validated values and exposes consistent getters.
- * This test does not check business-rule validation (handled by Application validators).
+ * Purpose: verify that Entry exposes id/title/body/date and enforces BR-4 on creation:
+ * createdAt and updatedAt must be set to the same snapshot time.
+ * Mechanics: we reuse EntryTestData to get a valid (title/body/date) payload, prepare a fixed uuid
+ * and a deterministic "now" derived from the logical date (00:00:00), then call the factory and assert getters.
  *
- * Cases:
- * - Construct from valid array and assert getters.
- * - Ensure factory method preserves values as-is (no trimming/validation here).
- *
- * @covers \Daylog\Domain\Models\Entry
+ * @covers \Daylog\Domain\Models\Entries\Entry
  */
 final class EntryTest extends Unit
 {
-    public function testConstructAndGetters(): void
+    public function testCreateSetsEqualTimestampsAndExposesAllFields(): void
     {
-        $data  = EntryTestData::getOne(); // returns valid title/body/date
+        // Arrange
+        $data = EntryTestData::getOne();
+
+        // Act
         $entry = Entry::fromArray($data);
 
-        $expectedTitle = $data['title'];
-        $expectedBody  = $data['body'];
-        $expectedDate  = $data['date'];
+        // Assert: basic getters reflect inputs
+        $actualId    = $entry->getId();
+        $actualTitle = $entry->getTitle();
+        $actualBody  = $entry->getBody();
+        $actualDate  = $entry->getDate();
 
-        $this->assertSame($expectedTitle, $entry->getTitle());
-        $this->assertSame($expectedBody,  $entry->getBody());
-        $this->assertSame($expectedDate,  $entry->getDate());
+        $this->assertSame($data['id'],    $actualId);
+        $this->assertSame($data['title'], $actualTitle);
+        $this->assertSame($data['body'],  $actualBody);
+        $this->assertSame($data['date'],  $actualDate);
+
+        // Assert: BR-4 single snapshot on creation (createdAt == updatedAt == now)
+        $createdAt = $entry->getCreatedAt();
+        $updatedAt = $entry->getUpdatedAt();
+
+        $this->assertSame($data['createdAt'], $createdAt);
+        $this->assertSame($data['updatedAt'], $updatedAt);
     }
 }
