@@ -20,16 +20,10 @@ interface EntryRepositoryInterface
     /**
      * Save a new Entry into storage.
      *
-     * @param Entry $entry
-     * @return array<string,string> Result with keys:
-     *                             - id (UUID v4)
-     *                             - title (string)
-     *                             - body (string)
-     *                             - date (YYYY-MM-DD)
-     *                             - createdAt (ISO-8601 UTC)
-     *                             - updatedAt (ISO-8601 UTC)
+     * @param Entry $entry Pre-built domain Entry (id/timestamps already set).
+     * @return Entry The same Entry instance after persistence.
      */
-    public function save(Entry $entry): array;
+    public function save(Entry $entry): Entry;
 
     /**
      * Fetch a paginated page of entries by domain criteria.

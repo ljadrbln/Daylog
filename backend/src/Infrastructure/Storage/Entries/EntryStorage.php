@@ -36,29 +36,23 @@ final class EntryStorage implements EntryStorageInterface
         $this->model = $model;
     }
 
+        /** @inheritDoc */
+    public function save(Entry $entry): Entry
+    {
+        $this->storage->insert($entry);
+
+        return $entry;
+    }
+
     /**
      * Insert the given Entry and return generated UUID.
      *
-     * @param Entry  $entry Domain entry to persist.
-     * @param string $now   Current timestamp (UTC, ISO 8601).
-     * @return string Generated UUID (v4).
+     * @param Entry  $entry Domain entry to persist.     
      */
-    public function insert(Entry $entry, string $now): string
+    public function insert(Entry $entry): void
     {
-        $uuid = UuidGenerator::generate();
-
-        $data = [
-            'id'        => $uuid,
-            'date'      => $entry->getDate(),
-            'title'     => $entry->getTitle(),
-            'body'      => $entry->getBody(),
-            'createdAt' => $now,
-            'updatedAt' => $now
-        ];
-
+        $data = EntryFieldMapper::toDbRowFromEntry($entry);
         $this->model->create($data);
-
-        return $uuid;
     }
 
     /**

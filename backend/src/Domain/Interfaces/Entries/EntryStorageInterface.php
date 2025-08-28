@@ -15,13 +15,16 @@ use Daylog\Domain\Models\Entries\ListEntriesCriteria;
 interface EntryStorageInterface
 {
     /**
-     * Insert the given Entry and return generated UUID.
+     * Insert the given Entry into the database.
      *
-     * @param Entry $entry Entry to be persisted.
-     * @param string $now   Current timestamp (UTC, ISO 8601).
-     * @return string Generated UUID for the new record.
+     * Design:
+     * - Storage DOES NOT generate id/timestamps.
+     * - Return value indicates success of the INSERT.
+     *
+     * @param Entry $entry Domain Entry ready to persist.
+     * @return bool True if exactly one row was inserted; false otherwise.
      */
-    public function insert(Entry $entry, string $now): string;
+    public function insert(Entry $entry): void;
 
     /**
      * Retrieve paginated entries by criteria (UC-2).

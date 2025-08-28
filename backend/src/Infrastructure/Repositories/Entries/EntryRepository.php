@@ -31,19 +31,9 @@ final class EntryRepository implements EntryRepositoryInterface
     }
 
     /** @inheritDoc */
-    public function save(Entry $entry): array
+    public function save(Entry $entry): Entry
     {
-        $now  = Clock::now();
-        $uuid = $this->storage->insert($entry, $now);
-
-        $entry = [
-            'id'        => $uuid,
-            'date'      => $entry->getDate(),
-            'title'     => $entry->getTitle(),
-            'body'      => $entry->getBody(),
-            'createdAt' => $now,
-            'updatedAt' => $now
-        ];
+        $this->storage->insert($entry);
 
         return $entry;
     }
