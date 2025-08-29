@@ -29,6 +29,7 @@ final class FakeEntryStorage implements EntryStorageInterface
     {
         $this->insertCalls++;
         $this->lastInserted = $entry;
+        $this->returnUuid   = $entry->getId();
     }
 
     /** 
