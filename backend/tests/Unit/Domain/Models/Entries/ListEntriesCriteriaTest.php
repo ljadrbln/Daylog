@@ -7,6 +7,8 @@ use Codeception\Test\Unit;
 use Daylog\Domain\Models\Entries\ListEntriesCriteria;
 use Daylog\Tests\Support\Helper\ListEntriesHelper;
 use Daylog\Domain\Models\Entries\ListEntriesConstraints;
+use Daylog\Application\Normalization\Entries\ListEntriesInputNormalizer;
+use Daylog\Application\UseCases\Entries\ListEntries;
 
 /**
  * Unit tests for Domain ListEntriesCriteria (UC-2).
@@ -35,7 +37,7 @@ final class ListEntriesCriteriaTest extends Unit
      */
     public function testFromRequestReturnsMappedValues(): void
     {
-        /** Arrange **/
+        // Arrange
         $filters = [
             'dateFrom' => '2025-08-01',
             'dateTo'   => '2025-08-21',
@@ -45,13 +47,15 @@ final class ListEntriesCriteriaTest extends Unit
 
         $base = ListEntriesHelper::getData();
         $data = ListEntriesHelper::withFilters($base, $filters);
-
         $request = ListEntriesHelper::buildRequest($data);
 
-        /** Act **/
-        $criteria = ListEntriesCriteria::fromRequest($request);
+        $normalizer = new ListEntriesInputNormalizer();
+        $normalized = $normalizer->normalize($request);
 
-        /** Assert **/
+        // Act
+        $criteria = ListEntriesCriteria::fromArray($normalized);
+
+        // Assert
         $actualPage = $criteria->getPage();
         $this->assertSame($base['page'], $actualPage);
 
@@ -93,7 +97,7 @@ final class ListEntriesCriteriaTest extends Unit
      */
     public function testDefaultsAndNormalizationArePreservedFromRequest(): void
     {
-        /** Arrange **/
+        // Arrange
         $page    = 0; // invalid, upstream => PAGE_MIN
         $perPage = 0; // invalid, upstream => PER_PAGE_MIN (NOT DEFAULT)
 
@@ -106,11 +110,14 @@ final class ListEntriesCriteriaTest extends Unit
         $base    = ListEntriesHelper::getData($page, $perPage);
         $data    = ListEntriesHelper::withFilters($base, $filters);
         $request = ListEntriesHelper::buildRequest($data);
+        
+        $normalizer = new ListEntriesInputNormalizer();
+        $normalized = $normalizer->normalize($request);
 
-        /** Act **/
-        $criteria = ListEntriesCriteria::fromRequest($request);
+        // Act
+        $criteria = ListEntriesCriteria::fromArray($normalized);
 
-        /** Assert **/
+        // Assert
         $expectedPage = ListEntriesConstraints::PAGE_MIN;
         $this->assertSame($expectedPage, $criteria->getPage());
 
@@ -122,7 +129,6 @@ final class ListEntriesCriteriaTest extends Unit
         $this->assertNull($criteria->getQuery());
     }
 
-
     /**
      * Query is trimmed upstream and preserved as-is by Criteria.
      *
@@ -133,21 +139,26 @@ final class ListEntriesCriteriaTest extends Unit
      */
     public function testQueryIsPreservedAfterUpstreamTrim(): void
     {
-        /** Arrange **/
+        // Arrange
+        $expectedQuery = '  project alpha  beta  ';
         $filters = [
-            'query' => '  project alpha  beta  '
+            'query' => $expectedQuery
         ];
 
         $base    = ListEntriesHelper::getData();
         $data    = ListEntriesHelper::withFilters($base, $filters);
         $request = ListEntriesHelper::buildRequest($data);
+        
+        $normalizer = new ListEntriesInputNormalizer();
+        $normalized = $normalizer->normalize($request);
 
-        /** Act **/
-        $criteria = ListEntriesCriteria::fromRequest($request);
+        // Act
+        $criteria = ListEntriesCriteria::fromArray($normalized);
 
-        /** Assert **/
-        $actualQuery = $criteria->getQuery();
-        $this->assertSame('project alpha  beta', $actualQuery);
+        // Assert
+        $expectedQuery = trim($expectedQuery);
+        $actualQuery   = $criteria->getQuery();
+        $this->assertSame($expectedQuery, $actualQuery);
     }
 
     /**
@@ -159,14 +170,17 @@ final class ListEntriesCriteriaTest extends Unit
      */
     public function testSortDescriptorPrimaryFromRequestAndSecondaryStable(): void
     {
-        /** Arrange **/
+        // Arrange
         $data = ListEntriesHelper::getData();
         $request  = ListEntriesHelper::buildRequest($data);
 
-        /** Act **/
-        $criteria = ListEntriesCriteria::fromRequest($request);
+        $normalizer = new ListEntriesInputNormalizer();
+        $normalized = $normalizer->normalize($request);
 
-        /** Assert **/
+        // Act
+        $criteria = ListEntriesCriteria::fromArray($normalized);
+
+        // Assert
         $sort = $criteria->getSortDescriptor();
 
         $expected = [

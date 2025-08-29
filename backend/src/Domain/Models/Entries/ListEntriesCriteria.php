@@ -52,18 +52,15 @@ final class ListEntriesCriteria
      */
     public static function fromArray(array $params): self
     {
-        var_dump($params);
-        exit;
+        $page     = $params['page'];
+        $perPage  = $params['perPage'];
+        $dateFrom = $params['dateFrom'];
+        $dateTo   = $params['dateTo'];
+        $date     = $params['date'];
+        $query    = $params['query'];
 
-        $page     = $req->getPage();
-        $perPage  = $req->getPerPage();
-        $dateFrom = $req->getDateFrom();
-        $dateTo   = $req->getDateTo();
-        $date     = $req->getDate();
-        $query    = $req->getQuery();
-
-        $primaryField = $req->getSort();
-        $primaryDir   = $req->getDirection();
+        $primaryField = $params['sortField'];
+        $primaryDir   = $params['sortDir'];
 
         $secondaryField = 'createdAt';
         $secondaryDir   = 'DESC';
