@@ -3,11 +3,9 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Support\Fakes;
 
-use Daylog\Domain\Models\Entries\ListEntriesCriteria;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Domain\Models\Entries\Entry;
-use Daylog\Domain\Services\UuidGenerator;
-use Daylog\Infrastructure\Utils\Clock;
+use Daylog\Domain\Models\Entries\ListEntriesCriteria;
 
 /**
  * Fake implementation of EntryRepositoryInterface for tests.
@@ -23,42 +21,24 @@ final class FakeEntryRepository implements EntryRepositoryInterface
     private int $saveCalls = 0;
 
     /**
-     * Saves the given entry to the in-memory storage.
+     * Save the given entry into in-memory storage.
      *
-     * Increments the save counter, stores the last saved entry,
-     * and returns an array with:
-     *  - id (string)       — generated UUID v4
-     *  - title (string)    — entry title
-     *  - body (string)     — entry body
-     *  - date (string)     — entry date
-     *  - createdAt (string)— ISO-8601 timestamp
-     *  - updatedAt (string)— ISO-8601 timestamp
+     * Increments the save counter, stores the entry, and
+     * returns the same Entry instance.
      *
      * @param Entry $entry Entry to save
-     * @return array<string,string> Saved entry data
+     * @return Entry Same entry
      */
-    public function save(Entry $entry): array
+    public function save(Entry $entry): Entry
     {
-        $this->entries[]  = $entry;
+        $this->entries[] = $entry;
         $this->saveCalls++;
 
-        $uuid = UuidGenerator::generate();
-        $now  = Clock::now();
-
-        $result = [
-            'id'        => $uuid,
-            'title'     => $entry->getTitle(),
-            'body'      => $entry->getBody(),
-            'date'      => $entry->getDate(),
-            'createdAt' => $now,
-            'updatedAt' => $now
-        ];
-        
-        return $result;
+        return $entry;
     }
 
     /**
-     * Returns the number of times save() has been called.
+     * Get the number of times save() has been called.
      *
      * @return int
      */
@@ -68,21 +48,25 @@ final class FakeEntryRepository implements EntryRepositoryInterface
     }
 
     /**
-     * Returns the last Entry instance passed to save(), or null if none.
+     * Get the last Entry instance saved, or null if none.
      *
      * @return Entry|null
      */
     public function getLastSaved(): ?Entry
     {
-        if (empty($this->entries)) {
+        if ($this->entries === []) {
             return null;
         }
 
-        return end($this->entries);
+        $last = end($this->entries);
+        return $last;
     }
 
     /**
-     * Find entries by Domain Criteria.
+     * Find entries by domain criteria.
+     *
+     * Simplified: applies stable sort by date DESC, then createdAt DESC,
+     * then applies pagination. Filtering by query/date not implemented.
      *
      * @param ListEntriesCriteria $criteria
      * @return array{
@@ -98,51 +82,31 @@ final class FakeEntryRepository implements EntryRepositoryInterface
         $page    = $criteria->getPage();
         $perPage = $criteria->getPerPage();
 
-        // 1) (Optional) Filters — включи при необходимости:
-        $pool = $this->items;
+        // Use all entries as pool
+        $pool = $this->entries;
 
-        // 2) Sorting: date DESC, then createdAt DESC (stable)
-        $cmp = function (Entry $a, Entry $b): int {
-            $dateA = $a->getDate();
-            $dateB = $b->getDate();
-
-            $primary = strcmp($dateB, $dateA);
+        // Sorting: date DESC, then createdAt DESC (stable)
+        usort($pool, function (Entry $a, Entry $b): int {
+            $primary = strcmp($b->getDate(), $a->getDate());
             if ($primary !== 0) {
-                $result = $primary;
-                return $result;
+                return $primary;
             }
 
-            $createdA = $a->getCreatedAt();
-            $createdB = $b->getCreatedAt();
+            return strcmp($b->getCreatedAt(), $a->getCreatedAt());
+        });
 
-            $secondary = strcmp($createdB, $createdA);
-            $result    = $secondary;
-            return $result;
-        };
-
-        usort($pool, $cmp);
-
-        // 3) Pagination
+        // Pagination
         $total   = count($pool);
-        $offset  = ($page - 1) * $perPage;
-        if ($offset < 0) {
-            $offset = 0;
-        }
+        $offset  = max(0, ($page - 1) * $perPage);
+        $slice   = array_slice($pool, $offset, $perPage);
+        $pagesCount = $perPage > 0 ? (int)ceil($total / $perPage) : 0;
 
-        $slice       = array_slice($pool, $offset, $perPage);
-        $pagesCount  = $perPage > 0 ? (int)ceil($total / $perPage) : 0;
-
-        $items = array_values($slice);
-
-        $result = [
-            'items'      => $items,
+        return [
+            'items'      => array_values($slice),
             'total'      => $total,
             'page'       => $page,
             'perPage'    => $perPage,
             'pagesCount' => $pagesCount,
         ];
-
-        return $result;
     }
-
 }
