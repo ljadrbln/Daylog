@@ -37,8 +37,7 @@ final class AC1_HappyPathTest extends BaseAddEntryIntegrationTest
         $data = EntryTestData::getOne();
 
         /** @var AddEntryRequestInterface $request */
-        $requestClass = AddEntryRequest::class;
-        $request      = $requestClass::fromArray($data);
+        $request = AddEntryRequest::fromArray($data);
 
         // Act
         $response = $this->useCase->execute($request);

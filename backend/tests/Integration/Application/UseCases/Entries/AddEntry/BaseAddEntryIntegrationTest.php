@@ -6,7 +6,9 @@ namespace Daylog\Tests\Integration\Application\UseCases\Entries\AddEntry;
 use Codeception\Test\Unit;
 use Daylog\Configuration\Bootstrap\SqlFactory;
 use Daylog\Configuration\Providers\Entries\AddEntryProvider;
+use Daylog\Application\UseCases\Entries\AddEntryInterface;
 use Daylog\Tests\Support\Fixture\EntryFixture;
+use DB\SQL;
 
 /**
  * Base class for UC-1 AddEntry integration tests.
@@ -25,11 +27,15 @@ use Daylog\Tests\Support\Fixture\EntryFixture;
  */
 abstract class BaseAddEntryIntegrationTest extends Unit
 {
-    /** @var \DB\SQL */
-    protected $db;
+    /** @var SQL */
+    protected SQL $db;
 
-    /** @var \Daylog\Application\UseCases\Entries\AddEntry */
-    protected $useCase;
+    /**
+     * Use case instance wired via configuration provider.
+     *
+     * @var AddEntryInterface
+     */
+    protected AddEntryInterface $useCase;
 
     /**
      * Prepare shared DB and wire the use case.

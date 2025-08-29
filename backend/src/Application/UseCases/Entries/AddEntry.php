@@ -3,14 +3,15 @@ declare(strict_types=1);
 
 namespace Daylog\Application\UseCases\Entries;
 
+use Daylog\Application\UseCases\Entries\AddEntryInterface;
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryResponse;
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryResponseInterface;
+use Daylog\Application\Validators\Entries\AddEntry\AddEntryValidatorInterface;
+use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 
 use Daylog\Application\Normalization\Entries\AddEntryInputNormalizer;
 
-use Daylog\Application\Validators\Entries\AddEntry\AddEntryValidatorInterface;
-use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Domain\Models\Entries\Entry;
 
 /**
@@ -19,7 +20,7 @@ use Daylog\Domain\Models\Entries\Entry;
  * UC-1: Create a new Entry from user input, validate per business rules,
  * persist via repository, and return the new Entry UUID.
  */
-final class AddEntry
+final class AddEntry implements AddEntryInterface
 {
     /**
      * @param EntryRepositoryInterface $repo Repository responsible for persistence.

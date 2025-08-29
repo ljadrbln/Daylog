@@ -157,5 +157,31 @@ final class EntryFixture
         $requestParams[] = $id;
 
         self::$db->exec($sql, $requestParams);
-    }    
+    }
+
+    /**
+     * Count rows in the 'entries' table for assertions in integration tests.
+     *
+     * Purpose:
+     * Provide a single-source row counter that works with the shared DB connection
+     * registered through setDb(), avoiding ad-hoc PDO usage in tests.
+     *
+     * Mechanics:
+     * - Requires a prior call to setDb() in test bootstrap/_before().
+     * - Executes a simple COUNT(*) query and returns the integer result.
+     *
+     * @return int Number of rows currently present in 'entries'.
+     */
+    public static function countRows(): int
+    {
+        $sql = 'SELECT COUNT(*) AS cnt FROM entries';
+
+        /** @var array<int,array<string,int|string>> $rows */
+        $rows = self::$db->exec($sql);
+
+        $count = $rows[0]['cnt'] ?? 0;
+        $count = (int) $count;
+        
+        return $count;
+    }
 }
