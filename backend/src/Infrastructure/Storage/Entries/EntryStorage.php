@@ -162,7 +162,7 @@ final class EntryStorage implements EntryStorageInterface
     private function buildF3Options(ListEntriesCriteria $criteria): array
     {
         $descriptors = $criteria->getSortDescriptor(); // [['field'=>'date|createdAt|updatedAt','direction'=>'ASC|DESC'], ...]
-        $order = EntryFieldMapper::buildOrder($descriptors);
+        $order = EntryFieldMapper::buildOrderSafe($descriptors);
 
         $page    = $criteria->getPage();
         $perPage = $criteria->getPerPage();

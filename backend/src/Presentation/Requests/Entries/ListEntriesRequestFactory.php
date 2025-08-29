@@ -6,7 +6,6 @@ namespace Daylog\Presentation\Requests\Entries;
 
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequest;
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequestInterface;
-use Daylog\Application\Normalization\Entries\ListEntriesInputNormalizer;
 use Daylog\Application\Exceptions\TransportValidationException;
 
 /**
@@ -14,11 +13,9 @@ use Daylog\Application\Exceptions\TransportValidationException;
  *
  * Purpose:
  * - Perform transport-level type checks (scalars or null) and raise TransportValidationException on violations.
- * - Delegate UC-2 normalization to the application normalizer.
  * - Construct a typed DTO using explicit local variables (no inline literals).
  *
  * Notes:
- * - Normalizer is created locally; DI is not required in this setup.
  * - Business validation (formats, ranges) is out of scope for this factory.
  */
 final class ListEntriesRequestFactory
@@ -53,10 +50,7 @@ final class ListEntriesRequestFactory
             throw new TransportValidationException($errors);
         }
 
-        $normalizer = new ListEntriesInputNormalizer();
-        $normalized = $normalizer->normalize($params);
-
-        $request = ListEntriesRequest::fromArray($normalized);
+        $request = ListEntriesRequest::fromArray($params);
         return $request;
     }
 
