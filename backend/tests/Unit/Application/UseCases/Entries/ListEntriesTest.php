@@ -35,17 +35,22 @@ final class ListEntriesTest extends Unit
      */
     public function testHappyPathReturnsEntriesSortedByDateDesc(): void
     {
-        /** Arrange **/
+        // Arrange
         $total = 3;
         $step  = 1;
         $rows = EntryTestData::getMany($total, $step);
+        
+        $entries = [];
+        foreach ($rows as $row) {
+            $entries[] = Entry::fromArray($row);
+        }
 
         $page     = 1;
         $perPage  = 10;
         $pagesCnt = (int)ceil($total / $perPage);
 
         $pageResult = [
-            'items'      => $rows,
+            'items'      => $entries,
             'total'      => $total,
             'page'       => $page,
             'perPage'    => $perPage,
@@ -102,21 +107,26 @@ final class ListEntriesTest extends Unit
      */
     public function testDateRangeInclusiveReturnsMatchingItems(): void
     {
-        /** Arrange **/
+        // Arrange
         $total = 4;
         $step  = 1;
         $rows = EntryTestData::getMany($total, $step);        
+
+        $entries = [];
+        foreach ($rows as $row) {
+            $entries[] = Entry::fromArray($row);
+        }
 
         $page     = 1;
         $perPage  = 10;
         $pagesCnt = (int)ceil($total / $perPage);
 
         $pageResult = [
-            'items'      => $rows,
+            'items'      => $entries,
             'total'      => $total,
-            'page'       => 1,
-            'perPage'    => 10,
-            'pagesCount' => 1,
+            'page'       => $page,
+            'perPage'    => $perPage,
+            'pagesCount' => $pagesCnt
         ];
 
         $repoClass = EntryRepositoryInterface::class;
@@ -137,10 +147,10 @@ final class ListEntriesTest extends Unit
         $data    = ListEntriesHelper::getData();
         $request = ListEntriesHelper::buildRequest($data);
 
-        /** Act **/
+        // Act
         $response = $useCase->execute($request);
 
-        /** Assert **/
+        // Assert
         $items = $response->getItems();
 
         $this->assertCount(4, $items);
