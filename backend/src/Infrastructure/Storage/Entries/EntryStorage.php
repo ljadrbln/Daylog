@@ -36,14 +36,6 @@ final class EntryStorage implements EntryStorageInterface
         $this->model = $model;
     }
 
-        /** @inheritDoc */
-    public function save(Entry $entry): Entry
-    {
-        $this->storage->insert($entry);
-
-        return $entry;
-    }
-
     /**
      * Insert the given Entry and return generated UUID.
      *
