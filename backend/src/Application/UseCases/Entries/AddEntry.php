@@ -7,6 +7,8 @@ use Daylog\Application\DTO\Entries\AddEntry\AddEntryResponse;
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryResponseInterface;
 
+use Daylog\Application\Normalization\Entries\AddEntryInputNormalizer;
+
 use Daylog\Application\Validators\Entries\AddEntry\AddEntryValidatorInterface;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Domain\Models\Entries\Entry;
@@ -40,17 +42,18 @@ final class AddEntry
         // Validate request per business rules
         $this->validator->validate($request);
 
-        $entry = [
-            'title' => trim($request->getTitle()),
-            'body'  => trim($request->getBody()),
-            'date'  => trim($request->getDate())
-        ];
+        // Normalize (adds id, createdAt, updatedAt)
+        $normalizer = new AddEntryInputNormalizer();
+        $normalized = $normalizer->normalize($request);
 
-        $entry  = Entry::fromArray($entry);
-        $data  = $this->repo->save($entry);
+        // Domain model
+        $entry = Entry::fromArray($normalized);
 
+        // Persist
+        $data = $this->repo->save($entry);
+
+        // Response DTO
         $response = AddEntryResponse::fromArray($data);
-
         return $response;
     }
 }
