@@ -18,6 +18,16 @@ interface AddEntryResponseInterface
     public function getId(): string;
 
     /**
+     * @return string The entry title.
+     */
+    public function getTitle(): string;
+
+    /**
+     * @return string The entry body.
+     */
+    public function getBody(): string;
+
+    /**
      * @return string Logical entry date (YYYY-MM-DD).
      */
     public function getDate(): string;
