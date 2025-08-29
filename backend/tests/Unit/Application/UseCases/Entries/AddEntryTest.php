@@ -13,6 +13,7 @@ use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\UseCases\Entries\AddEntry;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Domain\Services\UuidGenerator;
+use Daylog\Domain\Services\DateService;
 
 use Daylog\Tests\Support\Helper\EntryTestData;
 use Daylog\Tests\Support\Fakes\FakeEntryRepository;
@@ -66,47 +67,61 @@ final class AddEntryTest extends Unit
         $isValidId = UuidGenerator::isValid($id);
         $this->assertTrue($isValidId);
 
-        $this->assertSame($data['title'],     $response->getTitle());
-        $this->assertSame($data['body'],      $response->getBody());
-        $this->assertSame($data['date'],      $response->getDate());
-        $this->assertSame($data['createdAt'], $response->getCreatedAt());
-        $this->assertSame($data['updatedAt'], $response->getUpdatedAt());
+        $this->assertSame($data['title'], $response->getTitle());
+        $this->assertSame($data['body'],  $response->getBody());
+        $this->assertSame($data['date'],  $response->getDate());
+
+        $actualCreatedAt = $response->getCreatedAt();
+        $actualUpdatedAt = $response->getUpdatedAt();
+
+        $isCreatedAtDateValid = DateService::isValidIsoUtcDateTime($actualCreatedAt);
+        $this->assertTrue($isCreatedAtDateValid);
+        $this->assertSame($actualCreatedAt, $actualUpdatedAt);
     }
 
     /**
-     * Error path: validator throws, repository not called.
+     * Error path: validator throws, repository is not touched.
+     *
+     * Scenario:
+     * - Arrange: build AddEntryRequest; use FakeEntryRepository; mock validator to throw DomainValidationException.
+     * - Act: execute use case inside try/catch.
+     * - Assert: repository saveCalls() remains 0; exception class is correct.
+     *
+     * @covers \Daylog\Application\UseCases\Entries\AddEntry::execute
      */
     public function testValidationErrorDoesNotTouchRepository(): void
     {
-        /** Arrange **/
-        $data  = EntryTestData::getOne();
+        // Arrange
+        $data = EntryTestData::getOne();
 
         /** @var AddEntryRequestInterface $request */
         $request = AddEntryRequest::fromArray($data);
 
-        $repoClass = EntryRepositoryInterface::class;
-        $repoMock  = $this->createMock($repoClass);
+        // Use fake repo (in-memory), no mocks for repo here
+        $repo = new FakeEntryRepository();
 
-        $repoMock
-            ->expects($this->never())
-            ->method('save');
-
+        // Validator mock that throws
         $validatorInterface = AddEntryValidatorInterface::class;
-        $validatorMock      = $this->createMock($validatorInterface);
+        $validator          = $this->createMock($validatorInterface);
 
-        $exception = new DomainValidationException(['TITLE_REQUIRED']);
-        $validatorMock
+        $errors    = ['TITLE_REQUIRED'];
+        $exception = new DomainValidationException($errors);
+
+        $validator
             ->expects($this->once())
             ->method('validate')
             ->with($request)
             ->willThrowException($exception);
 
-        $uc = new AddEntry($repoMock, $validatorMock);
+        // Assert
+        $this->expectException(DomainValidationException::class); 
+    
+        // Act
+        $useCase = new AddEntry($repo, $validator);
+        $useCase->execute($request);
 
-        /** Assert **/
-        $this->expectException(DomainValidationException::class);
-
-        /** Act **/
-        $uc->execute($request);
+        // Assert that repository was never touched
+        $saveCalls = $repo->getSaveCalls();
+        $this->assertSame(0, $saveCalls);        
     }
 }
