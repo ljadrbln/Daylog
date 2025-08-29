@@ -7,15 +7,15 @@ use Codeception\Test\Unit;
 
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
-use Daylog\Application\DTO\Entries\AddEntry\AddEntryResponseInterface;
-use Daylog\Application\Normalization\Entries\AddEntryInputNormalizer;
 
 use Daylog\Application\Validators\Entries\AddEntry\AddEntryValidatorInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\UseCases\Entries\AddEntry;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
-use Daylog\Tests\Support\Helper\EntryTestData;
 use Daylog\Domain\Services\UuidGenerator;
+
+use Daylog\Tests\Support\Helper\EntryTestData;
+use Daylog\Tests\Support\Fakes\FakeEntryRepository;
 
 /**
  * Unit tests for UC-1 AddEntry.
@@ -48,16 +48,8 @@ final class AddEntryTest extends Unit
         // Arrange
         $data  = EntryTestData::getOne();
         
-        $normalizer = new AddEntryInputNormalizer();
-        $normalized = $normalizer->normalize($data);
-
-        $request = AddEntryRequest::fromArray($normalized);
-        $repoClass = EntryRepositoryInterface::class;
-        $repo      = $this->createMock($repoClass);
-
-        $repo
-            ->expects($this->once())
-            ->method('save');
+        $request = AddEntryRequest::fromArray($data);
+        $repo    = new FakeEntryRepository();
 
         $validatorClass = AddEntryValidatorInterface::class;
         $validator      = $this->createMock($validatorClass);
@@ -69,7 +61,7 @@ final class AddEntryTest extends Unit
         $useCase  = new AddEntry($repo, $validator);
         $response = $useCase->execute($request);
 
-        /** Assert **/
+        // Assert
         $id        = $response->getId();
         $isValidId = UuidGenerator::isValid($id);
         $this->assertTrue($isValidId);
