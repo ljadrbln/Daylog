@@ -50,10 +50,10 @@ final class AddEntry
         $entry = Entry::fromArray($normalized);
 
         // Persist
-        $data = $this->repo->save($entry);
+        $this->repo->save($entry);
 
         // Response DTO
-        $response = AddEntryResponse::fromArray($data);
+        $response = AddEntryResponse::fromArray($normalized);
         return $response;
     }
 }
