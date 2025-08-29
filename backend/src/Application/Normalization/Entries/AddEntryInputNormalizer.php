@@ -34,11 +34,7 @@ final class AddEntryInputNormalizer
     /**
      * Normalize Add Entry request into a strict payload.
      * 
-     * @param array{
-     *     title:string,
-     *     body:string,
-     *     date:string
-     * } $input Raw transport map (e.g., $_GET or JSON).
+     * @param AddEntryRequestInterface $request Transport request
      * 
      * @return array{
      *     id:string,
@@ -49,12 +45,12 @@ final class AddEntryInputNormalizer
      *     updatedAt:string
      * }
      */
-    public function normalize(array $input): array
+    public function normalize(AddEntryRequestInterface $request): array
     {
         // Trim input fields
-        $title = $this->normalizeTitle($input);
-        $body  = $this->normalizeBody($input);
-        $date  = $this->normalizeDate($input);
+        $title = $this->normalizeTitle($request);
+        $body  = $this->normalizeBody($request);
+        $date  = $this->normalizeDate($request);
 
         // Technical fields (Domain-level services; no Infrastructure calls here)
         $id  = UuidGenerator::generate();
@@ -76,17 +72,13 @@ final class AddEntryInputNormalizer
     /**
      * Normalize title: trim entry title.
      *
-     * @param array{
-     *     title:string,
-     *     body:string,
-     *     date:string
-     * } $input Raw transport map (e.g., $_GET or JSON).
+     * @param AddEntryRequestInterface $request Transport request
      * 
      * @return string
      */
-    private function normalizeTitle(array $input): string
+    private function normalizeTitle(AddEntryRequestInterface $request): string
     {
-        $title = $input['title'];
+        $title = $request->getTitle();
         $title = trim($title);
 
         return $title;
@@ -95,17 +87,13 @@ final class AddEntryInputNormalizer
     /**
      * Normalize body: trim entry body.
      *
-     * @param array{
-     *     title:string,
-     *     body:string,
-     *     date:string
-     * } $input Raw transport map (e.g., $_GET or JSON).
+     * @param AddEntryRequestInterface $request Transport request
      * 
      * @return string
      */
-    private function normalizeBody(array $input): string
+    private function normalizeBody(AddEntryRequestInterface $request): string
     {
-        $body = $input['body'];
+        $body = $request->getBody();
         $body = trim($body);
 
         return $body;
@@ -114,17 +102,13 @@ final class AddEntryInputNormalizer
     /**
      * Normalize date: trim entry date.
      *
-     * @param array{
-     *     title:string,
-     *     body:string,
-     *     date:string
-     * } $input Raw transport map (e.g., $_GET or JSON).
+     * @param AddEntryRequestInterface $request Transport request
      * 
      * @return string
      */
-    private function normalizeDate(array $input): string
+    private function normalizeDate(AddEntryRequestInterface $request): string
     {
-        $date = $input['date'];
+        $date = $request->getDate();
         $date = trim($date);
 
         return $date;
