@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Daylog\Application\Normalization\Entries;
 
+use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequestInterface;
 use Daylog\Domain\Models\Entries\ListEntriesConstraints;
 
 /**
@@ -32,7 +33,7 @@ final class ListEntriesInputNormalizer
     /**
      * Normalize raw input for UC-2 List Entries.
      *
-     * @param array<string,mixed> $input Raw transport map (e.g., $_GET or JSON).
+     * @param ListEntriesRequestInterface $request Raw transport map (e.g., $_GET or JSON).
      * @return array{
      *     page:int,
      *     perPage:int,
@@ -47,14 +48,14 @@ final class ListEntriesInputNormalizer
     public function normalize(ListEntriesRequestInterface $request): array
     {
         //use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequestInterface;
-        $page      = $this->normalizePage($input);
-        $perPage   = $this->normalizePerPage($input);
-        $sortField = $this->normalizeSortField($input);
-        $sortDir   = $this->normalizeSortDir($input);
-        $date      = $this->normalizeDate($input);
-        $dateFrom  = $this->normalizeDateFrom($input);
-        $dateTo    = $this->normalizeDateTo($input);
-        $query     = $this->normalizeQuery($input);
+        $page      = $this->normalizePage($request);
+        $perPage   = $this->normalizePerPage($request);
+        $sortField = $this->normalizeSortField($request);
+        $sortDir   = $this->normalizeSortDir($request);
+        $date      = $this->normalizeDate($request);
+        $dateFrom  = $this->normalizeDateFrom($request);
+        $dateTo    = $this->normalizeDateTo($request);
+        $query     = $this->normalizeQuery($request);
 
         $result = [
             'page'      => $page,
@@ -76,16 +77,16 @@ final class ListEntriesInputNormalizer
      * Assumes transport already ensured scalar|null for 'page'.
      * Missing/null -> PAGE_MIN; values below PAGE_MIN are corrected to PAGE_MIN.
      *
-     * @param array<string,mixed> $input
+     * @param ListEntriesRequestInterface $request
      * @return int
      */
-    private function normalizePage(array $input): int
+    private function normalizePage(ListEntriesRequestInterface $request): int
     {
-        $raw  = $input['page'] ?? null;
+        $raw  = $request->getPage() ?? null;
         $page = ListEntriesConstraints::PAGE_MIN;
 
         if (!is_null($raw)) {
-            $page = (int)$raw;
+            $page = (int) $raw;
         }
 
         if ($page < ListEntriesConstraints::PAGE_MIN) {
@@ -101,16 +102,16 @@ final class ListEntriesInputNormalizer
      * Assumes scalar|null for 'perPage'. Missing/null -> PER_PAGE_DEFAULT.
      * Values below min are raised to PER_PAGE_MIN; above max are lowered to PER_PAGE_MAX.
      *
-     * @param array<string,mixed> $input
+     * @param ListEntriesRequestInterface $request
      * @return int
      */
-    private function normalizePerPage(array $input): int
+    private function normalizePerPage(ListEntriesRequestInterface $request): int
     {
-        $raw     = $input['perPage'] ?? null;
+        $raw     = $request->getPerPage() ?? null;
         $perPage = ListEntriesConstraints::PER_PAGE_DEFAULT;
 
         if (!is_null($raw)) {
-            $perPage = (int)$raw;
+            $perPage = (int) $raw;
         }
 
         if ($perPage < ListEntriesConstraints::PER_PAGE_MIN) {
@@ -128,16 +129,16 @@ final class ListEntriesInputNormalizer
      * Assumes scalar/null for 'sortField'. Missing/null -> SORT_FIELD_DEFAULT.
      * If provided value is not in ALLOWED_SORT_FIELDS -> fallback to default.
      *
-     * @param array<string,mixed> $input
+     * @param ListEntriesRequestInterface $request
      * @return string
      */
-    private function normalizeSortField(array $input): string
+    private function normalizeSortField(ListEntriesRequestInterface $request): string
     {
-        $raw       = $input['sortField'] ?? null;
+        $raw       = $request->getSort() ?? null;
         $candidate = ListEntriesConstraints::SORT_FIELD_DEFAULT;
 
         if (!is_null($raw)) {
-            $candidate = (string)$raw;
+            $candidate = (string) $raw;
         }
 
         $allowed   = ListEntriesConstraints::ALLOWED_SORT_FIELDS;
@@ -158,16 +159,16 @@ final class ListEntriesInputNormalizer
      * Converts to uppercase and checks against ALLOWED_SORT_DIRS.
      * Invalid values fall back to SORT_DIR_DEFAULT.
      *
-     * @param array<string,mixed> $input
+     * @param ListEntriesRequestInterface $request
      * @return 'ASC'|'DESC'
      */
-    private function normalizeSortDir(array $input): string
+    private function normalizeSortDir(ListEntriesRequestInterface $request): string
     {
-        $raw   = $input['sortDir'] ?? null;
+        $raw   = $request->getDirection() ?? null;
         $upper = ListEntriesConstraints::SORT_DIR_DEFAULT;
 
         if (!is_null($raw)) {
-            $rawStr = (string)$raw;
+            $rawStr = (string) $raw;
             $upper  = strtoupper($rawStr);
         }
 
@@ -187,16 +188,16 @@ final class ListEntriesInputNormalizer
      *
      * Assumes scalar/null for 'date'. Any non-empty string is passed through.
      *
-     * @param array<string,mixed> $input
+     * @param ListEntriesRequestInterface $request
      * @return string|null
      */
-    private function normalizeDate(array $input): ?string
+    private function normalizeDate(ListEntriesRequestInterface $request): ?string
     {
-        $raw = $input['date'] ?? null;
+        $raw = $request->getDate() ?? null;
         $str = '';
 
         if (!is_null($raw)) {
-            $str = (string)$raw;
+            $str = (string) $raw;
         }
 
         $date = ($str === '') 
@@ -211,16 +212,16 @@ final class ListEntriesInputNormalizer
      *
      * Assumes scalar/null for 'dateFrom'. Any non-empty string is passed through.
      *
-     * @param array<string,mixed> $input
+     * @param ListEntriesRequestInterface $request
      * @return string|null
      */
-    private function normalizeDateFrom(array $input): ?string
+    private function normalizeDateFrom(ListEntriesRequestInterface $request): ?string
     {
-        $raw = $input['dateFrom'] ?? null;
+        $raw = $request->getDateFrom() ?? null;
         $str = '';
 
         if (!is_null($raw)) {
-            $str = (string)$raw;
+            $str = (string) $raw;
         }
 
         $dateFrom = ($str === '') 
@@ -235,16 +236,16 @@ final class ListEntriesInputNormalizer
      *
      * Assumes scalar/null for 'dateTo'. Any non-empty string is passed through.
      *
-     * @param array<string,mixed> $input
+     * @param ListEntriesRequestInterface $request
      * @return string|null
      */
-    private function normalizeDateTo(array $input): ?string
+    private function normalizeDateTo(ListEntriesRequestInterface $request): ?string
     {
-        $raw = $input['dateTo'] ?? null;
+        $raw = $request->getDateTo() ?? null;
         $str = '';
 
         if (!is_null($raw)) {
-            $str = (string)$raw;
+            $str = (string) $raw;
         }
 
         $dateTo = ($str === '') 
@@ -260,16 +261,16 @@ final class ListEntriesInputNormalizer
      * Assumes scalar/null for 'query'. Trims whitespace; returns null when empty.
      * Matching semantics are repository concerns.
      *
-     * @param array<string,mixed> $input
+     * @param ListEntriesRequestInterface $request
      * @return string|null
      */
-    private function normalizeQuery(array $input): ?string
+    private function normalizeQuery(ListEntriesRequestInterface $request): ?string
     {
-        $raw = $input['query'] ?? null;
+        $raw = $request->getQuery() ?? null;
         $str = '';
 
         if (!is_null($raw)) {
-            $str = (string)$raw;
+            $str = (string) $raw;
         }
 
         $trimmed = trim($str);

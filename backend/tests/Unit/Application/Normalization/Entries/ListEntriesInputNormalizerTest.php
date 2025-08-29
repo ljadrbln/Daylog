@@ -6,7 +6,9 @@ namespace Daylog\Tests\Unit\Application\Normalization\Entries;
 
 use Codeception\Test\Unit;
 use Daylog\Application\Normalization\Entries\ListEntriesInputNormalizer;
+use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequest;
 use Daylog\Domain\Models\Entries\ListEntriesConstraints;
+use Daylog\Tests\Support\Helper\ListEntriesHelper;
 
 /**
  * Unit test for ListEntriesInputNormalizer.
@@ -35,10 +37,11 @@ final class ListEntriesInputNormalizerTest extends Unit
      */
     public function testDefaultsAppliedWhenMissing(): void
     {
-        $input      = [];
-        $normalizer = new ListEntriesInputNormalizer();
+        $data = ListEntriesHelper::getData();
+        $request = ListEntriesRequest::fromArray($data);
 
-        $normalized = $normalizer->normalize($input);
+        $normalizer = new ListEntriesInputNormalizer();
+        $normalized = $normalizer->normalize($request);
 
         $expectedPage     = ListEntriesConstraints::PAGE_MIN;
         $expectedPerPage  = ListEntriesConstraints::PER_PAGE_DEFAULT;
@@ -114,13 +117,12 @@ final class ListEntriesInputNormalizerTest extends Unit
         int $pageExpected,
         int $perPageExpected
     ): void {
-        $input = [
-            'page'    => $pageIn,
-            'perPage' => $perPageIn,
-        ];
+
+        $data    = ListEntriesHelper::getData(page: $pageIn, perPage: $perPageIn);
+        $request = ListEntriesRequest::fromArray($data);
 
         $normalizer = new ListEntriesInputNormalizer();
-        $normalized = $normalizer->normalize($input);
+        $normalized = $normalizer->normalize($request);
 
         $this->assertSame($pageExpected, $normalized['page']);
         $this->assertSame($perPageExpected, $normalized['perPage']);
@@ -164,10 +166,13 @@ final class ListEntriesInputNormalizerTest extends Unit
      */
     public function testQueryNormalizationWithProvider(string $in, ?string $expected): void
     {
-        $input = ['query' => $in];
+        $data = ListEntriesHelper::getData();
+        $data['query'] = $in;
+
+        $request = ListEntriesRequest::fromArray($data);
 
         $normalizer = new ListEntriesInputNormalizer();
-        $normalized = $normalizer->normalize($input);
+        $normalized = $normalizer->normalize($request);
 
         $this->assertSame($expected, $normalized['query']);
     }
@@ -201,10 +206,13 @@ final class ListEntriesInputNormalizerTest extends Unit
      */
     public function testEmptyDateFieldsBecomeNull(string $key): void
     {
-        $input = [$key => ''];
+        $data = ListEntriesHelper::getData();
+        $data[$key] = '';
+
+        $request = ListEntriesRequest::fromArray($data);
 
         $normalizer = new ListEntriesInputNormalizer();
-        $normalized = $normalizer->normalize($input);
+        $normalized = $normalizer->normalize($request);
 
         $this->assertNull($normalized [$key]);
     }
@@ -217,12 +225,15 @@ final class ListEntriesInputNormalizerTest extends Unit
      */
     public function testNonEmptyDatePassThrough(): void
     {
-        $input = ['date' => '2025-08-15'];
-
-        $normalizer = new ListEntriesInputNormalizer();
-        $normalized = $normalizer->normalize($input);
-
         $expectedDate = '2025-08-15';
+        $data = ListEntriesHelper::getData();
+        $data['date'] = $expectedDate;
+
+        $request = ListEntriesRequest::fromArray($data);
+        $normalizer = new ListEntriesInputNormalizer();
+        $normalized = $normalizer->normalize($request);
+
+        
         $this->assertSame($expectedDate, $normalized['date']);
     }
 
@@ -260,10 +271,11 @@ final class ListEntriesInputNormalizerTest extends Unit
      */
     public function testSortFieldNormalization(string $in, string $expected): void
     {
-        $input = ['sortField' => $in];
+        $data    = ListEntriesHelper::getData(sortField: $in);
+        $request = ListEntriesRequest::fromArray($data);
 
         $normalizer = new ListEntriesInputNormalizer();
-        $normalized  = $normalizer->normalize($input);
+        $normalized  = $normalizer->normalize($request);
 
         $this->assertSame($expected, $normalized['sortField']);
     }
@@ -303,10 +315,11 @@ final class ListEntriesInputNormalizerTest extends Unit
      */
     public function testSortDirNormalization(string $in, string $expected): void
     {
-        $input = ['sortDir' => $in];
+        $data    = ListEntriesHelper::getData(sortDir: $in);
+        $request = ListEntriesRequest::fromArray($data);        
 
         $normalizer = new ListEntriesInputNormalizer();
-        $normalized = $normalizer->normalize($input);
+        $normalized = $normalizer->normalize($request);
 
         $this->assertSame($expected, $normalized['sortDir']);
     }
