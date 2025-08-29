@@ -52,7 +52,6 @@ final class AddEntryTest extends Unit
         $normalized = $normalizer->normalize($data);
 
         $request = AddEntryRequest::fromArray($normalized);
-var_dump($normalized);exit;
         $repoClass = EntryRepositoryInterface::class;
         $repo      = $this->createMock($repoClass);
 

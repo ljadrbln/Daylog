@@ -5,6 +5,7 @@ namespace Daylog\Tests\Unit\Application\Normalization\Entries;
 
 use Codeception\Test\Unit;
 use Daylog\Application\Normalization\Entries\AddEntryInputNormalizer;
+use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
 use Daylog\Domain\Services\DateService;
 use Daylog\Domain\Services\UuidGenerator;
 
@@ -80,18 +81,18 @@ final class AddEntryInputNormalizerTest extends Unit
      */
     public function testFieldNormalization(string $in, string $expected, string $field): void
     {
-        /**
-         * @var array{
-         *     title:string,
-         *     body:string,
-         *     date:string
-         * } $data Raw transport map (e.g., $_GET or JSON).
-         */
-        $data = ['title' => 'T', 'body'  => 'B', 'date'  => '2025-08-28'];
+        $data = [
+            'title' => 'T', 
+            'body'  => 'B', 
+            'date'  => '2025-08-28'
+        ];
+
+        // Override
         $data[$field] = $in;
 
+        $request    = AddEntryRequest::fromArray($data);
         $normalizer = new AddEntryInputNormalizer(); 
-        $normalized = $normalizer->normalize($data);
+        $normalized = $normalizer->normalize($request);
 
         $this->assertSame($expected, $normalized[$field]);
     }
@@ -117,8 +118,9 @@ final class AddEntryInputNormalizerTest extends Unit
             'date'  => ' 2025-08-28 ',
         ];
 
+        $request    = AddEntryRequest::fromArray($data);
         $normalizer = new AddEntryInputNormalizer();
-        $normalized = $normalizer->normalize($data);
+        $normalized = $normalizer->normalize($request);
 
         // UUID v4
         $id        = $normalized['id'];
