@@ -49,14 +49,7 @@ final class ListEntriesResponse implements ListEntriesResponseInterface
      * Factory method to create a response from repository output.
      *
      * @param array{
-     *     items: list<array{
-     *         id: string,
-     *         date: string,
-     *         title: string,
-     *         body: string,
-     *         createdAt: string,
-     *         updatedAt: string
-     *     }>,
+     *     items: list<Entry>,
      *     total: int,
      *     page: int,
      *     perPage: int,
@@ -65,6 +58,7 @@ final class ListEntriesResponse implements ListEntriesResponseInterface
      *
      * @return self
      */
+
     public static function fromArray(array $data): self
     {
         /** @var list<ListEntriesItem> $items */
