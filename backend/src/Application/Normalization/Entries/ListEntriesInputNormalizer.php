@@ -44,8 +44,9 @@ final class ListEntriesInputNormalizer
      *     query:?string
      * }
      */
-    public function normalize(array $input): array
+    public function normalize(ListEntriesRequestInterface $request): array
     {
+        //use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequestInterface;
         $page      = $this->normalizePage($input);
         $perPage   = $this->normalizePerPage($input);
         $sortField = $this->normalizeSortField($input);
