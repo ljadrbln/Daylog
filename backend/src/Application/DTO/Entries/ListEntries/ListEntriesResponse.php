@@ -64,8 +64,8 @@ final class ListEntriesResponse implements ListEntriesResponseInterface
         /** @var list<ListEntriesItem> $items */
         $items = [];
 
-        foreach ($data['items'] as $row) {
-            $item = ListEntriesItem::fromArray($row);
+        foreach ($data['items'] as $entry) {
+            $item = ListEntriesItem::fromEntry($entry);
             $items[] = $item;
         }
 

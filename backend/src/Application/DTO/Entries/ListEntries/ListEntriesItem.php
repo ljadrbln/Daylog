@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Daylog\Application\DTO\Entries\ListEntries;
 
+use Daylog\Domain\Models\Entries\Entry;
 /**
  * Class ListEntriesItem
  *
@@ -75,27 +76,19 @@ final class ListEntriesItem
     }
 
     /**
-     * Factory method: build a ListEntriesItem from a storage/repository row.
+     * Build item from Domain Entry model.
      *
-     * @param array{
-     *     id: string,
-     *     date: string,
-     *     title: string,
-     *     body: string,
-     *     createdAt: string,
-     *     updatedAt: string
-     * } $row Associative array with storage values.
-     *
+     * @param Entry $entry Domain model carrying validated fields.
      * @return self New instance constructed from the given row.
      */
-    public static function fromArray(array $row): self
-    {        
-        $id        = $row['id'];
-        $date      = $row['date'];
-        $title     = $row['title'];
-        $body      = $row['body'];
-        $createdAt = $row['createdAt'];
-        $updatedAt = $row['updatedAt'];
+    public static function fromEntry(Entry $entry): self
+    {
+        $id        = $entry->getId();
+        $title     = $entry->getTitle();
+        $body      = $entry->getBody();
+        $date      = $entry->getDate();
+        $createdAt = $entry->getCreatedAt();
+        $updatedAt = $entry->getUpdatedAt();
 
         $listEntryItem = new self(
             $id,
@@ -107,7 +100,7 @@ final class ListEntriesItem
         );
 
         return $listEntryItem;
-    }
+    }    
 
     /** @return string */
     public function getId(): string
