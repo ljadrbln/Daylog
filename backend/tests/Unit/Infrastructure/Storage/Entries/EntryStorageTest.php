@@ -13,10 +13,13 @@ use Daylog\Tests\Support\Helper\EntryTestData;
 /**
  * Class EntryStorageTest
  *
- * Verifies that EntryStorage::insert() returns a valid UUID v4.
- * Scenario: we inject a mocked EntryModel (DB is not touched), build a valid Entry,
- * pass a single time snapshot as $now, and assert UUID format. The test focuses on
- * storage-level orchestration (UUID generation + delegation to model).
+ * Verifies that EntryStorage::insert() generates a UUID v4
+ * and delegates persistence to EntryModel::create().
+ *
+ * Scenario:
+ * - Arrange: mock EntryModel, build Entry from helper, define $now.
+ * - Act: call insert($entry, $now).
+ * - Assert: returned UUID is valid v4; model->create() called once with array payload.
  *
  * @covers \Daylog\Infrastructure\Storage\Entries\EntryStorage::insert
  */
@@ -25,37 +28,33 @@ final class EntryStorageTest extends Unit
     /**
      * Ensure insert() generates UUID v4 and delegates to model->create().
      *
-     * Mechanics:
-     * - Arrange: mock EntryModel; build Entry from helper; define $now.
-     * - Act: call insert($entry, $now).
-     * - Assert: UUID is valid v4; model->create() was called once with array payload.
-     *
      * @return void
      */
     public function testInsertReturnsValidUuidV4(): void
     {
-        /** Arrange **/
+        // Arrange
         $modelClass = EntryModel::class;
         $model      = $this->createMock($modelClass);
 
         $model
             ->expects($this->once())
             ->method('create')
-            ->with($this->isType('array'));
-
+            ->with($this->callback(function (array $payload): bool {
+                // ensure payload has a UUID v4
+                return isset($payload['id']) && UuidGenerator::isValid($payload['id']);
+            }));
 
         $storage = new EntryStorage($model);
 
         $data  = EntryTestData::getOne();
         $entry = Entry::fromArray($data);
 
-        $now = '2025-08-12 10:00:00';
+        // Act
+        $storage->insert($entry);
 
-        /** Act **/
-        $uuid = $storage->insert($entry, $now);
-
-        /** Assert **/
-        $isValid = UuidGenerator::isValid($uuid);
+        // Assert
+        $isValid = UuidGenerator::isValid($entry->getId());
         $this->assertTrue($isValid);
     }
 }
+
