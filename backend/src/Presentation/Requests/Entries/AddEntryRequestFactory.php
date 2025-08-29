@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Daylog\Presentation\Requests\Entries;
 
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
-use Daylog\Application\Normalization\Entries\AddEntryInputNormalizer;
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
 use Daylog\Application\Exceptions\TransportValidationException;
 
@@ -53,12 +52,9 @@ final class AddEntryRequestFactory
 
         if ($errors !== []) {
             throw new TransportValidationException($errors);
-        }
+        };
 
-        $normalizer = new AddEntryInputNormalizer();
-        $normalized = $normalizer->normalize($params);
-
-        $request = AddEntryRequest::fromArray($normalized);
+        $request = AddEntryRequest::fromArray($params);
         return $request;
     }
 
