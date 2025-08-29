@@ -46,5 +46,4 @@ interface EntryStorageInterface
      * }
      */
     public function findByCriteria(ListEntriesCriteria $criteria): array;
-
 }
