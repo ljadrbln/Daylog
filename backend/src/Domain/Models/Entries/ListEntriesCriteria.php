@@ -50,8 +50,11 @@ final class ListEntriesCriteria
      * @param ListEntriesRequestInterface $req Normalized request DTO for UC-2.
      * @return self
      */
-    public static function fromRequest(ListEntriesRequestInterface $req): self
+    public static function fromArray(array $params): self
     {
+        var_dump($params);
+        exit;
+
         $page     = $req->getPage();
         $perPage  = $req->getPerPage();
         $dateFrom = $req->getDateFrom();

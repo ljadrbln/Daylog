@@ -8,6 +8,7 @@ use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequestInterface;
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesResponse;
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesResponseInterface;
 use Daylog\Application\Validators\Entries\ListEntries\ListEntriesValidatorInterface;
+use Daylog\Application\Normalization\Entries\ListEntriesInputNormalizer;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Domain\Models\Entries\ListEntriesCriteria;
 
@@ -16,7 +17,8 @@ use Daylog\Domain\Models\Entries\ListEntriesCriteria;
  *
  * Purpose:
  * Orchestrate the listing flow for entries:
- * - run business validation over normalized request DTO;
+ * - run business validation;
+ * - normalize request DTO;
  * - translate Application DTO to Domain Criteria;
  * - delegate data retrieval to the repository;
  * - build a typed response DTO with items and pagination metadata.
@@ -52,18 +54,23 @@ final class ListEntries
      *
      * Mechanics:
      * 1) Run business validation (date format, query length, etc.).
-     * 2) Map request to Domain Criteria (primary + stable secondary sort inside criteria).
-     * 3) Fetch a page from repository.
-     * 4) Build and return a typed response DTO.
+     * 2) Normalize raw params into canonical types/ranges.
+     * 3) Map request to Domain Criteria (primary + stable secondary sort inside criteria).
+     * 4) Fetch a page from repository.
+     * 5) Build and return a typed response DTO.
      *
-     * @param ListEntriesRequestInterface $request Normalized request parameters (filters, paging, sort).
+     * @param ListEntriesRequestInterface   $request Normalized request parameters (filters, paging, sort).
      * @return ListEntriesResponseInterface Response with items and pagination meta.
      */
     public function execute(ListEntriesRequestInterface $request): ListEntriesResponseInterface
     {
         $this->validator->validate($request);
 
-        $criteria = ListEntriesCriteria::fromRequest($request);
+        // Normalize list params
+        $normalizer = new ListEntriesInputNormalizer();
+        $normalized = $normalizer->normalize($request);
+
+        $criteria = ListEntriesCriteria::fromArray($normalized);
         $page = $this->repository->findByCriteria($criteria);
 
         $items      = $page['items'];
@@ -81,6 +88,7 @@ final class ListEntries
         ];
 
         $response = ListEntriesResponse::fromArray($data);
+
         return $response;
     }
 }
