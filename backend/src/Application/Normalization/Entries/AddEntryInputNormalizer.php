@@ -45,12 +45,12 @@ final class AddEntryInputNormalizer
      *     updatedAt:string
      * }
      */
-    public function normalize(AddEntryRequestInterface $request): array
+    public static function normalize(AddEntryRequestInterface $request): array
     {
         // Trim input fields
-        $title = $this->normalizeTitle($request);
-        $body  = $this->normalizeBody($request);
-        $date  = $this->normalizeDate($request);
+        $title = self::normalizeTitle($request);
+        $body  = self::normalizeBody($request);
+        $date  = self::normalizeDate($request);
 
         // Technical fields (Domain-level services; no Infrastructure calls here)
         $id  = UuidGenerator::generate();
@@ -76,7 +76,7 @@ final class AddEntryInputNormalizer
      * 
      * @return string
      */
-    private function normalizeTitle(AddEntryRequestInterface $request): string
+    private static function normalizeTitle(AddEntryRequestInterface $request): string
     {
         $title = $request->getTitle();
         $title = trim($title);
@@ -91,7 +91,7 @@ final class AddEntryInputNormalizer
      * 
      * @return string
      */
-    private function normalizeBody(AddEntryRequestInterface $request): string
+    private static function normalizeBody(AddEntryRequestInterface $request): string
     {
         $body = $request->getBody();
         $body = trim($body);
@@ -106,7 +106,7 @@ final class AddEntryInputNormalizer
      * 
      * @return string
      */
-    private function normalizeDate(AddEntryRequestInterface $request): string
+    private static function normalizeDate(AddEntryRequestInterface $request): string
     {
         $date = $request->getDate();
         $date = trim($date);

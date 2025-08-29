@@ -26,7 +26,7 @@ final class AddEntryInputNormalizerTest extends Unit
      * Data provider for trimming behavior across all fields (title|body|date).
      *
      * Purpose:
-     * Supplies raw input, expected normalized value, and field name under test.
+     * Supplies raw input, expected params value, and field name under test.
      * Cases cover: both-sides trim, whitespace-only, empty string, tabs/newlines,
      * leading and trailing spaces.
      *
@@ -69,10 +69,10 @@ final class AddEntryInputNormalizerTest extends Unit
      * Mechanics:
      * - Builds a real AddEntryRequest via fromArray().
      * - Substitutes the tested field with the provided raw input.
-     * - Asserts exact normalized value for the targeted field only.
+     * - Asserts exact params value for the targeted field only.
      *
      * @param string $in       Raw input value.
-     * @param string $expected Expected normalized value.
+     * @param string $expected Expected params value.
      * @param string $field    Field name under test ('title'|'body'|'date').
      * @return void
      *
@@ -90,11 +90,10 @@ final class AddEntryInputNormalizerTest extends Unit
         // Override
         $data[$field] = $in;
 
-        $request    = AddEntryRequest::fromArray($data);
-        $normalizer = new AddEntryInputNormalizer(); 
-        $normalized = $normalizer->normalize($request);
+        $request = AddEntryRequest::fromArray($data);
+        $params  = AddEntryInputNormalizer::normalize($request);
 
-        $this->assertSame($expected, $normalized[$field]);
+        $this->assertSame($expected, $params[$field]);
     }
 
     /**
@@ -118,17 +117,16 @@ final class AddEntryInputNormalizerTest extends Unit
             'date'  => ' 2025-08-28 ',
         ];
 
-        $request    = AddEntryRequest::fromArray($data);
-        $normalizer = new AddEntryInputNormalizer();
-        $normalized = $normalizer->normalize($request);
+        $request = AddEntryRequest::fromArray($data);
+        $params  = AddEntryInputNormalizer::normalize($request);
 
         // UUID v4
-        $id        = $normalized['id'];
+        $id        = $params['id'];
         $isIdValid = UuidGenerator::isValid($id);
         $this->assertTrue($isIdValid);
 
-        $createdAt = $normalized['createdAt'];
-        $updatedAt = $normalized['updatedAt'];
+        $createdAt = $params['createdAt'];
+        $updatedAt = $params['updatedAt'];
         
         // ISO-8601 UTC (+00:00)
         $isCreatedAtValid = DateService::isValidIsoUtcDateTime($createdAt);
@@ -144,8 +142,8 @@ final class AddEntryInputNormalizerTest extends Unit
         $expectedBody  = trim($data['body']);
         $expectedTitle = trim($data['title']);
 
-        $this->assertSame($expectedDate,   $normalized['date']);
-        $this->assertSame($expectedBody,   $normalized['body']);
-        $this->assertSame($expectedTitle,  $normalized['title']);
+        $this->assertSame($expectedDate,   $params['date']);
+        $this->assertSame($expectedBody,   $params['body']);
+        $this->assertSame($expectedTitle,  $params['title']);
     }
 }
