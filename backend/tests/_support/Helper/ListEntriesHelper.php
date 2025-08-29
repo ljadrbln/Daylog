@@ -97,12 +97,5 @@ final class ListEntriesHelper
         $request = ListEntriesRequest::fromArray($data);        
 
         return $request;
-
-
-        // $normalizer = new ListEntriesInputNormalizer();
-        // $normalized = $normalizer->normalize($data);
-
-        // $request = ListEntriesRequest::fromArray($normalized);
-        // return $request;
     }
 }

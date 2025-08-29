@@ -37,25 +37,23 @@ final class ListEntriesInputNormalizerTest extends Unit
      */
     public function testDefaultsAppliedWhenMissing(): void
     {
-        $data = ListEntriesHelper::getData();
+        $data    = ListEntriesHelper::getData();
         $request = ListEntriesRequest::fromArray($data);
-
-        $normalizer = new ListEntriesInputNormalizer();
-        $normalized = $normalizer->normalize($request);
+        $params  = ListEntriesInputNormalizer::normalize($request);
 
         $expectedPage     = ListEntriesConstraints::PAGE_MIN;
         $expectedPerPage  = ListEntriesConstraints::PER_PAGE_DEFAULT;
         $expectedSort     = ListEntriesConstraints::SORT_FIELD_DEFAULT;
         $expectedDir      = ListEntriesConstraints::SORT_DIR_DEFAULT;
 
-        $this->assertSame($expectedPage, $normalized['page']);
-        $this->assertSame($expectedPerPage, $normalized['perPage']);
-        $this->assertSame($expectedSort, $normalized['sortField']);
-        $this->assertSame($expectedDir, $normalized['sortDir']);
-        $this->assertNull($normalized['date']);
-        $this->assertNull($normalized['dateFrom']);
-        $this->assertNull($normalized['dateTo']);
-        $this->assertNull($normalized['query']);
+        $this->assertSame($expectedPage, $params['page']);
+        $this->assertSame($expectedPerPage, $params['perPage']);
+        $this->assertSame($expectedSort, $params['sortField']);
+        $this->assertSame($expectedDir, $params['sortDir']);
+        $this->assertNull($params['date']);
+        $this->assertNull($params['dateFrom']);
+        $this->assertNull($params['dateTo']);
+        $this->assertNull($params['query']);
     }
 
     /**
@@ -120,12 +118,10 @@ final class ListEntriesInputNormalizerTest extends Unit
 
         $data    = ListEntriesHelper::getData(page: $pageIn, perPage: $perPageIn);
         $request = ListEntriesRequest::fromArray($data);
+        $params  = ListEntriesInputNormalizer::normalize($request);
 
-        $normalizer = new ListEntriesInputNormalizer();
-        $normalized = $normalizer->normalize($request);
-
-        $this->assertSame($pageExpected, $normalized['page']);
-        $this->assertSame($perPageExpected, $normalized['perPage']);
+        $this->assertSame($pageExpected, $params['page']);
+        $this->assertSame($perPageExpected, $params['perPage']);
     }
 
     /**
@@ -170,11 +166,9 @@ final class ListEntriesInputNormalizerTest extends Unit
         $data['query'] = $in;
 
         $request = ListEntriesRequest::fromArray($data);
+        $params  = ListEntriesInputNormalizer::normalize($request);
 
-        $normalizer = new ListEntriesInputNormalizer();
-        $normalized = $normalizer->normalize($request);
-
-        $this->assertSame($expected, $normalized['query']);
+        $this->assertSame($expected, $params['query']);
     }
 
     /**
@@ -210,11 +204,9 @@ final class ListEntriesInputNormalizerTest extends Unit
         $data[$key] = '';
 
         $request = ListEntriesRequest::fromArray($data);
+        $params  = ListEntriesInputNormalizer::normalize($request);
 
-        $normalizer = new ListEntriesInputNormalizer();
-        $normalized = $normalizer->normalize($request);
-
-        $this->assertNull($normalized [$key]);
+        $this->assertNull($params[$key]);
     }
 
     /**
@@ -230,11 +222,9 @@ final class ListEntriesInputNormalizerTest extends Unit
         $data['date'] = $expectedDate;
 
         $request = ListEntriesRequest::fromArray($data);
-        $normalizer = new ListEntriesInputNormalizer();
-        $normalized = $normalizer->normalize($request);
+        $params  = ListEntriesInputNormalizer::normalize($request);
 
-        
-        $this->assertSame($expectedDate, $normalized['date']);
+        $this->assertSame($expectedDate, $params['date']);
     }
 
     /**
@@ -273,11 +263,9 @@ final class ListEntriesInputNormalizerTest extends Unit
     {
         $data    = ListEntriesHelper::getData(sortField: $in);
         $request = ListEntriesRequest::fromArray($data);
+        $params  = ListEntriesInputNormalizer::normalize($request);
 
-        $normalizer = new ListEntriesInputNormalizer();
-        $normalized  = $normalizer->normalize($request);
-
-        $this->assertSame($expected, $normalized['sortField']);
+        $this->assertSame($expected, $params['sortField']);
     }
 
     /**
@@ -317,10 +305,8 @@ final class ListEntriesInputNormalizerTest extends Unit
     {
         $data    = ListEntriesHelper::getData(sortDir: $in);
         $request = ListEntriesRequest::fromArray($data);        
+        $params  = ListEntriesInputNormalizer::normalize($request);
 
-        $normalizer = new ListEntriesInputNormalizer();
-        $normalized = $normalizer->normalize($request);
-
-        $this->assertSame($expected, $normalized['sortDir']);
+        $this->assertSame($expected, $params['sortDir']);
     }
 }

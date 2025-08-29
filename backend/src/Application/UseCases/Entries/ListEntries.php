@@ -67,27 +67,11 @@ final class ListEntries
         $this->validator->validate($request);
 
         // Normalize list params
-        $normalizer = new ListEntriesInputNormalizer();
-        $normalized = $normalizer->normalize($request);
-
-        $criteria = ListEntriesCriteria::fromArray($normalized);
-        $page = $this->repository->findByCriteria($criteria);
-
-        $items      = $page['items'];
-        $total      = $page['total'];
-        $pageNum    = $page['page'];
-        $perPage    = $page['perPage'];
-        $pagesCount = $page['pagesCount'];
-
-        $data = [
-            'items'      => $items,
-            'page'       => $pageNum,
-            'perPage'    => $perPage,
-            'total'      => $total,
-            'pagesCount' => $pagesCount,
-        ];
-
-        $response = ListEntriesResponse::fromArray($data);
+        $params   = ListEntriesInputNormalizer::normalize($request);
+        $criteria = ListEntriesCriteria::fromArray($params);
+        
+        $pageData = $this->repository->findByCriteria($criteria);
+        $response = ListEntriesResponse::fromArray($pageData);
 
         return $response;
     }

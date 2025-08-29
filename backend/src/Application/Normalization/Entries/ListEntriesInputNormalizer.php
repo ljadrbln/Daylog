@@ -45,17 +45,16 @@ final class ListEntriesInputNormalizer
      *     query:?string
      * }
      */
-    public function normalize(ListEntriesRequestInterface $request): array
+    public static function normalize(ListEntriesRequestInterface $request): array
     {
-        //use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequestInterface;
-        $page      = $this->normalizePage($request);
-        $perPage   = $this->normalizePerPage($request);
-        $sortField = $this->normalizeSortField($request);
-        $sortDir   = $this->normalizeSortDir($request);
-        $date      = $this->normalizeDate($request);
-        $dateFrom  = $this->normalizeDateFrom($request);
-        $dateTo    = $this->normalizeDateTo($request);
-        $query     = $this->normalizeQuery($request);
+        $page      = self::normalizePage($request);
+        $perPage   = self::normalizePerPage($request);
+        $sortField = self::normalizeSortField($request);
+        $sortDir   = self::normalizeSortDir($request);
+        $date      = self::normalizeDate($request);
+        $dateFrom  = self::normalizeDateFrom($request);
+        $dateTo    = self::normalizeDateTo($request);
+        $query     = self::normalizeQuery($request);
 
         $result = [
             'page'      => $page,
@@ -80,7 +79,7 @@ final class ListEntriesInputNormalizer
      * @param ListEntriesRequestInterface $request
      * @return int
      */
-    private function normalizePage(ListEntriesRequestInterface $request): int
+    private static function normalizePage(ListEntriesRequestInterface $request): int
     {
         $raw  = $request->getPage() ?? null;
         $page = ListEntriesConstraints::PAGE_MIN;
@@ -105,7 +104,7 @@ final class ListEntriesInputNormalizer
      * @param ListEntriesRequestInterface $request
      * @return int
      */
-    private function normalizePerPage(ListEntriesRequestInterface $request): int
+    private static function normalizePerPage(ListEntriesRequestInterface $request): int
     {
         $raw     = $request->getPerPage() ?? null;
         $perPage = ListEntriesConstraints::PER_PAGE_DEFAULT;
@@ -132,7 +131,7 @@ final class ListEntriesInputNormalizer
      * @param ListEntriesRequestInterface $request
      * @return string
      */
-    private function normalizeSortField(ListEntriesRequestInterface $request): string
+    private static function normalizeSortField(ListEntriesRequestInterface $request): string
     {
         $raw       = $request->getSort() ?? null;
         $candidate = ListEntriesConstraints::SORT_FIELD_DEFAULT;
@@ -162,7 +161,7 @@ final class ListEntriesInputNormalizer
      * @param ListEntriesRequestInterface $request
      * @return 'ASC'|'DESC'
      */
-    private function normalizeSortDir(ListEntriesRequestInterface $request): string
+    private static function normalizeSortDir(ListEntriesRequestInterface $request): string
     {
         $raw   = $request->getDirection() ?? null;
         $upper = ListEntriesConstraints::SORT_DIR_DEFAULT;
@@ -191,7 +190,7 @@ final class ListEntriesInputNormalizer
      * @param ListEntriesRequestInterface $request
      * @return string|null
      */
-    private function normalizeDate(ListEntriesRequestInterface $request): ?string
+    private static function normalizeDate(ListEntriesRequestInterface $request): ?string
     {
         $raw = $request->getDate() ?? null;
         $str = '';
@@ -215,7 +214,7 @@ final class ListEntriesInputNormalizer
      * @param ListEntriesRequestInterface $request
      * @return string|null
      */
-    private function normalizeDateFrom(ListEntriesRequestInterface $request): ?string
+    private static function normalizeDateFrom(ListEntriesRequestInterface $request): ?string
     {
         $raw = $request->getDateFrom() ?? null;
         $str = '';
@@ -239,7 +238,7 @@ final class ListEntriesInputNormalizer
      * @param ListEntriesRequestInterface $request
      * @return string|null
      */
-    private function normalizeDateTo(ListEntriesRequestInterface $request): ?string
+    private static function normalizeDateTo(ListEntriesRequestInterface $request): ?string
     {
         $raw = $request->getDateTo() ?? null;
         $str = '';
@@ -264,7 +263,7 @@ final class ListEntriesInputNormalizer
      * @param ListEntriesRequestInterface $request
      * @return string|null
      */
-    private function normalizeQuery(ListEntriesRequestInterface $request): ?string
+    private static function normalizeQuery(ListEntriesRequestInterface $request): ?string
     {
         $raw = $request->getQuery() ?? null;
         $str = '';

@@ -48,12 +48,10 @@ final class ListEntriesCriteriaTest extends Unit
         $base = ListEntriesHelper::getData();
         $data = ListEntriesHelper::withFilters($base, $filters);
         $request = ListEntriesHelper::buildRequest($data);
-
-        $normalizer = new ListEntriesInputNormalizer();
-        $normalized = $normalizer->normalize($request);
+        $params  = ListEntriesInputNormalizer::normalize($request);
 
         // Act
-        $criteria = ListEntriesCriteria::fromArray($normalized);
+        $criteria = ListEntriesCriteria::fromArray($params);
 
         // Assert
         $actualPage = $criteria->getPage();
@@ -110,12 +108,10 @@ final class ListEntriesCriteriaTest extends Unit
         $base    = ListEntriesHelper::getData($page, $perPage);
         $data    = ListEntriesHelper::withFilters($base, $filters);
         $request = ListEntriesHelper::buildRequest($data);
-        
-        $normalizer = new ListEntriesInputNormalizer();
-        $normalized = $normalizer->normalize($request);
+        $params  = ListEntriesInputNormalizer::normalize($request);
 
         // Act
-        $criteria = ListEntriesCriteria::fromArray($normalized);
+        $criteria = ListEntriesCriteria::fromArray($params);
 
         // Assert
         $expectedPage = ListEntriesConstraints::PAGE_MIN;
@@ -147,13 +143,11 @@ final class ListEntriesCriteriaTest extends Unit
 
         $base    = ListEntriesHelper::getData();
         $data    = ListEntriesHelper::withFilters($base, $filters);
-        $request = ListEntriesHelper::buildRequest($data);
-        
-        $normalizer = new ListEntriesInputNormalizer();
-        $normalized = $normalizer->normalize($request);
+        $request = ListEntriesHelper::buildRequest($data);        
+        $params  = ListEntriesInputNormalizer::normalize($request);
 
         // Act
-        $criteria = ListEntriesCriteria::fromArray($normalized);
+        $criteria = ListEntriesCriteria::fromArray($params);
 
         // Assert
         $expectedQuery = trim($expectedQuery);
@@ -171,14 +165,12 @@ final class ListEntriesCriteriaTest extends Unit
     public function testSortDescriptorPrimaryFromRequestAndSecondaryStable(): void
     {
         // Arrange
-        $data = ListEntriesHelper::getData();
+        $data     = ListEntriesHelper::getData();
         $request  = ListEntriesHelper::buildRequest($data);
-
-        $normalizer = new ListEntriesInputNormalizer();
-        $normalized = $normalizer->normalize($request);
+        $params   = ListEntriesInputNormalizer::normalize($request);
 
         // Act
-        $criteria = ListEntriesCriteria::fromArray($normalized);
+        $criteria = ListEntriesCriteria::fromArray($params);
 
         // Assert
         $sort = $criteria->getSortDescriptor();

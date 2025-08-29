@@ -43,8 +43,7 @@ final class AddEntry
         $this->validator->validate($request);
 
         // Normalize (adds id, createdAt, updatedAt)
-        $normalizer = new AddEntryInputNormalizer();
-        $normalized = $normalizer->normalize($request);
+        $normalized = AddEntryInputNormalizer::normalize($request);
 
         // Domain model
         $entry = Entry::fromArray($normalized);
