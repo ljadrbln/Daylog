@@ -50,8 +50,7 @@ abstract class BaseAddEntryIntegrationTest extends Unit
         EntryFixture::cleanTable();
 
         // Use case via configuration provider (wiring must exist)
-        $provider = AddEntryProvider::class;
-        $useCase  = $provider::useCase();
+        $useCase  = AddEntryProvider::useCase();
 
         $this->useCase = $useCase;
     }
