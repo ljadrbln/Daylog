@@ -26,8 +26,7 @@ final class AC2_EmptyTitleTest extends BaseAddEntryIntegrationTest
     public function testEmptyTitleFailsWithTitleRequired(): void
     {
         // Arrange
-        $data = EntryTestData::getOne();
-        $data['title'] = ''; // already-trimmed empty title (post-BR-3)
+        $data = EntryTestData::getOne(title: '');
 
         /** @var AddEntryRequestInterface $request */
         $request = AddEntryRequest::fromArray($data);
