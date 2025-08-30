@@ -42,8 +42,8 @@ final class ListEntriesHelper
      * @return array{
      *     page:int,
      *     perPage:int,
-     *     sortField:string,
-     *     sortDir:string
+     *     sortField:'createdAt'|'date'|'updatedAt',
+     *     sortDir:'ASC'|'DESC'
      * }
      */
     public static function getData(
@@ -51,8 +51,15 @@ final class ListEntriesHelper
         int $perPage        = ListEntriesConstraints::PER_PAGE_DEFAULT,
         string $sortField   = ListEntriesConstraints::SORT_FIELD_DEFAULT,
         string $sortDir     = ListEntriesConstraints::SORT_DIR_DEFAULT
-
     ): array {
+        /** @var array{
+         *   page:int,
+         *   perPage:int,
+         *   sortField:'createdAt'|'date'|'updatedAt',
+         *   sortDir:'ASC'|'DESC'
+         * } $data
+         */
+
         $data = [
             'page'      => $page,
             'perPage'   => $perPage,
@@ -69,9 +76,30 @@ final class ListEntriesHelper
      * Supported keys: dateFrom, dateTo, date, query.
      * Unknown keys are ignored to keep transport shape explicit.
      *
-     * @param array<string,mixed> $base
-     * @param array<string,mixed> $filters
-     * @return array<string,mixed>
+     * @param array{
+     *   page:int,
+     *   perPage:int,
+     *   sortField:'createdAt'|'date'|'updatedAt',
+     *   sortDir:'ASC'|'DESC'
+     * } $base
+     *
+     * @param array{
+     *   dateFrom?:string,
+     *   dateTo?:string,
+     *   date?:string,
+     *   query?:string
+     * } $filters
+     * 
+     * @return array{
+     *   page:int,
+     *   perPage:int,
+     *   sortField:'createdAt'|'date'|'updatedAt',
+     *   sortDir:'ASC'|'DESC',
+     *   dateFrom?:string,
+     *   dateTo?:string,
+     *   date?:string,
+     *   query?:string
+     * }
      */
     public static function withFilters(array $base, array $filters): array
     {
@@ -83,13 +111,34 @@ final class ListEntriesHelper
             }
         }
 
+        /** @var array{
+         *   page:int,
+         *   perPage:int,
+         *   sortField:'createdAt'|'date'|'updatedAt',
+         *   sortDir:'ASC'|'DESC',
+         *   dateFrom?:string,
+         *   dateTo?:string,
+         *   date?:string,
+         *   query?:string
+         * } $base
+         */        
         return $base;
     }
 
     /**
      * Convenience: build a concrete ListEntriesRequest from payload.
      *
-     * @param array<string,mixed> $data
+     * @param array{
+     *   page:int,
+     *   perPage:int,
+     *   sortField:'createdAt'|'date'|'updatedAt',
+     *   sortDir:'ASC'|'DESC',
+     *   dateFrom?:string,
+     *   dateTo?:string,
+     *   date?:string,
+     *   query?:string
+     * } $data
+     *
      * @return ListEntriesRequest
      */
     public static function buildRequest(array $data): ListEntriesRequest
