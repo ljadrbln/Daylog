@@ -3,66 +3,93 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Presentation\Requests\Entries;
 
+use Codeception\Test\Unit;
 use Daylog\Presentation\Requests\Entries\AddEntrySanitizer;
-use PHPUnit\Framework\TestCase;
+use Daylog\Tests\Support\Helper\EntryTestData;
+
 
 /**
- * Unit test for AddEntrySanitizer.
+ * Unit test for AddEntrySanitizer (BR-3 trimming).
  *
  * Purpose:
- *   Verify BR-3 (Trimming): leading and trailing whitespace is removed
- *   from title, body, and date fields before validation.
+ *   Ensure that AddEntrySanitizer::sanitize() removes leading/trailing
+ *   whitespace from title, body, and date fields before validation.
  *
  * Mechanics:
- *   - Provide raw params with surrounding whitespace.
- *   - Call sanitize().
- *   - Assert: all fields are trimmed correctly.
+ *   - Build baseline payload via EntryTestData::getOne().
+ *   - Override individual fields with whitespace variations.
+ *   - Expect sanitized fields to be trimmed.
  *
  * @covers \Daylog\Presentation\Requests\Entries\AddEntrySanitizer
  */
-final class AddEntrySanitizerTest extends TestCase
+final class AddEntrySanitizerTest extends Unit
 {
     /**
-     * Ensures sanitize() trims all string fields.
+     * Provides whitespace variations for title, body, and date.
      *
-     * @return void
+     * @return array<string,array{string,string}>
      */
-    public function testSanitizeTrimsAllFields(): void
+    public static function whitespaceProvider(): array
     {
-        // Arrange
-        $raw = [
-            'title' => "  My Title  ",
-            'body'  => "\n Body with spaces \t ",
-            'date'  => " 2025-08-30 ",
+        return [
+            'spaces'   => ['  foo  ', 'foo'],
+            'tabs'     => ["\tbar\t", 'bar'],
+            'newlines' => ["\n\nbaz\n", 'baz'],
+            'mixed'    => [" \tqux\n ", 'qux'],
         ];
-
-        // Act
-        $clean = AddEntrySanitizer::sanitize($raw);
-
-        // Assert
-        $this->assertSame('My Title', $clean['title']);
-        $this->assertSame('Body with spaces', $clean['body']);
-        $this->assertSame('2025-08-30', $clean['date']);
     }
 
     /**
-     * Ensures sanitize() leaves already clean fields unchanged.
+     * Ensures sanitize() trims title correctly.
      *
+     * @dataProvider whitespaceProvider
+     * @param string $input
+     * @param string $expected
      * @return void
      */
-    public function testSanitizeLeavesCleanValuesUntouched(): void
+    public function testSanitizeTrimsTitle(string $input, string $expected): void
     {
         // Arrange
-        $raw = [
-            'title' => 'Title',
-            'body'  => 'Body',
-            'date'  => '2025-08-30',
-        ];
+        $row = EntryTestData::getOne(title: $input);
 
         // Act
-        $clean = AddEntrySanitizer::sanitize($raw);
+        $clean = AddEntrySanitizer::sanitize($row);
 
         // Assert
-        $this->assertSame($raw, $clean);
+        $this->assertSame($expected, $clean['title']);
+    }
+
+    /**
+     * Ensures sanitize() trims body correctly.
+     *
+     * @dataProvider whitespaceProvider
+     */
+    public function testSanitizeTrimsBody(string $input, string $expected): void
+    {
+        // Arrange
+        $row = EntryTestData::getOne(body: $input);
+
+        // Act
+        $clean = AddEntrySanitizer::sanitize($row);
+
+        // Assert
+        $this->assertSame($expected, $clean['body']);
+    }
+
+    /**
+     * Ensures sanitize() trims date correctly.
+     *
+     * @dataProvider whitespaceProvider
+     */
+    public function testSanitizeTrimsDate(string $input, string $expected): void
+    {
+        // Arrange
+        $row = EntryTestData::getOne(date: $input);
+
+        // Act
+        $clean = AddEntrySanitizer::sanitize($row);
+
+        // Assert
+        $this->assertSame($expected, $clean['date']);
     }
 }
