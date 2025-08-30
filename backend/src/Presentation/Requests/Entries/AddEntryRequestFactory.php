@@ -5,6 +5,7 @@ namespace Daylog\Presentation\Requests\Entries;
 
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
+use Daylog\Presentation\Requests\Entries\AddEntrySanitizer;
 use Daylog\Application\Exceptions\TransportValidationException;
 
 /**
@@ -54,7 +55,9 @@ final class AddEntryRequestFactory
             throw new TransportValidationException($errors);
         };
 
+        $params  = AddEntrySanitizer::sanitize($params);
         $request = AddEntryRequest::fromArray($params);
+
         return $request;
     }
 
