@@ -8,7 +8,7 @@ use Daylog\Domain\Models\Entries\ListEntriesCriteria;
 use Daylog\Tests\Support\Helper\ListEntriesHelper;
 use Daylog\Domain\Models\Entries\ListEntriesConstraints;
 use Daylog\Application\Normalization\Entries\ListEntriesInputNormalizer;
-use Daylog\Application\UseCases\Entries\ListEntries;
+use Daylog\Presentation\Requests\Entries\ListEntriesSanitizer;
 
 /**
  * Unit tests for Domain ListEntriesCriteria (UC-2).
@@ -47,6 +47,8 @@ final class ListEntriesCriteriaTest extends Unit
 
         $base = ListEntriesHelper::getData();
         $data = ListEntriesHelper::withFilters($base, $filters);
+        $data = ListEntriesSanitizer::sanitize($data);
+
         $request = ListEntriesHelper::buildRequest($data);
         $params  = ListEntriesInputNormalizer::normalize($request);
 
@@ -107,6 +109,8 @@ final class ListEntriesCriteriaTest extends Unit
 
         $base    = ListEntriesHelper::getData($page, $perPage);
         $data    = ListEntriesHelper::withFilters($base, $filters);
+        $data    = ListEntriesSanitizer::sanitize($data);
+
         $request = ListEntriesHelper::buildRequest($data);
         $params  = ListEntriesInputNormalizer::normalize($request);
 
@@ -143,7 +147,9 @@ final class ListEntriesCriteriaTest extends Unit
 
         $base    = ListEntriesHelper::getData();
         $data    = ListEntriesHelper::withFilters($base, $filters);
-        $request = ListEntriesHelper::buildRequest($data);        
+        $data    = ListEntriesSanitizer::sanitize($data);
+
+        $request = ListEntriesHelper::buildRequest($data);       
         $params  = ListEntriesInputNormalizer::normalize($request);
 
         // Act
