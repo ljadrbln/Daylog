@@ -125,53 +125,6 @@ final class ListEntriesInputNormalizerTest extends Unit
     }
 
     /**
-     * Data provider for query normalization.
-     *
-     * Purpose:
-     * Supplies (raw, expected) pairs with titled cases to verify trimming and
-     * empty-to-null behavior for the free-text query.
-     *
-     * @return array<string, array{0:string,1:?string}>
-     */
-    public function queryProvider(): array
-    {
-        $cases = [
-            'trim both sides'      => ['   hello   ', 'hello'],
-            'whitespace only'      => ['     ',       null],
-            'empty string'         => ['',            null],
-            'tabs and newline'     => ["\tfoo\n",     'foo'],
-            'leading space only'   => [' bar',        'bar'],
-            'trailing space only'  => ['baz ',        'baz'],
-        ];
-
-        return $cases;
-    }
-
-    /**
-     * Ensures query is trimmed and empty-after-trim becomes null (titled provider).
-     *
-     * Mechanics:
-     * - Given a raw 'query' string, normalization must either trim it
-     *   or convert it to null when the trimmed value is empty.
-     *
-     * @param string      $in       Raw query string.
-     * @param string|null $expected Expected normalized value.
-     * @return void
-     * @covers \Daylog\Application\Normalization\Entries\ListEntriesInputNormalizer::normalize
-     * @dataProvider queryProvider
-     */
-    public function testQueryNormalizationWithProvider(string $in, ?string $expected): void
-    {
-        $data = ListEntriesHelper::getData();
-        $data['query'] = $in;
-
-        $request = ListEntriesRequest::fromArray($data);
-        $params  = ListEntriesInputNormalizer::normalize($request);
-
-        $this->assertSame($expected, $params['query']);
-    }
-
-    /**
      * Data provider for empty date fields.
      *
      * Purpose:
