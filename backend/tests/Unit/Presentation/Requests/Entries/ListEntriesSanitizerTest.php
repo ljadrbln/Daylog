@@ -5,6 +5,7 @@ namespace Daylog\Tests\Unit\Presentation\Requests\Entries;
 
 use Codeception\Test\Unit;
 use Daylog\Presentation\Requests\Entries\ListEntriesSanitizer;
+use Daylog\Tests\Support\Helper\ListEntriesHelper;
 
 /**
  * Unit test for ListEntriesSanitizer (BR-3 trimming).
@@ -51,10 +52,10 @@ final class ListEntriesSanitizerTest extends Unit
     public function testSanitizeTrimsSortField(string $input, string $expected): void
     {
         // Arrange
-        $row = ['sortField' => $input];
+        $data = ListEntriesHelper::getData(sortField: $input);
 
         // Act
-        $clean = ListEntriesSanitizer::sanitize($row);
+        $clean = ListEntriesSanitizer::sanitize($data);
 
         // Assert
         $this->assertSame($expected, $clean['sortField']);
@@ -67,8 +68,13 @@ final class ListEntriesSanitizerTest extends Unit
      */
     public function testSanitizeTrimsSortDir(string $input, string $expected): void
     {
-        $row   = ['sortDir' => $input];
-        $clean = ListEntriesSanitizer::sanitize($row);
+        // Arrange
+        $data = ListEntriesHelper::getData(sortDir: $input);
+
+        // Act
+        $clean = ListEntriesSanitizer::sanitize($data);
+
+        // Assert
         $this->assertSame($expected, $clean['sortDir']);
     }
 
@@ -79,8 +85,14 @@ final class ListEntriesSanitizerTest extends Unit
      */
     public function testSanitizeTrimsDateFrom(string $input, string $expected): void
     {
-        $row   = ['dateFrom' => $input];
-        $clean = ListEntriesSanitizer::sanitize($row);
+        // Arrange
+        $base = ListEntriesHelper::getData();
+        $data = ListEntriesHelper::withFilters($base, ['dateFrom' => $input]);
+
+        // Act
+        $clean = ListEntriesSanitizer::sanitize($data);
+
+        // Assert
         $this->assertSame($expected, $clean['dateFrom']);
     }
 
@@ -91,9 +103,15 @@ final class ListEntriesSanitizerTest extends Unit
      */
     public function testSanitizeTrimsDateTo(string $input, string $expected): void
     {
-        $row   = ['dateTo' => $input];
-        $clean = ListEntriesSanitizer::sanitize($row);
-        $this->assertSame($expected, $clean['dateTo']);
+        // Arrange
+        $base = ListEntriesHelper::getData();
+        $data = ListEntriesHelper::withFilters($base, ['dateTo' => $input]);
+
+        // Act
+        $clean = ListEntriesSanitizer::sanitize($data);
+
+        // Assert
+        $this->assertSame($expected, $clean['dateTo']);        
     }
 
     /**
@@ -103,8 +121,14 @@ final class ListEntriesSanitizerTest extends Unit
      */
     public function testSanitizeTrimsDate(string $input, string $expected): void
     {
-        $row   = ['date' => $input];
-        $clean = ListEntriesSanitizer::sanitize($row);
+        // Arrange
+        $base = ListEntriesHelper::getData();
+        $data = ListEntriesHelper::withFilters($base, ['date' => $input]);
+
+        // Act
+        $clean = ListEntriesSanitizer::sanitize($data);
+
+        // Assert
         $this->assertSame($expected, $clean['date']);
     }
 
@@ -115,8 +139,14 @@ final class ListEntriesSanitizerTest extends Unit
      */
     public function testSanitizeTrimsQuery(string $input, string $expected): void
     {
-        $row   = ['query' => $input];
-        $clean = ListEntriesSanitizer::sanitize($row);
+        // Arrange
+        $base = ListEntriesHelper::getData();
+        $data = ListEntriesHelper::withFilters($base, ['query' => $input]);
+
+        // Act
+        $clean = ListEntriesSanitizer::sanitize($data);
+
+        // Assert
         $this->assertSame($expected, $clean['query']);
     }
 }
