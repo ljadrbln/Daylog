@@ -97,9 +97,9 @@ final class ListEntriesRequest implements ListEntriesRequestInterface
      *     query?: string
      * } $data Normalized request parameters.
      *
-     * @return self New instance created from the given array.
+     * @return ListEntriesRequestInterface New instance created from the given array.
      */
-    public static function fromArray(array $data): self
+    public static function fromArray(array $data): ListEntriesRequestInterface
     {
         $page      = $data['page'];
         $perPage   = $data['perPage'];

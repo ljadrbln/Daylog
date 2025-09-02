@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Daylog\Application\UseCases\Entries;
 
+use Daylog\Application\UseCases\Entries\ListEntriesInterface;
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequestInterface;
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesResponse;
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesResponseInterface;
@@ -27,7 +28,7 @@ use Daylog\Domain\Models\Entries\ListEntriesCriteria;
  * - Sorting, filtering, and pagination are applied by the repository based on Domain Criteria.
  * - The use case remains thin and does not perform data-processing logic itself.
  */
-final class ListEntries
+final class ListEntries implements ListEntriesInterface
 {
     /** @var EntryRepositoryInterface */
     private EntryRepositoryInterface $repository;

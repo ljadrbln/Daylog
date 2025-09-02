@@ -7,16 +7,17 @@ use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Tests\Support\Helper\EntryTestData;
+use Daylog\Domain\Models\Entries\EntryConstraints;
 
 /**
  * AC-5: Body too long → BODY_TOO_LONG.
  *
  * Purpose:
- *   Ensure that a body exceeding BR-2 limit (after trimming) triggers a validation error.
+ *   Ensure that a body exceeding ENTRY-BR-2 limit (after trimming) triggers a validation error.
  *
  * Mechanics:
  *   - Build a valid baseline payload via EntryTestData::getOne().
- *   - Set body to 50001 chars (post-trim state).
+ *   - Set body to EntryConstraints chars (post-trim state).
  *   - Expect DomainValidationException, then execute the use case.
  *
  * @covers \Daylog\Configuration\Providers\Entries\AddEntryProvider
@@ -33,7 +34,7 @@ final class AC5_BodyTooLongTest extends BaseAddEntryIntegrationTest
     {
         // Arrange
         $data = EntryTestData::getOne();
-        $tooLong = str_repeat('B', 50001);
+        $tooLong = str_repeat('B', EntryConstraints::BODY_MAX+1);
         $data['body'] = $tooLong;
 
         /** @var AddEntryRequestInterface $request */

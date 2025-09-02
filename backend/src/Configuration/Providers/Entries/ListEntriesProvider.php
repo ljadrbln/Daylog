@@ -5,29 +5,27 @@ declare(strict_types=1);
 namespace Daylog\Configuration\Providers\Entries;
 
 use Daylog\Configuration\Bootstrap\SqlFactory;
+
 use Daylog\Application\UseCases\Entries\ListEntries;
+use Daylog\Application\UseCases\Entries\ListEntriesInterface;
+
 use Daylog\Application\Validators\Entries\ListEntries\ListEntriesValidator;
 use Daylog\Application\Validators\Entries\ListEntries\ListEntriesValidatorInterface;
+
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Infrastructure\Repositories\Entries\EntryRepository;
+
 use Daylog\Domain\Interfaces\Entries\EntryStorageInterface;
 use Daylog\Infrastructure\Storage\Entries\EntryStorage;
 use Daylog\Infrastructure\Storage\Entries\EntryModel;
 
 /**
- * Provider for UC-2 ListEntries.
+ * Provider for UC-1 ListEntries.
  *
  * Purpose:
- *  Compose the dependency chain (DB\SQL => Model => Storage => Repository => Validator => UseCase)
- *  without a framework DI container and without closures.
+ * Compose the dependency chain (DB\SQL => Model => Storage => Repository => Validator => UseCase).
  *
- * Scenarios:
- *  - Production wiring: create real infrastructure components and the use case.
- *  - Functional/integration tests: reuse the same wiring to exercise the real stack.
- *
- * Notes:
- *  - All methods are static. The constructor is private to prevent instantiation.
- *  - Returns are typed to interfaces where applicable to keep boundaries explicit.
+ * @return ListEntriesInterface Fully wired use case ready for execution.
  */
 final class ListEntriesProvider
 {
@@ -44,13 +42,9 @@ final class ListEntriesProvider
     /**
      * Build configured UC-2 use case.
      *
-     * Mechanics:
-     *  - Wires concrete dependencies but returns the interface to allow substitution
-     *    with decorators (e.g., transactional, logging) or fakes in tests.
-     *
-     * @return \Daylog\Application\UseCases\Entries\ListEntriesInterface
+     * @return ListEntriesInterface
      */
-    public static function useCase(): ListEntries
+    public static function useCase(): ListEntriesInterface
     {
         $repo      = self::repository();
         $validator = self::validator();
