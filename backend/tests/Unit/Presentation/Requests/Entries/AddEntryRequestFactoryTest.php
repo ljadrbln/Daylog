@@ -28,10 +28,15 @@ final class AddEntryRequestFactoryTest extends Unit
      */
     public function testFromArrayReturnsDtoOnValidInput(): void
     {
+        // Arrange
         $factory = new AddEntryRequestFactory();
         $input   = EntryTestData::getOne();
 
+        // Act
         $dto = $factory->fromArray($input);
+
+        // Assert
+        $this->assertInstanceOf(AddEntryRequestInterface::class, $dto);
 
         $this->assertSame($input['title'], $dto->getTitle());
         $this->assertSame($input['body'], $dto->getBody());
@@ -48,11 +53,15 @@ final class AddEntryRequestFactoryTest extends Unit
      */
     public function testFromArrayThrowsOnInvalidTransportData(array $overrides): void
     {
+        // Arrange
         $factory = new AddEntryRequestFactory();
         $data    = EntryTestData::getOne();
         $data    = array_merge($data, $overrides);
 
+        // Expectation
         $this->expectException(TransportValidationException::class);
+
+        // Act
         $factory->fromArray($data);
     }
 
