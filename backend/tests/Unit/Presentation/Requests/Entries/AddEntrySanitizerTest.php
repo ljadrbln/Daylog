@@ -8,7 +8,7 @@ use Daylog\Presentation\Requests\Entries\AddEntrySanitizer;
 use Daylog\Tests\Support\Helper\EntryTestData;
 
 /**
- * Unit test for AddEntrySanitizer (BR-3 trimming).
+ * Unit test for AddEntrySanitizer (BR-1 trimming).
  *
  * Purpose:
  *   Ensure that AddEntrySanitizer::sanitize() removes leading/trailing
