@@ -11,6 +11,7 @@ Start here to navigate the project documentation.
 - [Use Cases Index](USE_CASES.md)
 - UC-1 details: [UC-1 — Add Entry](use-cases/UC-1-AddEntry.md)
 - UC-2 details: [UC-2 — List Entries](use-cases/UC-2-ListEntries.md)
+- UC-3 details: [UC-3 — Get Entry](use-cases/UC-3-GetEntry.md)
 - Template: [UC Template](use-cases/UC_TEMPLATE.md)
 
 ## Process & Conventions

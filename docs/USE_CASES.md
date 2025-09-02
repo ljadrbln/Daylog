@@ -14,4 +14,11 @@ Display a paginated list of entries with filters and sorting.
 
 ---
 
+## UC-3 Get Entry
+Display information about existed diary entry.
+
+**Details:** [UC-3-GetEntry.md](use-cases/UC-3-GetEntry.md)
+
+---
+
 *(More use cases will be added as the project evolves.)*
