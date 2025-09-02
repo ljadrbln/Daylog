@@ -7,7 +7,7 @@ namespace Daylog\Presentation\Requests\Entries;
  * Sanitizer for UC-1 Add Entry transport input.
  *
  * Purpose:
- * - Apply BR-3 (Trimming) consistently to all string fields.
+ * - Apply BR-1 (Trimming) consistently to all string fields.
  * - Keep AddEntryRequestFactory focused on type checks and DTO creation.
  *
  * Mechanics:
@@ -17,7 +17,7 @@ namespace Daylog\Presentation\Requests\Entries;
 final class AddEntrySanitizer
 {
     /**
-     * Apply BR-3 trimming to raw params.
+     * Apply BR-1 trimming to raw params.
      *
      * @param array{
      *     title:string,
