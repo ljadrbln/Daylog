@@ -5,7 +5,6 @@ namespace Daylog\Tests\Unit\Presentation\Requests\Entries;
 
 use Codeception\Test\Unit;
 use Daylog\Presentation\Requests\Entries\AddEntryRequestFactory;
-use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
 use Daylog\Application\Exceptions\TransportValidationException;
 use Daylog\Tests\Support\Helper\EntryTestData;
 
@@ -29,15 +28,12 @@ final class AddEntryRequestFactoryTest extends Unit
     public function testFromArrayReturnsDtoOnValidInput(): void
     {
         // Arrange
-        $factory = new AddEntryRequestFactory();
         $input   = EntryTestData::getOne();
 
         // Act
-        $dto = $factory->fromArray($input);
+        $dto = AddEntryRequestFactory::fromArray($input);
 
         // Assert
-        $this->assertInstanceOf(AddEntryRequestInterface::class, $dto);
-
         $this->assertSame($input['title'], $dto->getTitle());
         $this->assertSame($input['body'], $dto->getBody());
         $this->assertSame($input['date'], $dto->getDate());
@@ -54,15 +50,14 @@ final class AddEntryRequestFactoryTest extends Unit
     public function testFromArrayThrowsOnInvalidTransportData(array $overrides): void
     {
         // Arrange
-        $factory = new AddEntryRequestFactory();
-        $data    = EntryTestData::getOne();
-        $data    = array_merge($data, $overrides);
+        $data = EntryTestData::getOne();
+        $data = array_merge($data, $overrides);
 
         // Expectation
         $this->expectException(TransportValidationException::class);
 
         // Act
-        $factory->fromArray($data);
+        AddEntryRequestFactory::fromArray($data);
     }
 
     /**

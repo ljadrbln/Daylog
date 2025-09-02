@@ -6,7 +6,6 @@ namespace Daylog\Tests\Unit\Presentation\Requests\Entries;
 
 use Codeception\Test\Unit;
 use Daylog\Presentation\Requests\Entries\ListEntriesRequestFactory;
-use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequestInterface;
 use Daylog\Tests\Support\Helper\ListEntriesHelper;
 use Daylog\Application\Exceptions\TransportValidationException;
 
@@ -30,12 +29,13 @@ final class ListEntriesRequestFactoryTest extends Unit
      */
     public function testFromArrayReturnsDtoOnValidInput(): void
     {
-        /** Arrange **/
-        $factory = new ListEntriesRequestFactory();
-        $input   = ListEntriesHelper::getData();
+        // Arrange
+        $input = ListEntriesHelper::getData();
 
-        $dto = $factory->fromArray($input);
+        // Act
+        $dto = ListEntriesRequestFactory::fromArray($input);
 
+        // Assert
         $this->assertSame($input['page'],       $dto->getPage());
         $this->assertSame($input['perPage'],    $dto->getPerPage());
         $this->assertSame($input['sortField'],  $dto->getSort());
@@ -54,12 +54,15 @@ final class ListEntriesRequestFactoryTest extends Unit
      */
     public function testFromArrayThrowsOnInvalidTransportData(array $overrides): void
     {
-        $factory = new ListEntriesRequestFactory();
-        $data    = ListEntriesHelper::getData();
-        $data    = array_merge($data, $overrides);
+        // Arrange
+        $data = ListEntriesHelper::getData();
+        $data = array_merge($data, $overrides);
 
+        // Expectation
         $this->expectException(TransportValidationException::class);
-        $factory->fromArray($data);
+
+        // Act
+        ListEntriesRequestFactory::fromArray($data);
     }
 
     /**

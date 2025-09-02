@@ -5,7 +5,6 @@ namespace Daylog\Tests\Unit\Presentation\Requests\Entries;
 
 use Codeception\Test\Unit;
 use Daylog\Presentation\Requests\Entries\GetEntryRequestFactory;
-use Daylog\Application\DTO\Entries\GetEntry\GetEntryRequestInterface;
 use Daylog\Application\Exceptions\TransportValidationException;
 use Daylog\Tests\Support\Helper\EntryTestData;
 
@@ -33,14 +32,12 @@ final class GetEntryRequestFactoryTest extends Unit
     public function testFromArrayReturnsDtoOnValidInput(): void
     {
         // Arrange
-        $factory = new GetEntryRequestFactory();
-        $input   = EntryTestData::getOne();
+        $input = EntryTestData::getOne();
 
         // Act
-        $dto = $factory->fromArray($input);
+        $dto = GetEntryRequestFactory::fromArray($input);
 
         // Assert
-        $this->assertInstanceOf(GetEntryRequestInterface::class, $dto);
         $this->assertSame($input['id'], $dto->getId());
     }    
 
