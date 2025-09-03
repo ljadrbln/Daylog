@@ -6,6 +6,7 @@ namespace Daylog\Tests\Support\Fakes;
 use Daylog\Domain\Interfaces\Entries\EntryStorageInterface;
 use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Domain\Models\Entries\ListEntriesCriteria;
+use Daylog\Domain\Models\Entries\ListEntriesConstraints;
 
 /**
  * FakeEntryStorage
@@ -77,8 +78,8 @@ final class FakeEntryStorage implements EntryStorageInterface
 
         // UC-2 defaults: page=1, perPage=20; empty result ⇒ total=0, pagesCount=0.
         $total      = 0;
-        $page       = 1;
-        $perPage    = 20;
+        $page       = ListEntriesConstraints::PAGE_MIN;
+        $perPage    = ListEntriesConstraints::PER_PAGE_DEFAULT;
         $pagesCount = 0;
 
         $result = [

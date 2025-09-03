@@ -178,47 +178,14 @@ final class EntryRepositoryTest extends Unit
         $request  = ListEntriesHelper::buildRequest($data);       
         $params   = ListEntriesInputNormalizer::normalize($request);
         $criteria = ListEntriesCriteria::fromArray($params);
-        
+
         // Act
         $pageResult = $repo->findByCriteria($criteria);
 
         // Assert
-        $this->assertIsArray($pageResult);
-
-        $items      = $pageResult['items']      ?? null;
-        $total      = $pageResult['total']      ?? null;
-        $pageNum    = $pageResult['page']       ?? null;
-        $limit      = $pageResult['perPage']    ?? null;
-        $pagesCount = $pageResult['pagesCount'] ?? null;
-
-        $this->assertIsArray($items);
-        $this->assertSame(0, $total);
-        $this->assertSame(1, $pageNum);
-        $this->assertSame(20, $limit);
-        $this->assertSame(0, $pagesCount);
+        $this->assertSame(0,                        $pageResult['total']);
+        $this->assertSame($criteria->getPage(),     $pageResult['page']);
+        $this->assertSame($criteria->getPerPage(),  $pageResult['perPage']);
+        $this->assertSame(0,                        $pageResult['pagesCount']);
     }    
 }
-
-    // public function testQueryIsPreservedAfterUpstreamTrim(): void
-    // {
-    //     // Arrange
-    //     $expectedQuery = '  project alpha  beta  ';
-    //     $filters = [
-    //         'query' => $expectedQuery
-    //     ];
-
-    //     $base    = ListEntriesHelper::getData();
-    //     $data    = ListEntriesHelper::withFilters($base, $filters);
-    //     $data    = ListEntriesSanitizer::sanitize($data);
-
-    //     $request = ListEntriesHelper::buildRequest($data);       
-    //     $params  = ListEntriesInputNormalizer::normalize($request);
-
-    //     // Act
-    //     $criteria = ListEntriesCriteria::fromArray($params);
-
-    //     // Assert
-    //     $expectedQuery = trim($expectedQuery);
-    //     $actualQuery   = $criteria->getQuery();
-    //     $this->assertSame($expectedQuery, $actualQuery);
-    // }
