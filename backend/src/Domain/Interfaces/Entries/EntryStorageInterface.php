@@ -22,9 +22,21 @@ interface EntryStorageInterface
      * - Return value indicates success of the INSERT.
      *
      * @param Entry $entry Domain Entry ready to persist.
-     * @return bool True if exactly one row was inserted; false otherwise.
+     * @return void
      */
     public function insert(Entry $entry): void;
+
+    /**
+     * Retrieve a single Entry by its id (UC-3 GetEntry).
+     *
+     * Storage responsibilities:
+     * - Lookup by primary key.
+     * - Return null if not found.
+     *
+     * @param string $id UUIDv4 identifier of the Entry.
+     * @return Entry|null Domain Entry if found, otherwise null.
+     */
+    public function findById(string $id): ?Entry;    
 
     /**
      * Retrieve paginated entries by criteria (UC-2).
