@@ -38,6 +38,23 @@ final class FakeEntryRepository implements EntryRepositoryInterface
     }
 
     /**
+     * Get saved entry by given id from in-memory storage.
+     * 
+     * @param String $id Target entry id
+     * @return Entry|null Same entry
+     */
+    public function findById(string $id): ?Entry
+    {
+        foreach ($this->entries as $entry) {
+            if ($entry->getId() === $id) {
+                return $entry;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Get the number of times save() has been called.
      *
      * @return int

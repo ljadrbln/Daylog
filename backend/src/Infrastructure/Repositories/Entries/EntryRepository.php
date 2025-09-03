@@ -38,6 +38,13 @@ final class EntryRepository implements EntryRepositoryInterface
         return $entry;
     }
 
+    /** @inheritDoc */
+    public function findById(string $id): ?Entry {
+        $entry = $this->storage->findById($id);
+
+        return $entry;
+    }
+
     /**
      * Fetch a page of entries by criteria (UC-2).
      *
