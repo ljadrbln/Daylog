@@ -59,7 +59,7 @@ final class EntryModelTest extends Unit
         $model->create($data);
 
         /** @var array<string,mixed>|null $fetched */
-        $fetched = $model->getRowByUuid($uuid);
+        $fetched = $model->findById($uuid);
 
         $this->assertNotNull($fetched);
         $this->assertSame($data['title'], $fetched['title']);
