@@ -50,5 +50,5 @@ interface EntryRepositoryInterface
      * @param string $id UUID identifier of the entry.
      * @return Entry|null Entry if found, otherwise null.
      */
-    public function findById(string $id): ?Entry;    
+    public function findById(string $id): ?Entry;
 }
