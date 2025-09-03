@@ -66,14 +66,14 @@ class EntryModel extends AbstractModel {
      * @param string $uuid Entry UUID (v4).
      * @return array<string,mixed>|null Plain row or null if not found.
      */
-    public function getRowByUuid(string $uuid): ?array
+    public function findById(string $uuid): ?array
     {
         $this->load(['id = ?', $uuid]);
 
-        $result = $this->dry() 
+        $row = $this->dry() 
             ? null 
             : $this->cast();
 
-        return $result;
+        return $row;
     }
 }        
