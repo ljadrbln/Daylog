@@ -32,6 +32,28 @@ final class FakeEntryStorage implements EntryStorageInterface
         $this->returnUuid   = $entry->getId();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * This fake simply checks whether the last inserted entry matches the given id.
+     * Returns that entry if it exists, otherwise null.
+     *
+     * Useful for unit tests verifying use cases that call storage->findById(),
+     * without needing a real database lookup.
+     *
+     * @param string $id UUIDv4 identifier.
+     * @return Entry|null
+     */
+    public function findById(string $id): ?Entry
+    {
+        if ($this->lastInserted !== null && $this->lastInserted->getId() === $id) {
+            $result = $this->lastInserted;
+            return $result;
+        }
+
+        return null;
+    }
+
     /** 
      * {@inheritDoc} 
      * 
