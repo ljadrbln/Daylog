@@ -20,6 +20,7 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  *   - Expect sanitized fields to be trimmed.
  *
  * @covers \Daylog\Presentation\Requests\Entries\AddEntrySanitizer
+ * @group UC-AddEntry
  */
 final class AddEntrySanitizerTest extends Unit
 {

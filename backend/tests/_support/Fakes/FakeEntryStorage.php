@@ -76,7 +76,6 @@ final class FakeEntryStorage implements EntryStorageInterface
          */
         $items = [];
 
-        // UC-2 defaults: page=1, perPage=20; empty result ⇒ total=0, pagesCount=0.
         $total      = 0;
         $page       = ListEntriesConstraints::PAGE_MIN;
         $perPage    = ListEntriesConstraints::PER_PAGE_DEFAULT;

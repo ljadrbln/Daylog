@@ -22,6 +22,7 @@ use Daylog\Tests\Support\Helper\ListEntriesHelper;
  * - Uses ListEntriesConstraints for all expectations (no magic numbers/strings).
  *
  * @covers \Daylog\Application\Normalization\Entries\ListEntriesInputNormalizer
+ * @group UC-ListEntries
  */
 final class ListEntriesInputNormalizerTest extends Unit
 {

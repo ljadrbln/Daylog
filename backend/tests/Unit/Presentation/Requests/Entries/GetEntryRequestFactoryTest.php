@@ -21,6 +21,7 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  * - Invalid transport shapes (missing/non-string 'id') raise TransportValidationException.
  *
  * @covers \Daylog\Presentation\Requests\Entries\GetEntryRequestFactory
+ * @group UC-GetEntry
  */
 final class GetEntryRequestFactoryTest extends Unit
 {

@@ -24,6 +24,7 @@ use Daylog\Tests\Support\Helper\ListEntriesHelper;
  * - Repository is mocked; data source is synthesized via EntryTestData.
  *
  * @covers \Daylog\Application\UseCases\Entries\ListEntries
+ * @group UC-ListEntries
  */
 final class ListEntriesTest extends Unit
 {

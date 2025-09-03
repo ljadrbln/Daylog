@@ -29,6 +29,7 @@ use Daylog\Tests\Support\Fakes\FakeEntryRepository;
  * - Does not test actual validation logic (covered in AddEntryValidatorTest).
  *
  * @covers \Daylog\Application\UseCases\Entries\AddEntry
+ * @group UC-AddEntry
  */
 final class AddEntryTest extends Unit
 {

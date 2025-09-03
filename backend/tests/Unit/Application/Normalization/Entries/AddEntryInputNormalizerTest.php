@@ -19,6 +19,8 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  *
  * Coverage:
  * - Technical fields: UUID v4 format, ISO-8601 UTC timestamps, createdAt === updatedAt.
+ * 
+ * @group UC-AddEntry
  */
 final class AddEntryInputNormalizerTest extends Unit
 {

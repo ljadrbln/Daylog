@@ -30,6 +30,7 @@ use Daylog\Tests\Support\Fakes\FakeEntryRepository;
  * - Does not test actual validation logic (covered in GetEntryValidatorTest).
  *
  * @covers \Daylog\Application\UseCases\Entries\GetEntry
+ * @group UC-GetEntry
  */
 final class GetEntryTest extends Unit
 {

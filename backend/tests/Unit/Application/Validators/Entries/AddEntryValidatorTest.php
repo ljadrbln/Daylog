@@ -23,6 +23,7 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  * Transport concerns (presence/types) are NOT checked here; they belong to Presentation.
  *
  * @covers \Daylog\Application\Validators\Entries\AddEntryValidator
+ * @group UC-AddEntry
  */
 final class AddEntryValidatorTest extends Unit
 {

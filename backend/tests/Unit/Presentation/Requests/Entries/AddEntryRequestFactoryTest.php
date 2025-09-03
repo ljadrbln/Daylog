@@ -17,6 +17,8 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  * business rules (those are validated separately in Application layer).
  *
  * @covers \Daylog\Presentation\Requests\AddEntryRequestFactory
+ * @group UC-AddEntry
+ * 
  */
 final class AddEntryRequestFactoryTest extends Unit
 {

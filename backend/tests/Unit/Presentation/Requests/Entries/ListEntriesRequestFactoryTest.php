@@ -18,6 +18,7 @@ use Daylog\Application\Exceptions\TransportValidationException;
  * business rules (those are validated separately in Application layer).
  *
  * @covers \Daylog\Presentation\Requests\ListEntriesRequestFactory
+ * @group UC-ListEntries
  */
 
 final class ListEntriesRequestFactoryTest extends Unit

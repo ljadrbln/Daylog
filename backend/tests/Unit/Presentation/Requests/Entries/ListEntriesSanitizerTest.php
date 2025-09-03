@@ -23,6 +23,7 @@ use Daylog\Tests\Support\Helper\ListEntriesHelper;
  *   - sortField, sortDir, dateFrom, dateTo, date, query
  *
  * @covers \Daylog\Presentation\Requests\Entries\ListEntriesSanitizer
+ * @group UC-ListEntries
  */
 final class ListEntriesSanitizerTest extends Unit
 {

@@ -23,6 +23,7 @@ use Daylog\Domain\Services\UuidGenerator;
  * - Error paths: malformed IDs (empty, short, bad chars, bad hyphens) must raise DomainValidationException.
  *
  * @covers \Daylog\Application\Validators\Entries\GetEntry\GetEntryValidator
+ * @group UC-GetEntry
  */
 final class GetEntryValidatorTest extends Unit
 {

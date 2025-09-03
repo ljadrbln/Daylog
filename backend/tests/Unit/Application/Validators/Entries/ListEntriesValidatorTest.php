@@ -21,6 +21,7 @@ use Daylog\Tests\Support\Helper\ListEntriesHelper;
  * Pagination and sorting are enforced by the normalizer and are not re-validated here.
  *
  * @covers \Daylog\Application\Validators\Entries\ListEntries\ListEntriesValidator
+ * @group UC-ListEntries
  */
 final class ListEntriesValidatorTest extends Unit
 {

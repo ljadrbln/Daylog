@@ -23,6 +23,7 @@ use Daylog\Tests\Support\Fixture\EntryFixture;
  *   - Build the use case via configuration provider.
  *
  * @internal Extend this class in AC/AF test files (AC1_..., AC2_..., etc.).
+ * @group UC-ListEntries
  */
 abstract class BaseListEntriesIntegrationTest extends Unit
 {
