@@ -24,7 +24,7 @@ use Daylog\Domain\Models\Entries\Entry;
  * - if $entry === null → throw DomainValidationException(['ENTRY_NOT_FOUND'])
  * - else return $entry
  */
-final class GetEntry
+final class GetEntry implements GetEntryRequestInterface
 {
     /** @var EntryRepositoryInterface */
     private EntryRepositoryInterface $repo;
