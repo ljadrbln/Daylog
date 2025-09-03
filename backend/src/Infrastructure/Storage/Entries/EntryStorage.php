@@ -48,6 +48,28 @@ final class EntryStorage implements EntryStorageInterface
     }
 
     /**
+     * {@inheritDoc}
+     *
+     * Retrieves entry by the given id.
+     * Returns that entry if it exists, otherwise null.
+     *
+     * @param string $id UUIDv4 identifier.
+     * @return Entry|null
+     */
+    public function findById(string $id): ?Entry
+    {
+        $row = $this->model->findById($id);
+        if(null == $row) {
+            return null;
+        }
+
+        $data  = EntryFieldMapper::fromDbRow($row);
+        $entry = Entry::fromArray($data);
+
+        return $entry;
+    }
+
+    /**
      * Retrieve entries by UC-2 criteria with pagination.
      *
      * Mechanics:
