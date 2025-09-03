@@ -5,11 +5,11 @@ namespace Daylog\Configuration\Providers\Entries;
 
 use Daylog\Configuration\Bootstrap\SqlFactory;
 
-use Daylog\Application\UseCases\Entries\GetEntry;
-use Daylog\Application\UseCases\Entries\GetEntryInterface;
+use Daylog\Application\UseCases\Entries\AddEntry;
+use Daylog\Application\UseCases\Entries\AddEntryInterface;
 
-use Daylog\Application\Validators\Entries\GetEntry\GetEntryValidator;
-use Daylog\Application\Validators\Entries\GetEntry\GetEntryValidatorInterface;
+use Daylog\Application\Validators\Entries\AddEntry\AddEntryValidator;
+use Daylog\Application\Validators\Entries\AddEntry\AddEntryValidatorInterface;
 
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Infrastructure\Repositories\Entries\EntryRepository;
@@ -19,22 +19,14 @@ use Daylog\Infrastructure\Storage\Entries\EntryStorage;
 use Daylog\Infrastructure\Storage\Entries\EntryModel;
 
 /**
- * Provider for UC-3 GetEntry.
+ * Provider for UC-1 AddEntry.
  *
  * Purpose:
- * Compose the dependency chain (DB\SQL => Model => Storage => Repository => Validator => UseCase)
- * to retrieve a single diary entry by UUIDv4. Keeps wiring centralized and framework-agnostic.
+ * Compose the dependency chain (DB\SQL => Model => Storage => Repository => Validator => UseCase).
  *
- * Mechanics:
- * - Builds a real DB connection via SqlFactory (single source of truth).
- * - Instantiates the EntryModel (thin DB mapper), then wraps it with EntryStorage.
- * - Composes EntryRepository on top of storage.
- * - Provides a validator for request id checks.
- * - Returns a fully-wired GetEntry use case.
- *
- * @return GetEntryInterface Fully wired use case ready for execution.
+ * @return AddEntryInterface Fully wired use case ready for execution.
  */
-final class GetEntryProvider
+final class AddEntryProvider
 {
     /**
      * Disallow instantiation (static provider).
@@ -47,16 +39,16 @@ final class GetEntryProvider
     }
 
     /**
-     * Build configured UC-3 use case.
+     * Build configured UC-1 use case.
      *
-     * @return GetEntryInterface
+     * @return AddEntryInterface
      */
-    public static function useCase(): GetEntryInterface
+    public static function useCase(): AddEntryInterface
     {
         $repo      = self::repository();
         $validator = self::validator();
 
-        $useCase = new GetEntry($repo, $validator);
+        $useCase = new AddEntry($repo, $validator);
         return $useCase;
     }
 
@@ -90,11 +82,11 @@ final class GetEntryProvider
     /**
      * Build validator instance.
      *
-     * @return GetEntryValidatorInterface
+     * @return AddEntryValidatorInterface
      */
-    private static function validator(): GetEntryValidatorInterface
+    private static function validator(): AddEntryValidatorInterface
     {
-        $validator = new GetEntryValidator();
+        $validator = new AddEntryValidator();
         return $validator;
     }
 }

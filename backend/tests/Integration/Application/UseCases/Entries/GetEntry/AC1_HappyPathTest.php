@@ -41,13 +41,14 @@ final class AC1_HappyPathTest extends BaseGetEntryIntegrationTest
     {
         // Arrange: seed one row
         $rows = EntryFixture::insertRows(1);
+        $row  = $rows[0];
 
         // Sanity: exactly one row present
         $rowsCount = EntryFixture::countRows();
         $this->assertSame(1, $rowsCount);
 
         // Build request
-        $payload = ['id' => $rows[0]['id']];
+        $payload = ['id' => $row['id']];
 
         /** @var GetEntryRequestInterface $request */
         $request = GetEntryRequestFactory::fromArray($payload);
@@ -63,9 +64,9 @@ final class AC1_HappyPathTest extends BaseGetEntryIntegrationTest
         $actualBody  = $result->getBody();
         $actualDate  = $result->getDate();
 
-        $this->assertSame($id,    $actualId);
-        $this->assertSame($title, $actualTitle);
-        $this->assertSame($body,  $actualBody);
-        $this->assertSame($date,  $actualDate);
+        $this->assertSame($row['id'],    $actualId);
+        $this->assertSame($row['title'], $actualTitle);
+        $this->assertSame($row['body'],  $actualBody);
+        $this->assertSame($row['date'],  $actualDate);
     }
 }

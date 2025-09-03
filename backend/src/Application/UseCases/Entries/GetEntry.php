@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Daylog\Application\UseCases\Entries;
 
+use Daylog\Application\UseCases\Entries\GetEntryInterface;
 use Daylog\Application\DTO\Entries\GetEntry\GetEntryRequestInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\Validators\Entries\GetEntry\GetEntryValidatorInterface;
@@ -24,7 +25,7 @@ use Daylog\Domain\Models\Entries\Entry;
  * - if $entry === null → throw DomainValidationException(['ENTRY_NOT_FOUND'])
  * - else return $entry
  */
-final class GetEntry implements GetEntryRequestInterface
+final class GetEntry implements GetEntryInterface
 {
     /** @var EntryRepositoryInterface */
     private EntryRepositoryInterface $repo;
