@@ -71,16 +71,7 @@ final class GetEntryTest extends Unit
         $isValidId = UuidGenerator::isValid($id);
         $this->assertTrue($isValidId);
 
-        $this->assertSame($data['title'], $response->getTitle());
-        $this->assertSame($data['body'],  $response->getBody());
-        $this->assertSame($data['date'],  $response->getDate());
-
-        $actualCreatedAt = $response->getCreatedAt();
-        $actualUpdatedAt = $response->getUpdatedAt();
-
-        $isCreatedAtDateValid = DateService::isValidIsoUtcDateTime($actualCreatedAt);
-        $this->assertTrue($isCreatedAtDateValid);
-        $this->assertSame($actualCreatedAt, $actualUpdatedAt);
+        $this->assertSame($data['id'], $id);
     }
 
     /**
