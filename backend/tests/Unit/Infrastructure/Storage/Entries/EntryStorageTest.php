@@ -56,5 +56,75 @@ final class EntryStorageTest extends Unit
         $isValid = UuidGenerator::isValid($entry->getId());
         $this->assertTrue($isValid);
     }
+
+    /**
+     * Ensure findById() returns a hydrated Entry when the model finds a row.
+     *
+     * Mechanics:
+     * - Arrange a model mock that returns an associative array for the requested id.
+     * - Execute storage->findById($id).
+     * - Verify instance type and that ids match.
+     *
+     * @return void
+     */
+    public function testFindByIdReturnsEntryWhenFound(): void
+    {
+        // Arrange
+        $modelClass = EntryModel::class;
+        $model      = $this->createMock($modelClass);
+
+        $expectedEntry   = EntryTestData::getOne();
+        $expectedEntryId = $expectedEntry['id'];
+
+        $model
+            ->expects($this->once())
+            ->method('findById')
+            ->with($expectedEntryId)
+            ->willReturn($expectedEntry);
+
+        $storage = new EntryStorage($model);
+
+        // Act
+        
+        $actualEntry   = $storage->findById($expectedEntryId);
+        $actualEntryId = $actualEntry->getId();
+
+        // Assert
+        $this->assertSame($expectedEntryId, $actualEntryId);
+    }
+
+    /**
+     * Ensure findById() returns null when the model returns no row.
+     *
+     * Mechanics:
+     * - Arrange a model mock that returns null for the requested id.
+     * - Execute storage->findById($id).
+     * - Verify null result.
+     *
+     * @return void
+     */
+    public function testFindByIdReturnsNullWhenNotFound(): void
+    {
+        // Arrange
+        $modelClass = EntryModel::class;
+        $model      = $this->createMock($modelClass);
+
+        $expectedEntry   = EntryTestData::getOne();
+        $expectedEntryId = $expectedEntry['id'];
+
+        $model
+            ->expects($this->once())
+            ->method('findById')
+            ->with($expectedEntryId)
+            ->willReturn(null);
+
+        $storage = new EntryStorage($model);
+
+        // Act
+        $result = $storage->findById($expectedEntryId);
+
+        // Assert
+        $this->assertNull($result);
+    }    
 }
 
