@@ -40,8 +40,8 @@ final class AC4_EmptyBodyTest extends BaseAddEntryIntegrationTest
         $request = AddEntryRequest::fromArray($data);
 
         // Expectation
-        $exceptionClass = DomainValidationException::class;
-        $this->expectException($exceptionClass);
+        $this->expectException(DomainValidationException::class);
+        $this->expectExceptionMessage('BODY_REQUIRED');
 
         // Act
         $this->useCase->execute($request);

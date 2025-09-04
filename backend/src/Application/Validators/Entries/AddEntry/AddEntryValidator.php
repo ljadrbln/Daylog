@@ -31,67 +31,71 @@ final class AddEntryValidator implements AddEntryValidatorInterface
      */
     public function validate(AddEntryRequestInterface $req): void
     {
-        $errors = [];
+        $this->validateTitle($req);
+        $this->validateBody($req);
+        $this->validateDate($req);
+    }
 
-        $errors = $this->validateTitle($req, $errors);
-        $errors = $this->validateBody($req, $errors);
-        $errors = $this->validateDate($req, $errors);
+    /**
+     * @param AddEntryRequestInterface $request
+     * @return void
+     */
+    private function validateTitle(AddEntryRequestInterface $request): void
+    {
+        $title = $request->getTitle();
 
-        if ($errors !== []) {
-            throw new DomainValidationException($errors);
+        if($title === '') {
+            $errorCode = 'TITLE_EMPTY';
+            $exception = new DomainValidationException($errorCode);
+
+            throw $exception;
+        }
+
+        if (mb_strlen($title) > EntryConstraints::TITLE_MAX) {
+            $errorCode = 'TITLE_TOO_LONG';
+            $exception = new DomainValidationException($errorCode);
+
+            throw $exception;            
         }
     }
 
     /**
-     * @param AddEntryRequestInterface $req
-     * @param string[]                 $errors
-     * @return string[]
+     * @param AddEntryRequestInterface $request
+     * @return void
      */
-    private function validateTitle(AddEntryRequestInterface $req, array $errors): array
+    private function validateBody(AddEntryRequestInterface $request): void
     {
-        $title = $req->getTitle();
+        $body = $request->getBody();
 
-        if ($title === '') {
-            $errors[] = 'TITLE_EMPTY';
-        } elseif (mb_strlen($title) > EntryConstraints::TITLE_MAX) {
-            $errors[] = 'TITLE_TOO_LONG';
+        if($body === '') {
+            $errorCode = 'BODY_EMPTY';
+            $exception = new DomainValidationException($errorCode);
+
+            throw $exception;
         }
 
-        return $errors;
+        if (mb_strlen($body) > EntryConstraints::BODY_MAX) {
+            $errorCode = 'BODY_TOO_LONG';
+            $exception = new DomainValidationException($errorCode);
+
+            throw $exception;
+        }
     }
 
     /**
-     * @param AddEntryRequestInterface $req
-     * @param string[]                 $errors
-     * @return string[]
+     * @param AddEntryRequestInterface $request
+     * @return void
      */
-    private function validateBody(AddEntryRequestInterface $req, array $errors): array
+    private function validateDate(AddEntryRequestInterface $request): void
     {
-        $body = $req->getBody();
-
-        if ($body === '') {
-            $errors[] = 'BODY_EMPTY';
-        } elseif (mb_strlen($body) > EntryConstraints::BODY_MAX) {
-            $errors[] = 'BODY_TOO_LONG';
-        }
-
-        return $errors;
-    }
-
-    /**
-     * @param AddEntryRequestInterface $req
-     * @param string[]                 $errors
-     * @return string[]
-     */
-    private function validateDate(AddEntryRequestInterface $req, array $errors): array
-    {
-        $date = $req->getDate();
+        $date = $request->getDate();
 
         $isValid = DateService::isValidLocalDate($date);
         if ($isValid === false) {
-            $errors[] = 'DATE_INVALID';
-        }
+            $errorCode = 'DATE_INVALID';
+            $exception = new DomainValidationException($errorCode);
 
-        return $errors;
+            throw $exception;
+        }
     }
 }

@@ -41,8 +41,8 @@ final class AC7_InvalidDateFormatTest extends BaseAddEntryIntegrationTest
         $request = AddEntryRequest::fromArray($data);
 
         // Expectation
-        $exceptionClass = DomainValidationException::class;
-        $this->expectException($exceptionClass);
+        $this->expectException(DomainValidationException::class);
+        $this->expectExceptionMessage('DATE_INVALID');
 
         // Act
         $this->useCase->execute($request);

@@ -37,8 +37,8 @@ final class AC3_TitleTooLongTest extends BaseAddEntryIntegrationTest
         $request = AddEntryRequest::fromArray($data);
 
         // Expectation
-        $exceptionClass = DomainValidationException::class;
-        $this->expectException($exceptionClass);
+        $this->expectException(DomainValidationException::class);
+        $this->expectExceptionMessage('TITLE_TOO_LONG');
 
         // Act
         $this->useCase->execute($request);

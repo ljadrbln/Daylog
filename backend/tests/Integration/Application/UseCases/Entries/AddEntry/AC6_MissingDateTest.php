@@ -41,8 +41,8 @@ final class AC6_MissingDateTest extends BaseAddEntryIntegrationTest
         $request = AddEntryRequest::fromArray($data);
 
         // Expectation
-        $exceptionClass = DomainValidationException::class;
-        $this->expectException($exceptionClass);
+        $this->expectException(DomainValidationException::class);
+        $this->expectExceptionMessage('DATE_REQUIRED');
 
         // Act
         $this->useCase->execute($request);

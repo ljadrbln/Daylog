@@ -34,8 +34,8 @@ final class AC2_EmptyTitleTest extends BaseAddEntryIntegrationTest
         $request = AddEntryRequest::fromArray($data);
 
         // Expectation
-        $exceptionClass = DomainValidationException::class;
-        $this->expectException($exceptionClass);
+        $this->expectException(DomainValidationException::class);
+        $this->expectExceptionMessage('TITLE_REQUIRED');
 
         // Act
         $this->useCase->execute($request);

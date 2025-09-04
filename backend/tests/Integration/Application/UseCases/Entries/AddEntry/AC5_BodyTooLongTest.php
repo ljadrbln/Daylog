@@ -43,8 +43,8 @@ final class AC5_BodyTooLongTest extends BaseAddEntryIntegrationTest
         $request = AddEntryRequest::fromArray($data);
 
         // Expectation
-        $exceptionClass = DomainValidationException::class;
-        $this->expectException($exceptionClass);
+        $this->expectException(DomainValidationException::class);
+        $this->expectExceptionMessage('BODY_TOO_LONG');
 
         // Act
         $this->useCase->execute($request);
