@@ -8,8 +8,6 @@ use Daylog\Application\Exceptions\DomainValidationException;
 
 /**
  * Validates AddEntry request against business rules.
- *
- * @template T of AddEntryRequestInterface
  */
 interface AddEntryValidatorInterface
 {
