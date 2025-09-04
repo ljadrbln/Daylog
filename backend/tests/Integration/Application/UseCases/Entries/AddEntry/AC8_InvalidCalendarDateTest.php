@@ -22,6 +22,8 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  *
  * @covers \Daylog\Configuration\Providers\Entries\AddEntryProvider
  * @covers \Daylog\Application\UseCases\Entries\AddEntry
+ * 
+ * @group UC-AddEntry
  */
 final class AC8_InvalidCalendarDateTest extends BaseAddEntryIntegrationTest
 {

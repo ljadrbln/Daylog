@@ -24,6 +24,8 @@ use Daylog\Tests\Support\Fixture\EntryFixture;
  *   but it returns null for the missing id; the use case translates this to a domain error.
  *
  * @covers \Daylog\Application\UseCases\Entries\GetEntry
+ *
+ * @group UC-GetEntry
  */
 final class AC3_NotFoundTest extends BaseGetEntryIntegrationTest
 {

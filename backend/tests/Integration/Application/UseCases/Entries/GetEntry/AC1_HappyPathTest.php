@@ -27,7 +27,7 @@ use Daylog\Tests\Support\Fixture\EntryFixture;
  *
  * @covers \Daylog\Configuration\Providers\Entries\GetEntryProvider
  * @covers \Daylog\Application\UseCases\Entries\GetEntry
- *
+ * 
  * @group UC-GetEntry
  */
 final class AC1_HappyPathTest extends BaseGetEntryIntegrationTest

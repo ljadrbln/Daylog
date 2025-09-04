@@ -20,6 +20,8 @@ use Daylog\Presentation\Requests\Entries\GetEntryRequestFactory;
  * - Error codes list contains only `ID_INVALID`.
  *
  * @covers \Daylog\Application\UseCases\Entries\GetEntry
+ * 
+ * @group UC-GetEntry
  */
 final class AC2_InvalidIdTest extends BaseGetEntryIntegrationTest
 {

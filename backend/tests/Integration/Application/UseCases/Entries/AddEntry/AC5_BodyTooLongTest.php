@@ -22,6 +22,8 @@ use Daylog\Domain\Models\Entries\EntryConstraints;
  *
  * @covers \Daylog\Configuration\Providers\Entries\AddEntryProvider
  * @covers \Daylog\Application\UseCases\Entries\AddEntry
+ * 
+ * @group UC-AddEntry
  */
 final class AC5_BodyTooLongTest extends BaseAddEntryIntegrationTest
 {

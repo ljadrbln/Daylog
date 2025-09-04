@@ -23,6 +23,8 @@ use Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries\BaseListEn
  *
  * @covers \Daylog\Configuration\Providers\Entries\ListEntriesProvider
  * @covers \Daylog\Application\UseCases\Entries\ListEntries
+ * 
+ * @group UC-ListEntries
  */
 final class AC7_SingleDateExactMatchTest extends BaseListEntriesIntegrationTest
 {
