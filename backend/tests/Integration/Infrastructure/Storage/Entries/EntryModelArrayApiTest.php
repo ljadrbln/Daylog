@@ -8,6 +8,10 @@ use Daylog\Infrastructure\Storage\Entries\EntryModel;
 use Daylog\Configuration\Bootstrap\SqlFactory;
 use Daylog\Tests\Support\Fixture\EntryFixture;
 
+use Daylog\Domain\Services\DateService;
+use Daylog\Domain\Services\UuidGenerator;
+use Daylog\Infrastructure\Storage\Entries\EntryFieldMapper;
+
 /**
  * Integration test for EntryModel array API.
  *
@@ -48,6 +52,7 @@ final class EntryModelArrayApiTest extends Unit
      */
     public function testFindRowsReturnsPlainArraysWithSnakeCase(): void
     {
+        // Arrange
         $rows = EntryFixture::insertRows(3, 2);
 
         $db    = EntryFixture::getDb();
@@ -56,20 +61,29 @@ final class EntryModelArrayApiTest extends Unit
         $filter  = ['date >= ? AND date <= ?', $rows[0]['date'], $rows[2]['date']];
         $options = ['order' => 'date DESC, created_at DESC', 'limit' => 10, 'offset' => 0];
 
+        // Act
         $rows = $model->findRows($filter, $options);
 
-        $this->assertIsArray($rows);
+        // Assert
         $this->assertNotEmpty($rows);
 
         $first = $rows[0];
+        $first = EntryFieldMapper::fromDbRow($first);
 
-        $this->assertIsArray($first);
-        $this->assertArrayHasKey('id', $first);
-        $this->assertArrayHasKey('date', $first);
-        $this->assertArrayHasKey('title', $first);
-        $this->assertArrayHasKey('body', $first);
-        $this->assertArrayHasKey('created_at', $first);
-        $this->assertArrayHasKey('updated_at', $first);
+        $isIdValid = UuidGenerator::isValid($first['id']);
+        $this->assertTrue($isIdValid);
+
+        $isDateValid = DateService::isValidLocalDate($first['date']);
+        $this->assertTrue($isDateValid);
+
+        $isCreatedAtValid = DateService::isValidIsoUtcDateTime($first['createdAt']);        
+        $this->assertTrue($isCreatedAtValid);
+
+        $isUpdatedAtValid = DateService::isValidIsoUtcDateTime($first['updatedAt']);
+        $this->assertTrue($isUpdatedAtValid);
+
+        $this->assertNotSame('', $first['title']);
+        $this->assertNotSame('', $first['body']);
     }
 
     /**
