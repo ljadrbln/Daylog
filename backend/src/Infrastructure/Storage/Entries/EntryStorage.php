@@ -59,7 +59,7 @@ final class EntryStorage implements EntryStorageInterface
     public function findById(string $id): ?Entry
     {
         $row = $this->model->findById($id);
-        if(null == $row) {
+        if(is_null($row)) {
             return null;
         }
 
