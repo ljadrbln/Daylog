@@ -6,6 +6,7 @@ namespace Daylog\Tests\Support\Fixture;
 
 use DB\SQL;
 use Daylog\Infrastructure\Storage\Entries\EntryFieldMapper;
+use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Tests\Support\Helper\EntryTestData;
 
 /**
@@ -99,6 +100,8 @@ final class EntryFixture
 
         for ($i = 0; $i < count($rows); $i++) {
             $row = $rows[$i];
+            $row = Entry::fromArray($row);
+
             self::insertRow($row);
         }
 
@@ -106,25 +109,30 @@ final class EntryFixture
     }
 
     /**
-     * Insert a single entry into DB using a logical row payload.
+     * Insert a single Entry entity into the database.
      *
-     * The row is expected to contain valid logical fields:
-     * - id, title, body, date, createdAt, updatedAt (all strings).
-     * The method maps keys to DB shape and performs a parameterized INSERT.
+     * Purpose:
+     * - Accept a fully constructed domain Entry (id, title, body, date, createdAt, updatedAt).
+     * - Convert it into a DB-compatible snake_case row via EntryFieldMapper.
+     * - Execute a parameterized INSERT to persist the record.
      *
-     * @param array<string,string> $row Logical entry data payload.
+     * Notes:
+     * - All business rules (BR-1..BR-6) are already enforced at higher layers (DTO + validators).
+     * - This method performs no validation; it assumes the Entry is consistent.
+     *
+     * @param Entry $entry Domain entity containing logical and timestamp fields.
      * @return void
      */
-    private static function insertRow(array $row): void
+    private static function insertRow(Entry $entry): void
     {
         $sql = 'INSERT INTO entries (id, title, body, date, created_at, updated_at) 
                 VALUES (:id, :title, :body, :date, :created_at, :updated_at)';
 
         // Normalize payload to DB shape (snake_case).
-        $dbRow = EntryFieldMapper::toDbRow($row);
+        $dbRow = EntryFieldMapper::toDbRowFromEntry($entry);
 
         self::$db->exec($sql, $dbRow);
-    }    
+    }
 
     /**
      * Update allowed fields of an entry by id.
