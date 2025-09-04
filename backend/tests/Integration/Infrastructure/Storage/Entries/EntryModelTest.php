@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Integration\Infrastructure\Storage\Entries;
 
 use Codeception\Test\Unit;
+use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Infrastructure\Storage\Entries\EntryModel;
 use Daylog\Configuration\Bootstrap\SqlFactory;
 use Daylog\Infrastructure\Storage\Entries\EntryFieldMapper;
@@ -50,13 +51,14 @@ final class EntryModelTest extends Unit
         /** @var EntryModel $model */
         $model = new EntryModel($this->db);
 
-
         /** @var array<string,string> $data */
-        $data = EntryTestData::getOne();
-        $data = EntryFieldMapper::toDbRow($data);
+        $data  = EntryTestData::getOne();
+        $entry = Entry::fromArray($data);
+
+        $dbRow = EntryFieldMapper::toDbRowFromEntry($entry);
         $uuid = $data['id'];
 
-        $model->create($data);
+        $model->create($dbRow);
 
         /** @var array<string,mixed>|null $fetched */
         $fetched = $model->findById($uuid);
