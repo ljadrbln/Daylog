@@ -45,7 +45,7 @@ final class AddEntryValidator implements AddEntryValidatorInterface
         $title = $request->getTitle();
 
         if($title === '') {
-            $errorCode = 'TITLE_EMPTY';
+            $errorCode = 'TITLE_REQUIRED';
             $exception = new DomainValidationException($errorCode);
 
             throw $exception;
@@ -68,7 +68,7 @@ final class AddEntryValidator implements AddEntryValidatorInterface
         $body = $request->getBody();
 
         if($body === '') {
-            $errorCode = 'BODY_EMPTY';
+            $errorCode = 'BODY_REQUIRED';
             $exception = new DomainValidationException($errorCode);
 
             throw $exception;
@@ -89,6 +89,13 @@ final class AddEntryValidator implements AddEntryValidatorInterface
     private function validateDate(AddEntryRequestInterface $request): void
     {
         $date = $request->getDate();
+
+        if($date === '') {
+            $errorCode = 'DATE_REQUIRED';
+            $exception = new DomainValidationException($errorCode);
+
+            throw $exception;
+        }
 
         $isValid = DateService::isValidLocalDate($date);
         if ($isValid === false) {
