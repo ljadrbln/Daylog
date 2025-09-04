@@ -45,8 +45,8 @@ final class AC9_QueryTooLongTest extends BaseListEntriesIntegrationTest
         $request = ListEntriesHelper::buildRequest($data);
 
         // Expect
-        $exception = DomainValidationException::class;
-        $this->expectException($exception);
+        $this->expectException(DomainValidationException::class);
+        $this->expectExceptionMessage('QUERY_TOO_LONG');
 
         // Act
         $this->useCase->execute($request);

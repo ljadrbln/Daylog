@@ -47,8 +47,8 @@ final class AC6_InvalidDateInputTest extends BaseListEntriesIntegrationTest
         $request = ListEntriesHelper::buildRequest($data);
 
         // Expectation
-        $exception = DomainValidationException::class;
-        $this->expectException($exception);
+        $this->expectException(DomainValidationException::class);
+        $this->expectExceptionMessage('DATE_INVALID');
 
         // Act
         $this->useCase->execute($request);

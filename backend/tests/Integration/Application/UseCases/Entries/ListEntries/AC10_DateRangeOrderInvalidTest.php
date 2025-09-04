@@ -49,8 +49,8 @@ final class AC10_DateRangeOrderInvalidTest extends BaseListEntriesIntegrationTes
         $request = ListEntriesHelper::buildRequest($data);
 
         // Expectation
-        $exceptionClass = DomainValidationException::class;
-        $this->expectException($exceptionClass);
+        $this->expectException(DomainValidationException::class);
+        $this->expectExceptionMessage('DATE_RANGE_INVALID');
 
         // Act
         $this->useCase->execute($request);

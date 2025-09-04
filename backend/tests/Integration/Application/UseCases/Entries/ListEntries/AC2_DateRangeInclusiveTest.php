@@ -42,6 +42,8 @@ final class AC2_DateRangeInclusiveTest extends BaseListEntriesIntegrationTest
         $data['dateTo']   = $rows[1]['date'];
 
         $request  = ListEntriesHelper::buildRequest($data);
+
+        // Act
         $response = $this->useCase->execute($request);
 
         // Assert
