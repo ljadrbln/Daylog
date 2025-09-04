@@ -5,17 +5,17 @@ namespace Daylog\Application\Interfaces;
 
 /**
  * Common contract for validation exceptions.
- * Provides flat list of error codes/messages and category identifier.
+ * Provides error code/message and category identifier.
  */
 interface InputValidationExceptionInterface extends \Throwable
 {
     /**
-     * @return string[] Flat list of error codes/messages (no field keys)
+     * @return string The single error code/message.
      */
-    public function getErrors(): array;
+    public function getError(): string;
 
     /**
-     * @return string Category of the validation error: 'transport' | 'domain'
+     * @return string Category of the validation error: 'TRANSPORT' | 'DOMAIN'
      */
     public function getCategory(): string;
 }

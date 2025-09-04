@@ -60,8 +60,9 @@ final class GetEntry implements GetEntryInterface
         $entry = $this->repo->findById($id);
 
         if ($entry === null) {
-            $errors    = ['ENTRY_NOT_FOUND'];
-            $exception = new DomainValidationException($errors);
+            $error     = 'ENTRY_NOT_FOUND';
+            $exception = new DomainValidationException($error);
+
             throw $exception;
         }
 

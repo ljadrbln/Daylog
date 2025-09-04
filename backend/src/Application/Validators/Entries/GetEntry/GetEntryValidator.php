@@ -34,28 +34,23 @@ final class GetEntryValidator implements GetEntryValidatorInterface
      */
     public function validate(GetEntryRequestInterface $request): void
     {
-        $errors = [];
-        $errors = $this->validateId($request, $errors);
-
-        if ($errors !== []) {
-            throw new DomainValidationException($errors);
-        }
+        $this->validateId($request);
     }
 
     /**
      * @param GetEntryRequestInterface $request
-     * @param string[]                 $errors
-     * @return string[]
+     * @return void
      */
-    private function validateId(GetEntryRequestInterface $request, array $errors): array
+    private function validateId(GetEntryRequestInterface $request): void
     {
-        $id = $request->getId();
-        $isValid = UuidGenerator::isValid($id);
+        $entryId = $request->getId();
+        $isValid = UuidGenerator::isValid($entryId);
         
         if ($isValid === false) {
-            $errors[] = 'ID_INVALID';
-        }        
-
-        return $errors;
+            $errorCode = 'ID_INVALID';
+            $exception = new DomainValidationException($errorCode);
+            
+            throw $exception;
+        }
     }    
 }

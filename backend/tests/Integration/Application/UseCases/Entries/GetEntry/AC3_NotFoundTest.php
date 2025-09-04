@@ -47,6 +47,7 @@ final class AC3_NotFoundTest extends BaseGetEntryIntegrationTest
 
         // Expectation
         $this->expectException(DomainValidationException::class);
+        $this->expectExceptionMessage('ENTRY_NOT_FOUND');
 
         // Act
         $this->useCase->execute($request);

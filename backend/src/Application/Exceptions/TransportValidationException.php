@@ -12,30 +12,31 @@ use Daylog\Application\Interfaces\InputValidationExceptionInterface;
  */
 final class TransportValidationException extends RuntimeException implements InputValidationExceptionInterface
 {
-    /** @var string[] */
-    private array $errors;
+    /** @var string */
+    private $error;
 
     /**
-     * @param string[] $errors
+     * @param string $error Error code/message.
      */
-    public function __construct(array $errors)
+    public function __construct(string $error)
     {
-        parent::__construct('Transport validation failed');
-        $this->errors = array_values($errors);
+        parent::__construct($error);
+        $this->error = $error;
     }
 
     /**
-     * @return string[]
+     * @return string Error code/message.
      */
-    public function getErrors(): array
+    public function getError(): string
     {
-        $result = $this->errors;
-        return $result;
+        $error = $this->error;
+
+        return $error;
     }
 
     /** @inheritDoc */
     public function getCategory(): string
     {
-        return 'transport';
+        return 'TRANSPORT';
     }    
 }
