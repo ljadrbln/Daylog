@@ -45,15 +45,9 @@ final class AddEntryRequestFactory
      */
     public static function fromArray(array $params): AddEntryRequestInterface
     {
-        $errors = [];
-
-        $errors = self::validateTitle($params, $errors);
-        $errors = self::validateBody($params, $errors);
-        $errors = self::validateDate($params, $errors);
-
-        if ($errors !== []) {
-            throw new TransportValidationException($errors);
-        };
+        self::validateTitle($params);
+        self::validateBody($params);
+        self::validateDate($params);
 
         $params  = AddEntrySanitizer::sanitize($params);
         $request = AddEntryRequest::fromArray($params);
@@ -65,54 +59,53 @@ final class AddEntryRequestFactory
      * Validate title: must be present (non-null) and string.
      *
      * @param array<string,mixed> $input
-     * @param string[]            $errors
-     * @return string[]
+     * @return void
      */
-    private static function validateTitle(array $input, array $errors): array
+    private static function validateTitle(array $input): void
     {
         $rawTitle = $input['title'] ?? null;
 
         if (!is_string($rawTitle)) { 
-            $errors[] = 'TITLE_MUST_BE_STRING'; 
-        }
+            $errorCode = 'TITLE_MUST_BE_STRING'; 
+            $exception = new TransportValidationException($errorCode);
 
-        return $errors;
+            throw $exception;
+        }
     }
 
     /**
      * Validate body: must be present (non-null) and string.
      *
      * @param array<string,mixed> $input
-     * @param string[]            $errors
-     * @return string[]
+     * @return void
      */
-    private static function validateBody(array $input, array $errors): array
+    private static function validateBody(array $input): void
     {
         $rawBody = $input['body'] ?? null;
 
         if (!is_string($rawBody)) { 
-            $errors[] = 'BODY_MUST_BE_STRING'; 
-        } 
+            $errorCode = 'BODY_MUST_BE_STRING'; 
+            $exception = new TransportValidationException($errorCode);
 
-        return $errors;
+            throw $exception;
+        }
     }
 
     /**
      * Validate date: must be present (non-null) and string.
      *
      * @param array<string,mixed> $input
-     * @param string[]            $errors
-     * @return string[]
+     * @return void
      */
-    private static function validateDate(array $input, array $errors): array
+    private static function validateDate(array $input): void
     {
         $rawDate = $input['date'] ?? null; 
 
         if (!is_string($rawDate)) { 
-            $errors[] = 'DATE_MUST_BE_STRING'; 
+            $errorCode = 'DATE_MUST_BE_STRING'; 
+            $exception = new TransportValidationException($errorCode);
+
+            throw $exception;            
         }
-
-        return $errors;
     }
-
 }

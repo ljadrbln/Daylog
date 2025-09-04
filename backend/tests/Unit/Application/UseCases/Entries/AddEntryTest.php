@@ -105,8 +105,8 @@ final class AddEntryTest extends Unit
         $validatorInterface = AddEntryValidatorInterface::class;
         $validator          = $this->createMock($validatorInterface);
 
-        $errors    = ['TITLE_REQUIRED'];
-        $exception = new DomainValidationException($errors);
+        $errorCode = 'TITLE_REQUIRED';
+        $exception = new DomainValidationException($errorCode);
 
         $validator
             ->expects($this->once())

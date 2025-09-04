@@ -47,9 +47,10 @@ final class AddEntryRequestFactoryTest extends Unit
      * @dataProvider provideInvalidTransportData
      *
      * @param array<string,mixed> $overrides
+     * @param string              $expectedCode
      * @return void
      */
-    public function testFromArrayThrowsOnInvalidTransportData(array $overrides): void
+    public function testFromArrayThrowsOnInvalidTransportData(array $overrides, string $expectedCode): void
     {
         // Arrange
         $data = EntryTestData::getOne();
@@ -57,6 +58,7 @@ final class AddEntryRequestFactoryTest extends Unit
 
         // Expectation
         $this->expectException(TransportValidationException::class);
+        $this->expectExceptionMessage($expectedCode);
 
         // Act
         AddEntryRequestFactory::fromArray($data);
@@ -76,12 +78,12 @@ final class AddEntryRequestFactoryTest extends Unit
     public function provideInvalidTransportData(): array
     {
         return [
-            'title is array' => [['title' => ['oops']]],
-            'title missing'  => [['title' => null]],
-            'body is array'  => [['body'  => ['oops']]],
-            'body missing'   => [['body'  => null]],
-            'date missing'   => [['date'  => null]],
-            'date is array'  => [['date'  => ['oops']]],
+            'title is array' => [['title' => ['oops']], 'TITLE_MUST_BE_STRING'],
+            'title missing'  => [['title' => null],     'TITLE_MUST_BE_STRING'],
+            'body is array'  => [['body'  => ['oops']], 'BODY_MUST_BE_STRING'],
+            'body missing'   => [['body'  => null],     'BODY_MUST_BE_STRING'],
+            'date missing'   => [['date'  => null],     'DATE_MUST_BE_STRING'],
+            'date is array'  => [['date'  => ['oops']], 'DATE_MUST_BE_STRING'],
         ];
     }
 }
