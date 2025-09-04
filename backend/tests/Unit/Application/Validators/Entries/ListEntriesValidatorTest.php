@@ -11,14 +11,17 @@ use Daylog\Application\Validators\Entries\ListEntries\ListEntriesValidatorInterf
 use Daylog\Tests\Support\Helper\ListEntriesHelper;
 
 /**
- * Unit test for ListEntriesValidator (UC-2).
+ * Unit tests for ListEntriesValidator (UC-2).
  *
  * Purpose:
- * Validates business rules that remain after normalization:
- * - strict/local date validity, date range ordering, query length.
+ * Validate business rules that remain after normalization:
+ * - Strict date validity (YYYY-MM-DD) and real calendar dates.
+ * - Date range ordering (dateFrom <= dateTo).
+ * - Query length constraint (0..QUERY_MAX) after trimming.
  *
- * Scope:
- * Pagination and sorting are enforced by the normalizer and are not re-validated here.
+ * Mechanics:
+ * - Happy path: normalized request with absent dates and in-range query passes.
+ * - Error paths: each violation throws DomainValidationException with a specific code.
  *
  * @covers \Daylog\Application\Validators\Entries\ListEntries\ListEntriesValidator
  * @group UC-ListEntries
@@ -39,11 +42,7 @@ final class ListEntriesValidatorTest extends Unit
     }
 
     /**
-     * Validation rule: valid request passes without exception (happy path).
-     *
-     * Mechanics:
-     * - Build request via ListEntriesHelper (normalization performed inside buildRequest()).
-     * - Validator must not throw when dates are absent and query within limits.
+     * Happy path: valid request passes without exception.
      *
      * @return void
      */
@@ -53,28 +52,27 @@ final class ListEntriesValidatorTest extends Unit
         $request = ListEntriesHelper::buildRequest($data);
 
         $this->validator->validate($request);
+
         $this->assertTrue(true);
     }
 
     /**
-     * Validation rule: invalid date inputs raise DATE_INVALID.
+     * Invalid date inputs must raise DATE_INVALID.
      *
-     * Mechanics:
-     * - Provide transport-level bad formats or non-existent dates.
-     * - Normalized DTO still carries these values; validator must reject them.
+     * @dataProvider invalidDateProvider
      *
      * @param array<string,mixed> $overrides
+     * @param string              $expectedCode
      * @return void
-     * @dataProvider invalidDateProvider
      */
-    public function testInvalidDatesThrowException(array $overrides): void
+    public function testInvalidDatesThrowException(array $overrides, string $expectedCode): void
     {
         $data    = ListEntriesHelper::getData();
         $data    = array_merge($data, $overrides);
         $request = ListEntriesHelper::buildRequest($data);
 
-        $exception = DomainValidationException::class;
-        $this->expectException($exception);
+        $this->expectException(DomainValidationException::class);
+        $this->expectExceptionMessage($expectedCode);
 
         $this->validator->validate($request);
     }
@@ -82,32 +80,30 @@ final class ListEntriesValidatorTest extends Unit
     /**
      * Invalid date payloads (bad format or calendar-invalid).
      *
-     * @return array<string,array{0:array<string,mixed>}>
+     * @return array<string,array{0:array<string,mixed>,1:string}>
      */
     public function invalidDateProvider(): array
     {
         $cases = [
-            'from date invalid format' => [[
-                'dateFrom' => '2025-8-1',
-                'dateTo'   => '2025-08-31',
-            ]],
-            'to date invalid format' => [[
-                'dateFrom' => '2025-08-01',
-                'dateTo'   => '31-08-2025',
-            ]],
-            'dateFrom nonexistent day' => [[
-                'dateFrom' => '2025-02-29',
-            ]],
+            'from date invalid format' => [
+                ['dateFrom' => '2025-8-1', 'dateTo' => '2025-08-31'],
+                'DATE_INVALID',
+            ],
+            'to date invalid format' => [
+                ['dateFrom' => '2025-08-01', 'dateTo' => '31-08-2025'],
+                'DATE_INVALID',
+            ],
+            'dateFrom nonexistent day' => [
+                ['dateFrom' => '2025-02-29'],
+                'DATE_INVALID',
+            ],
         ];
 
         return $cases;
     }
 
     /**
-     * Validation rule: dateFrom > dateTo raises DATE_RANGE_INVALID.
-     *
-     * Mechanics:
-     * - Both dates valid but in the wrong order -> validator must throw.
+     * Date range rule: dateFrom > dateTo raises DATE_RANGE_INVALID.
      *
      * @return void
      */
@@ -120,30 +116,32 @@ final class ListEntriesValidatorTest extends Unit
             'dateTo'   => '2025-08-01',
         ];
 
-        $data    = array_merge($data, $overrides);
-        $request = ListEntriesHelper::buildRequest($data);
+        $merged  = array_merge($data, $overrides);
+        $request = ListEntriesHelper::buildRequest($merged);
 
-        $exception = DomainValidationException::class;
-        $this->expectException($exception);
+        $this->expectException(DomainValidationException::class);
+        $this->expectExceptionMessage('DATE_RANGE_INVALID');
 
         $this->validator->validate($request);
     }
 
     /**
-     * Validation rule: invalid exact date throws DATE_INVALID.
+     * Invalid exact date must raise DATE_INVALID.
+     *
+     * @dataProvider invalidExactDateProvider
      *
      * @param array<string,mixed> $overrides
+     * @param string              $expectedCode
      * @return void
-     * @dataProvider invalidExactDateProvider
      */
-    public function testInvalidExactDateThrowsException(array $overrides): void
+    public function testInvalidExactDateThrowsException(array $overrides, string $expectedCode): void
     {
         $data    = ListEntriesHelper::getData();
         $data    = array_merge($data, $overrides);
         $request = ListEntriesHelper::buildRequest($data);
 
-        $exception = DomainValidationException::class;
-        $this->expectException($exception);
+        $this->expectException(DomainValidationException::class);
+        $this->expectExceptionMessage($expectedCode);
 
         $this->validator->validate($request);
     }
@@ -151,31 +149,28 @@ final class ListEntriesValidatorTest extends Unit
     /**
      * Invalid exact date payloads (strict YYYY-MM-DD required).
      *
-     * @return array<string,array{0:array<string,mixed>}>
+     * @return array<string,array{0:array<string,mixed>,1:string}>
      */
     public function invalidExactDateProvider(): array
     {
         $cases = [
-            'date invalid format'  => [['date' => '15-08-2025']],
-            'date nonexistent day' => [['date' => '2025-02-30']],
-            'date has time suffix' => [['date' => '2025-08-02T00:00:00']],
-            'wrong separator'      => [['date' => '2025/08/02']],
-            'no zero padding'      => [['date' => '2025-8-2']],
+            'date invalid format'  => [['date' => '15-08-2025'], 'DATE_INVALID'],
+            'date nonexistent day' => [['date' => '2025-02-30'],   'DATE_INVALID'],
+            'date has time suffix' => [['date' => '2025-08-02T00:00:00'], 'DATE_INVALID'],
+            'wrong separator'      => [['date' => '2025/08/02'],   'DATE_INVALID'],
+            'no zero padding'      => [['date' => '2025-8-2'],     'DATE_INVALID'],
         ];
 
         return $cases;
     }
 
     /**
-     * Validation rule: `query` within 0..30 (post-trim) must pass without exception.
+     * Query within 0..30 (post-trim) must pass without exception.
      *
-     * Mechanics:
-     * - Empty and spaces-only mean "no filter".
-     * - Boundary length 30 is allowed.
+     * @dataProvider validQueryProvider
      *
      * @param array<string,mixed> $overrides
      * @return void
-     * @dataProvider validQueryProvider
      */
     public function testValidQueryPassesValidation(array $overrides): void
     {
@@ -184,15 +179,18 @@ final class ListEntriesValidatorTest extends Unit
         $request = ListEntriesHelper::buildRequest($data);
 
         $this->validator->validate($request);
+
+        $assertion = true;
         $this->assertTrue(true);
     }
 
     /**
-     * AF-4: `query` longer than 30 (after trimming) must raise QUERY_TOO_LONG.
+     * AF-4: query longer than 30 (after trimming) must raise QUERY_TOO_LONG.
+     *
+     * @dataProvider invalidQueryProvider
      *
      * @param array<string,mixed> $overrides
      * @return void
-     * @dataProvider invalidQueryProvider
      */
     public function testQueryTooLongThrowsException(array $overrides): void
     {
@@ -200,8 +198,8 @@ final class ListEntriesValidatorTest extends Unit
         $data    = array_merge($data, $overrides);
         $request = ListEntriesHelper::buildRequest($data);
 
-        $exception = DomainValidationException::class;
-        $this->expectException($exception);
+        $this->expectException(DomainValidationException::class);
+        $this->expectExceptionMessage('QUERY_TOO_LONG');
 
         $this->validator->validate($request);
     }
@@ -216,11 +214,11 @@ final class ListEntriesValidatorTest extends Unit
         $exact30 = str_repeat('a', 30);
 
         $rows = [
-            'empty string'             => [['query' => '']],
+            'empty string'              => [['query' => '']],
             'spaces only (trim=>empty)' => [['query' => '     ']],
-            'short word'               => [['query' => 'summer']],
-            'boundary length 30'       => [['query' => $exact30]],
-            'trimmed within limit'     => [['query' => '  june  ']],
+            'short word'                => [['query' => 'summer']],
+            'boundary length 30'        => [['query' => $exact30]],
+            'trimmed within limit'      => [['query' => '  june  ']],
         ];
 
         return $rows;
@@ -238,9 +236,9 @@ final class ListEntriesValidatorTest extends Unit
         $trimmed31   = '  ' . str_repeat('a', 31) . '  ';
 
         $rows = [
-            'ascii length 31'      => [['query' => $ascii31]],
-            'multibyte length 31'  => [['query' => $multibyte31]],
-            'trimmed still > 30'   => [['query' => $trimmed31]],
+            'ascii length 31'     => [['query' => $ascii31]],
+            'multibyte length 31' => [['query' => $multibyte31]],
+            'trimmed still > 30'  => [['query' => $trimmed31]],
         ];
 
         return $rows;

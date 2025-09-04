@@ -39,10 +39,8 @@ final class AC6_InvalidDateInputTest extends BaseListEntriesIntegrationTest
     public function testInvalidDateInputThrowsValidationException(string $field, string $value): void
     {
         // Arrange
-        $data   = ListEntriesHelper::getData();
-        $name   = $field;
-        $val    = $value;
-        $data[$name] = $val;
+        $data = ListEntriesHelper::getData();
+        $data[$field] = $value;
 
         $request = ListEntriesHelper::buildRequest($data);
 

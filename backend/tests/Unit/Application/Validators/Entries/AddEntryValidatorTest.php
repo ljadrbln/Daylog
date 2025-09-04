@@ -53,52 +53,50 @@ final class AddEntryValidatorTest extends Unit
     }
 
     /**
-     * Validation rules: invalid business input yields DomainValidationException.
+     * Validation rules: invalid business input yields DomainValidationException
+     * with the correct error code.
      *
      * @dataProvider provideInvalidDomainCases
      *
      * @param array<string,string> $overrides
+     * @param string               $expectedCode
      * @return void
      */
-    public function testValidateThrowsOnDomainViolations(array $overrides): void
+    public function testValidateThrowsOnDomainViolations(array $overrides, string $expectedCode): void
     {
+        // Arrange
         $data = EntryTestData::getOne();
         $data = array_merge($data, $overrides);
 
         /** @var AddEntryRequestInterface $request */
         $request = AddEntryRequest::fromArray($data);
 
+        // Expect
         $this->expectException(DomainValidationException::class);
+        $this->expectExceptionMessage($expectedCode);
 
+        // Act
         $this->validator->validate($request);
     }
 
     /**
-     * Provides invalid domain-level cases:
-     * - empty title
-     * - too long title
-     * - empty body
-     * - too long body
-     * - invalid date format
-     * - invalid calendar date
+     * Provides invalid domain-level cases with expected error codes.
      *
-     * @return array<string,array{0:array<string,string>}>
+     * @return array<string,array{0:array<string,string>,1:string}>
      */
     public function provideInvalidDomainCases(): array
     {
-        // Create «too longs» strings; actual limits will be detemined by validator.
-        $tooLongTitle = str_repeat('T', EntryConstraints::TITLE_MAX+1);  // expect TITLE_MAX = 200
-        $tooLongBody  = str_repeat('B', EntryConstraints::BODY_MAX+1);   // expect BODY_MAX  = 50000
+        $tooLongTitle = str_repeat('T', EntryConstraints::TITLE_MAX + 1);
+        $tooLongBody  = str_repeat('B', EntryConstraints::BODY_MAX + 1);
 
-        $cases = [
-            'title is empty'             => [['title' => '']],
-            'title is too long'          => [['title' => $tooLongTitle]],
-            'body is empty'              => [['body'  => '']],
-            'body is too long'           => [['body'  => $tooLongBody]],
-            'date is invalid format'     => [['date'  => '15-08-2025']],
-            'date is invalid calendar'   => [['date'  => '2025-02-30']],
+        return [
+            'title is empty'           => [['title' => ''], 'TITLE_REQUIRED'],
+            'title is too long'        => [['title' => $tooLongTitle], 'TITLE_TOO_LONG'],
+            'body is empty'            => [['body' => ''], 'BODY_REQUIRED'],
+            'body is too long'         => [['body' => $tooLongBody], 'BODY_TOO_LONG'],
+            'date invalid format'      => [['date' => '15-08-2025'], 'DATE_INVALID'],
+            'date invalid calendar'    => [['date' => '2025-02-30'], 'DATE_INVALID'],
+            'date is empty'            => [['date' => ''], 'DATE_REQUIRED'],
         ];
-
-        return $cases;
     }
 }
