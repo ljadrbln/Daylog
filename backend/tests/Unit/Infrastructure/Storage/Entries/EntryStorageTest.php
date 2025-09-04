@@ -9,6 +9,7 @@ use Daylog\Infrastructure\Storage\Entries\EntryModel;
 use Daylog\Infrastructure\Storage\Entries\EntryStorage;
 use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Tests\Support\Helper\EntryTestData;
+use Daylog\Infrastructure\Storage\Entries\EntryFieldMapper;
 
 /**
  * Class EntryStorageTest
@@ -73,19 +74,21 @@ final class EntryStorageTest extends Unit
         $modelClass = EntryModel::class;
         $model      = $this->createMock($modelClass);
 
-        $expectedEntry   = EntryTestData::getOne();
-        $expectedEntryId = $expectedEntry['id'];
+        $data  = EntryTestData::getOne();
+        $entry = Entry::fromArray($data);
+        $dbRow = EntryFieldMapper::toDbRowFromEntry($entry);
+
+        $expectedEntryId = $data['id'];
 
         $model
             ->expects($this->once())
             ->method('findById')
             ->with($expectedEntryId)
-            ->willReturn($expectedEntry);
+            ->willReturn($dbRow);
 
         $storage = new EntryStorage($model);
 
         // Act
-        
         $actualEntry   = $storage->findById($expectedEntryId);
         $actualEntryId = $actualEntry->getId();
 
