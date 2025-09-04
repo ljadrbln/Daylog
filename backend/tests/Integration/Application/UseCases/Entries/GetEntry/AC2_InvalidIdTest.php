@@ -32,15 +32,17 @@ final class AC2_InvalidIdTest extends BaseGetEntryIntegrationTest
      */
     public function testInvalidIdTriggersValidationError(): void
     {
-        // Arrange: non-UUID string
+        // Arrange
         $payload = ['id' => 'not-a-uuid'];
 
         /** @var GetEntryRequestInterface $request */
         $request = GetEntryRequestFactory::fromArray($payload);
 
-        // Assert: expect DomainValidationException with ID_INVALID
+        // Assert
         $this->expectException(DomainValidationException::class);
+        $this->expectExceptionMessage('ID_INVALID');
 
+        // Act
         $this->useCase->execute($request);        
     }
 }
