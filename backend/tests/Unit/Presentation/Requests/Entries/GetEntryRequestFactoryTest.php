@@ -46,19 +46,21 @@ final class GetEntryRequestFactoryTest extends Unit
      * Transport validation errors: For invalid type or missing field, throws TransportValidationException.
      *
      * Cases:
-     * - id missing (null)
-     * - id is array
-     * - id is int
+     * - id missing → ID_REQUIRED
+     * - id is array → ID_NOT_STRING
+     * - id is int → ID_NOT_STRING
      *
      * @dataProvider provideInvalidTransportData
      *
      * @param array<string,mixed> $data
+     * @param string              $expectedCode
      * @return void
      */
-    public function testFromArrayThrowsOnInvalidTransportData(array $data): void
+    public function testFromArrayThrowsOnInvalidTransportData(array $data, string $expectedCode): void
     {
         // Assert
         $this->expectException(TransportValidationException::class);
+        $this->expectExceptionMessage($expectedCode);
 
         // Act
         GetEntryRequestFactory::fromArray($data);
@@ -67,16 +69,17 @@ final class GetEntryRequestFactoryTest extends Unit
     /**
      * Provides invalid transport-level cases for GetEntryRequestFactory.
      *
-     * @return array<string,array{0:array<string,mixed>}>
+     * @return array<string,array{0:array<string,mixed>,1:string}>
      */
     public function provideInvalidTransportData(): array
     {
         $cases = [
-            'id missing'  => [['id' => null]],
-            'id is array' => [['id' => ['oops']]],
-            'id is int'   => [['id' => 123]],
+            'id missing'  => [['id' => null], 'ID_REQUIRED'],
+            'id is array' => [['id' => ['oops']], 'ID_NOT_STRING'],
+            'id is int'   => [['id' => 123], 'ID_NOT_STRING'],
         ];
 
         return $cases;
     }
+
 }
