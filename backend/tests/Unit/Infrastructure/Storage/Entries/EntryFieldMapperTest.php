@@ -4,192 +4,86 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Infrastructure\Storage\Entries;
 
 use Codeception\Test\Unit;
+use Daylog\Domain\Models\Entries\Entry;
+use Daylog\Domain\Services\DateService;
 use Daylog\Infrastructure\Storage\Entries\EntryFieldMapper;
+use Daylog\Tests\Support\Helper\EntryTestData;
 
 /**
- * Class EntryFieldMapperTest
+ * Unit tests for EntryFieldMapper (minimal API).
  *
- * Verifies the bidirectional field/row mapping between domain/application camelCase
- * and database snake_case. The mapper is a deterministic, pure transformation layer:
- * no IO, no side-effects. Tests cover:
- *  - single-field mapping to DB and back (unknown keys pass through);
- *  - full-row mapping to DTO (fromDbRow) and to DB (toDbRow);
- *  - symmetry/involution property on rows (toDbRow(fromDbRow($dbRow)) === $dbRow).
+ * Purpose:
+ * Validate two transformations only:
+ *  1) DB row (snake_case, SQL datetime 'Y-m-d H:i:s') → camelCase with ISO-8601 UTC.
+ *  2) Domain Entry → DB row (snake_case) without implicit mutation.
+ *
+ * Mechanics:
+ * - fromDbRow(): created_at/updated_at MUST be converted to 'Y-m-d\TH:i:sP' (+00:00).
+ * - toDbRowFromEntry(): field names mapped 1:1; values passed as-is.
  *
  * @covers \Daylog\Infrastructure\Storage\Entries\EntryFieldMapper
  */
 final class EntryFieldMapperTest extends Unit
 {
     /**
-     * @return array<string, array{camel:string, snake:string}>
-     */
-    public static function fieldPairsProvider(): array
-    {
-        $cases = [
-            'id'        => ['camel' => 'id',        'snake' => 'id'],
-            'date'      => ['camel' => 'date',      'snake' => 'date'],
-            'title'     => ['camel' => 'title',     'snake' => 'title'],
-            'body'      => ['camel' => 'body',      'snake' => 'body'],
-            'createdAt' => ['camel' => 'createdAt', 'snake' => 'created_at'],
-            'updatedAt' => ['camel' => 'updatedAt', 'snake' => 'updated_at'],
-        ];
-
-        return $cases;
-    }
-
-    /**
-     * Ensure known camelCase fields are mapped to snake_case DB fields.
+     * Ensure fromDbRow() converts SQL DATETIME to ISO-8601 UTC and maps keys to camelCase.
      *
-     * @dataProvider fieldPairsProvider
-     * @param string $camel
-     * @param string $snake
-     * @return void
-     */
-    public function testToDbFieldMapsKnownKeys(string $camel, string $snake): void
-    {
-        $result = EntryFieldMapper::toDbField($camel);
-
-        $this->assertSame($snake, $result);
-    }
-
-    /**
-     * Ensure unknown camelCase fields pass through unchanged in toDbField().
+     * Cases:
+     * - created_at/updated_at given as 'Y-m-d H:i:s' (UTC) → 'Y-m-d\TH:i:sP' (+00:00).
+     * - id/date/title/body passed through unchanged.
      *
      * @return void
      */
-    public function testToDbFieldPassesUnknownKeysThrough(): void
+    public function testFromDbRowConvertsTimestampsAndMapsKeys(): void
     {
-        $unknown = 'someCustomField';
-        $result  = EntryFieldMapper::toDbField($unknown);
+        // Arrange
+        $data  = EntryTestData::getOne();
+        $entry = Entry::fromArray($data);
+        $dbRow = EntryFieldMapper::toDbRowFromEntry($entry);
 
-        $this->assertSame($unknown, $result);
-    }
-
-    /**
-     * Ensure known snake_case DB fields are mapped back to camelCase.
-     *
-     * @dataProvider fieldPairsProvider
-     * @param string $camel
-     * @param string $snake
-     * @return void
-     */
-    public function testFromDbFieldMapsKnownKeys(string $camel, string $snake): void
-    {
-        $result = EntryFieldMapper::fromDbField($snake);
-
-        $this->assertSame($camel, $result);
-    }
-
-    /**
-     * Ensure unknown snake_case fields pass through unchanged in fromDbField().
-     *
-     * @return void
-     */
-    public function testFromDbFieldPassesUnknownKeysThrough(): void
-    {
-        $unknown = 'extra_db_column';
-        $result  = EntryFieldMapper::fromDbField($unknown);
-
-        $this->assertSame($unknown, $result);
-    }
-
-    /**
-     * Map a full DB row (snake_case) to DTO shape (camelCase).
-     *
-     * Scenarios:
-     * - All required keys present => each converted as expected.
-     * - Extra unknown keys preserved and re-keyed via fromDbField (pass-through).
-     *
-     * @return void
-     */
-    public function testFromDbRowMapsAllKnownKeys(): void
-    {
-        /** @var array{id:string,date:string,title:string,body:string,created_at:string,updated_at:string,extra_db_column?:string} $dbRow */
-        $dbRow = [
-            'id'         => 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee',
-            'date'       => '2025-08-26',
-            'title'      => 'Valid title',
-            'body'       => 'Valid body',
-            'created_at' => '2025-08-26T10:00:00Z',
-            'updated_at' => '2025-08-26T10:00:00Z',
-            'extra_db_column' => 'kept',
-        ];
-
+        // Act
         $mapped = EntryFieldMapper::fromDbRow($dbRow);
 
-        $this->assertSame($dbRow['id'],         $mapped['id']);
-        $this->assertSame($dbRow['date'],       $mapped['date']);
-        $this->assertSame($dbRow['title'],      $mapped['title']);
-        $this->assertSame($dbRow['body'],       $mapped['body']);
-        $this->assertSame($dbRow['created_at'], $mapped['createdAt']);
-        $this->assertSame($dbRow['updated_at'], $mapped['updatedAt']);
+        // Assert (values unchanged for plain fields)
+        $this->assertSame($dbRow['id'],    $mapped['id']);
+        $this->assertSame($dbRow['title'], $mapped['title']);
+        $this->assertSame($dbRow['body'],  $mapped['body']);
+        $this->assertSame($dbRow['date'],  $mapped['date']);
 
-        // Unknown key passes through with same name (fromDbField fallback)
-        $this->assertArrayHasKey('extra_db_column', $mapped);
-        $this->assertSame('kept', $mapped['extra_db_column']);
+        // Assert (timestamps converted to ISO-8601 UTC)
+        $createdAt = $mapped['createdAt'];
+        $isCreatedAtValid = DateService::isValidIsoUtcDateTime($createdAt);
+        $this->assertTrue($isCreatedAtValid);
+
+        $updatedAt = $mapped['updatedAt'];
+        $isUpdatedAtValid = DateService::isValidIsoUtcDateTime($updatedAt);
+        $this->assertTrue($isUpdatedAtValid);
     }
 
     /**
-     * Map a full DTO row (camelCase) to DB shape (snake_case).
-     *
-     * Scenarios:
-     * - All known keys converted to snake_case.
-     * - Unknown keys preserved via toDbField pass-through.
-     *
-     * @return void
-     */
-    public function testToDbRowMapsAllKnownKeys(): void
-    {
-        /** @var array{id:string,date:string,title:string,body:string,createdAt:string,updatedAt:string,someCustomField?:string} $dtoRow */
-        $dtoRow = [
-            'id'            => 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee',
-            'date'          => '2025-08-26',
-            'title'         => 'Valid title',
-            'body'          => 'Valid body',
-            'createdAt'     => '2025-08-26T10:00:00Z',
-            'updatedAt'     => '2025-08-26T10:00:00Z',
-            'someCustomField' => 'keep',
-        ];
-
-        $mapped = EntryFieldMapper::toDbRow($dtoRow);
-
-        $this->assertSame($dtoRow['id'],        $mapped['id']);
-        $this->assertSame($dtoRow['date'],      $mapped['date']);
-        $this->assertSame($dtoRow['title'],     $mapped['title']);
-        $this->assertSame($dtoRow['body'],      $mapped['body']);
-        $this->assertSame($dtoRow['createdAt'], $mapped['created_at']);
-        $this->assertSame($dtoRow['updatedAt'], $mapped['updated_at']);
-
-        // Unknown field passes through unchanged in name
-        $this->assertArrayHasKey('someCustomField', $mapped);
-        $this->assertSame('keep', $mapped['someCustomField']);
-    }
-
-    /**
-     * Symmetry property: toDbRow(fromDbRow($dbRow)) === $dbRow for known keys.
+     * Ensure toDbRowFromEntry() maps a domain Entry to snake_case DB row as-is.
      *
      * Mechanics:
-     * - Start from snake_case row;
-     * - Map to camelCase via fromDbRow();
-     * - Map back via toDbRow();
-     * - Expect exactly the original shape for all known keys.
+     * - Prepare a simple stub Entry with getters.
+     * - Mapper must copy values verbatim and rename keys to snake_case.
      *
      * @return void
      */
-    public function testRowMappingIsSymmetricForKnownKeys(): void
+    public function testToDbRowFromEntryMapsFieldsVerbatim(): void
     {
-        $dbRow = [
-            'id'         => 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee',
-            'date'       => '2025-08-26',
-            'title'      => 'Valid title',
-            'body'       => 'Valid body',
-            'created_at' => '2025-08-26T10:00:00Z',
-            'updated_at' => '2025-08-26T10:00:00Z',
-        ];
+        // Arrange
+        $data  = EntryTestData::getOne();
+        $entry = Entry::fromArray($data);
 
-        $camel = EntryFieldMapper::fromDbRow($dbRow);
-        $back  = EntryFieldMapper::toDbRow($camel);
+        // Act
+        $row = EntryFieldMapper::toDbRowFromEntry($entry);
 
-        $this->assertSame($dbRow, $back);
+        // Assert
+        $this->assertSame($data['id'],        $row['id']);
+        $this->assertSame($data['title'],     $row['title']);
+        $this->assertSame($data['body'],      $row['body']);
+        $this->assertSame($data['date'],      $row['date']);
+        $this->assertSame($data['createdAt'], $row['created_at']);
+        $this->assertSame($data['updatedAt'], $row['updated_at']);
     }
 }
