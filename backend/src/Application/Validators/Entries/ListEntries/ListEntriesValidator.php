@@ -34,53 +34,52 @@ final class ListEntriesValidator implements ListEntriesValidatorInterface
      */
     public function validate(ListEntriesRequestInterface $req): void
     {
-        $errors = [];
-
-        $errors = $this->validateDates($req, $errors);
-        $errors = $this->validateDateRange($req, $errors);
-        $errors = $this->validateQuery($req, $errors);
-
-        if ($errors !== []) {
-            $exception = new DomainValidationException($errors);
-            throw $exception;
-        }
+        $this->validateDates($req);
+        $this->validateDateRange($req);
+        $this->validateQuery($req);
     }
 
     /**
      * Validate dateFrom, dateTo, and exact date (strict YYYY-MM-DD and calendar).
      *
-     * @param ListEntriesRequestInterface $req
-     * @param string[]                    $errors
-     * @return string[]
+     * @param ListEntriesRequestInterface $request
+     * @return void
      */
-    private function validateDates(ListEntriesRequestInterface $req, array $errors): array
+    private function validateDates(ListEntriesRequestInterface $request): void
     {
-        $dateFrom = $req->getDateFrom();
-        $dateTo   = $req->getDateTo();
-        $date     = $req->getDate();
+        $dateFrom = $request->getDateFrom();
+        $dateTo   = $request->getDateTo();
+        $date     = $request->getDate();
 
         if (!is_null($dateFrom)) {
             $isValidFrom = DateService::isValidLocalDate($dateFrom);
             if ($isValidFrom === false) {
-                $errors[] = 'DATE_INVALID';
+                $errorCode = 'DATE_INVALID'; 
+                $exception = new DomainValidationException($errorCode);
+
+                throw $exception;
             }
         }
 
         if (!is_null($dateTo)) {
             $isValidTo = DateService::isValidLocalDate($dateTo);
             if ($isValidTo === false) {
-                $errors[] = 'DATE_INVALID';
+                $errorCode = 'DATE_INVALID'; 
+                $exception = new DomainValidationException($errorCode);
+
+                throw $exception;
             }
         }
 
         if (!is_null($date)) {
             $isValidExact = DateService::isValidLocalDate($date);
             if ($isValidExact === false) {
-                $errors[] = 'DATE_INVALID';
+                $errorCode = 'DATE_INVALID'; 
+                $exception = new DomainValidationException($errorCode);
+
+                throw $exception;
             }
         }
-
-        return $errors;
     }
 
     /**
@@ -89,28 +88,28 @@ final class ListEntriesValidator implements ListEntriesValidatorInterface
      * Mechanics:
      * - Only compares when both dates are non-null and valid by DateService.
      *
-     * @param ListEntriesRequestInterface $req
-     * @param string[]                    $errors
-     * @return string[]
+     * @param ListEntriesRequestInterface $request
+     * @return void
      */
-    private function validateDateRange(ListEntriesRequestInterface $req, array $errors): array
+    private function validateDateRange(ListEntriesRequestInterface $request): void
     {
-        $dateFrom = $req->getDateFrom();
-        $dateTo   = $req->getDateTo();
+        $dateFrom = $request->getDateFrom();
+        $dateTo   = $request->getDateTo();
 
         $bothPresent = !is_null($dateFrom) && !is_null($dateTo);
         if ($bothPresent === false) {
-            return $errors;
+            return;
         }
 
         $from = new DateTimeImmutable($dateFrom);
         $to   = new DateTimeImmutable($dateTo);
 
         if ($from > $to) {
-            $errors[] = 'DATE_RANGE_INVALID';
-        }
+            $errorCode = 'DATE_RANGE_INVALID'; 
+            $exception = new DomainValidationException($errorCode);
 
-        return $errors;
+            throw $exception;
+        }
     }
 
     /**
@@ -120,25 +119,25 @@ final class ListEntriesValidator implements ListEntriesValidatorInterface
      * - Null or empty string is allowed (no error).
      * - Non-empty queries must not exceed QUERY_MAX characters.
      *
-     * @param ListEntriesRequestInterface $req
-     * @param string[]                    $errors
-     * @return string[]
+     * @param ListEntriesRequestInterface $request
+     * @return void
      */
-    private function validateQuery(ListEntriesRequestInterface $req, array $errors): array
+    private function validateQuery(ListEntriesRequestInterface $request): void
     {
-        $query = $req->getQuery();
+        $query = $request->getQuery();
 
         if (is_null($query) || $query === '') {
-            return $errors;
+            return;
         }
 
         $length = mb_strlen($query);
         $max    = ListEntriesConstraints::QUERY_MAX;
 
         if ($length > $max) {
-            $errors[] = 'QUERY_TOO_LONG';
-        }
+            $errorCode = 'QUERY_TOO_LONG'; 
+            $exception = new DomainValidationException($errorCode);
 
-        return $errors;
+            throw $exception;            
+        }
     }
 }
