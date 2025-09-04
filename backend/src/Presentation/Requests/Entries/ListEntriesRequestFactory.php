@@ -35,20 +35,14 @@ final class ListEntriesRequestFactory
     */
     public static function fromArray(array $params): ListEntriesRequestInterface
     {
-        $errors = [];
-
-        $errors = self::validatePage($params, $errors);
-        $errors = self::validatePerPage($params, $errors);
-        $errors = self::validateSortField($params, $errors);
-        $errors = self::validateSortDir($params, $errors);
-        $errors = self::validateDateFrom($params, $errors);
-        $errors = self::validateDateTo($params, $errors);
-        $errors = self::validateDate($params, $errors);
-        $errors = self::validateQuery($params, $errors);
-
-        if ($errors !== []) {
-            throw new TransportValidationException($errors);
-        }
+        self::validatePage($params);
+        self::validatePerPage($params);
+        self::validateSortField($params);
+        self::validateSortDir($params);
+        self::validateDateFrom($params);
+        self::validateDateTo($params);
+        self::validateDate($params);
+        self::validateQuery($params);
 
         $request = ListEntriesRequest::fromArray($params);
         return $request;
@@ -58,144 +52,143 @@ final class ListEntriesRequestFactory
      * Validate page param: must be numeric if provided.
      *
      * @param array<string,mixed> $params
-     * @param string[] $errors
-     * @return string[]
+     * @return void
      */
-    private static function validatePage(array $params, array $errors): array
+    private static function validatePage(array $params): void
     {
         $raw = $params['page'] ?? null;
 
         if (!is_null($raw) && !is_numeric($raw)) {
-            $errors[] = 'PAGE_MUST_BE_NUMERIC';
-        }
+            $errorCode = 'PAGE_MUST_BE_NUMERIC';
+            $exception = new TransportValidationException($errorCode);
 
-        return $errors;
+            throw $exception;
+        }
     }
 
     /**
      * Validate perPage param: must be numeric if provided.
      *
      * @param array<string,mixed> $params
-     * @param string[] $errors
-     * @return string[]
+     * @return void
      */
-    private static function validatePerPage(array $params, array $errors): array
+    private static function validatePerPage(array $params): void
     {
         $raw = $params['perPage'] ?? null;
 
         if (!is_null($raw) && !is_numeric($raw)) {
-            $errors[] = 'PER_PAGE_MUST_BE_NUMERIC';
-        }
+            $errorCode = 'PER_PAGE_MUST_BE_NUMERIC';
+            $exception = new TransportValidationException($errorCode);
 
-        return $errors;
+            throw $exception;
+        }
     }
 
     /**
      * Validate sort param: must be string if provided.
      *
      * @param array<string,mixed> $params
-     * @param string[] $errors
-     * @return string[]
+     * @return void
      */
-    private static function validateSortField(array $params, array $errors): array
+    private static function validateSortField(array $params): void
     {
         $raw = $params['sortField'] ?? null;
 
         if (!is_null($raw) && !is_string($raw)) {
-            $errors[] = 'SORT_FIELD_MUST_BE_STRING';
-        }
+            $errorCode = 'SORT_FIELD_MUST_BE_STRING';
+            $exception = new TransportValidationException($errorCode);
 
-        return $errors;
+            throw $exception;
+        }
     }
 
     /**
      * Validate direction param: must be string if provided.
      *
      * @param array<string,mixed> $params
-     * @param string[] $errors
-     * @return string[]
+     * @return void
      */
-    private static function validateSortDir(array $params, array $errors): array
+    private static function validateSortDir(array $params): void
     {
         $raw = $params['sortDir'] ?? null;
 
         if (!is_null($raw) && !is_string($raw)) {
-            $errors[] = 'DIRECTION_MUST_BE_STRING';
-        }
+            $errorCode = 'DIRECTION_MUST_BE_STRING';
+            $exception = new TransportValidationException($errorCode);
 
-        return $errors;
+            throw $exception;
+        }
     }
 
     /**
      * Validate dateFrom param: must be string if provided.
      *
      * @param array<string,mixed> $params
-     * @param string[] $errors
-     * @return string[]
+     * @return void
      */
-    private static function validateDateFrom(array $params, array $errors): array
+    private static function validateDateFrom(array $params): void
     {
         $raw = $params['dateFrom'] ?? null;
 
         if (!is_null($raw) && !is_string($raw)) {
-            $errors[] = 'DATE_FROM_MUST_BE_STRING';
-        }
+            $errorCode = 'DATE_FROM_MUST_BE_STRING';
+            $exception = new TransportValidationException($errorCode);
 
-        return $errors;
+            throw $exception;
+        }
     }
 
     /**
      * Validate dateTo param: must be string if provided.
      *
      * @param array<string,mixed> $params
-     * @param string[] $errors
-     * @return string[]
+     * @return void
      */
-    private static function validateDateTo(array $params, array $errors): array
+    private static function validateDateTo(array $params): void
     {
         $raw = $params['dateTo'] ?? null;
 
         if (!is_null($raw) && !is_string($raw)) {
-            $errors[] = 'DATE_TO_MUST_BE_STRING';
-        }
+            $errorCode = 'DATE_TO_MUST_BE_STRING';
+            $exception = new TransportValidationException($errorCode);
 
-        return $errors;
+            throw $exception;
+        }
     }
 
     /**
      * Validate date param: must be string if provided.
      *
      * @param array<string,mixed> $params
-     * @param string[] $errors
-     * @return string[]
+     * @return void
      */
-    private static function validateDate(array $params, array $errors): array
+    private static function validateDate(array $params): void
     {
         $raw = $params['date'] ?? null;
 
         if (!is_null($raw) && !is_string($raw)) {
-            $errors[] = 'DATE_MUST_BE_STRING';
-        }
+            $errorCode = 'DATE_MUST_BE_STRING';
+            $exception = new TransportValidationException($errorCode);
 
-        return $errors;
+            throw $exception;
+        }
     }
 
     /**
      * Validate query param: must be string if provided.
      *
      * @param array<string,mixed> $params
-     * @param string[] $errors
-     * @return string[]
+     * @return void
      */
-    private static function validateQuery(array $params, array $errors): array
+    private static function validateQuery(array $params): void
     {
         $raw = $params['query'] ?? null;
 
         if (!is_null($raw) && !is_string($raw)) {
-            $errors[] = 'QUERY_MUST_BE_STRING';
+            $errorCode = 'QUERY_MUST_BE_STRING';
+            $exception = new TransportValidationException($errorCode);
+
+            throw $exception;            
         }
-
-        return $errors;
     }
-
 }

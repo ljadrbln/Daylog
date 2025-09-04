@@ -22,8 +22,6 @@ use DB\SQL;
  * - Clean the 'entries' table before each test to ensure isolation.
  * - Register DB in EntryFixture for convenience.
  * - Build the use case via configuration provider.
- *
- * @group UC-GetEntry
  * 
  * @internal Extend this class in AC/AF test files (AC1_..., AF1_..., etc.).
  */
