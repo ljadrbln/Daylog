@@ -21,4 +21,11 @@ Display information about existed diary entry.
 
 ---
 
+## UC-4 Delete Entry
+Delete an existing diary entry by its UUID.
+
+**Details:** [UC-4-DeleteEntry.md](use-cases/UC-4-DeleteEntry.md)
+
+---
+
 *(More use cases will be added as the project evolves.)*
