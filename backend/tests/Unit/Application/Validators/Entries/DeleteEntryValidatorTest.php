@@ -11,6 +11,8 @@ use Daylog\Application\Validators\Entries\DeleteEntry\DeleteEntryValidator;
 use Daylog\Application\Validators\Entries\DeleteEntry\DeleteEntryValidatorInterface;
 use Daylog\Domain\Services\UuidGenerator;
 
+use Daylog\Tests\Support\DataProviders\UuidDataProvider;
+
 /**
  * Unit tests for DeleteEntryValidator (domain-level validation for UC-4 DeleteEntry).
  *
@@ -27,6 +29,8 @@ use Daylog\Domain\Services\UuidGenerator;
  */
 final class DeleteEntryValidatorTest extends Unit
 {
+    use UuidDataProvider;
+
     /** @var DeleteEntryValidatorInterface */
     private DeleteEntryValidatorInterface $validator;
 
@@ -59,7 +63,7 @@ final class DeleteEntryValidatorTest extends Unit
      * Validation rules: malformed IDs must trigger DomainValidationException
      * with the expected error code from the data provider.
      *
-     * @dataProvider provideInvalidIdCases
+     * @dataProvider provideInvalidUuidCases
      *
      * @param string $badId
      * @param string $expectedCode
@@ -80,30 +84,5 @@ final class DeleteEntryValidatorTest extends Unit
         $this->expectExceptionMessage($message);
 
         $this->validator->validate($request);
-    }
-
-    /**
-     * Provides malformed UUID cases and their expected error codes.
-     *
-     * Cases:
-     * - empty string
-     * - too short token
-     * - non-hex character
-     * - wrong length (35)
-     * - bad hyphenation
-     *
-     * @return array<string,array{0:string,1:string}>
-     */
-    public function provideInvalidIdCases(): array
-    {
-        $cases = [
-            'empty string'       => ['',                                        'ID_INVALID'],
-            'too short token'    => ['123',                                     'ID_INVALID'],
-            'non-hex character'  => ['123e4567-e89b-12d3-a456-42661417400g',    'ID_INVALID'],
-            'wrong length (35)'  => ['123e4567-e89b-12d3-a456-42661417400',     'ID_INVALID'],
-            'bad hyphenation'    => ['123e4567e89b-12d3-a456-426614174000',     'ID_INVALID'],
-        ];
-
-        return $cases;
     }
 }
