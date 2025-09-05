@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Daylog\Application\UseCases\Entries;
 
+use Daylog\Application\UseCases\Entries\DeleteEntryInterface;
 use Daylog\Application\DTO\Entries\DeleteEntry\DeleteEntryRequestInterface;
 use Daylog\Application\DTO\Entries\DeleteEntry\DeleteEntryResponse;
 use Daylog\Application\DTO\Entries\DeleteEntry\DeleteEntryResponseInterface;
@@ -21,7 +22,7 @@ use Daylog\Application\Exceptions\DomainValidationException;
  * - Extract id from request and delegate deletion to repository.
  * - Return a response DTO echoing the deleted id.
  */
-final class DeleteEntry
+final class DeleteEntry implements DeleteEntryInterface
 {
     /** @var DeleteEntryValidatorInterface */
     private DeleteEntryValidatorInterface $validator;
