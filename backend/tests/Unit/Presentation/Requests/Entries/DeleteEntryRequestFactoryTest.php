@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Presentation\Requests\Entries;
 
 use Codeception\Test\Unit;
-use Daylog\Presentation\Requests\Entries\DeleteEntryRequestFactoryTest;
+use Daylog\Presentation\Requests\Entries\DeleteEntryRequestFactory;
 use Daylog\Application\Exceptions\TransportValidationException;
 use Daylog\Tests\Support\Helper\EntryTestData;
 
@@ -36,7 +36,7 @@ final class DeleteEntryRequestFactoryTestTest extends Unit
         $input = EntryTestData::getOne();
 
         // Act
-        $dto = DeleteEntryRequestFactoryTest::fromArray($input);
+        $dto = DeleteEntryRequestFactory::fromArray($input);
 
         // Assert
         $this->assertSame($input['id'], $dto->getId());
@@ -63,7 +63,7 @@ final class DeleteEntryRequestFactoryTestTest extends Unit
         $this->expectExceptionMessage($expectedCode);
 
         // Act
-        DeleteEntryRequestFactoryTest::fromArray($data);
+        DeleteEntryRequestFactory::fromArray($data);
     }
 
     /**
