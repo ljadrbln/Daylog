@@ -132,4 +132,55 @@ final class DeleteEntryTest extends Unit
         $stillExists = $repo->findById($id);
         $this->assertNotNull($stillExists);
     }
+
+   /**
+     * Error path: repository returns null (entity not found), use case throws ENTRY_NOT_FOUND.
+     *
+     * Mechanics:
+     * - Arrange: seed repository with an unrelated entry A.
+     * - Build request with a different, valid UUID B (not present in repo).
+     * - Expect validator->validate() to be called once and pass (no exception).
+     * - Execute use case; expect DomainValidationException with ENTRY_NOT_FOUND.
+     * - Assert: entry A still exists in repository after the failure.
+     *
+     * @return void
+     * @covers \Daylog\Application\UseCases\Entries\DeleteEntry::execute
+     */
+    public function testNotFoundThrowsAndDoesNotDeleteOtherEntries(): void
+    {
+        // Arrange
+        $data  = EntryTestData::getOne();
+        $entry = Entry::fromArray($data);
+
+        $repo = new FakeEntryRepository();
+        $repo->save($entry);
+
+        // Use a different, valid UUID that is not in the repo
+        $notFoundId = UuidGenerator::generate();
+
+        $requestData = ['id' => $notFoundId];
+        /** @var DeleteEntryRequestInterface $request */
+        $request = DeleteEntryRequest::fromArray($requestData);
+
+        $validatorInterface = DeleteEntryValidatorInterface::class;
+        $validator = $this->createMock($validatorInterface);
+        $validator
+            ->expects($this->once())
+            ->method('validate')
+            ->with($request);
+
+        $useCase = new DeleteEntry($repo, $validator);
+
+        $this->expectException(DomainValidationException::class);
+        $this->expectExceptionMessage('ENTRY_NOT_FOUND');
+
+        // Act
+        $useCase->execute($request);
+
+        // Assert: the seeded, unrelated entry still exists
+        $expectedId = $data['id'];
+        $stillThere = $repo->findById($expectedId);
+        
+        $this->assertNotNull($stillThere);
+    }    
 }
