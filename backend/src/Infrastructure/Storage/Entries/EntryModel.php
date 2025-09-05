@@ -68,7 +68,8 @@ class EntryModel extends AbstractModel {
      */
     public function findById(string $uuid): ?array
     {
-        $this->load(['id = ?', $uuid]);
+        $condition = ['id = ?', $uuid];
+        $this->load($condition);
 
         $row = $this->dry() 
             ? null 
@@ -76,4 +77,32 @@ class EntryModel extends AbstractModel {
 
         return $row;
     }
+
+    /**
+     * Delete one row by UUID.
+     *
+     * Purpose:
+     * Remove a single entry identified by its UUID. If the row does not exist,
+     * the method performs no action.
+     *
+     * Mechanics:
+     * - Loads the record via Mapper::load() with a parameterized condition.
+     * - If the mapper is dry(), returns immediately.
+     * - Otherwise calls erase() to delete the record.
+     *
+     * @param string $uuid Entry UUID (v4).
+     * @return void
+     */
+    public function deleteById(string $uuid): void
+    {
+        $condition = ['id = ?', $uuid];
+        $this->load($condition);
+
+        $isDry = $this->dry();
+        if ($isDry) {
+            return;
+        }
+
+        $this->erase();
+    }    
 }        

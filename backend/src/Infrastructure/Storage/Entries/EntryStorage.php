@@ -70,6 +70,13 @@ final class EntryStorage implements EntryStorageInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function deleteById(string $id): void {
+
+    }
+
+    /**
      * Retrieve entries by UC-2 criteria with pagination.
      *
      * Mechanics:

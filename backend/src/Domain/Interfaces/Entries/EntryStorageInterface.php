@@ -36,8 +36,25 @@ interface EntryStorageInterface
      * @param string $id UUIDv4 identifier of the Entry.
      * @return Entry|null Domain Entry if found, otherwise null.
      */
-    public function findById(string $id): ?Entry;    
-
+    public function findById(string $id): ?Entry;
+    
+    /**
+     * Delete entry by UUID.
+     *
+     * Purpose:
+     * Provide low-level deletion of an entry record by its UUID.
+     * This method must silently do nothing if the given UUID does not exist in storage.
+     *
+     * Mechanics:
+     * - Accept a UUID string as identifier.
+     * - Perform a delete operation in underlying storage.
+     * - Return no value (void).
+     *
+     * @param string $id UUID of the entry to delete.
+     * @return void
+     */
+    public function deleteById(string $id): void;
+    
     /**
      * Retrieve paginated entries by criteria (UC-2).
      *

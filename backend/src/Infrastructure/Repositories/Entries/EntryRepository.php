@@ -46,6 +46,24 @@ final class EntryRepository implements EntryRepositoryInterface
     }
 
     /**
+     * Delete an entry by its id.
+     *
+     * Purpose:
+     * Provide a repository-level abstraction over storage delete operation.
+     * Return the number of affected rows to allow use cases to detect "not found".
+     *
+     * Mechanics:
+     * - Call underlying storage->deleteById($id).
+     *
+     * @param string $id Entry identifier (UUID).
+     * @return void
+     */
+    public function deleteById(string $id): void
+    {
+        $this->storage->deleteById($id);
+    }
+
+    /**
      * Fetch a page of entries by criteria (UC-2).
      *
      * Mechanics:

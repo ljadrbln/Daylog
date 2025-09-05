@@ -56,7 +56,7 @@ interface EntryRepositoryInterface
      * Delete entry by UUID.
      *
      * @param string $id UUID of the entry to delete.
-     * @return int Affected rows count: 1 if deleted, 0 if not found.
+     * @return void
      */
-    public function deleteById(string $id): int;    
+    public function deleteById(string $id): void;    
 }
