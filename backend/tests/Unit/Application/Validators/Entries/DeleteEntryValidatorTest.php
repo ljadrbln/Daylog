@@ -11,7 +11,7 @@ use Daylog\Application\Validators\Entries\DeleteEntry\DeleteEntryValidator;
 use Daylog\Application\Validators\Entries\DeleteEntry\DeleteEntryValidatorInterface;
 use Daylog\Domain\Services\UuidGenerator;
 
-use Daylog\Tests\Support\DataProviders\UuidDataProvider;
+use Daylog\Tests\Support\DataProviders\IdDomainDataProvider;
 
 /**
  * Unit tests for DeleteEntryValidator (domain-level validation for UC-4 DeleteEntry).
@@ -29,7 +29,7 @@ use Daylog\Tests\Support\DataProviders\UuidDataProvider;
  */
 final class DeleteEntryValidatorTest extends Unit
 {
-    use UuidDataProvider;
+    use IdDomainDataProvider;
 
     /** @var DeleteEntryValidatorInterface */
     private DeleteEntryValidatorInterface $validator;

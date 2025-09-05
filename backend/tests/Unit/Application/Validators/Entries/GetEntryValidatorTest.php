@@ -11,7 +11,7 @@ use Daylog\Application\Validators\Entries\GetEntry\GetEntryValidator;
 use Daylog\Application\Validators\Entries\GetEntry\GetEntryValidatorInterface;
 use Daylog\Domain\Services\UuidGenerator;
 
-use Daylog\Tests\Support\DataProviders\UuidDataProvider;
+use Daylog\Tests\Support\DataProviders\IdDomainDataProvider;
 
 /**
  * Unit tests for GetEntryValidator (domain-level validation for UC: GetEntry).
@@ -29,7 +29,7 @@ use Daylog\Tests\Support\DataProviders\UuidDataProvider;
  */
 final class GetEntryValidatorTest extends Unit
 {
-    use UuidDataProvider;
+    use IdDomainDataProvider;
 
     /** @var GetEntryValidatorInterface */
     private GetEntryValidatorInterface $validator;

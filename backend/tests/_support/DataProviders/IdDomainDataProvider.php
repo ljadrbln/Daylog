@@ -6,7 +6,7 @@ namespace Daylog\Tests\Support\DataProviders;
 /**
  * Centralized invalid UUID cases for validator tests.
  */
-trait UuidDataProvider
+trait IdDomainDataProvider
 {
     /**
      * Provides malformed UUID cases and their expected error codes.
