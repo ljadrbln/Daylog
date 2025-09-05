@@ -9,6 +9,7 @@ use Daylog\Application\DTO\Entries\DeleteEntry\DeleteEntryResponseInterface;
 use Daylog\Application\Validators\Entries\DeleteEntry\DeleteEntryValidatorInterface;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 
+use Daylog\Application\Exceptions\DomainValidationException;
 /**
  * UC-4 DeleteEntry — application service.
  *
@@ -34,15 +35,23 @@ final class DeleteEntry
      */
     public function __construct(EntryRepositoryInterface $repo, DeleteEntryValidatorInterface $validator)
     {
-        $this->validator = $validator;
         $this->repo      = $repo;
+        $this->validator = $validator;
     }
 
     /**
-     * Execute UC-4.
+     * Execute UC-4 DeleteEntry.
+     *
+     * Purpose:
+     * - Validate the request.
+     * - Ensure the entry exists before deleting.
+     * - Throw DomainValidationException if not found.
+     * - On success, delete and return a response with the id.
      *
      * @param DeleteEntryRequestInterface $request
      * @return DeleteEntryResponseInterface
+     *
+     * @throws DomainValidationException ENTRY_NOT_FOUND when entity is absent.
      */
     public function execute(DeleteEntryRequestInterface $request): DeleteEntryResponseInterface
     {
@@ -50,7 +59,15 @@ final class DeleteEntry
 
         $id = $request->getId();
 
-        $affected = $this->repo->deleteById($id);
+        $entry = $this->repo->findById($id);
+        if (is_null($entry)) {
+            $errorCode = 'ENTRY_NOT_FOUND';
+            $exception = new DomainValidationException($errorCode);
+            
+            throw $exception;
+        }
+
+        $this->repo->deleteById($id);
 
         $response = new DeleteEntryResponse($id);
         return $response;

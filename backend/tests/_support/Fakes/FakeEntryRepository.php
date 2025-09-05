@@ -131,9 +131,9 @@ final class FakeEntryRepository implements EntryRepositoryInterface
      * Delete by UUID.
      *
      * @param string $id
-     * @return int 1 if deleted, 0 if not found.
+     * @return void
      */
-    public function deleteById(string $id): int
+    public function deleteById(string $id): void
     {
         $indexToRemove = null;
 
@@ -147,17 +147,13 @@ final class FakeEntryRepository implements EntryRepositoryInterface
 
         $notFound = $indexToRemove === null;
         if ($notFound) {
-            $affected = 0;
-            return $affected;
+            return;
         }
 
         unset($this->entries[$indexToRemove]);
 
         // keep sequential indexing for predictable order
-        $affected  = 1;
         $reindexed = array_values($this->entries);
         $this->entries = $reindexed;
-        
-        return $affected;
     }
 }

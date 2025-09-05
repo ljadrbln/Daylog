@@ -106,6 +106,7 @@ final class DeleteEntryTest extends Unit
         $repo->save($entry);
 
         $requestData = ['id' => $data['id']];
+        
         /** @var DeleteEntryRequestInterface $request */
         $request = DeleteEntryRequest::fromArray($requestData);
 
@@ -180,7 +181,7 @@ final class DeleteEntryTest extends Unit
         // Assert: the seeded, unrelated entry still exists
         $expectedId = $data['id'];
         $stillThere = $repo->findById($expectedId);
-        
+
         $this->assertNotNull($stillThere);
     }    
 }
