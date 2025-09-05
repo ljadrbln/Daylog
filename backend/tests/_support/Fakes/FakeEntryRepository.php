@@ -126,4 +126,38 @@ final class FakeEntryRepository implements EntryRepositoryInterface
             'pagesCount' => $pagesCount,
         ];
     }
+
+    /**
+     * Delete by UUID.
+     *
+     * @param string $id
+     * @return int 1 if deleted, 0 if not found.
+     */
+    public function deleteById(string $id): int
+    {
+        $indexToRemove = null;
+
+        foreach ($this->entries as $index => $entry) {
+            $entryId = $entry->getId();
+            if ($entryId === $id) {
+                $indexToRemove = $index;
+                break;
+            }
+        }
+
+        $notFound = $indexToRemove === null;
+        if ($notFound) {
+            $affected = 0;
+            return $affected;
+        }
+
+        unset($this->entries[$indexToRemove]);
+
+        // keep sequential indexing for predictable order
+        $affected  = 1;
+        $reindexed = array_values($this->entries);
+        $this->entries = $reindexed;
+        
+        return $affected;
+    }
 }
