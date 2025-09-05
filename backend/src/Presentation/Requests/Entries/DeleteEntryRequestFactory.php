@@ -6,6 +6,7 @@ namespace Daylog\Presentation\Requests\Entries;
 use Daylog\Application\DTO\Entries\DeleteEntry\DeleteEntryRequest;
 use Daylog\Application\DTO\Entries\DeleteEntry\DeleteEntryRequestInterface;
 use Daylog\Application\Exceptions\TransportValidationException;
+use Daylog\Presentation\Requests\Rules\IdTransportRule;
 
 /**
  * Builds DeleteEntryRequest DTO from raw transport input (UC-DeleteEntry, fail-first).
@@ -40,40 +41,11 @@ final class DeleteEntryRequestFactory
      */
     public static function fromArray(array $params): DeleteEntryRequestInterface
     {
-        self::validateId($params);
+        IdTransportRule::assertValid($params);
 
         $sanitized = DeleteEntrySanitizer::sanitize($params);
         $request   = DeleteEntryRequest::fromArray($sanitized);
 
         return $request;
-    }
-
-    /**
-     * Validate 'id' presence (non-null) and type (string).
-     *
-     * @param array<string,mixed> $input Raw input to check.
-     * @return void
-     *
-     * @throws TransportValidationException
-     */
-    private static function validateId(array $input): void
-    {
-        $rawId = $input['id'] ?? null;
-
-        $isNull = is_null($rawId);
-        if ($isNull) {
-            $errorCode = 'ID_REQUIRED';
-            $exception = new TransportValidationException($errorCode);
-            
-            throw $exception;
-        }
-
-        $isString = is_string($rawId);
-        if (!$isString) {
-            $errorCode = 'ID_NOT_STRING';
-            $exception = new TransportValidationException($errorCode);
-
-            throw $exception;
-        }
     }
 }

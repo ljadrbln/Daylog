@@ -7,6 +7,7 @@ use Daylog\Application\DTO\Entries\GetEntry\GetEntryRequest;
 use Daylog\Application\DTO\Entries\GetEntry\GetEntryRequestInterface;
 use Daylog\Presentation\Requests\Entries\GetEntrySanitizer;
 use Daylog\Application\Exceptions\TransportValidationException;
+use Daylog\Presentation\Requests\Rules\IdTransportRule;
 
 /**
  * Builds GetEntryRequest DTO from raw transport input (UC-3, fail-first).
@@ -37,36 +38,11 @@ final class GetEntryRequestFactory
      */
     public static function fromArray(array $params): GetEntryRequestInterface
     {
-        self::validateId($params);
+        IdTransportRule::assertValid($params);
 
         $params  = GetEntrySanitizer::sanitize($params);
         $request = GetEntryRequest::fromArray($params);
 
         return $request;
-    }
-
-    /**
-     * Validate id: must be present (non-null) and string.
-     *
-     * @param array<string,mixed> $input
-     * @return void
-     */
-    private static function validateId(array $input): void
-    {
-        $rawId = $input['id'] ?? null;
-
-        if(is_null($rawId)) {
-            $errorCode = 'ID_REQUIRED';
-            $exception = new TransportValidationException($errorCode);
-
-            throw $exception;
-        }
-
-        if (!is_string($rawId)) { 
-            $errorCode = 'ID_NOT_STRING';
-            $exception = new TransportValidationException($errorCode);
-
-            throw $exception;
-        }
     }
 }
