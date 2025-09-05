@@ -4,17 +4,17 @@ declare(strict_types=1);
 namespace Daylog\Presentation\Requests\Entries;
 
 /**
- * Sanitizer for UC-3 Get Entry transport input.
+ * Sanitizer for UC-3 Delete Entry transport input.
  *
  * Purpose:
  * - Apply BR-1 (Trimming) consistently to id field.
- * - Keep GetEntryRequestFactory focused on type checks and DTO creation.
+ * - Keep DeleteEntryRequestFactory focused on type checks and DTO creation.
  *
  * Mechanics:
- * - Called inside GetEntryRequestFactory::fromArray().
+ * - Called inside DeleteEntryRequestFactory::fromArray().
  * - Does not perform any business validation.
  */
-final class GetEntrySanitizer
+final class DeleteEntrySanitizer
 {
     /**
      * Apply BR-1 trimming to raw params.
