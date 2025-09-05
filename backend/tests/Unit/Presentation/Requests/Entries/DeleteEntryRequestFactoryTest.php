@@ -7,6 +7,7 @@ use Codeception\Test\Unit;
 use Daylog\Presentation\Requests\Entries\DeleteEntryRequestFactory;
 use Daylog\Application\Exceptions\TransportValidationException;
 use Daylog\Tests\Support\Helper\EntryTestData;
+use Daylog\Tests\Support\DataProviders\IdTransportDataProvider;
 
 /**
  * Unit tests for DeleteEntryRequestFactoryTest.
@@ -23,8 +24,10 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  * @covers \Daylog\Presentation\Requests\Entries\DeleteEntryRequestFactoryTest
  * @group UC-DeleteEntry
  */
-final class DeleteEntryRequestFactoryTestTest extends Unit
+final class DeleteEntryRequestFactoryTest extends Unit
 {
+    use IdTransportDataProvider;
+
     /**
      * Happy path: Given valid input, returns a DTO with mapped id.
      *
@@ -45,12 +48,7 @@ final class DeleteEntryRequestFactoryTestTest extends Unit
     /**
      * Transport validation errors: For invalid type or missing field, throws TransportValidationException.
      *
-     * Cases:
-     * - id missing → ID_REQUIRED
-     * - id is array → ID_NOT_STRING
-     * - id is int → ID_NOT_STRING
-     *
-     * @dataProvider provideInvalidTransportData
+     * @dataProvider provideInvalidTransportIdData
      *
      * @param array<string,mixed> $data
      * @param string              $expectedCode
@@ -65,21 +63,4 @@ final class DeleteEntryRequestFactoryTestTest extends Unit
         // Act
         DeleteEntryRequestFactory::fromArray($data);
     }
-
-    /**
-     * Provides invalid transport-level cases for DeleteEntryRequestFactoryTest.
-     *
-     * @return array<string,array{0:array<string,mixed>,1:string}>
-     */
-    public function provideInvalidTransportData(): array
-    {
-        $cases = [
-            'id missing'  => [['id' => null], 'ID_REQUIRED'],
-            'id is array' => [['id' => ['oops']], 'ID_NOT_STRING'],
-            'id is int'   => [['id' => 123], 'ID_NOT_STRING'],
-        ];
-
-        return $cases;
-    }
-
 }
