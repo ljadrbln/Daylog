@@ -64,7 +64,8 @@ class EntryModel extends AbstractModel {
      * - Returns null when dry().
      *
      * @param string $uuid Entry UUID (v4).
-     * @return array<string,mixed>|null Plain row or null if not found.
+     * @return array{id:string,date:string,title:string,body:string,created_at:string,updated_at:string}|null
+     *         Plain row as associative array or null if not found.
      */
     public function findById(string $uuid): ?array
     {

@@ -7,7 +7,6 @@ use Daylog\Infrastructure\Storage\Entries\EntryModel;
 use Daylog\Domain\Interfaces\Entries\EntryStorageInterface;
 use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Domain\Models\Entries\ListEntriesCriteria;
-use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Infrastructure\Storage\Entries\EntryFieldMapper;
 
 /**
@@ -73,7 +72,7 @@ final class EntryStorage implements EntryStorageInterface
      * {@inheritDoc}
      */
     public function deleteById(string $id): void {
-
+        $this->model->deleteById($id);
     }
 
     /**

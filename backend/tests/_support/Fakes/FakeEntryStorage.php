@@ -55,6 +55,14 @@ final class FakeEntryStorage implements EntryStorageInterface
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function deleteById(string $id): void
+    {
+        
+    }
+
     /** 
      * {@inheritDoc} 
      * 
