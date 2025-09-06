@@ -5,6 +5,9 @@ namespace Daylog\Application\UseCases\Entries;
 
 use Daylog\Application\UseCases\Entries\GetEntryInterface;
 use Daylog\Application\DTO\Entries\GetEntry\GetEntryRequestInterface;
+use Daylog\Application\DTO\Entries\GetEntry\GetEntryResponse;
+use Daylog\Application\DTO\Entries\GetEntry\GetEntryResponseInterface;
+
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\Validators\Entries\GetEntry\GetEntryValidatorInterface;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
@@ -47,16 +50,15 @@ final class GetEntry implements GetEntryInterface
      * Execute UC: return Entry by id or raise ENTRY_NOT_FOUND.
      *
      * @param GetEntryRequestInterface $request DTO with target identifier.
-     * @return Entry Domain model found by repository.
+     * @return GetEntryResponseInterface DTO with retrieved domain Entry.
      *
      * @throws DomainValidationException On invalid id or when entry is absent.
      */
-    public function execute(GetEntryRequestInterface $request): Entry
+    public function execute(GetEntryRequestInterface $request): GetEntryResponseInterface
     {
         $this->validator->validate($request);
 
-        $id = $request->getId();
-
+        $id    = $request->getId();
         $entry = $this->repo->findById($id);
 
         if ($entry === null) {
@@ -66,6 +68,7 @@ final class GetEntry implements GetEntryInterface
             throw $exception;
         }
 
-        return $entry;
+        $response = new GetEntryResponse($entry);
+        return $response;
     }
 }
