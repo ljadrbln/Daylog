@@ -1,114 +1,52 @@
 <?php
-
 declare(strict_types=1);
 
 namespace Daylog\Application\DTO\Entries\AddEntry;
-use Daylog\Application\DTO\Entries\AddEntry\AddEntryResponseInterface;
+
+use Daylog\Domain\Models\Entries\Entry;
 
 /**
  * Response DTO for UC-1 Add Entry.
  *
- * Encapsulates the newly created entry state. 
- * Factory method `fromArray()` allows constructing from storage/domain data.
+ * Purpose:
+ * Encapsulates the newly created Entry state immediately after persistence.
+ *
+ * Mechanics:
+ * - Constructed from a domain Entry using the factory method fromEntry().
+ * - Provides getEntry() to access the domain snapshot.
+ * - DTO is immutable after construction.
  */
 final class AddEntryResponse implements AddEntryResponseInterface
 {
-    private string $id;
-    private string $title;
-    private string $body;
-    private string $date;
-    private string $createdAt;
-    private string $updatedAt;
+    private Entry $entry;
 
     /**
-     * Private constructor. Use fromArray().
-     *
-     * @param string $id
-     * @param string $title
-     * @param string $body
-     * @param string $date
-     * @param string $createdAt
-     * @param string $updatedAt
+     * @param Entry $entry Newly created and already persisted domain entity.
      */
-    private function __construct(
-        string $id,
-        string $title,
-        string $body,
-        string $date,
-        string $createdAt,
-        string $updatedAt
-    ) {
-        $this->id        = $id;
-        $this->title     = $title;
-        $this->body      = $body;
-        $this->date      = $date;
-        $this->createdAt = $createdAt;
-        $this->updatedAt = $updatedAt;
+    private function __construct(Entry $entry)
+    {
+        $this->entry = $entry;
     }
 
     /**
-     * Factory method to create a response from an associative array.
+     * Factory method to create a response from a domain Entry.
      *
-     * @param array<string,string> $data Keys: id, title, body, date, createdAt, updatedAt.
+     * @param Entry $entry Domain model representing the persisted entry.
      * @return self
      */
-    public static function fromArray(array $data): self
+    public static function fromEntry(Entry $entry): self
     {
-        $id        = $data['id']        ?? '';
-        $title     = $data['title']     ?? '';
-        $body      = $data['body']      ?? '';
-        $date      = $data['date']      ?? '';
-        $createdAt = $data['createdAt'] ?? '';
-        $updatedAt = $data['updatedAt'] ?? '';
-
-        return new self($id, $title, $body, $date, $createdAt, $updatedAt);
+        $response = new self($entry);
+        return $response;
     }
 
     /**
-     * @return string The entry identifier (UUID v4).
+     * Get the encapsulated domain Entry.
+     *
+     * @return Entry Snapshot of the newly created entry.
      */
-    public function getId(): string
+    public function getEntry(): Entry
     {
-        return $this->id;
-    }
-
-    /**
-     * @return string The entry title.
-     */
-    public function getTitle(): string
-    {
-        return $this->title;
-    }
-
-    /**
-     * @return string The entry body.
-     */
-    public function getBody(): string
-    {
-        return $this->body;
-    }
-
-    /**
-     * @return string The logical entry date (YYYY-MM-DD).
-     */
-    public function getDate(): string
-    {
-        return $this->date;
-    }
-
-    /**
-     * @return string The creation timestamp (ISO-8601 UTC).
-     */
-    public function getCreatedAt(): string
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @return string The update timestamp (ISO-8601 UTC).
-     */
-    public function getUpdatedAt(): string
-    {
-        return $this->updatedAt;
+        return $this->entry;
     }
 }

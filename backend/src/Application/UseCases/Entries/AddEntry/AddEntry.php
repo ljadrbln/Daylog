@@ -44,16 +44,15 @@ final class AddEntry implements AddEntryInterface
         $this->validator->validate($request);
 
         // Normalize (adds id, createdAt, updatedAt)
-        $normalized = AddEntryInputNormalizer::normalize($request);
-
-        // Domain model
-        $entry = Entry::fromArray($normalized);
+        $params = AddEntryInputNormalizer::normalize($request);
+        $entry  = Entry::fromArray($params);
 
         // Persist
         $this->repo->save($entry);
 
         // Response DTO
-        $response = AddEntryResponse::fromArray($normalized);
+        $response = AddEntryResponse::fromEntry($entry);
+
         return $response;
     }
 }

@@ -1,44 +1,33 @@
 <?php
-
 declare(strict_types=1);
 
 namespace Daylog\Application\DTO\Entries\AddEntry;
 
+use Daylog\Domain\Models\Entries\Entry;
+
 /**
- * Interface for AddEntryResponse DTO.
+ * Contract for UC-1 AddEntry response DTO.
  *
- * Guarantees that every AddEntry use case result
- * provides access to the new entry's identifier and timestamps.
+ * Purpose:
+ * Define a unified response for the AddEntry use case,
+ * exposing the persisted domain Entry through a stable accessor.
+ *
+ * Mechanics:
+ * - Built from a domain entity via static fromEntry().
+ * - getEntry() provides the domain snapshot to Presentation/API layers.
  */
 interface AddEntryResponseInterface
 {
     /**
-     * @return string Entry identifier (UUID v4).
+     * Create a response DTO from a domain Entry.
+     *
+     * @param Entry $entry Newly created domain entity (already persisted).
+     * @return self
      */
-    public function getId(): string;
+    public static function fromEntry(Entry $entry): self;
 
     /**
-     * @return string The entry title.
+     * @return Entry Domain snapshot of the added entry.
      */
-    public function getTitle(): string;
-
-    /**
-     * @return string The entry body.
-     */
-    public function getBody(): string;
-
-    /**
-     * @return string Logical entry date (YYYY-MM-DD).
-     */
-    public function getDate(): string;
-
-    /**
-     * @return string Creation timestamp (ISO-8601 UTC).
-     */
-    public function getCreatedAt(): string;
-
-    /**
-     * @return string Update timestamp (ISO-8601 UTC).
-     */
-    public function getUpdatedAt(): string;
+    public function getEntry(): Entry;
 }
