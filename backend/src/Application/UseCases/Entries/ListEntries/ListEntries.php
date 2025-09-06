@@ -71,7 +71,10 @@ final class ListEntries implements ListEntriesInterface
         $params   = ListEntriesInputNormalizer::normalize($request);
         $criteria = ListEntriesCriteria::fromArray($params);
         
+        // Fetch page
         $pageData = $this->repository->findByCriteria($criteria);
+
+        // Response DTO
         $response = ListEntriesResponse::fromArray($pageData);
 
         return $response;

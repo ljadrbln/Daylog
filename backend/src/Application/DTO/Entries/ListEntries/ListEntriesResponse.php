@@ -1,17 +1,22 @@
 <?php
-
 declare(strict_types=1);
 
 namespace Daylog\Application\DTO\Entries\ListEntries;
 
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesItem;
-use Daylog\Application\DTO\Entries\ListEntries\ListEntriesResponseInterface;
 
 /**
  * Response DTO for UC-2 List Entries.
  *
- * Carries a list of ListEntriesItem and pagination metadata from the Use Case
- * to the Presentation layer. Construct via fromArray() using repository output.
+ * Purpose:
+ * Carry read-model items with pagination metadata and provide a scalar-only
+ * payload for Presentation via toArray().
+ *
+ * Mechanics:
+ * - Construct via fromArray() using repository output.
+ * - Keep immutable state and typed getters for Application/tests.
+ *
+ * @implements ListEntriesResponseInterface
  */
 final class ListEntriesResponse implements ListEntriesResponseInterface
 {
@@ -23,13 +28,11 @@ final class ListEntriesResponse implements ListEntriesResponseInterface
     private int $pagesCount;
 
     /**
-     * Private constructor. Use fromArray().
-     *
-     * @param list<ListEntriesItem> $items    List of items (may be empty).
-     * @param int                   $page     Current page (1-based).
-     * @param int                   $perPage  Items per page.
-     * @param int                   $total    Total items count.
-     * @param int                   $pagesCount Total number of pages.
+     * @param list<ListEntriesItem> $items
+     * @param int                   $page
+     * @param int                   $perPage
+     * @param int                   $total
+     * @param int                   $pagesCount
      */
     private function __construct(
         array $items,
@@ -46,19 +49,8 @@ final class ListEntriesResponse implements ListEntriesResponseInterface
     }
 
     /**
-     * Factory method to create a response from repository output.
-     *
-     * @param array{
-     *     items: list<Entry>,
-     *     total: int,
-     *     page: int,
-     *     perPage: int,
-     *     pagesCount: int
-     * } $data Normalized repository result.
-     *
-     * @return self
+     * {@inheritDoc}
      */
-
     public static function fromArray(array $data): self
     {
         /** @var list<ListEntriesItem> $items */
@@ -74,20 +66,48 @@ final class ListEntriesResponse implements ListEntriesResponseInterface
         $total      = $data['total'];
         $pagesCount = $data['pagesCount'];
 
-        $response = new self(
-            $items,
-            $page,
-            $perPage,
-            $total,
-            $pagesCount
-        );
-
+        $response = new self($items, $page, $perPage, $total, $pagesCount);
         return $response;
     }
 
     /**
-     * @return list<ListEntriesItem>
+     * Convert response to a flat associative payload (scalars only).
+     *
+     * @return array{
+     *   items: list<array{
+     *     id: string,
+     *     title: string,
+     *     body: string,
+     *     date: string,
+     *     createdAt: string,
+     *     updatedAt: string
+     *   }>,
+     *   page: int,
+     *   perPage: int,
+     *   total: int,
+     *   pagesCount: int
+     * }
      */
+    public function toArray(): array
+    {
+        /** @var list<array{id:string,title:string,body:string,date:string,createdAt:string,updatedAt:string}> $items */
+        $items = [];
+        foreach ($this->items as $item) {
+            $row   = $item->toArray();
+            $items[] = $row;
+        }
+
+        $payload = [
+            'items'      => $items,
+            'page'       => $this->page,
+            'perPage'    => $this->perPage,
+            'total'      => $this->total,
+            'pagesCount' => $this->pagesCount,
+        ];
+        return $payload;
+    }
+
+    /** @return list<ListEntriesItem> */
     public function getItems(): array
     {
         $items = $this->items;
