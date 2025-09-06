@@ -19,7 +19,7 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  *   - Override individual fields with whitespace variations.
  *   - Expect sanitized fields to be trimmed.
  *
- * @covers \Daylog\Presentation\Requests\Entries\GetEntrySanitizer
+ * @covers \Daylog\Presentation\Requests\Entries\GetEntry\GetEntrySanitizer
  * @group UC-GetEntry
  */
 final class GetEntrySanitizerTest extends Unit

@@ -21,7 +21,7 @@ use Daylog\Tests\Support\DataProviders\IdTransportDataProvider;
  * - Happy path returns a typed DTO with mapped 'id'.
  * - Invalid transport shapes (missing/non-string 'id') raise TransportValidationException.
  *
- * @covers \Daylog\Presentation\Requests\Entries\DeleteEntryRequestFactoryTest
+ * @covers \Daylog\Presentation\Requests\Entries\DeleteEntry\DeleteEntryRequestFactoryTest
  * @group UC-DeleteEntry
  */
 final class DeleteEntryRequestFactoryTest extends Unit
