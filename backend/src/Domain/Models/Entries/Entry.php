@@ -14,34 +14,27 @@ namespace Daylog\Domain\Models\Entries;
  */
 final class Entry
 {
-    private string $id;
-    private string $title;
-    private string $body;
-    private string $date;     
-    private string $createdAt;
-    private string $updatedAt;
-
     /**
      * Create an Entry with already validated values.
      *
      * Caller guarantees that inputs are pre-validated and trimmed.
      * A single snapshot time is passed via $now and applied to both timestamps.
      * 
-     * @param string $id    UUID (generated upstream)
-     * @param string $title Pre-validated title
-     * @param string $body  Pre-validated body
-     * @param string $date  Logical date in YYYY-MM-DD
-     * @param string $now   Snapshot timestamp for createdAt/updatedAt
+     * @param string $id        UUID (generated upstream).
+     * @param string $title     Pre-validated title.
+     * @param string $body      Pre-validated body.
+     * @param string $date      Logical date in YYYY-MM-DD.
+     * @param string $createdAt Creation timestamp (ISO-8601).
+     * @param string $updatedAt Update timestamp (ISO-8601).
      */
-    private function __construct(string $id, string $title, string $body, string $date, string $now)
-    {
-        $this->id    = $id;
-        $this->title = $title;
-        $this->body  = $body;
-        $this->date  = $date;
-        $this->createdAt = $now;
-        $this->updatedAt = $now;
-    }
+    private function __construct(
+        private string $id,
+        private string $title,
+        private string $body,
+        private string $date,
+        private string $createdAt,
+        private string $updatedAt,
+    ) {}
 
     /**
      * Factory from array. Assumes values are pre-validated upstream.
