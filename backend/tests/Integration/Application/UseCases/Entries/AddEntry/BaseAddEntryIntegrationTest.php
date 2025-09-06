@@ -6,7 +6,7 @@ namespace Daylog\Tests\Integration\Application\UseCases\Entries\AddEntry;
 use Codeception\Test\Unit;
 use Daylog\Configuration\Bootstrap\SqlFactory;
 use Daylog\Configuration\Providers\Entries\AddEntryProvider;
-use Daylog\Application\UseCases\Entries\AddEntryInterface;
+use Daylog\Application\UseCases\Entries\AddEntry\AddEntryInterface;
 use Daylog\Tests\Support\Fixture\EntryFixture;
 use DB\SQL;
 

@@ -6,7 +6,7 @@ namespace Daylog\Tests\Integration\Application\UseCases\Entries\DeleteEntry;
 use Codeception\Test\Unit;
 use Daylog\Configuration\Bootstrap\SqlFactory;
 use Daylog\Configuration\Providers\Entries\DeleteEntryProvider;
-use Daylog\Application\UseCases\Entries\DeleteEntryInterface;
+use Daylog\Application\UseCases\Entries\DeleteEntry\DeleteEntryInterface;
 use Daylog\Tests\Support\Fixture\EntryFixture;
 use DB\SQL;
 

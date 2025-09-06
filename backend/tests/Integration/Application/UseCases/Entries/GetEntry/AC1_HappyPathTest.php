@@ -3,9 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\GetEntry;
 
-use Daylog\Domain\Models\Entries\Entry;
-use Daylog\Presentation\Requests\Entries\GetEntryRequestFactory;
-use Daylog\Presentation\Requests\Entries\GetEntryRequestInterface;
+use Daylog\Presentation\Requests\Entries\GetEntry\GetEntryRequestFactory;
+use Daylog\Presentation\Requests\Entries\GetEntry\GetEntryRequestInterface;
 use Daylog\Tests\Support\Fixture\EntryFixture;
 
 /**

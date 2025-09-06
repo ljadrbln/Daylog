@@ -6,7 +6,7 @@ namespace Daylog\Tests\Integration\Application\UseCases\Entries\GetEntry;
 use Daylog\Application\DTO\Entries\GetEntry\GetEntryRequestInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Domain\Services\UuidGenerator;
-use Daylog\Presentation\Requests\Entries\GetEntryRequestFactory;
+use Daylog\Presentation\Requests\Entries\GetEntry\GetEntryRequestFactory;
 use Daylog\Tests\Support\Fixture\EntryFixture;
 
 /**

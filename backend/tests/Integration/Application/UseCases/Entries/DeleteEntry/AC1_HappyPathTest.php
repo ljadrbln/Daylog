@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\DeleteEntry;
 
-use Daylog\Presentation\Requests\Entries\DeleteEntryRequestFactory;
-use Daylog\Presentation\Requests\Entries\DeleteEntryRequestInterface;
+use Daylog\Presentation\Requests\Entries\DeleteEntry\DeleteEntryRequestFactory;
+use Daylog\Presentation\Requests\Entries\DeleteEntry\DeleteEntryRequestInterface;
 use Daylog\Tests\Support\Fixture\EntryFixture;
 
 /**

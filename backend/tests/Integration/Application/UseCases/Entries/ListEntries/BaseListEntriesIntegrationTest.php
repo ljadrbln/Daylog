@@ -6,8 +6,10 @@ namespace Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries;
 use Codeception\Test\Unit;
 
 use Daylog\Configuration\Providers\Entries\ListEntriesProvider;
+use Daylog\Application\UseCases\Entries\ListEntries\ListEntriesInterface;
 use Daylog\Configuration\Bootstrap\SqlFactory;
 use Daylog\Tests\Support\Fixture\EntryFixture;
+use DB\SQL;
 
 /**
  * Base class for UC-2 ListEntries integration tests.
@@ -26,11 +28,19 @@ use Daylog\Tests\Support\Fixture\EntryFixture;
  */
 abstract class BaseListEntriesIntegrationTest extends Unit
 {
-    /** @var \DB\SQL */
-    protected $db;
+    /**
+     * Real DB connection used by child tests.
+     *
+     * @var SQL
+     */
+    protected SQL $db;
 
-    /** @var \Daylog\Application\UseCases\Entries\ListEntries */
-    protected $useCase;
+    /**
+     * Use case instance wired via configuration provider.
+     *
+     * @var ListEntries
+     */    
+    protected ListEntriesInterface $useCase;
 
     /**
      * Prepare shared DB and wire the use case.
@@ -45,8 +55,7 @@ abstract class BaseListEntriesIntegrationTest extends Unit
         EntryFixture::cleanTable();
 
         // Use case
-        $provider = ListEntriesProvider::class;
-        $useCase  = $provider::useCase();
+        $useCase = ListEntriesProvider::useCase();
 
         $this->useCase = $useCase;
     }

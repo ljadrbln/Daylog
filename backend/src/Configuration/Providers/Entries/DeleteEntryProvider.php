@@ -5,8 +5,8 @@ namespace Daylog\Configuration\Providers\Entries;
 
 use Daylog\Configuration\Bootstrap\SqlFactory;
 
-use Daylog\Application\UseCases\Entries\DeleteEntry;
-use Daylog\Application\UseCases\Entries\DeleteEntryInterface;
+use Daylog\Application\UseCases\Entries\DeleteEntry\DeleteEntry;
+use Daylog\Application\UseCases\Entries\DeleteEntry\DeleteEntryInterface;
 
 use Daylog\Application\Validators\Entries\DeleteEntry\DeleteEntryValidator;
 use Daylog\Application\Validators\Entries\DeleteEntry\DeleteEntryValidatorInterface;

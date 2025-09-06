@@ -6,7 +6,7 @@ namespace Daylog\Tests\Integration\Application\UseCases\Entries\DeleteEntry;
 use Daylog\Application\DTO\Entries\DeleteEntry\DeleteEntryRequestInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Domain\Services\UuidGenerator;
-use Daylog\Presentation\Requests\Entries\DeleteEntryRequestFactory;
+use Daylog\Presentation\Requests\Entries\DeleteEntry\DeleteEntryRequestFactory;
 use Daylog\Tests\Support\Fixture\EntryFixture;
 
 /**

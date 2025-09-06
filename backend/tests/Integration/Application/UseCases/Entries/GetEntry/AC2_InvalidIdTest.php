@@ -5,7 +5,7 @@ namespace Daylog\Tests\Integration\Application\UseCases\Entries\GetEntry;
 
 use Daylog\Application\DTO\Entries\GetEntry\GetEntryRequestInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
-use Daylog\Presentation\Requests\Entries\GetEntryRequestFactory;
+use Daylog\Presentation\Requests\Entries\GetEntry\GetEntryRequestFactory;
 
 /**
  * AC-2 Invalid id: ensures that non-UUID input is rejected.

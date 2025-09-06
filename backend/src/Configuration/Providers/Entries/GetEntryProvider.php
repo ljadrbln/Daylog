@@ -5,8 +5,8 @@ namespace Daylog\Configuration\Providers\Entries;
 
 use Daylog\Configuration\Bootstrap\SqlFactory;
 
-use Daylog\Application\UseCases\Entries\GetEntry;
-use Daylog\Application\UseCases\Entries\GetEntryInterface;
+use Daylog\Application\UseCases\Entries\GetEntry\GetEntry;
+use Daylog\Application\UseCases\Entries\GetEntry\GetEntryInterface;
 
 use Daylog\Application\Validators\Entries\GetEntry\GetEntryValidator;
 use Daylog\Application\Validators\Entries\GetEntry\GetEntryValidatorInterface;
