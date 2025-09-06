@@ -10,28 +10,18 @@ use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
  */
 final class AddEntryRequest implements AddEntryRequestInterface
 {
-    /** @var string */
-    private string $title;
-
-    /** @var string */
-    private string $body;
-
-    /** @var string */
-    private string $date;
-
     /**
      * Private constructor. Use fromArray().
      *
-     * @param string $title
-     * @param string $body
-     * @param string $date
+     * @param string $title Entry title.
+     * @param string $body  Entry body/content.
+     * @param string $date  Logical date (YYYY-MM-DD).
      */
-    private function __construct(string $title, string $body, string $date)
-    {
-        $this->title = $title;
-        $this->body  = $body;
-        $this->date  = $date;
-    }
+    private function __construct(
+        private string $title,
+        private string $body,
+        private string $date
+    ) {}
 
     /**
      * Factory method to create a request from an associative array.
