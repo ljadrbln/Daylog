@@ -43,10 +43,11 @@ final class AC1_HappyPathTest extends BaseAddEntryIntegrationTest
 
         // Act
         $response = $this->useCase->execute($request);
-        $uuid     = $response->getId();
+        $entry    = $response->getEntry();
 
         // Assert
-        $isValid = UuidGenerator::isValid($uuid);
+        $entryId = $entry->getId();
+        $isValid = UuidGenerator::isValid($entryId);
         $this->assertTrue($isValid);
 
         $rowsCount = EntryFixture::countRows();

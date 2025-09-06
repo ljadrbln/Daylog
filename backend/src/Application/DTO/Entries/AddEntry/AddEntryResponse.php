@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Daylog\Application\DTO\Entries\AddEntry;
 
+use Daylog\Application\DTO\Common\UseCaseResponseInterface;
 use Daylog\Domain\Models\Entries\Entry;
 
 /**
@@ -13,10 +14,20 @@ use Daylog\Domain\Models\Entries\Entry;
  *
  * Mechanics:
  * - Constructed from a domain Entry using the factory method fromEntry().
- * - Provides getEntry() to access the domain snapshot.
- * - DTO is immutable after construction.
+ * - Provides getEntry() for internal access if needed by Application.
+ * - Implements UseCaseResponseInterface so Presentation can safely consume
+ *   a flat associative payload via toArray().
+ *
+ * @implements UseCaseResponseInterface<array{
+ *   id: string,
+ *   title: string,
+ *   body: string,
+ *   date: string,
+ *   createdAt: string,
+ *   updatedAt: string
+ * }>
  */
-final class AddEntryResponse implements AddEntryResponseInterface
+final class AddEntryResponse implements AddEntryResponseInterface, UseCaseResponseInterface
 {
     private Entry $entry;
 
@@ -48,5 +59,30 @@ final class AddEntryResponse implements AddEntryResponseInterface
     public function getEntry(): Entry
     {
         return $this->entry;
+    }
+
+    /**
+     * Convert response to a flat associative payload.
+     *
+     * @return array{
+     *   id: string,
+     *   title: string,
+     *   body: string,
+     *   date: string,
+     *   createdAt: string,
+     *   updatedAt: string
+     * }
+     */
+    public function toArray(): array
+    {
+        $payload = [
+            'id'        => $this->entry->getId(),
+            'title'     => $this->entry->getTitle(),
+            'body'      => $this->entry->getBody(),
+            'date'      => $this->entry->getDate(),
+            'createdAt' => $this->entry->getCreatedAt(),
+            'updatedAt' => $this->entry->getUpdatedAt(),
+        ];
+        return $payload;
     }
 }
