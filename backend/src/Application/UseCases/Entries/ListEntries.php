@@ -9,7 +9,7 @@ use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequestInterface;
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesResponse;
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesResponseInterface;
 use Daylog\Application\Validators\Entries\ListEntries\ListEntriesValidatorInterface;
-use Daylog\Application\Normalization\Entries\ListEntriesInputNormalizer;
+use Daylog\Application\Normalization\Entries\ListEntries\ListEntriesInputNormalizer;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Domain\Models\Entries\ListEntriesCriteria;
 

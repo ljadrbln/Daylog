@@ -11,7 +11,7 @@ use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
 use Daylog\Application\Validators\Entries\AddEntry\AddEntryValidatorInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\UseCases\Entries\AddEntry;
-use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
+
 use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Domain\Services\DateService;
 

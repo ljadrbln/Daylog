@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Tests\Unit\Application\Normalization\Entries;
+namespace Daylog\Tests\Unit\Application\Normalization\Entries\AddEntry;
 
 use Codeception\Test\Unit;
-use Daylog\Application\Normalization\Entries\AddEntryInputNormalizer;
+use Daylog\Application\Normalization\Entries\AddEntry\AddEntryInputNormalizer;
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
 use Daylog\Domain\Services\DateService;
 use Daylog\Domain\Services\UuidGenerator;

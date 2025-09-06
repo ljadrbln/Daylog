@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Application\Normalization\Entries;
+namespace Daylog\Application\Normalization\Entries\AddEntry;
 
 /**
  * Contract for UC-1 Add Entry input normalization.

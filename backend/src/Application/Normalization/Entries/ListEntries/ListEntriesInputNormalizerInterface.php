@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Daylog\Application\Normalization\Entries;
+namespace Daylog\Application\Normalization\Entries\ListEntries;
 
 /**
  * Contract for UC-2 input normalization.

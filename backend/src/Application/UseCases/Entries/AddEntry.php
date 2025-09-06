@@ -10,7 +10,7 @@ use Daylog\Application\DTO\Entries\AddEntry\AddEntryResponseInterface;
 use Daylog\Application\Validators\Entries\AddEntry\AddEntryValidatorInterface;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 
-use Daylog\Application\Normalization\Entries\AddEntryInputNormalizer;
+use Daylog\Application\Normalization\Entries\AddEntry\AddEntryInputNormalizer;
 
 use Daylog\Domain\Models\Entries\Entry;
 

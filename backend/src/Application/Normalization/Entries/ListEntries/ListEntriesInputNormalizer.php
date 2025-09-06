@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Daylog\Application\Normalization\Entries;
+namespace Daylog\Application\Normalization\Entries\ListEntries;
 
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequestInterface;
 use Daylog\Domain\Models\Entries\ListEntriesConstraints;

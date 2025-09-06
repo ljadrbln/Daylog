@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Daylog\Tests\Unit\Application\Normalization\Entries;
+namespace Daylog\Tests\Unit\Application\Normalization\Entries\ListEntries;
 
 use Codeception\Test\Unit;
-use Daylog\Application\Normalization\Entries\ListEntriesInputNormalizer;
+use Daylog\Application\Normalization\Entries\ListEntries\ListEntriesInputNormalizer;
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequest;
 use Daylog\Domain\Models\Entries\ListEntriesConstraints;
 use Daylog\Tests\Support\Helper\ListEntriesHelper;
