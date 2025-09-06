@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Daylog\Application\DTO\Entries\DeleteEntry;
 
-use Daylog\Application\DTO\Common\UseCaseResponseInterface;
 use Daylog\Domain\Models\Entries\Entry;
 
 /**
@@ -17,16 +16,9 @@ use Daylog\Domain\Models\Entries\Entry;
  * - getEntry() returns the domain snapshot.
  * - toArray() returns a scalar-only associative payload.
  *
- * @implements UseCaseResponseInterface<array{
- *   id: string,
- *   title: string,
- *   body: string,
- *   date: string,
- *   createdAt: string,
- *   updatedAt: string
- * }>
+ * @implements DeleteEntryResponseInterface
  */
-final class DeleteEntryResponse implements DeleteEntryResponseInterface, UseCaseResponseInterface
+final class DeleteEntryResponse implements DeleteEntryResponseInterface
 {
     private Entry $entry;
 

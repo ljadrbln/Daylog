@@ -55,11 +55,12 @@ final class DeleteEntry implements DeleteEntryInterface
      */
     public function execute(DeleteEntryRequestInterface $request): DeleteEntryResponseInterface
     {
+        // Validate request per business rules
         $this->validator->validate($request);
 
-        $id = $request->getId();
+        $entryId = $request->getId();
+        $entry   = $this->repo->findById($entryId);
 
-        $entry = $this->repo->findById($id);
         if (is_null($entry)) {
             $errorCode = 'ENTRY_NOT_FOUND';
             $exception = new DomainValidationException($errorCode);
@@ -67,9 +68,12 @@ final class DeleteEntry implements DeleteEntryInterface
             throw $exception;
         }
 
-        $this->repo->deleteById($id);
+        // Delete
+        $this->repo->deleteById($entryId);
 
+        // Response DTO
         $response = DeleteEntryResponse::fromEntry($entry);
+
         return $response;
     }
 }
