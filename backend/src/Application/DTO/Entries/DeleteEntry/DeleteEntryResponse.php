@@ -20,15 +20,12 @@ use Daylog\Domain\Models\Entries\Entry;
  */
 final class DeleteEntryResponse implements DeleteEntryResponseInterface
 {
-    private Entry $entry;
-
     /**
      * @param Entry $entry Deleted domain entity snapshot.
      */
-    private function __construct(Entry $entry)
-    {
-        $this->entry = $entry;
-    }
+    private function __construct(
+        private Entry $entry
+    ) {}
 
     /**
      * {@inheritDoc}

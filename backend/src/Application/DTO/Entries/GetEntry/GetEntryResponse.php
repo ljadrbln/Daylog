@@ -16,15 +16,12 @@ use Daylog\Domain\Models\Entries\Entry;
  */
 final class GetEntryResponse implements GetEntryResponseInterface
 {
-    private Entry $entry;
-
     /**
      * @param Entry $entry Domain model retrieved from repository.
      */
-    private function __construct(Entry $entry)
-    {
-        $this->entry = $entry;
-    }
+    private function __construct(
+        private Entry $entry
+    ) {}
 
     /**
      * {@inheritDoc}

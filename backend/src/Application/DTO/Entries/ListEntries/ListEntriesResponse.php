@@ -20,13 +20,6 @@ use Daylog\Application\DTO\Entries\ListEntries\ListEntriesItem;
  */
 final class ListEntriesResponse implements ListEntriesResponseInterface
 {
-    /** @var list<ListEntriesItem> */
-    private array $items;
-    private int $page;
-    private int $perPage;
-    private int $total;
-    private int $pagesCount;
-
     /**
      * @param list<ListEntriesItem> $items
      * @param int                   $page
@@ -35,18 +28,12 @@ final class ListEntriesResponse implements ListEntriesResponseInterface
      * @param int                   $pagesCount
      */
     private function __construct(
-        array $items,
-        int $page,
-        int $perPage,
-        int $total,
-        int $pagesCount
-    ) {
-        $this->items      = $items;
-        $this->page       = $page;
-        $this->perPage    = $perPage;
-        $this->total      = $total;
-        $this->pagesCount = $pagesCount;
-    }
+        private array $items,
+        private int $page,
+        private int $perPage,
+        private int $total,
+        private int $pagesCount
+    ) {}
 
     /**
      * {@inheritDoc}

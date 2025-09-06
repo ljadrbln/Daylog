@@ -25,24 +25,6 @@ use Daylog\Domain\Models\Entries\Entry;
  */
 final class ListEntriesItem
 {
-    /** @var string */
-    private string $id;
-
-    /** @var string */
-    private string $date;
-
-    /** @var string */
-    private string $title;
-
-    /** @var string */
-    private string $body;
-
-    /** @var string */
-    private string $createdAt;
-
-    /** @var string */
-    private string $updatedAt;
-
     /**
      * Private constructor. Use fromArray().
      *
@@ -57,23 +39,15 @@ final class ListEntriesItem
      * @param string $body      Entry body.
      * @param string $createdAt UTC timestamp "YYYY-MM-DD HH:MM:SS".
      * @param string $updatedAt UTC timestamp "YYYY-MM-DD HH:MM:SS".
-     * @return void
      */
     private function __construct(
-        string $id,
-        string $date,
-        string $title,
-        string $body,
-        string $createdAt,
-        string $updatedAt
-    ) {
-        $this->id        = $id;
-        $this->date      = $date;
-        $this->title     = $title;
-        $this->body      = $body;
-        $this->createdAt = $createdAt;
-        $this->updatedAt = $updatedAt;
-    }
+        private string $id,
+        private string $date,
+        private string $title,
+        private string $body,
+        private string $createdAt,
+        private string $updatedAt
+    ) {}
 
     /**
      * Build item from Domain Entry model.

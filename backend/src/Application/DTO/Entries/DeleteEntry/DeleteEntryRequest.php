@@ -15,18 +15,14 @@ namespace Daylog\Application\DTO\Entries\DeleteEntry;
  */
 final class DeleteEntryRequest implements DeleteEntryRequestInterface
 {
-    /** @var string */
-    private string $id;
-
     /**
      * Private constructor. Use fromArray().
-     * 
-     * @param string $id
+     *
+     * @param string $id UUID v4 identifier of the entry.
      */
-    public function __construct(string $id)
-    {
-        $this->id = $id;
-    }
+    private function __construct(
+        private string $id
+    ) {}
 
     /**
      * Factory method to create a request from an associative array.

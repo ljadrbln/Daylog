@@ -56,10 +56,11 @@ final class GetEntry implements GetEntryInterface
      */
     public function execute(GetEntryRequestInterface $request): GetEntryResponseInterface
     {
+        // Validate request per business rules
         $this->validator->validate($request);
 
-        $id    = $request->getId();
-        $entry = $this->repo->findById($id);
+        $entryId = $request->getId();
+        $entry   = $this->repo->findById($entryId);
 
         if ($entry === null) {
             $error     = 'ENTRY_NOT_FOUND';
@@ -68,7 +69,9 @@ final class GetEntry implements GetEntryInterface
             throw $exception;
         }
 
-        $response = new GetEntryResponse($entry);
+        // Response DTO
+        $response = GetEntryResponse::fromEntry($entry);
+
         return $response;
     }
 }

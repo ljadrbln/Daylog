@@ -29,15 +29,12 @@ use Daylog\Domain\Models\Entries\Entry;
  */
 final class AddEntryResponse implements AddEntryResponseInterface, UseCaseResponseInterface
 {
-    private Entry $entry;
-
     /**
      * @param Entry $entry Newly created and already persisted domain entity.
      */
-    private function __construct(Entry $entry)
-    {
-        $this->entry = $entry;
-    }
+    private function __construct(
+        private Entry $entry
+    ) {}    
 
     /**
      * Factory method to create a response from a domain Entry.
