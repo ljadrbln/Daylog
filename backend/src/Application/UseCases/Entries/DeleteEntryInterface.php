@@ -6,7 +6,6 @@ namespace Daylog\Application\UseCases\Entries;
 use Daylog\Application\DTO\Entries\DeleteEntry\DeleteEntryRequestInterface;
 use Daylog\Application\DTO\Entries\DeleteEntry\DeleteEntryResponseInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
-use Daylog\Application\Exceptions\TransportValidationException;
 
 /**
  * Use Case Contract: UC-4 DeleteEntry.
@@ -23,7 +22,6 @@ use Daylog\Application\Exceptions\TransportValidationException;
  * - Returns a response DTO indicating the outcome of the operation.
  *
  * Error cases:
- * - Invalid id (format/content) → TransportValidationException (e.g., ID_INVALID).
  * - Entry not found → DomainValidationException with code ENTRY_NOT_FOUND.
  */
 interface DeleteEntryInterface
@@ -31,10 +29,9 @@ interface DeleteEntryInterface
     /**
      * Execute UC-4 DeleteEntry.
      *
-     * @param DeleteEntryRequestInterface $request Input DTO containing the entry UUID.
+     * @param DeleteEntryRequestInterface   $request Input DTO containing the entry UUID.
      * @return DeleteEntryResponseInterface Response DTO indicating deletion outcome.
      *
-     * @throws TransportValidationException When the request payload fails transport-level validation.
      * @throws DomainValidationException    When the entry is not found or violates domain constraints.
      */
     public function execute(DeleteEntryRequestInterface $request): DeleteEntryResponseInterface;
