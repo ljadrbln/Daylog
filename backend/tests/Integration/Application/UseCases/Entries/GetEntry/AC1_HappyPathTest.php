@@ -54,15 +54,14 @@ final class AC1_HappyPathTest extends BaseGetEntryIntegrationTest
         $request = GetEntryRequestFactory::fromArray($payload);
 
         // Act
-        $result = $this->useCase->execute($request);
+        $response = $this->useCase->execute($request);
+        $entry  = $response->getEntry();
 
         // Assert
-        $this->assertInstanceOf(Entry::class, $result);
-
-        $actualId    = $result->getId();
-        $actualTitle = $result->getTitle();
-        $actualBody  = $result->getBody();
-        $actualDate  = $result->getDate();
+        $actualId    = $entry->getId();
+        $actualTitle = $entry->getTitle();
+        $actualBody  = $entry->getBody();
+        $actualDate  = $entry->getDate();
 
         $this->assertSame($row['id'],    $actualId);
         $this->assertSame($row['title'], $actualTitle);

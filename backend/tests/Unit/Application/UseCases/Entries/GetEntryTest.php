@@ -66,9 +66,10 @@ final class GetEntryTest extends Unit
         // Act
         $useCase  = new GetEntry($repo, $validator);
         $response = $useCase->execute($request);
+        $entry    = $response->getEntry();
 
         // Assert
-        $id        = $response->getId();
+        $id        = $entry->getId();
         $isValidId = UuidGenerator::isValid($id);
         $this->assertTrue($isValidId);
 
