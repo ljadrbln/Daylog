@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Application\UseCases\Entries;
+namespace Daylog\Application\UseCases\Entries\AddEntry;
 
-use Daylog\Application\UseCases\Entries\AddEntryInterface;
+use Daylog\Application\UseCases\Entries\AddEntry\AddEntryInterface;
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryResponse;
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryResponseInterface;

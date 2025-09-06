@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Application\UseCases\Entries;
+namespace Daylog\Application\UseCases\Entries\DeleteEntry;
 
-use Daylog\Application\UseCases\Entries\DeleteEntryInterface;
+use Daylog\Application\UseCases\Entries\DeleteEntry\DeleteEntryInterface;
 use Daylog\Application\DTO\Entries\DeleteEntry\DeleteEntryRequestInterface;
 use Daylog\Application\DTO\Entries\DeleteEntry\DeleteEntryResponse;
 use Daylog\Application\DTO\Entries\DeleteEntry\DeleteEntryResponseInterface;

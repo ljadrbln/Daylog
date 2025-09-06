@@ -10,10 +10,8 @@ use Daylog\Application\DTO\Entries\GetEntry\GetEntryRequestInterface;
 
 use Daylog\Application\Validators\Entries\GetEntry\GetEntryValidatorInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
-use Daylog\Application\UseCases\Entries\GetEntry;
-use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
+use Daylog\Application\UseCases\Entries\GetEntry\GetEntry;
 use Daylog\Domain\Services\UuidGenerator;
-use Daylog\Domain\Services\DateService;
 use Daylog\Domain\Models\Entries\Entry;
 
 use Daylog\Tests\Support\Helper\EntryTestData;
@@ -29,7 +27,7 @@ use Daylog\Tests\Support\Fakes\FakeEntryRepository;
  * - Uses mocked repository and mocked validator.
  * - Does not test actual validation logic (covered in GetEntryValidatorTest).
  *
- * @covers \Daylog\Application\UseCases\Entries\GetEntry
+ * @covers \Daylog\Application\UseCases\Entries\GetEntry\GetEntry
  * @group UC-GetEntry
  */
 final class GetEntryTest extends Unit
@@ -44,7 +42,7 @@ final class GetEntryTest extends Unit
      * - We assert that UUID is valid and all fields are propagated correctly.
      *
      * @return void
-     * @covers \Daylog\Application\UseCases\Entries\GetEntry
+     * @covers \Daylog\Application\UseCases\Entries\GetEntry\GetEntry
      */
     public function testHappyPathSavesEntryAndReturnsResponseDto(): void
     {
@@ -84,7 +82,7 @@ final class GetEntryTest extends Unit
      * - Act: execute use case inside try/catch.
      * - Assert: repository saveCalls() remains 0; exception class is correct.
      *
-     * @covers \Daylog\Application\UseCases\Entries\GetEntry::execute
+     * @covers \Daylog\Application\UseCases\Entries\GetEntry\GetEntry::execute
      */
     public function testValidationErrorDoesNotTouchRepository(): void
     {

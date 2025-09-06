@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Application\UseCases\Entries;
+namespace Daylog\Application\UseCases\Entries\GetEntry;
 
 use Daylog\Application\DTO\Entries\GetEntry\GetEntryRequestInterface;
 use Daylog\Application\DTO\Entries\GetEntry\GetEntryResponseInterface;

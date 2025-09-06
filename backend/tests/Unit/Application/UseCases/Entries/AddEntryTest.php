@@ -10,7 +10,7 @@ use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
 
 use Daylog\Application\Validators\Entries\AddEntry\AddEntryValidatorInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
-use Daylog\Application\UseCases\Entries\AddEntry;
+use Daylog\Application\UseCases\Entries\AddEntry\AddEntry;
 
 use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Domain\Services\DateService;
@@ -28,7 +28,7 @@ use Daylog\Tests\Support\Fakes\FakeEntryRepository;
  * - Uses mocked repository and mocked validator.
  * - Does not test actual validation logic (covered in AddEntryValidatorTest).
  *
- * @covers \Daylog\Application\UseCases\Entries\AddEntry
+ * @covers \Daylog\Application\UseCases\Entries\AddEntry\AddEntry
  * @group UC-AddEntry
  */
 final class AddEntryTest extends Unit
@@ -43,7 +43,7 @@ final class AddEntryTest extends Unit
      * - We assert that UUID is valid and all fields are propagated correctly.
      *
      * @return void
-     * @covers \Daylog\Application\UseCases\Entries\AddEntry
+     * @covers \Daylog\Application\UseCases\Entries\AddEntry\AddEntry
      */
     public function testHappyPathSavesEntryAndReturnsResponseDto(): void
     {
@@ -88,7 +88,7 @@ final class AddEntryTest extends Unit
      * - Act: execute use case inside try/catch.
      * - Assert: repository saveCalls() remains 0; exception class is correct.
      *
-     * @covers \Daylog\Application\UseCases\Entries\AddEntry::execute
+     * @covers \Daylog\Application\UseCases\Entries\AddEntry\AddEntry::execute
      */
     public function testValidationErrorDoesNotTouchRepository(): void
     {

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Daylog\Application\UseCases\Entries;
+namespace Daylog\Application\UseCases\Entries\ListEntries;
 
-use Daylog\Application\UseCases\Entries\ListEntriesInterface;
+use Daylog\Application\UseCases\Entries\ListEntries\ListEntriesInterface;
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequestInterface;
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesResponse;
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesResponseInterface;

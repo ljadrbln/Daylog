@@ -10,9 +10,8 @@ use Daylog\Application\DTO\Entries\DeleteEntry\DeleteEntryRequestInterface;
 
 use Daylog\Application\Validators\Entries\DeleteEntry\DeleteEntryValidatorInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
-use Daylog\Application\UseCases\Entries\DeleteEntry;
+use Daylog\Application\UseCases\Entries\DeleteEntry\DeleteEntry;
 
-use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Domain\Models\Entries\Entry;
 
@@ -31,7 +30,7 @@ use Daylog\Tests\Support\Fakes\FakeEntryRepository;
  * - Uses a mocked validator; actual validation logic is covered elsewhere.
  * - Data source comes from EntryTestData::getOne().
  *
- * @covers \Daylog\Application\UseCases\Entries\DeleteEntry
+ * @covers \Daylog\Application\UseCases\Entries\DeleteEntry\DeleteEntry
  * @group UC-DeleteEntry
  */
 final class DeleteEntryTest extends Unit
@@ -46,7 +45,7 @@ final class DeleteEntryTest extends Unit
      * - Execute use case; assert response echoes id; assert repository findById() returns null after deletion.
      *
      * @return void
-     * @covers \Daylog\Application\UseCases\Entries\DeleteEntry::execute
+     * @covers \Daylog\Application\UseCases\Entries\DeleteEntry\DeleteEntry::execute
      * 
      * @group UC-DeleteEntry
      */
@@ -94,7 +93,7 @@ final class DeleteEntryTest extends Unit
      * - Assert: the seeded entry still exists in FakeEntryRepository after the failed call.
      *
      * @return void
-     * @covers \Daylog\Application\UseCases\Entries\DeleteEntry::execute
+     * @covers \Daylog\Application\UseCases\Entries\DeleteEntry\DeleteEntry::execute
      */
     public function testValidationErrorDoesNotTouchRepository(): void
     {
@@ -145,7 +144,7 @@ final class DeleteEntryTest extends Unit
      * - Assert: entry A still exists in repository after the failure.
      *
      * @return void
-     * @covers \Daylog\Application\UseCases\Entries\DeleteEntry::execute
+     * @covers \Daylog\Application\UseCases\Entries\DeleteEntry\DeleteEntry::execute
      */
     public function testNotFoundThrowsAndDoesNotDeleteOtherEntries(): void
     {

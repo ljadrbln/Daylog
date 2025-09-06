@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases\Entries;
 
 use Codeception\Test\Unit;
-use Daylog\Application\UseCases\Entries\ListEntries;
+use Daylog\Application\UseCases\Entries\ListEntries\ListEntries;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Application\Validators\Entries\ListEntries\ListEntriesValidatorInterface;
 use Daylog\Domain\Models\Entries\Entry;
@@ -23,7 +23,7 @@ use Daylog\Tests\Support\Helper\ListEntriesHelper;
  * - Storage is responsible for timestamps; domain Entry exposes logical date only.
  * - Repository is mocked; data source is synthesized via EntryTestData.
  *
- * @covers \Daylog\Application\UseCases\Entries\ListEntries
+ * @covers \Daylog\Application\UseCases\Entries\ListEntries\ListEntries
  * @group UC-ListEntries
  */
 final class ListEntriesTest extends Unit
