@@ -23,7 +23,7 @@ use Daylog\Infrastructure\Storage\Entries\EntryModel;
  * Provider for UC-1 ListEntries.
  *
  * Purpose:
- * Compose the dependency chain (DB\SQL => Model => Storage => Repository => Validator => UseCase).
+ * Compose the dependency chain (DB\SQL → Model → Storage → Repository → Validator → UseCase).
  *
  * @return ListEntriesInterface Fully wired use case ready for execution.
  */

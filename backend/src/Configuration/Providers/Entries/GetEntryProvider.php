@@ -22,7 +22,7 @@ use Daylog\Infrastructure\Storage\Entries\EntryModel;
  * Provider for UC-3 GetEntry.
  *
  * Purpose:
- * Compose the dependency chain (DB\SQL => Model => Storage => Repository => Validator => UseCase)
+ * Compose the dependency chain (DB\SQL → Model → Storage → Repository → Validator → UseCase)
  * to retrieve a single diary entry by UUIDv4. Keeps wiring centralized and framework-agnostic.
  *
  * Mechanics:
