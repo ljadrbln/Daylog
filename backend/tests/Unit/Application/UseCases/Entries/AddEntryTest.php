@@ -64,18 +64,20 @@ final class AddEntryTest extends Unit
         $response = $useCase->execute($request);
 
         // Assert
-        $id        = $response->getId();
-        $isValidId = UuidGenerator::isValid($id);
+        $entry = $response->getEntry();
+
+        $entryId   = $entry->getId();
+        $isValidId = UuidGenerator::isValid($entryId);
         $this->assertTrue($isValidId);
 
-        $this->assertSame($data['title'], $response->getTitle());
-        $this->assertSame($data['body'],  $response->getBody());
-        $this->assertSame($data['date'],  $response->getDate());
+        $this->assertSame($data['title'], $entry->getTitle());
+        $this->assertSame($data['body'],  $entry->getBody());
+        $this->assertSame($data['date'],  $entry->getDate());
 
-        $actualCreatedAt = $response->getCreatedAt();
-        $actualUpdatedAt = $response->getUpdatedAt();
-
+        $actualCreatedAt = $entry->getCreatedAt();
+        $actualUpdatedAt = $entry->getUpdatedAt();
         $isCreatedAtDateValid = DateService::isValidIsoUtcDateTime($actualCreatedAt);
+        
         $this->assertTrue($isCreatedAtDateValid);
         $this->assertSame($actualCreatedAt, $actualUpdatedAt);
     }
