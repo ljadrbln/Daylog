@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Tests\Unit\Presentation\Requests\Entries;
+namespace Daylog\Tests\Unit\Presentation\Requests\Entries\AddEntry;
 
 use Codeception\Test\Unit;
-use Daylog\Presentation\Requests\Entries\AddEntryRequestFactory;
+use Daylog\Presentation\Requests\Entries\AddEntry\AddEntryRequestFactory;
 use Daylog\Application\Exceptions\TransportValidationException;
 use Daylog\Tests\Support\Helper\EntryTestData;
 
@@ -16,7 +16,7 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  * types of required fields (`title`, `body`, `date`), but does not enforce
  * business rules (those are validated separately in Application layer).
  *
- * @covers \Daylog\Presentation\Requests\AddEntryRequestFactory
+ * @covers \Daylog\Presentation\Requests\AddEntry\AddEntryRequestFactory
  * @group UC-AddEntry
  * 
  */

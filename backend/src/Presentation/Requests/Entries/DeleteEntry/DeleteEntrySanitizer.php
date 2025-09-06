@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Presentation\Requests\Entries;
+namespace Daylog\Presentation\Requests\Entries\DeleteEntry;
 
 /**
  * Sanitizer for UC-3 Delete Entry transport input.

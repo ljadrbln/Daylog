@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Tests\Unit\Presentation\Requests\Entries;
+namespace Daylog\Tests\Unit\Presentation\Requests\Entries\ListEntries;
 
 use Codeception\Test\Unit;
-use Daylog\Presentation\Requests\Entries\ListEntriesSanitizer;
+use Daylog\Presentation\Requests\Entries\ListEntries\ListEntriesSanitizer;
 use Daylog\Tests\Support\Helper\ListEntriesHelper;
 
 /**
@@ -22,7 +22,7 @@ use Daylog\Tests\Support\Helper\ListEntriesHelper;
  * Covered fields (if present in input):
  *   - sortField, sortDir, dateFrom, dateTo, date, query
  *
- * @covers \Daylog\Presentation\Requests\Entries\ListEntriesSanitizer
+ * @covers \Daylog\Presentation\Requests\Entries\ListEntries\ListEntriesSanitizer
  * @group UC-ListEntries
  */
 final class ListEntriesSanitizerTest extends Unit

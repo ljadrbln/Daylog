@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Presentation\Requests\Entries;
+namespace Daylog\Presentation\Requests\Entries\ListEntries;
 
 /**
  * Sanitizer for UC-2 List Entries transport input (pure, non-expanding).
  *
  * Purpose:
- * Apply BR-3 (Trimming) only to existing string fields without introducing
+ * Apply BR-1 (Trimming) only to existing string fields without introducing
  * new keys or altering types of non-string values.
  *
  * Mechanics:

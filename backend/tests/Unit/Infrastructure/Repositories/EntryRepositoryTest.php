@@ -11,9 +11,8 @@ use Daylog\Tests\Support\Helper\EntryTestData;
 use Daylog\Domain\Models\Entries\ListEntriesCriteria;
 
 use Daylog\Tests\Support\Helper\ListEntriesHelper;
-use Daylog\Domain\Models\Entries\ListEntriesConstraints;
 use Daylog\Application\Normalization\Entries\ListEntries\ListEntriesInputNormalizer;
-use Daylog\Presentation\Requests\Entries\ListEntriesSanitizer;
+use Daylog\Presentation\Requests\Entries\ListEntries\ListEntriesSanitizer;
 
 
 /**

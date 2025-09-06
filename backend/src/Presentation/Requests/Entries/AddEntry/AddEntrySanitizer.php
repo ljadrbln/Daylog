@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Presentation\Requests\Entries;
+namespace Daylog\Presentation\Requests\Entries\AddEntry;
 
 /**
  * Sanitizer for UC-1 Add Entry transport input.

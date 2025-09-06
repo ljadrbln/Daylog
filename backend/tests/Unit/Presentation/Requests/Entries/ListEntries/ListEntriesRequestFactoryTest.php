@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Daylog\Tests\Unit\Presentation\Requests\Entries;
+namespace Daylog\Tests\Unit\Presentation\Requests\Entries\ListEntries;
 
 use Codeception\Test\Unit;
-use Daylog\Presentation\Requests\Entries\ListEntriesRequestFactory;
+use Daylog\Presentation\Requests\Entries\ListEntries\ListEntriesRequestFactory;
 use Daylog\Tests\Support\Helper\ListEntriesHelper;
 use Daylog\Application\Exceptions\TransportValidationException;
 
@@ -22,7 +22,7 @@ use Daylog\Application\Exceptions\TransportValidationException;
  * Notes:
  * - Business rules (date validity, query length, clamping) are validated later in Application layer.
  *
- * @covers \Daylog\Presentation\Requests\Entries\ListEntriesRequestFactory
+ * @covers \Daylog\Presentation\Requests\Entries\ListEntries\ListEntriesRequestFactory
  * @group UC-ListEntries
  */
 final class ListEntriesRequestFactoryTest extends Unit

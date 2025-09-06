@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Tests\Unit\Presentation\Requests\Entries;
+namespace Daylog\Tests\Unit\Presentation\Requests\Entries\DeleteEntry;
 
 use Codeception\Test\Unit;
-use Daylog\Presentation\Requests\Entries\DeleteEntrySanitizer;
+use Daylog\Presentation\Requests\Entries\DeleteEntry\DeleteEntrySanitizer;
 use Daylog\Tests\Support\Helper\EntryTestData;
 
 /**
@@ -19,7 +19,7 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  *   - Override id field with whitespace variations.
  *   - Expect sanitized id to be trimmed.
  *
- * @covers \Daylog\Presentation\Requests\Entries\DeleteEntrySanitizer
+ * @covers \Daylog\Presentation\Requests\Entries\DeleteEntry\DeleteEntrySanitizer
  * @group UC-DeleteEntry
  */
 final class DeleteEntrySanitizerTest extends Unit

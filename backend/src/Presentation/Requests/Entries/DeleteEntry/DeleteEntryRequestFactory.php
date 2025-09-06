@@ -1,12 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Presentation\Requests\Entries;
+namespace Daylog\Presentation\Requests\Entries\DeleteEntry;
 
 use Daylog\Application\DTO\Entries\DeleteEntry\DeleteEntryRequest;
 use Daylog\Application\DTO\Entries\DeleteEntry\DeleteEntryRequestInterface;
 use Daylog\Application\Exceptions\TransportValidationException;
 use Daylog\Presentation\Requests\Rules\IdTransportRule;
+use Daylog\Presentation\Requests\Entries\DeleteEntry\DeleteEntrySanitizer;
 
 /**
  * Builds DeleteEntryRequest DTO from raw transport input (UC-DeleteEntry, fail-first).

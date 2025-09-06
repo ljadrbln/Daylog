@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Tests\Unit\Presentation\Requests\Entries;
+namespace Daylog\Tests\Unit\Presentation\Requests\Entries\AddEntry;
 
 use Codeception\Test\Unit;
-use Daylog\Presentation\Requests\Entries\AddEntrySanitizer;
+use Daylog\Presentation\Requests\Entries\AddEntry\AddEntrySanitizer;
 use Daylog\Tests\Support\Helper\EntryTestData;
 
 /**
@@ -19,7 +19,7 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  *   - Override individual fields with whitespace variations.
  *   - Expect sanitized fields to be trimmed.
  *
- * @covers \Daylog\Presentation\Requests\Entries\AddEntrySanitizer
+ * @covers \Daylog\Presentation\Requests\Entries\AddEntry\AddEntrySanitizer
  * @group UC-AddEntry
  */
 final class AddEntrySanitizerTest extends Unit

@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Tests\Unit\Presentation\Requests\Entries;
+namespace Daylog\Tests\Unit\Presentation\Requests\Entries\GetEntry;
 
 use Codeception\Test\Unit;
-use Daylog\Presentation\Requests\Entries\GetEntrySanitizer;
+use Daylog\Presentation\Requests\Entries\GetEntry\GetEntrySanitizer;
 use Daylog\Tests\Support\Helper\EntryTestData;
 
 /**

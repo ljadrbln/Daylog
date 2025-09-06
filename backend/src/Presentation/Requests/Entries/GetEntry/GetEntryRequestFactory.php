@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Presentation\Requests\Entries;
+namespace Daylog\Presentation\Requests\Entries\GetEntry;
 
 use Daylog\Application\DTO\Entries\GetEntry\GetEntryRequest;
 use Daylog\Application\DTO\Entries\GetEntry\GetEntryRequestInterface;
-use Daylog\Presentation\Requests\Entries\GetEntrySanitizer;
+use Daylog\Presentation\Requests\Entries\GetEntry\GetEntrySanitizer;
 use Daylog\Application\Exceptions\TransportValidationException;
 use Daylog\Presentation\Requests\Rules\IdTransportRule;
 
