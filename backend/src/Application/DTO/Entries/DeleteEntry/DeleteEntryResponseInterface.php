@@ -3,21 +3,42 @@ declare(strict_types=1);
 
 namespace Daylog\Application\DTO\Entries\DeleteEntry;
 
+use Daylog\Application\DTO\Common\UseCaseResponseInterface;
+use Daylog\Domain\Models\Entries\Entry;
+
 /**
- * Response DTO contract for UC-4 DeleteEntry.
+ * Response DTO contract for UC-4 Delete Entry.
  *
  * Purpose:
- * Return a lightweight confirmation that includes the deleted entry UUID.
+ * Define a unified Application-level response for successful deletion,
+ * built from the deleted domain Entry and serializable for Presentation.
  *
  * Mechanics:
- * - Use cases construct this object on successful deletion.
+ * - Built via static factory fromEntry().
+ * - Exposes getEntry() for internal usage.
+ * - Provides toArray() for a flat associative payload (no transport details).
+ *
+ * @extends UseCaseResponseInterface<array{
+ *   id: string,
+ *   title: string,
+ *   body: string,
+ *   date: string,
+ *   createdAt: string,
+ *   updatedAt: string
+ * }>
  */
-interface DeleteEntryResponseInterface
+interface DeleteEntryResponseInterface extends UseCaseResponseInterface
 {
     /**
-     * Get deleted entry UUID.
+     * Build a response from the deleted domain Entry.
      *
-     * @return string UUID string that was deleted.
+     * @param Entry $entry Deleted entity snapshot.
+     * @return self
      */
-    public function getId(): string;
+    public static function fromEntry(Entry $entry): self;
+
+    /**
+     * @return Entry Deleted entry snapshot for downstream usage.
+     */
+    public function getEntry(): Entry;
 }

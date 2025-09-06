@@ -3,37 +3,80 @@ declare(strict_types=1);
 
 namespace Daylog\Application\DTO\Entries\DeleteEntry;
 
-use Daylog\Application\DTO\Entries\DeleteEntry\DeleteEntryResponseInterface;
+use Daylog\Application\DTO\Common\UseCaseResponseInterface;
+use Daylog\Domain\Models\Entries\Entry;
 
 /**
- * Concrete response DTO for UC-4 DeleteEntry.
+ * Concrete response DTO for UC-4 Delete Entry.
  *
  * Purpose:
- * Provide a simple acknowledgment containing the deleted UUID.
+ * Provide a snapshot of the deleted Entry, and a flat payload for Presentation.
  *
  * Mechanics:
- * - Immutable value object with a single getter.
+ * - Constructed via fromEntry() to avoid partial/invalid states.
+ * - getEntry() returns the domain snapshot.
+ * - toArray() returns a scalar-only associative payload.
+ *
+ * @implements UseCaseResponseInterface<array{
+ *   id: string,
+ *   title: string,
+ *   body: string,
+ *   date: string,
+ *   createdAt: string,
+ *   updatedAt: string
+ * }>
  */
-final class DeleteEntryResponse implements DeleteEntryResponseInterface
+final class DeleteEntryResponse implements DeleteEntryResponseInterface, UseCaseResponseInterface
 {
-    /** @var string */
-    private string $id;
+    private Entry $entry;
 
     /**
-     * @param string $id UUID that was deleted.
+     * @param Entry $entry Deleted domain entity snapshot.
      */
-    public function __construct(string $id)
+    private function __construct(Entry $entry)
     {
-        $value = $id;
-        $this->id = $value;
+        $this->entry = $entry;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getId(): string
+    public static function fromEntry(Entry $entry): self
     {
-        $value = $this->id;
-        return $value;
+        $response = new self($entry);
+        return $response;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getEntry(): Entry
+    {
+        return $this->entry;
+    }
+
+    /**
+     * Convert response to a flat associative payload (scalars only).
+     *
+     * @return array{
+     *   id: string,
+     *   title: string,
+     *   body: string,
+     *   date: string,
+     *   createdAt: string,
+     *   updatedAt: string
+     * }
+     */
+    public function toArray(): array
+    {
+        $payload = [
+            'id'        => $this->entry->getId(),
+            'title'     => $this->entry->getTitle(),
+            'body'      => $this->entry->getBody(),
+            'date'      => $this->entry->getDate(),
+            'createdAt' => $this->entry->getCreatedAt(),
+            'updatedAt' => $this->entry->getUpdatedAt(),
+        ];
+        return $payload;
     }
 }

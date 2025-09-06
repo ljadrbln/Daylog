@@ -11,6 +11,7 @@ use Daylog\Application\Validators\Entries\DeleteEntry\DeleteEntryValidatorInterf
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 
 use Daylog\Application\Exceptions\DomainValidationException;
+
 /**
  * UC-4 DeleteEntry — application service.
  *
@@ -41,18 +42,16 @@ final class DeleteEntry implements DeleteEntryInterface
     }
 
     /**
-     * Execute UC-4 DeleteEntry.
+     * Execute UC-4 Delete Entry.
      *
      * Purpose:
-     * - Validate the request.
-     * - Ensure the entry exists before deleting.
-     * - Throw DomainValidationException if not found.
-     * - On success, delete and return a response with the id.
+     * Validate request, ensure entry exists, delete it, and return a response
+     * built from the pre-fetched domain snapshot.
      *
      * @param DeleteEntryRequestInterface $request
      * @return DeleteEntryResponseInterface
      *
-     * @throws DomainValidationException ENTRY_NOT_FOUND when entity is absent.
+     * @throws DomainValidationException When entry is not found.
      */
     public function execute(DeleteEntryRequestInterface $request): DeleteEntryResponseInterface
     {
@@ -64,13 +63,13 @@ final class DeleteEntry implements DeleteEntryInterface
         if (is_null($entry)) {
             $errorCode = 'ENTRY_NOT_FOUND';
             $exception = new DomainValidationException($errorCode);
-            
+
             throw $exception;
         }
 
         $this->repo->deleteById($id);
 
-        $response = new DeleteEntryResponse($id);
+        $response = DeleteEntryResponse::fromEntry($entry);
         return $response;
     }
 }

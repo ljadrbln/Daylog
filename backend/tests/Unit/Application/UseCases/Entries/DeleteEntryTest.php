@@ -74,13 +74,14 @@ final class DeleteEntryTest extends Unit
         $response = $useCase->execute($request);
 
         // Assert: response echoes the same UUID and it's a valid UUID
-        $id        = $response->getId();
-        $isValidId = UuidGenerator::isValid($id);
+        $entry     = $response->getEntry();
+        $entryId   = $entry->getId();
+        $isValidId = UuidGenerator::isValid($entryId);
         $this->assertTrue($isValidId);
-        $this->assertSame($data['id'], $id);
+        $this->assertSame($data['id'], $entryId);
 
         // Assert: entity is removed from storage
-        $foundAfter = $repo->findById($id);
+        $foundAfter = $repo->findById($entryId);
         $this->assertNull($foundAfter);
     }
 
