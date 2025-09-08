@@ -8,6 +8,7 @@ use Daylog\Presentation\Requests\Entries\UpdateEntry\UpdateEntryRequestFactory;
 use Daylog\Application\Exceptions\TransportValidationException;
 use Daylog\Tests\Support\DataProviders\IdTransportDataProvider;
 use Daylog\Tests\Support\Helper\EntryTestData;
+use Daylog\Tests\Support\DataProviders\EntryFieldsTransportDataProvider;
 
 /**
  * Unit tests for UpdateEntryRequestFactory.
@@ -30,6 +31,7 @@ use Daylog\Tests\Support\Helper\EntryTestData;
 final class UpdateEntryRequestFactoryTest extends Unit
 {
     use IdTransportDataProvider;
+    use EntryFieldsTransportDataProvider;
 
     /**
      * Happy path: id + title only → returns DTO with mapped values.
@@ -54,7 +56,7 @@ final class UpdateEntryRequestFactoryTest extends Unit
     /**
      * Transport validation errors: For invalid type or missing field, throws TransportValidationException.
      *
-     * @dataProvider provideInvalidTransportData
+     * @dataProvider provideInvalidTransportEntryData
      *
      * @param array<string,mixed> $overrides
      * @param string              $expectedCode
@@ -72,24 +74,5 @@ final class UpdateEntryRequestFactoryTest extends Unit
 
         // Act
         UpdateEntryRequestFactory::fromArray($data);
-    }
-
-    /**
-     * Provides invalid type cases for optional fields (present but not strings).
-     *
-     * @return array<string,array{0:array<string,mixed>,1:string}>
-     */
-    public function provideInvalidTransportData(): array
-    {
-        $cases = [
-            'title is array' => [['title' => ['oops']], 'TITLE_MUST_BE_STRING'],
-            'title is int'   => [['title' => 123],      'TITLE_MUST_BE_STRING'],
-            'body is array'  => [['body'  => ['oops']], 'BODY_MUST_BE_STRING'],
-            'body is int'    => [['body'  => 456],      'BODY_MUST_BE_STRING'],
-            'date is array'  => [['date'  => ['oops']], 'DATE_MUST_BE_STRING'],
-            'date is int'    => [['date'  => 20250101], 'DATE_MUST_BE_STRING'],
-        ];
-
-        return $cases;
     }
 }

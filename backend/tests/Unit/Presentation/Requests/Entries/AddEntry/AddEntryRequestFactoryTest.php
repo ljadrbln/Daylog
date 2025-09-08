@@ -7,6 +7,7 @@ use Codeception\Test\Unit;
 use Daylog\Presentation\Requests\Entries\AddEntry\AddEntryRequestFactory;
 use Daylog\Application\Exceptions\TransportValidationException;
 use Daylog\Tests\Support\Helper\EntryTestData;
+use Daylog\Tests\Support\DataProviders\EntryFieldsTransportDataProvider;
 
 /**
  * Unit tests for AddEntryRequestFactory.
@@ -22,6 +23,8 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  */
 final class AddEntryRequestFactoryTest extends Unit
 {
+    use EntryFieldsTransportDataProvider;
+
     /**
      * Happy path: Given valid input, returns a DTO with mapped values.
      *
@@ -44,7 +47,7 @@ final class AddEntryRequestFactoryTest extends Unit
     /**
      * Transport validation errors: For invalid type or missing field, throws TransportValidationException.
      *
-     * @dataProvider provideInvalidTransportData
+     * @dataProvider provideInvalidTransportEntryData
      *
      * @param array<string,mixed> $overrides
      * @param string              $expectedCode
@@ -62,28 +65,5 @@ final class AddEntryRequestFactoryTest extends Unit
 
         // Act
         AddEntryRequestFactory::fromArray($data);
-    }
-
-    /**
-     * Provides invalid transport-level cases:
-     * - title is array
-     * - title missing
-     * - body is array
-     * - body missing
-     * - date missing
-     * - date is array
-     *
-     * @return array<string,array{0:array<string,mixed>}>
-     */
-    public function provideInvalidTransportData(): array
-    {
-        return [
-            'title is array' => [['title' => ['oops']], 'TITLE_MUST_BE_STRING'],
-            'title missing'  => [['title' => null],     'TITLE_MUST_BE_STRING'],
-            'body is array'  => [['body'  => ['oops']], 'BODY_MUST_BE_STRING'],
-            'body missing'   => [['body'  => null],     'BODY_MUST_BE_STRING'],
-            'date missing'   => [['date'  => null],     'DATE_MUST_BE_STRING'],
-            'date is array'  => [['date'  => ['oops']], 'DATE_MUST_BE_STRING'],
-        ];
     }
 }
