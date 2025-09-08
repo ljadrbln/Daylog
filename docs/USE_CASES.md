@@ -28,4 +28,11 @@ Delete an existing diary entry by its UUID.
 
 ---
 
+## UC-5 Update Entry
+Update an existing diary entry by its UUID.
+
+**Details:** [UC-5-UpdateEntry.md](use-cases/UC-5-UpdateEntry.md)
+
+---
+
 *(More use cases will be added as the project evolves.)*

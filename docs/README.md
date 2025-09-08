@@ -13,6 +13,7 @@ Start here to navigate the project documentation.
 - UC-2 details: [UC-2 — List Entries](use-cases/UC-2-ListEntries.md)
 - UC-3 details: [UC-3 — Get Entry](use-cases/UC-3-GetEntry.md)
 - UC-4 details: [UC-4 — Delete Entry](use-cases/UC-4-DeleteEntry.md)
+- UC-5 details: [UC-5 — Update Entry](use-cases/UC-5-UpdateEntry.md)
 - Template: [UC Template](use-cases/UC_TEMPLATE.md)
 
 ## Process & Conventions

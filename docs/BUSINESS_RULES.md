@@ -13,5 +13,3 @@ These rules apply across the system unless a use case specifies otherwise.
 - Invariants: `updatedAt >= createdAt` must always hold.
 
 Implementation note: strict calendar date validation is implemented by DateService::isValidLocalDate().
-
-
