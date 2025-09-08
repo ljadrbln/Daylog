@@ -71,7 +71,7 @@ final class UpdateEntryRequestFactoryTest extends Unit
         $this->expectExceptionMessage($expectedCode);
 
         // Act
-        AddEntryRequestFactory::fromArray($data);
+        UpdateEntryRequestFactory::fromArray($data);
     }
 
     /**
