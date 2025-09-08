@@ -7,7 +7,7 @@ use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequest;
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
 use Daylog\Presentation\Requests\Entries\UpdateEntry\UpdateEntrySanitizer;
 use Daylog\Application\Exceptions\TransportValidationException;
-use Daylog\Presentation\Requests\Rules\IdTransportRule;
+use Daylog\Presentation\Requests\Rules\Common\IdTransportRule;
 
 /**
  * Builds UpdateEntryRequest DTO from raw transport input.
@@ -35,9 +35,10 @@ final class UpdateEntryRequestFactory
      * - This factory only ensures transport correctness for UC-1 Add Entry.
      *
      * @param array{
-     *     title:string,
-     *     body:string,
-     *     date:string
+     *     id:string,
+     *     title?:string,
+     *     body?:string,
+     *     date?:string
      * } $params Raw transport map (e.g., $_GET or JSON).
      * 
      * @return UpdateEntryRequestInterface Typed request DTO for UC-1.
@@ -46,7 +47,7 @@ final class UpdateEntryRequestFactory
      */
     public static function fromArray(array $params): UpdateEntryRequestInterface
     {
-        IdTransportRule::assertValid($params);
+        IdTransportRule::assertValidRequired($params);
 
         self::validateTitle($params);
         self::validateBody($params);

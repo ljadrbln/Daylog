@@ -7,7 +7,7 @@ use Daylog\Application\DTO\Entries\GetEntry\GetEntryRequest;
 use Daylog\Application\DTO\Entries\GetEntry\GetEntryRequestInterface;
 use Daylog\Presentation\Requests\Entries\GetEntry\GetEntrySanitizer;
 use Daylog\Application\Exceptions\TransportValidationException;
-use Daylog\Presentation\Requests\Rules\IdTransportRule;
+use Daylog\Presentation\Requests\Rules\Common\IdTransportRule;
 
 /**
  * Builds GetEntryRequest DTO from raw transport input (UC-3, fail-first).
@@ -29,7 +29,7 @@ final class GetEntryRequestFactory
     /**
      * Build a typed request DTO from raw transport map.
      *
-     * @param array{id:mixed} $params Raw transport map (e.g. $_GET or decoded JSON).
+     * @param array{id:string} $params Raw transport map (e.g. $_GET or decoded JSON).
      * @return GetEntryRequestInterface Typed request DTO for UC-3.
      *
      * @throws TransportValidationException
@@ -38,7 +38,7 @@ final class GetEntryRequestFactory
      */
     public static function fromArray(array $params): GetEntryRequestInterface
     {
-        IdTransportRule::assertValid($params);
+        IdTransportRule::assertValidRequired($params);
 
         $params  = GetEntrySanitizer::sanitize($params);
         $request = GetEntryRequest::fromArray($params);

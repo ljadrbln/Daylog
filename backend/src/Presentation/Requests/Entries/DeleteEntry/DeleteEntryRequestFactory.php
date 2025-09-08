@@ -6,7 +6,7 @@ namespace Daylog\Presentation\Requests\Entries\DeleteEntry;
 use Daylog\Application\DTO\Entries\DeleteEntry\DeleteEntryRequest;
 use Daylog\Application\DTO\Entries\DeleteEntry\DeleteEntryRequestInterface;
 use Daylog\Application\Exceptions\TransportValidationException;
-use Daylog\Presentation\Requests\Rules\IdTransportRule;
+use Daylog\Presentation\Requests\Rules\Common\IdTransportRule;
 use Daylog\Presentation\Requests\Entries\DeleteEntry\DeleteEntrySanitizer;
 
 /**
@@ -42,10 +42,10 @@ final class DeleteEntryRequestFactory
      */
     public static function fromArray(array $params): DeleteEntryRequestInterface
     {
-        IdTransportRule::assertValid($params);
+        IdTransportRule::assertValidRequired($params);
 
-        $sanitized = DeleteEntrySanitizer::sanitize($params);
-        $request   = DeleteEntryRequest::fromArray($sanitized);
+        $params  = DeleteEntrySanitizer::sanitize($params);
+        $request = DeleteEntryRequest::fromArray($params);
 
         return $request;
     }

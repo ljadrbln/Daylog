@@ -13,8 +13,8 @@ use Daylog\Application\Exceptions\TransportValidationException;
  * at the transport boundary, prior to business validation.
  *
  * Mechanics:
- * - assertRequired(): field key must exist, value !== null, and be string.
- * - assertOptional(): field may be absent/null; if present, must be string.
+ * - assertValidRequired(): field key must exist, value !== null, and be string.
+ * - assertValidOptional(): field may be absent/null; if present, must be string.
  * - Throws TransportValidationException with provided error codes.
  */
 final class StringTransportRule
@@ -30,7 +30,7 @@ final class StringTransportRule
      *
      * @throws TransportValidationException
      */
-    public static function assertRequired(array $input, string $key, string $missingCode, string $typeCode): void
+    public static function assertValidRequired(array $input, string $key, string $missingCode, string $typeCode): void
     {
         $exists = array_key_exists($key, $input);
         $raw    = $exists ? $input[$key] : null;
@@ -38,12 +38,14 @@ final class StringTransportRule
         if ($raw === null) {
             $message   = $missingCode;
             $exception = new TransportValidationException($message);
+            
             throw $exception;
         }
 
         if (!is_string($raw)) {
             $message   = $typeCode;
             $exception = new TransportValidationException($message);
+
             throw $exception;
         }
     }
@@ -58,7 +60,7 @@ final class StringTransportRule
      *
      * @throws TransportValidationException
      */
-    public static function assertOptional(array $input, string $key, string $typeCode): void
+    public static function assertValidOptional(array $input, string $key, string $typeCode): void
     {
         $exists = array_key_exists($key, $input);
         if ($exists === false) {
@@ -73,6 +75,7 @@ final class StringTransportRule
         if (!is_string($raw)) {
             $message   = $typeCode;
             $exception = new TransportValidationException($message);
+            
             throw $exception;
         }
     }
