@@ -12,7 +12,7 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  * Class EntryTransformerTest
  *
  * Verifies that EntryTransformer converts a Domain Entry into a plain array
- * suitable for UC-2 List Entries presentation. The transformer is intentionally
+ * suitable for  presentation. The transformer is intentionally
  * stateless and performs a 1:1 field mapping without side effects or mutation.
  *
  * Mechanics under test:
