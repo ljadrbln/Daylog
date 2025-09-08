@@ -8,6 +8,10 @@ use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
 use Daylog\Presentation\Requests\Entries\AddEntry\AddEntrySanitizer;
 use Daylog\Application\Exceptions\TransportValidationException;
 
+use Daylog\Presentation\Requests\Rules\Entries\BodyTransportRule;
+use Daylog\Presentation\Requests\Rules\Entries\DateTransportRule;
+use Daylog\Presentation\Requests\Rules\Entries\TitleTransportRule;
+
 /**
  * Builds AddEntryRequest DTO from raw transport input.
  *
@@ -45,67 +49,13 @@ final class AddEntryRequestFactory
      */
     public static function fromArray(array $params): AddEntryRequestInterface
     {
-        self::validateTitle($params);
-        self::validateBody($params);
-        self::validateDate($params);
+        TitleTransportRule::assertValidRequired($params);
+        BodyTransportRule::assertValidRequired($params);
+        DateTransportRule::assertValidRequired($params);
 
         $params  = AddEntrySanitizer::sanitize($params);
         $request = AddEntryRequest::fromArray($params);
 
         return $request;
-    }
-
-    /**
-     * Validate title: must be present (non-null) and string.
-     *
-     * @param array<string,mixed> $input
-     * @return void
-     */
-    private static function validateTitle(array $input): void
-    {
-        $rawTitle = $input['title'] ?? null;
-
-        if (!is_string($rawTitle)) { 
-            $errorCode = 'TITLE_MUST_BE_STRING'; 
-            $exception = new TransportValidationException($errorCode);
-
-            throw $exception;
-        }
-    }
-
-    /**
-     * Validate body: must be present (non-null) and string.
-     *
-     * @param array<string,mixed> $input
-     * @return void
-     */
-    private static function validateBody(array $input): void
-    {
-        $rawBody = $input['body'] ?? null;
-
-        if (!is_string($rawBody)) { 
-            $errorCode = 'BODY_MUST_BE_STRING'; 
-            $exception = new TransportValidationException($errorCode);
-
-            throw $exception;
-        }
-    }
-
-    /**
-     * Validate date: must be present (non-null) and string.
-     *
-     * @param array<string,mixed> $input
-     * @return void
-     */
-    private static function validateDate(array $input): void
-    {
-        $rawDate = $input['date'] ?? null; 
-
-        if (!is_string($rawDate)) { 
-            $errorCode = 'DATE_MUST_BE_STRING'; 
-            $exception = new TransportValidationException($errorCode);
-
-            throw $exception;            
-        }
     }
 }

@@ -15,6 +15,9 @@ use Daylog\Presentation\Requests\Rules\Common\StringTransportRule;
  */
 final class DateTransportRule
 {
+    private const ERROR_REQUIRED   = 'DATE_REQUIRED';
+    private const ERROR_NOT_STRING = 'DATE_MUST_BE_STRING';
+
     /**
      * Assert that 'date' exists and is a string (e.g., UC-1 AddEntry).
      *
@@ -23,12 +26,12 @@ final class DateTransportRule
      *
      * @throws TransportValidationException
      */
-    public static function assertRequired(array $input): void
+    public static function assertValidRequired(array $input): void
     {
-        $missing = 'DATE_REQUIRED';
-        $type    = 'DATE_NOT_STRING';
+        $missingCode = self::ERROR_REQUIRED;
+        $typeCode    = self::ERROR_NOT_STRING;
 
-        StringTransportRule::assertRequired($input, 'date', $missing, $type);
+        StringTransportRule::assertValidRequired($input, 'date', $missingCode, $typeCode);
     }
 
     /**
@@ -39,9 +42,9 @@ final class DateTransportRule
      *
      * @throws TransportValidationException
      */
-    public static function assertOptional(array $input): void
+    public static function assertValidOptional(array $input): void
     {
-        $type = 'DATE_NOT_STRING';
-        StringTransportRule::assertOptional($input, 'date', $type);
+        $typeCode = self::ERROR_NOT_STRING;
+        StringTransportRule::assertValidOptional($input, 'date', $typeCode);        
     }
 }

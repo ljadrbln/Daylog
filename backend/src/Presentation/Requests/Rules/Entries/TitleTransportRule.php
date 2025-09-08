@@ -15,6 +15,9 @@ use Daylog\Presentation\Requests\Rules\Common\StringTransportRule;
  */
 final class TitleTransportRule
 {
+    private const ERROR_REQUIRED   = 'TITLE_REQUIRED';
+    private const ERROR_NOT_STRING = 'TITLE_MUST_BE_STRING';
+
     /**
      * Assert that 'title' exists and is a string (e.g., UC-1 AddEntry).
      *
@@ -23,12 +26,12 @@ final class TitleTransportRule
      *
      * @throws TransportValidationException
      */
-    public static function assertRequired(array $input): void
+    public static function assertValidRequired(array $input): void
     {
-        $missing = 'TITLE_REQUIRED';
-        $type    = 'TITLE_NOT_STRING';
+        $missingCode = self::ERROR_REQUIRED;
+        $typeCode    = self::ERROR_NOT_STRING;
 
-        StringTransportRule::assertRequired($input, 'title', $missing, $type);
+        StringTransportRule::assertValidRequired($input, 'title', $missingCode, $typeCode);
     }
 
     /**
@@ -39,9 +42,9 @@ final class TitleTransportRule
      *
      * @throws TransportValidationException
      */
-    public static function assertOptional(array $input): void
+    public static function assertValidOptional(array $input): void
     {
-        $type = 'TITLE_NOT_STRING';
-        StringTransportRule::assertOptional($input, 'title', $type);
+        $typeCode = self::ERROR_NOT_STRING;
+        StringTransportRule::assertValidOptional($input, 'title', $typeCode);
     }
 }

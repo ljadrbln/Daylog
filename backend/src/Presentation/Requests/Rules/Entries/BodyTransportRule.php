@@ -15,6 +15,9 @@ use Daylog\Presentation\Requests\Rules\Common\StringTransportRule;
  */
 final class BodyTransportRule
 {
+    private const ERROR_REQUIRED   = 'BODY_REQUIRED';
+    private const ERROR_NOT_STRING = 'BODY_MUST_BE_STRING';
+
     /**
      * Assert that 'body' exists and is a string (e.g., UC-1 AddEntry).
      *
@@ -23,12 +26,12 @@ final class BodyTransportRule
      *
      * @throws TransportValidationException
      */
-    public static function assertRequired(array $input): void
+    public static function assertValidRequired(array $input): void
     {
-        $missing = 'BODY_REQUIRED';
-        $type    = 'BODY_NOT_STRING';
+        $missingCode = self::ERROR_REQUIRED;
+        $typeCode    = self::ERROR_NOT_STRING;
 
-        StringTransportRule::assertRequired($input, 'body', $missing, $type);
+        StringTransportRule::assertValidRequired($input, 'body', $missingCode, $typeCode);
     }
 
     /**
@@ -39,9 +42,9 @@ final class BodyTransportRule
      *
      * @throws TransportValidationException
      */
-    public static function assertOptional(array $input): void
+    public static function assertValidOptional(array $input): void
     {
-        $type = 'BODY_NOT_STRING';
-        StringTransportRule::assertOptional($input, 'body', $type);
+        $typeCode = self::ERROR_NOT_STRING;
+        StringTransportRule::assertValidOptional($input, 'body', $typeCode);        
     }
 }
