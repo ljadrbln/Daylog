@@ -77,9 +77,9 @@ final class AC5_SortingByFieldsTest extends BaseListEntriesIntegrationTest
         $items = $res->getItems();
 
         // Assert
-        $this->assertSame($expected[0], $items[0]->getId());
-        $this->assertSame($expected[1], $items[1]->getId());
-        $this->assertSame($expected[2], $items[2]->getId());
+        $this->assertSame($expected[0], $items[0]['id']);
+        $this->assertSame($expected[1], $items[1]['id']);
+        $this->assertSame($expected[2], $items[2]['id']);
     }
 
     /**

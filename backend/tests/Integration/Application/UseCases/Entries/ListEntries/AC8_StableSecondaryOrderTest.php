@@ -65,8 +65,8 @@ final class AC8_StableSecondaryOrderTest extends BaseListEntriesIntegrationTest
         $items = $res->getItems();
 
         // Assert: stable secondary order by createdAt DESC => id3, id2, id1
-        $this->assertSame($id3, $items[0]->getId());
-        $this->assertSame($id2, $items[1]->getId());
-        $this->assertSame($id1, $items[2]->getId());
+        $this->assertSame($id3, $items[0]['id']);
+        $this->assertSame($id2, $items[1]['id']);
+        $this->assertSame($id1, $items[2]['id']);
     }
 }

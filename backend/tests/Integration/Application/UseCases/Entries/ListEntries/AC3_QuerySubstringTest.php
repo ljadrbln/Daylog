@@ -56,7 +56,7 @@ final class AC3_QuerySubstringTest extends BaseListEntriesIntegrationTest
         $items = $response->getItems();
 
         $this->assertCount(2, $items);
-        $this->assertSame($rows[1]['date'], $items[0]->getDate());
-        $this->assertSame($rows[0]['date'], $items[1]->getDate());
+        $this->assertSame($rows[1]['date'], $items[0]['date']);
+        $this->assertSame($rows[0]['date'], $items[1]['date']);
     }
 }

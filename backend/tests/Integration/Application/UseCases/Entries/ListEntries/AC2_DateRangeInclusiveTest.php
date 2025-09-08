@@ -50,7 +50,7 @@ final class AC2_DateRangeInclusiveTest extends BaseListEntriesIntegrationTest
         $items = $response->getItems();
 
         $this->assertCount(2, $items);
-        $this->assertSame($data['dateTo'],   $items[0]->getDate());
-        $this->assertSame($data['dateFrom'], $items[1]->getDate());
+        $this->assertSame($data['dateTo'],   $items[0]['date']);
+        $this->assertSame($data['dateFrom'], $items[1]['date']);
     }
 }

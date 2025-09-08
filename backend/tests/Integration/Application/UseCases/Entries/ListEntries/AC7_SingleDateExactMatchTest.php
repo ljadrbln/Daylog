@@ -65,7 +65,7 @@ final class AC7_SingleDateExactMatchTest extends BaseListEntriesIntegrationTest
         // Collect returned IDs (order-agnostic check)
         $actualIds = [];
         foreach ($items as $item) {
-            $actualIds[] = $item->getId();
+            $actualIds[] = $item['id'];
         }
 
         $expectedIds = [$id1, $id2];

@@ -50,9 +50,9 @@ final class AC1_HappyPathTest extends BaseListEntriesIntegrationTest
         $items = $response->getItems();
 
         $this->assertCount($rowsCount, $items);
-        $this->assertSame($rows[2]['date'], $items[0]->getDate());
-        $this->assertSame($rows[1]['date'], $items[1]->getDate());
-        $this->assertSame($rows[0]['date'], $items[2]->getDate());
+        $this->assertSame($rows[2]['date'], $items[0]['date']);
+        $this->assertSame($rows[1]['date'], $items[1]['date']);
+        $this->assertSame($rows[0]['date'], $items[2]['date']);
 
         $this->assertSame($rowsCount,               $response->getTotal());
         $this->assertSame($request->getPage(),      $response->getPage());
