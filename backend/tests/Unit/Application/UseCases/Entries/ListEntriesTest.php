@@ -77,14 +77,14 @@ final class ListEntriesTest extends Unit
         $data    = ListEntriesHelper::getData();
         $request = ListEntriesHelper::buildRequest($data);
 
-        /** Act **/
+        // Act
         $response = $useCase->execute($request);
 
-        /** Assert **/
+        // Assert
         $items = $response->getItems();
-        $this->assertSame($rows[0]['date'], $items[0]->getDate());
-        $this->assertSame($rows[1]['date'], $items[1]->getDate());
-        $this->assertSame($rows[2]['date'], $items[2]->getDate());
+        $this->assertSame($rows[0]['date'], $items[0]['date']);
+        $this->assertSame($rows[1]['date'], $items[1]['date']);
+        $this->assertSame($rows[2]['date'], $items[2]['date']);
 
         $this->assertSame($total,                 $response->getTotal());
         $this->assertSame($request->getPage(),    $response->getPage());
@@ -155,10 +155,10 @@ final class ListEntriesTest extends Unit
         $items = $response->getItems();
 
         $this->assertCount(4, $items);
-        $this->assertSame($rows[0]['date'], $items[0]->getDate());
-        $this->assertSame($rows[1]['date'], $items[1]->getDate());
-        $this->assertSame($rows[2]['date'], $items[2]->getDate());
-        $this->assertSame($rows[3]['date'], $items[3]->getDate());
+        $this->assertSame($rows[0]['date'], $items[0]['date']);
+        $this->assertSame($rows[1]['date'], $items[1]['date']);
+        $this->assertSame($rows[2]['date'], $items[2]['date']);
+        $this->assertSame($rows[3]['date'], $items[3]['date']);
 
         $this->assertSame($total,                   $response->getTotal());
         $this->assertSame($request->getPage(),      $response->getPage());

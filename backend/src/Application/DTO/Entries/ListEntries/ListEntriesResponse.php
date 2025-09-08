@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Application\DTO\Entries\ListEntries;
 
-use Daylog\Application\DTO\Entries\ListEntries\ListEntriesItem;
+use Daylog\Application\Transformers\Entries\EntryTransformer;
+
 
 /**
  * Response DTO for UC-2 List Entries.
@@ -21,11 +22,11 @@ use Daylog\Application\DTO\Entries\ListEntries\ListEntriesItem;
 final class ListEntriesResponse implements ListEntriesResponseInterface
 {
     /**
-     * @param list<ListEntriesItem> $items
-     * @param int                   $page
-     * @param int                   $perPage
-     * @param int                   $total
-     * @param int                   $pagesCount
+     * @param array $items
+     * @param int   $page
+     * @param int   $perPage
+     * @param int   $total
+     * @param int   $pagesCount
      */
     private function __construct(
         private array $items,
@@ -40,11 +41,9 @@ final class ListEntriesResponse implements ListEntriesResponseInterface
      */
     public static function fromArray(array $data): self
     {
-        /** @var list<ListEntriesItem> $items */
         $items = [];
-
         foreach ($data['items'] as $entry) {
-            $item = ListEntriesItem::fromEntry($entry);
+            $item = EntryTransformer::fromEntry($entry);
             $items[] = $item;
         }
 
