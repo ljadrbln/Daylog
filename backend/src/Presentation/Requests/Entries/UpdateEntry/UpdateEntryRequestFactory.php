@@ -7,6 +7,7 @@ use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequest;
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
 use Daylog\Presentation\Requests\Entries\UpdateEntry\UpdateEntrySanitizer;
 use Daylog\Application\Exceptions\TransportValidationException;
+use Daylog\Presentation\Requests\Rules\IdTransportRule;
 
 /**
  * Builds UpdateEntryRequest DTO from raw transport input.
@@ -45,6 +46,8 @@ final class UpdateEntryRequestFactory
      */
     public static function fromArray(array $params): UpdateEntryRequestInterface
     {
+        IdTransportRule::assertValid($params);
+
         self::validateTitle($params);
         self::validateBody($params);
         self::validateDate($params);

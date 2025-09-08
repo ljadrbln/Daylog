@@ -14,7 +14,7 @@ use Daylog\Tests\Support\DataProviders\EntryFieldsTransportDataProvider;
  * Unit tests for UpdateEntryRequestFactory.
  *
  * Purpose:
- * Build an UpdateEntryRequest DTO from raw HTTP input for UC-4.
+ * Build an UpdateEntryRequest DTO from raw HTTP input for UC-5.
  * The factory performs transport-level validation only:
  * - 'id' is required and must be a string (no UUID format check here).
  * - 'title' | 'body' | 'date' are optional; if present, they must be strings.
@@ -75,4 +75,24 @@ final class UpdateEntryRequestFactoryTest extends Unit
         // Act
         UpdateEntryRequestFactory::fromArray($data);
     }
+
+    /**
+     * Transport validation errors: For invalid id field, throws TransportValidationException.
+     *
+     * @dataProvider provideInvalidTransportIdData
+     *
+     * @param array<string,mixed> $overrides
+     * @param string              $expectedCode
+     * @return void
+     */    
+    public function testFromArrayThrowsOnInvalidTransportId(array $overrides, string $expectedCode): void
+    {
+        $data = EntryTestData::getOne();
+        $data = array_merge($data, $overrides);
+
+        $this->expectException(TransportValidationException::class);
+        $this->expectExceptionMessage($expectedCode);
+
+        UpdateEntryRequestFactory::fromArray($data);
+    }    
 }
