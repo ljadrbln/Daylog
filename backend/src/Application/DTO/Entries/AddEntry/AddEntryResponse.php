@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Application\DTO\Entries\AddEntry;
 
-use Daylog\Application\DTO\Common\UseCaseResponseInterface;
 use Daylog\Domain\Models\Entries\Entry;
+use Daylog\Application\Transformers\Entries\EntryTransformer;
 
 /**
  * Response DTO for UC-1 Add Entry.
@@ -27,7 +27,7 @@ use Daylog\Domain\Models\Entries\Entry;
  *   updatedAt: string
  * }>
  */
-final class AddEntryResponse implements AddEntryResponseInterface, UseCaseResponseInterface
+final class AddEntryResponse implements AddEntryResponseInterface
 {
     /**
      * @param Entry $entry Newly created and already persisted domain entity.
@@ -59,27 +59,13 @@ final class AddEntryResponse implements AddEntryResponseInterface, UseCaseRespon
     }
 
     /**
-     * Convert response to a flat associative payload.
-     *
-     * @return array{
-     *   id: string,
-     *   title: string,
-     *   body: string,
-     *   date: string,
-     *   createdAt: string,
-     *   updatedAt: string
-     * }
+     * {@inheritDoc}
      */
     public function toArray(): array
     {
-        $payload = [
-            'id'        => $this->entry->getId(),
-            'title'     => $this->entry->getTitle(),
-            'body'      => $this->entry->getBody(),
-            'date'      => $this->entry->getDate(),
-            'createdAt' => $this->entry->getCreatedAt(),
-            'updatedAt' => $this->entry->getUpdatedAt(),
-        ];
+        $entry   = $this->entry;
+        $payload = EntryTransformer::fromEntry($entry);
+
         return $payload;
     }
 }

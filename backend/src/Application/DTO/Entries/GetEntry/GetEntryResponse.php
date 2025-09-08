@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Application\DTO\Entries\GetEntry;
 
 use Daylog\Domain\Models\Entries\Entry;
+use Daylog\Application\Transformers\Entries\EntryTransformer;
 
 /**
  * Concrete response DTO for UC-3 GetEntry.
@@ -12,7 +13,14 @@ use Daylog\Domain\Models\Entries\Entry;
  * Provide the retrieved Entry in an immutable wrapper,
  * with a scalar-only payload for Presentation.
  *
- * @implements GetEntryResponseInterface
+ * @implements UseCaseResponseInterface<array{
+ *   id: string,
+ *   title: string,
+ *   body: string,
+ *   date: string,
+ *   createdAt: string,
+ *   updatedAt: string
+ * }>
  */
 final class GetEntryResponse implements GetEntryResponseInterface
 {
@@ -45,14 +53,9 @@ final class GetEntryResponse implements GetEntryResponseInterface
      */
     public function toArray(): array
     {
-        $payload = [
-            'id'        => $this->entry->getId(),
-            'title'     => $this->entry->getTitle(),
-            'body'      => $this->entry->getBody(),
-            'date'      => $this->entry->getDate(),
-            'createdAt' => $this->entry->getCreatedAt(),
-            'updatedAt' => $this->entry->getUpdatedAt(),
-        ];
+        $entry   = $this->entry;
+        $payload = EntryTransformer::fromEntry($entry);
+
         return $payload;
     }
 }

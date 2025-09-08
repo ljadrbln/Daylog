@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Application\DTO\Entries\DeleteEntry;
 
 use Daylog\Domain\Models\Entries\Entry;
+use Daylog\Application\Transformers\Entries\EntryTransformer;
 
 /**
  * Concrete response DTO for UC-4 Delete Entry.
@@ -16,7 +17,14 @@ use Daylog\Domain\Models\Entries\Entry;
  * - getEntry() returns the domain snapshot.
  * - toArray() returns a scalar-only associative payload.
  *
- * @implements DeleteEntryResponseInterface
+ * @implements UseCaseResponseInterface<array{
+ *   id: string,
+ *   title: string,
+ *   body: string,
+ *   date: string,
+ *   createdAt: string,
+ *   updatedAt: string
+ * }>
  */
 final class DeleteEntryResponse implements DeleteEntryResponseInterface
 {
@@ -45,27 +53,13 @@ final class DeleteEntryResponse implements DeleteEntryResponseInterface
     }
 
     /**
-     * Convert response to a flat associative payload (scalars only).
-     *
-     * @return array{
-     *   id: string,
-     *   title: string,
-     *   body: string,
-     *   date: string,
-     *   createdAt: string,
-     *   updatedAt: string
-     * }
+     * {@inheritDoc}
      */
     public function toArray(): array
     {
-        $payload = [
-            'id'        => $this->entry->getId(),
-            'title'     => $this->entry->getTitle(),
-            'body'      => $this->entry->getBody(),
-            'date'      => $this->entry->getDate(),
-            'createdAt' => $this->entry->getCreatedAt(),
-            'updatedAt' => $this->entry->getUpdatedAt(),
-        ];
+        $entry   = $this->entry;
+        $payload = EntryTransformer::fromEntry($entry);
+
         return $payload;
     }
 }
