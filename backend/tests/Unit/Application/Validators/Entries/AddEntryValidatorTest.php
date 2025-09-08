@@ -4,13 +4,14 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\Validators\Entries;
 
 use Codeception\Test\Unit;
-use Daylog\Domain\Models\Entries\EntryConstraints;
+
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
 use Daylog\Application\Validators\Entries\AddEntry\AddEntryValidator;
 use Daylog\Application\Validators\Entries\AddEntry\AddEntryValidatorInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Tests\Support\Helper\EntryTestData;
+use Daylog\Tests\Support\DataProviders\EntryFieldsDomainDataProvider;
 
 /**
  * Unit tests for AddEntryValidator (domain-level validation).
@@ -27,6 +28,8 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  */
 final class AddEntryValidatorTest extends Unit
 {
+    use EntryFieldsDomainDataProvider;
+
     /** @var AddEntryValidatorInterface */
     private AddEntryValidatorInterface $validator;
 
@@ -56,7 +59,7 @@ final class AddEntryValidatorTest extends Unit
      * Validation rules: invalid business input yields DomainValidationException
      * with the correct error code.
      *
-     * @dataProvider provideInvalidDomainCases
+     * @dataProvider provideInvalidDomainAddEntryCases
      *
      * @param array<string,string> $overrides
      * @param string               $expectedCode
@@ -77,26 +80,5 @@ final class AddEntryValidatorTest extends Unit
 
         // Act
         $this->validator->validate($request);
-    }
-
-    /**
-     * Provides invalid domain-level cases with expected error codes.
-     *
-     * @return array<string,array{0:array<string,string>,1:string}>
-     */
-    public function provideInvalidDomainCases(): array
-    {
-        $tooLongTitle = str_repeat('T', EntryConstraints::TITLE_MAX + 1);
-        $tooLongBody  = str_repeat('B', EntryConstraints::BODY_MAX + 1);
-
-        return [
-            'title is empty'           => [['title' => ''], 'TITLE_REQUIRED'],
-            'title is too long'        => [['title' => $tooLongTitle], 'TITLE_TOO_LONG'],
-            'body is empty'            => [['body' => ''], 'BODY_REQUIRED'],
-            'body is too long'         => [['body' => $tooLongBody], 'BODY_TOO_LONG'],
-            'date invalid format'      => [['date' => '15-08-2025'], 'DATE_INVALID'],
-            'date invalid calendar'    => [['date' => '2025-02-30'], 'DATE_INVALID'],
-            'date is empty'            => [['date' => ''], 'DATE_REQUIRED'],
-        ];
     }
 }
