@@ -29,7 +29,7 @@ interface AddEntryInterface
      * Execute UC-1 AddEntry.
      *
      * @param AddEntryRequestInterface $request Input DTO carrying title, body, date.
-     * @return Entry Created domain model with id/createdAt/updatedAt set.
+     * @return AddEntryResponseInterface Response DTO with id and timestamps.
      */
     public function execute(AddEntryRequestInterface $request): AddEntryResponseInterface;
 }
