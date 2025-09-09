@@ -3,27 +3,17 @@ declare(strict_types=1);
 
 namespace Daylog\Application\Validators\Rules\Entries;
 
-use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
+use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Domain\Models\Entries\EntryConstraints;
 
 /**
- * Domain rule for Entry title.
- *
- * Purpose:
- * Reusable domain-level checks for title in UC-1 (required) and UC-5 (optional).
- * Presentation guarantees types; here we validate content: non-empty + max length.
- *
- * Mechanics:
- * - assertValidRequired(): empty string → TITLE_REQUIRED; length overflow → TITLE_TOO_LONG.
- * - assertValidOptional(): if null → return; otherwise delegates to assertValidRequired().
+ * Domain rule for Entry body (UC-1 required, UC-5 optional).
  */
-final class TitleDomainRule
+final class BodyDomainRule
 {
     /**
-     * Validate required title (UC-1).
-     *
      * @param AddEntryRequestInterface|UpdateEntryRequestInterface $request
      * @return void
      *
@@ -32,25 +22,25 @@ final class TitleDomainRule
     public static function assertValidRequired(
         AddEntryRequestInterface|UpdateEntryRequestInterface $request
     ): void {
-        $title = $request->getTitle();
+        $body = $request->getBody();
 
-        if ($title === null || $title === '') {
-            $message   = 'TITLE_REQUIRED';
+        if ($body === '') {
+            $message   = 'BODY_REQUIRED';
             $exception = new DomainValidationException($message);
+
             throw $exception;
         }
 
-        $tooLong = mb_strlen($title) > EntryConstraints::TITLE_MAX;
+        $tooLong = mb_strlen($body) > EntryConstraints::BODY_MAX;
         if ($tooLong === true) {
-            $message   = 'TITLE_TOO_LONG';
+            $message   = 'BODY_TOO_LONG';
             $exception = new DomainValidationException($message);
+            
             throw $exception;
         }
     }
 
     /**
-     * Validate optional title (UC-5).
-     *
      * @param AddEntryRequestInterface|UpdateEntryRequestInterface $request
      * @return void
      *
@@ -59,9 +49,9 @@ final class TitleDomainRule
     public static function assertValidOptional(
         AddEntryRequestInterface|UpdateEntryRequestInterface $request
     ): void {
-        $title = $request->getTitle();
+        $body = $request->getBody();
 
-        if ($title === null) {
+        if ($body === null) {
             return;
         }
 
