@@ -3,40 +3,33 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
-use Codeception\Test\Unit;
-
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequest;
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
-
-use Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry;
 use Daylog\Application\Validators\Entries\UpdateEntry\UpdateEntryValidatorInterface;
-
 use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Domain\Services\DateService;
-
 use Daylog\Tests\Support\Helper\EntryTestData;
-use Daylog\Tests\Support\Fakes\FakeEntryRepository;
 
 /**
  * UC-5 / AC-2 — Happy path (body-only) for UpdateEntry use case.
  *
  * Purpose:
- * Ensure that when only the body is provided along with a valid id, the use case
- * updates the body, preserves other fields, refreshes updatedAt per BR-2, and
- * returns a response DTO with a valid domain Entry snapshot.
+ * Ensure that when only the body is provided with a valid id, the use case
+ * updates the body, preserves other fields, refreshes updatedAt per BR-2,
+ * and returns a response DTO holding a valid domain Entry snapshot.
  *
  * Mechanics:
- * - Seeds FakeEntryRepository with a valid Entry from EntryTestData::getOne().
+ * - Seeds repository with a valid Entry from EntryTestData::getOne().
  * - Builds UpdateEntryRequest with {id, body} only.
- * - Mocks validator to run exactly once; domain rule specifics are tested elsewhere.
- * - Asserts: id preservation and validity, field isolation (body only), ISO timestamps,
- *   and BR-2 monotonicity (updatedAt ≥ createdAt).
+ * - Validator is expected to run exactly once (domain rules tested elsewhere).
+ * - Asserts: id validity/preservation, field isolation, ISO timestamps, and
+ *   BR-2 monotonicity (updatedAt ≥ createdAt).
  *
  * @covers \Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry::execute
  * @group UC-UpdateEntry
  */
-final class AC2_HappyPath_BodyOnlyTest extends Unit
+final class AC2_HappyPath_BodyOnlyTest extends BaseUpdateEntryUnitTest
 {
     /**
      * Validate body-only update behavior and response DTO integrity.
@@ -49,7 +42,7 @@ final class AC2_HappyPath_BodyOnlyTest extends Unit
         $seedData = EntryTestData::getOne();
         $existing = Entry::fromArray($seedData);
 
-        $repo = new FakeEntryRepository();
+        $repo = $this->makeRepo();
         $repo->save($existing);
 
         $id      = $existing->getId();
@@ -63,14 +56,11 @@ final class AC2_HappyPath_BodyOnlyTest extends Unit
         /** @var UpdateEntryRequestInterface $request */
         $request = UpdateEntryRequest::fromArray($payload);
 
-        $validatorClass = UpdateEntryValidatorInterface::class;
-        $validator      = $this->createMock($validatorClass);
-        $validator
-            ->expects($this->once())
-            ->method('validate');
+        // Validator: once, OK
+        $validator = $this->makeValidatorOk();
 
         // Act
-        $useCase  = new UpdateEntry($repo, $validator);
+        $useCase  = $this->makeUseCase($repo, $validator);
         $response = $useCase->execute($request);
 
         // Assert
@@ -79,8 +69,8 @@ final class AC2_HappyPath_BodyOnlyTest extends Unit
         $entryId   = $entry->getId();
         $isValidId = UuidGenerator::isValid($entryId);
         $this->assertTrue($isValidId);
-        $this->assertSame($id, $entryId);
 
+        $this->assertSame($id, $entryId);
         $this->assertSame($seedData['title'], $entry->getTitle());
         $this->assertSame($newBody,           $entry->getBody());
         $this->assertSame($seedData['date'],  $entry->getDate());
@@ -93,6 +83,9 @@ final class AC2_HappyPath_BodyOnlyTest extends Unit
 
         $this->assertTrue($isCreatedAtValid);
         $this->assertTrue($isUpdatedAtValid);
-        $this->assertGreaterThanOrEqual(strtotime($createdAt), strtotime($updatedAt));
+
+        $createdTs = strtotime($createdAt);
+        $updatedTs = strtotime($updatedAt);
+        $this->assertGreaterThanOrEqual($createdTs, $updatedTs);
     }
 }

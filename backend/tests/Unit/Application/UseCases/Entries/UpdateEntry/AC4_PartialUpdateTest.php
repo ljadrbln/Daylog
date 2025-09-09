@@ -12,45 +12,44 @@ use Daylog\Domain\Services\DateService;
 use Daylog\Tests\Support\Helper\EntryTestData;
 
 /**
- * UC-5 / AC-3 — Happy path (date-only) for UpdateEntry use case.
+ * UC-5 / AC-4 — Partial update.
  *
  * Purpose:
- * Ensure that when only the date is provided with a valid id, the use case
- * updates the date, preserves other fields, refreshes updatedAt per BR-2,
- * and returns a response DTO holding a valid domain Entry snapshot.
+ * Given a valid id and a subset of fields, only provided fields must change
+ * while others remain intact. The updatedAt timestamp is refreshed per BR-2.
  *
  * Mechanics:
- * - Seeds repository with a valid Entry from EntryTestData::getOne().
- * - Builds UpdateEntryRequest with {id, date} only.
- * - Validator is expected to run exactly once (domain rules tested elsewhere).
- * - Asserts: id validity/preservation, field isolation, ISO timestamps, and
- *   BR-2 monotonicity (updatedAt ≥ createdAt).
+ * - Seed repository with a valid Entry from EntryTestData::getOne().
+ * - Build request with {id, title, date} while omitting body entirely.
+ * - Validator is expected to run exactly once (domain specifics tested elsewhere).
  *
  * @covers \Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry::execute
  * @group UC-UpdateEntry
  */
-final class AC3_HappyPath_DateOnlyTest extends BaseUpdateEntryUnitTest
+final class AC4_PartialUpdateTest extends BaseUpdateEntryUnitTest
 {
     /**
-     * Validate date-only update behavior and response DTO integrity.
+     * Validate that only provided fields are changed; others remain intact.
      *
      * @return void
      */
-    public function testHappyPathUpdatesDateOnlyAndReturnsResponseDto(): void
+    public function testPartialUpdateChangesOnlyProvidedFields(): void
     {
-        // Arrange: seed an existing entry
+        // Arrange
         $seedData = EntryTestData::getOne();
         $existing = Entry::fromArray($seedData);
 
         $repo = $this->makeRepo();
         $repo->save($existing);
 
-        $id      = $existing->getId();
-        $newDate = '2005-08-14';
+        $id       = $existing->getId();
+        $newTitle = 'Updated title';
+        $newDate  = '2005-08-14';
 
         $payload = [
-            'id'   => $id,
-            'date' => $newDate,
+            'id'    => $id,
+            'title' => $newTitle,
+            'date'  => $newDate, // body intentionally omitted
         ];
 
         /** @var UpdateEntryRequestInterface $request */
@@ -69,9 +68,9 @@ final class AC3_HappyPath_DateOnlyTest extends BaseUpdateEntryUnitTest
         $entryId   = $entry->getId();
         $isValidId = UuidGenerator::isValid($entryId);
         $this->assertTrue($isValidId);
-
         $this->assertSame($id, $entryId);
-        $this->assertSame($seedData['title'], $entry->getTitle());
+
+        $this->assertSame($newTitle,          $entry->getTitle());
         $this->assertSame($seedData['body'],  $entry->getBody());
         $this->assertSame($newDate,           $entry->getDate());
 
