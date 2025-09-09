@@ -68,24 +68,33 @@ final class UpdateEntryValidatorTest extends Unit
      * Validation rules: invalid business input yields DomainValidationException
      * with the correct error code.
      *
-     * @dataProvider provideInvalidDomainAddEntryCases
+     * @dataProvider provideInvalidDomainUpdateEntryCases
      *
      * @param array<string,string> $overrides
      * @param string               $expectedCode
+     * @param bool                 $idOnly When true, build DTO with only 'id'
      * @return void
      */
-    public function testValidateThrowsOnDomainViolations(array $overrides, string $expectedCode): void
+    public function testValidateThrowsOnDomainViolations(array $overrides, string $expectedCode, bool $idOnly = false): void
     {
         // Arrange
-        $data = EntryTestData::getOne();
-        $data = array_merge($data, $overrides);
+        $baseline = EntryTestData::getOne();
+
+        if ($idOnly === true) {
+            $data = ['id' => $baseline['id']];
+        } else {
+            $data = array_merge($baseline, $overrides);
+        }
 
         /** @var UpdateEntryRequestInterface $request */
         $request = UpdateEntryRequest::fromArray($data);
 
         // Expect
-        $this->expectException(DomainValidationException::class);
-        $this->expectExceptionMessage($expectedCode);
+        $exceptionClass = DomainValidationException::class;
+        $this->expectException($exceptionClass);
+
+        $message = $expectedCode;
+        $this->expectExceptionMessage($message);
 
         // Act
         $this->validator->validate($request);
