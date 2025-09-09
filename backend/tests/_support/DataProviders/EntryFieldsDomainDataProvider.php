@@ -67,7 +67,7 @@ trait EntryFieldsDomainDataProvider
             'body is too long'      => [['body' => $tooLongBody],     'BODY_TOO_LONG'],
             'date invalid format'   => [['date' => '15-08-2025'],     'DATE_INVALID'],
             'date invalid calendar' => [['date' => '2025-02-30'],     'DATE_INVALID'],
-            'date is empty string'  => [['date' => ''],               'DATE_INVALID'],
+            'date is empty string'  => [['date' => ''],               'DATE_REQUIRED'],
         ];
     } 
 }

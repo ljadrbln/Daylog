@@ -9,6 +9,7 @@ use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\Validators\Rules\Entries\TitleDomainRule;
 use Daylog\Application\Validators\Rules\Entries\BodyDomainRule;
+use Daylog\Application\Validators\Rules\Entries\DateDomainRule;
 
 /**
  * Validates business rules for UpdateEntry request (UC-5).
@@ -49,11 +50,7 @@ final class UpdateEntryValidator implements UpdateEntryValidatorInterface
         
         TitleDomainRule::assertValidOptional($request);
         BodyDomainRule::assertValidOptional($request);
-
-        //$this->validateTitleIfProvided($request);
-        //$this->validateBodyIfProvided($request);
-        
-        $this->validateDateIfProvided($request);
+        DateDomainRule::assertValidOptional($request);
     }
 
     /**
@@ -76,60 +73,6 @@ final class UpdateEntryValidator implements UpdateEntryValidatorInterface
 
         if ($hasTitle === false && $hasBody === false && $hasDate === false) {
             $errorCode = 'NO_FIELDS_TO_UPDATE';
-            $exception = new DomainValidationException($errorCode);
-
-            throw $exception;
-        }
-    }
-
-    /**
-     * Validate body only when it is provided (non-null).
-     *
-     * @param UpdateEntryRequestInterface $request
-     * @return void
-     *
-     * @throws DomainValidationException
-     */
-    private function validateBodyIfProvided(UpdateEntryRequestInterface $request): void
-    {
-        $body = $request->getBody();
-        if ($body === null) {
-            return;
-        }
-
-        if ($body === '') {
-            $errorCode = 'BODY_REQUIRED';
-            $exception = new DomainValidationException($errorCode);
-
-            throw $exception;
-        }
-
-        if (mb_strlen($body) > EntryConstraints::BODY_MAX) {
-            $errorCode = 'BODY_TOO_LONG';
-            $exception = new DomainValidationException($errorCode);
-
-            throw $exception;
-        }
-    }
-
-    /**
-     * Validate date only when it is provided (non-null).
-     *
-     * @param UpdateEntryRequestInterface $request
-     * @return void
-     *
-     * @throws DomainValidationException
-     */
-    private function validateDateIfProvided(UpdateEntryRequestInterface $request): void
-    {
-        $date = $request->getDate();
-        if ($date === null) {
-            return;
-        }
-
-        $isValid = DateService::isValidLocalDate($date);
-        if ($isValid === false) {
-            $errorCode = 'DATE_INVALID';
             $exception = new DomainValidationException($errorCode);
 
             throw $exception;

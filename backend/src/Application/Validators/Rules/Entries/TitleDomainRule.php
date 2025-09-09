@@ -37,6 +37,7 @@ final class TitleDomainRule
         if ($title === null || $title === '') {
             $message   = 'TITLE_REQUIRED';
             $exception = new DomainValidationException($message);
+            
             throw $exception;
         }
 
@@ -44,6 +45,7 @@ final class TitleDomainRule
         if ($tooLong === true) {
             $message   = 'TITLE_TOO_LONG';
             $exception = new DomainValidationException($message);
+            
             throw $exception;
         }
     }
