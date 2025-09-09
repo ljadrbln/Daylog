@@ -88,16 +88,13 @@ final class UpdateEntryTest extends Unit
      */
     public function testValidationErrorDoesNotTouchRepository(): void
     {
-        $entryId = UuidGenerator::generate();
-
-        $payload = [
-            'id'    => $entryId,
-            'title' => '', // invalid
-        ];
+        // Arrange
+        $data = EntryTestData::getOne();
 
         /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryRequest::fromArray($payload);
+        $request = UpdateEntryRequest::fromArray($data);
 
+        // Use fake repo (in-memory), no mocks for repo here
         $repo = new FakeEntryRepository();
 
         $validatorInterface = UpdateEntryValidatorInterface::class;
@@ -121,43 +118,37 @@ final class UpdateEntryTest extends Unit
         $this->assertSame(0, $saveCalls);
     }
 
-    /**
-     * Error path: only id provided → NO_FIELDS_TO_UPDATE; repository must not be touched.
+   /**
+     * Error path: repository returns null → ENTRY_NOT_FOUND.
      *
      * @return void
-     * @covers \Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry::execute
+     * @covers \Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry::execute 
      */
-    public function testNoFieldsToUpdateTriggersDomainError(): void
+    public function testEntryNotFoundThrowsDomainError(): void
     {
-        $entryId = UuidGenerator::generate();
-
-        $payload = [
-            'id' => $entryId,
-        ];
+        // Arrange
+        $data = EntryTestData::getOne();
 
         /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryRequest::fromArray($payload);
+        $request = UpdateEntryRequest::fromArray($data);
 
-        $repo = new FakeEntryRepository();
+        $repo = new FakeEntryRepository(); // findById($id) → null
 
-        $validatorInterface = UpdateEntryValidatorInterface::class;
-        $validator          = $this->createMock($validatorInterface);
-
-        $errorCode = 'NO_FIELDS_TO_UPDATE';
-        $exception = new DomainValidationException($errorCode);
-
+        $validatorClass = UpdateEntryValidatorInterface::class;
+        $validator      = $this->createMock($validatorClass);
         $validator
             ->expects($this->once())
             ->method('validate')
-            ->with($request)
-            ->willThrowException($exception);
+            ->with($request);
 
         $this->expectException(DomainValidationException::class);
 
+        // Act
         $useCase = new UpdateEntry($repo, $validator);
         $useCase->execute($request);
 
+        // Assert
         $saveCalls = $repo->getSaveCalls();
         $this->assertSame(0, $saveCalls);
-    }
+    }    
 }
