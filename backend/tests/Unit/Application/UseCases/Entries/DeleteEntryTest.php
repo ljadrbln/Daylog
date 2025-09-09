@@ -170,12 +170,11 @@ final class DeleteEntryTest extends Unit
             ->method('validate')
             ->with($request);
 
+        // Act
         $useCase = new DeleteEntry($repo, $validator);
-
         $this->expectException(DomainValidationException::class);
         $this->expectExceptionMessage('ENTRY_NOT_FOUND');
 
-        // Act
         $useCase->execute($request);
 
         // Assert: the seeded, unrelated entry still exists

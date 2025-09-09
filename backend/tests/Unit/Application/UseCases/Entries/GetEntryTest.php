@@ -119,4 +119,39 @@ final class GetEntryTest extends Unit
         $saveCalls = $repo->getSaveCalls();
         $this->assertSame(0, $saveCalls);        
     }
+
+   /**
+     * Error path: repository returns null → ENTRY_NOT_FOUND.
+     *
+     * @return void
+     * @covers \Daylog\Application\UseCases\Entries\GetEntry\GetEntry::execute 
+     */
+    public function testEntryNotFoundThrowsDomainError(): void
+    {
+        // Arrange
+        $data = EntryTestData::getOne();
+
+        /** @var GetEntryRequestInterface $request */
+        $request = GetEntryRequest::fromArray($data);
+
+        $repo = new FakeEntryRepository(); // findById($id) → null
+
+        $validatorClass = GetEntryValidatorInterface::class;
+        $validator      = $this->createMock($validatorClass);
+        $validator
+            ->expects($this->once())
+            ->method('validate')
+            ->with($request);
+
+        // Act
+        $useCase = new GetEntry($repo, $validator);
+        $this->expectException(DomainValidationException::class);
+        $this->expectExceptionMessage('ENTRY_NOT_FOUND');
+
+        $useCase->execute($request);
+
+        // Assert
+        $saveCalls = $repo->getSaveCalls();
+        $this->assertSame(0, $saveCalls);
+    }
 }

@@ -141,14 +141,15 @@ final class UpdateEntryTest extends Unit
             ->method('validate')
             ->with($request);
 
-        $this->expectException(DomainValidationException::class);
-
         // Act
         $useCase = new UpdateEntry($repo, $validator);
+        $this->expectException(DomainValidationException::class);
+        $this->expectExceptionMessage('ENTRY_NOT_FOUND');        
+
         $useCase->execute($request);
 
         // Assert
         $saveCalls = $repo->getSaveCalls();
         $this->assertSame(0, $saveCalls);
-    }    
+    }
 }
