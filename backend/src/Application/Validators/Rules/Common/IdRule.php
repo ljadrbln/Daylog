@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Application\Validators\Rules;
+namespace Daylog\Application\Validators\Rules\Common;
 
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Domain\Services\UuidGenerator;
@@ -17,7 +17,7 @@ use Daylog\Domain\Services\UuidGenerator;
  * - Call assertValid($id) from concrete UC validators.
  * - Delegates actual shape check to UuidGenerator::isValid().
  */
-final class UuidIdRule
+final class IdRule
 {
     /**
      * Assert that given id is a valid RFC-4122 UUID.

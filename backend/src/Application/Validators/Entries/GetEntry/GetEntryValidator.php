@@ -5,7 +5,7 @@ namespace Daylog\Application\Validators\Entries\GetEntry;
 
 use Daylog\Application\DTO\Entries\GetEntry\GetEntryRequestInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
-use Daylog\Application\Validators\Rules\UuidIdRule;
+use Daylog\Application\Validators\Rules\Common\IdRule;
 
 /**
  * Validates business rules for GetEntry request.
@@ -44,6 +44,6 @@ final class GetEntryValidator implements GetEntryValidatorInterface
     private function validateId(GetEntryRequestInterface $request): void
     {
         $entryId = $request->getId();
-        UuidIdRule::assertValid($entryId);
+        IdRule::assertValid($entryId);
     }    
 }

@@ -5,7 +5,7 @@ namespace Daylog\Application\Validators\Entries\DeleteEntry;
 
 use Daylog\Application\DTO\Entries\DeleteEntry\DeleteEntryRequestInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
-use Daylog\Application\Validators\Rules\UuidIdRule;
+use Daylog\Application\Validators\Rules\Common\IdRule;
 
 /**
  * Validates business rules for DeleteEntry request.
@@ -45,6 +45,6 @@ final class DeleteEntryValidator implements DeleteEntryValidatorInterface
     private function validateId(DeleteEntryRequestInterface $request): void
     {
         $entryId = $request->getId();
-        UuidIdRule::assertValid($entryId);
+        IdRule::assertValid($entryId);
     }
 }
