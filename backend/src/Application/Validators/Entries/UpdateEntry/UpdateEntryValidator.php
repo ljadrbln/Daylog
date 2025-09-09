@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Daylog\Application\Validators\Entries\UpdateEntry;
 
-use Daylog\Domain\Models\Entries\EntryConstraints;
-use Daylog\Domain\Services\DateService;
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\Validators\Rules\Entries\TitleDomainRule;

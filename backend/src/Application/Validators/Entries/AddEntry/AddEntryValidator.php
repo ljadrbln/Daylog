@@ -9,100 +9,50 @@ use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\Validators\Entries\AddEntry\AddEntryValidatorInterface;
 
+use Daylog\Application\Validators\Rules\Entries\TitleDomainRule;
+use Daylog\Application\Validators\Rules\Entries\BodyDomainRule;
+use Daylog\Application\Validators\Rules\Entries\DateDomainRule;
+
 /**
- * Validates business rules for AddEntry request.
+ * Validates business rules for AddEntry request (UC-1).
+ *
+ * Purpose:
+ * Enforce entity-level constraints for creating a new Entry:
+ * title/body must be non-empty and within limits; date must be a valid local YYYY-MM-DD.
+ * Transport-level concerns (presence/types) are explicitly out of scope here.
  *
  * Rules:
- *  - title: not empty, max length TITLE_MAX
- *  - body:  not empty, max length BODY_MAX
- *  - date:  ISO format YYYY-MM-DD and valid calendar date
+ * - Title: non-empty after trimming and length ≤ TITLE_MAX.
+ * - Body:  non-empty after trimming and length ≤ BODY_MAX.
+ * - Date:  strict local date in YYYY-MM-DD format and a real calendar date.
  *
- * Transport-level checks (types/presence) are NOT performed here.
+ * Error codes (thrown via DomainValidationException):
+ * - TITLE_REQUIRED  — title is empty after trimming.
+ * - TITLE_TOO_LONG  — title exceeds TITLE_MAX.
+ * - BODY_REQUIRED   — body is empty after trimming.
+ * - BODY_TOO_LONG   — body exceeds BODY_MAX.
+ * - DATE_REQUIRED   — date is missing or empty.
+ * - DATE_INVALID    — date is not strict YYYY-MM-DD or not a real calendar date.
  */
 final class AddEntryValidator implements AddEntryValidatorInterface
 {
     /**
-     * Validate domain rules. Aggregates all errors and throws once.
+     * Validate domain rules for AddEntry.
      *
-     * @param AddEntryRequestInterface $req
+     * Scenario:
+     * Receives a fully constructed AddEntry DTO (transport already done),
+     * asserts required title/body/date against domain constraints, and throws on violations.
+     *
+     * @param AddEntryRequestInterface $request Incoming DTO with required fields.
      * @return void
      *
-     * @throws DomainValidationException
+     * @throws DomainValidationException When one or more domain rules are violated.
      */
-    public function validate(AddEntryRequestInterface $req): void
+    public function validate(AddEntryRequestInterface $request): void
     {
-        $this->validateTitle($req);
-        $this->validateBody($req);
-        $this->validateDate($req);
-    }
-
-    /**
-     * @param AddEntryRequestInterface $request
-     * @return void
-     */
-    private function validateTitle(AddEntryRequestInterface $request): void
-    {
-        $title = $request->getTitle();
-
-        if($title === '') {
-            $errorCode = 'TITLE_REQUIRED';
-            $exception = new DomainValidationException($errorCode);
-
-            throw $exception;
-        }
-
-        if (mb_strlen($title) > EntryConstraints::TITLE_MAX) {
-            $errorCode = 'TITLE_TOO_LONG';
-            $exception = new DomainValidationException($errorCode);
-
-            throw $exception;            
-        }
-    }
-
-    /**
-     * @param AddEntryRequestInterface $request
-     * @return void
-     */
-    private function validateBody(AddEntryRequestInterface $request): void
-    {
-        $body = $request->getBody();
-
-        if($body === '') {
-            $errorCode = 'BODY_REQUIRED';
-            $exception = new DomainValidationException($errorCode);
-
-            throw $exception;
-        }
-
-        if (mb_strlen($body) > EntryConstraints::BODY_MAX) {
-            $errorCode = 'BODY_TOO_LONG';
-            $exception = new DomainValidationException($errorCode);
-
-            throw $exception;
-        }
-    }
-
-    /**
-     * @param AddEntryRequestInterface $request
-     * @return void
-     */
-    private function validateDate(AddEntryRequestInterface $request): void
-    {
-        $date = $request->getDate();
-
-        if($date === '') {
-            $errorCode = 'DATE_REQUIRED';
-            $exception = new DomainValidationException($errorCode);
-
-            throw $exception;
-        }
-
-        $isValid = DateService::isValidLocalDate($date);
-        if ($isValid === false) {
-            $errorCode = 'DATE_INVALID';
-            $exception = new DomainValidationException($errorCode);
-
-            throw $exception;
-        }
+        TitleDomainRule::assertValidRequired($request);
+        BodyDomainRule::assertValidRequired($request);
+        DateDomainRule::assertValidRequired($request);
     }
 }
+
