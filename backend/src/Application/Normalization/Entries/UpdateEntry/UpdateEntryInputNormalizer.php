@@ -6,7 +6,7 @@ namespace Daylog\Application\Normalization\Entries\UpdateEntry;
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
 use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Domain\Services\Clock;
-
+use Daylog\Domain\Services\DateService;
 /**
  * Normalize merged state for UC-5 UpdateEntry.
  *
@@ -68,12 +68,10 @@ final class UpdateEntryInputNormalizer
         $date  = $dateProvided  ? $newDate  : $currentDate;
 
         // BR-2: updatedAt := max(previous.updatedAt, now)
-        $now       = Clock::now();
-        $updatedAt = $current->getUpdatedAt();
+        $newUpdatedAt = Clock::now();
+        $curUpdatedAt = $current->getUpdatedAt();
 
-        $useNow    = strcmp($now, $updatedAt) >= 0;
-        $updatedAt = $useNow ? $now : $updatedAt;
-
+        $updatedAt = DateService::maxIsoUtc($newUpdatedAt, $curUpdatedAt);
 
         // Assemble payload
         $payload = [

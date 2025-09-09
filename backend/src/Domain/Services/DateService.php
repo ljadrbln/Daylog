@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Daylog\Domain\Services;
 
 use DateTimeImmutable;
+use InvalidArgumentException;
 
 /**
  * DateService provides strict ISO local date ('Y-m-d') validation.
@@ -13,6 +14,8 @@ use DateTimeImmutable;
  */
 final class DateService
 {
+    private const ISO_UTC_FORMAT = 'Y-m-d\TH:i:sP';
+
     /**
      * Validate strict 'Y-m-d' date using DateTime with a round-trip check.
      *
@@ -51,5 +54,48 @@ final class DateService
         $isUtc  = $dt->getOffset() === 0; // requires '+00:00'
         
         return $isUtc;
+    }
+
+    /**
+     * Return the later of two ISO-8601 UTC instants.
+     *
+     * Preconditions:
+     *  - $a and $b MUST be strict ISO-8601 with '+00:00' offset and pass isValidIsoUtcDateTime().
+     *
+     * @param string $a ISO-8601 UTC datetime ('Y-m-d\TH:i:sP')
+     * @param string $b ISO-8601 UTC datetime ('Y-m-d\TH:i:sP')
+     * @return string Later instant, formatted as ISO-8601 UTC.
+     *
+     * @throws InvalidArgumentException When either input is not strict ISO-8601 UTC.
+     */
+    public static function maxIsoUtc(string $a, string $b): string
+    {
+        $format = self::ISO_UTC_FORMAT;
+
+        $da = DateTimeImmutable::createFromFormat($format, $a);
+        $db = DateTimeImmutable::createFromFormat($format, $b);
+
+        $isAValid = (
+            $da !== false 
+            && $da->format($format) === $a 
+            && $da->getOffset() === 0
+        );
+
+        $isBValid = (
+            $db !== false 
+            && $db->format($format) === $b 
+            && $db->getOffset() === 0
+        );
+
+        if (!$isAValid || !$isBValid) {
+            $message = sprintf('Expected ISO-8601 UTC strings (+00:00) in format %s', $format);
+
+            throw new InvalidArgumentException($message);
+        }
+
+        $max    = $da >= $db ? $da : $db;        
+        $result = $max->format($format);
+
+        return $result;
     }    
 }
