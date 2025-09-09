@@ -7,6 +7,7 @@ use Daylog\Domain\Models\Entries\EntryConstraints;
 use Daylog\Domain\Services\DateService;
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
+use Daylog\Application\Validators\Rules\Entries\TitleDomainRule;
 
 /**
  * Validates business rules for UpdateEntry request (UC-5).
@@ -44,7 +45,12 @@ final class UpdateEntryValidator implements UpdateEntryValidatorInterface
     public function validate(UpdateEntryRequestInterface $request): void
     {
         $this->assertAtLeastOneFieldProvided($request);
-        $this->validateTitleIfProvided($request);
+        
+        $title = $request->getTitle();
+        TitleDomainRule::assertValidOptional($title);
+
+        //$this->validateTitleIfProvided($request);
+
         $this->validateBodyIfProvided($request);
         $this->validateDateIfProvided($request);
     }
@@ -69,36 +75,6 @@ final class UpdateEntryValidator implements UpdateEntryValidatorInterface
 
         if ($hasTitle === false && $hasBody === false && $hasDate === false) {
             $errorCode = 'NO_FIELDS_TO_UPDATE';
-            $exception = new DomainValidationException($errorCode);
-
-            throw $exception;
-        }
-    }
-
-    /**
-     * Validate title only when it is provided (non-null).
-     *
-     * @param UpdateEntryRequestInterface $request
-     * @return void
-     *
-     * @throws DomainValidationException
-     */
-    private function validateTitleIfProvided(UpdateEntryRequestInterface $request): void
-    {
-        $title = $request->getTitle();
-        if ($title === null) {
-            return;
-        }
-
-        if ($title === '') {
-            $errorCode = 'TITLE_REQUIRED';
-            $exception = new DomainValidationException($errorCode);
-
-            throw $exception;
-        }
-
-        if (mb_strlen($title) > EntryConstraints::TITLE_MAX) {
-            $errorCode = 'TITLE_TOO_LONG';
             $exception = new DomainValidationException($errorCode);
 
             throw $exception;
