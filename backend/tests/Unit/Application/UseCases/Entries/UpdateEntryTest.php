@@ -60,10 +60,10 @@ final class UpdateEntryTest extends Unit
         // Assert
         $entry = $response->getEntry();
 
-        $actualId   = $entry['id'];
+        $actualId   = $entry->getId();
         $isValidId  = UuidGenerator::isValid($actualId);
         $this->assertTrue($isValidId);
-        $this->assertSame($entry['id'], $actualId);
+        $this->assertSame($data['id'], $actualId);
 
         $this->assertSame($data['title'], $entry->getTitle());
         $this->assertSame($data['body'],  $entry->getBody());

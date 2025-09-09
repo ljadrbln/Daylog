@@ -45,7 +45,7 @@ final class EntryTestData
         ?string $createdAt = null,
         ?string $updatedAt = null
     ): array {
-        $defaultTs = $date . ' 00:00:00';
+        $defaultTs = $date . 'T00:00:00+00:00';
 
         $finalCreatedAt = $createdAt ?? $defaultTs;
         $finalUpdatedAt = $updatedAt ?? $finalCreatedAt;

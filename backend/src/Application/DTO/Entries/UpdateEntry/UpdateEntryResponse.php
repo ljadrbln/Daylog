@@ -1,16 +1,16 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Application\DTO\Entries\AddEntry;
+namespace Daylog\Application\DTO\Entries\UpdateEntry;
 
 use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Application\Transformers\Entries\EntryTransformer;
 
 /**
- * Response DTO for UC-1 Add Entry.
+ * Response DTO for UC-5 Update Entry.
  *
  * Purpose:
- * Encapsulates the newly created Entry state immediately after persistence.
+ * Encapsulates the updated Entry state immediately after persistence.
  *
  * Mechanics:
  * - Constructed from a domain Entry using the factory method fromEntry().
@@ -27,19 +27,19 @@ use Daylog\Application\Transformers\Entries\EntryTransformer;
  *   updatedAt: string
  * }>
  */
-final class AddEntryResponse implements AddEntryResponseInterface
+final class UpdateEntryResponse implements UpdateEntryResponseInterface
 {
     /**
-     * @param Entry $entry Newly created and already persisted domain entity.
+     * @param Entry $entry Updated and already persisted domain entity.
      */
     private function __construct(
         private Entry $entry
-    ) {}    
+    ) {}
 
     /**
      * Factory method to create a response from a domain Entry.
      *
-     * @param Entry $entry Domain model representing the persisted entry.
+     * @param Entry $entry Domain model representing the persisted entry after update.
      * @return self
      */
     public static function fromEntry(Entry $entry): self
@@ -51,11 +51,12 @@ final class AddEntryResponse implements AddEntryResponseInterface
     /**
      * Get the encapsulated domain Entry.
      *
-     * @return Entry Snapshot of the newly created entry.
+     * @return Entry Snapshot of the updated entry.
      */
     public function getEntry(): Entry
     {
-        return $this->entry;
+        $entry = $this->entry;
+        return $entry;
     }
 
     /**
