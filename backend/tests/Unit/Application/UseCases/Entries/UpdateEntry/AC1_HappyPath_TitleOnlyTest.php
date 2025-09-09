@@ -13,7 +13,7 @@ use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Tests\Support\Helper\EntryTestData;
 
 /**
- * UC-5 / AC-2 — Happy path (title-only) for UpdateEntry use case.
+ * UC-5 / AC-1 — Happy path (title-only) for UpdateEntry use case.
  *
  * Purpose:
  * Ensure that when only the title is provided along with a valid id, the use case
@@ -33,7 +33,7 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  * @covers \Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry::execute
  * @group UC-UpdateEntry
  */
-final class AC2_HappyPath_TitleOnlyTest extends BaseUpdateEntryUnitTest
+final class AC1_HappyPath_TitleOnlyTest extends BaseUpdateEntryUnitTest
 {
     /**
      * Validate title-only update behavior and response DTO integrity.
