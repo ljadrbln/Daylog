@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Support\Helper;
 
 use Daylog\Domain\Services\UuidGenerator;
+use Daylog\Domain\Services\Clock;
 
 /**
  * Test data builder for Entry in camelCase shape (Application-wide, except Storage).
@@ -45,7 +46,7 @@ final class EntryTestData
         ?string $createdAt = null,
         ?string $updatedAt = null
     ): array {
-        $defaultTs = $date . 'T00:00:00+00:00';
+        $defaultTs = Clock::now();
 
         $finalCreatedAt = $createdAt ?? $defaultTs;
         $finalUpdatedAt = $updatedAt ?? $finalCreatedAt;
