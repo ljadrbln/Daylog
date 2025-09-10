@@ -10,6 +10,13 @@ use Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntryInterface;
 use Daylog\Tests\Support\Fixture\EntryFixture;
 use DB\SQL;
 
+use Daylog\Tests\Support\Helper\EntryTestData;
+use Daylog\Infrastructure\Storage\Entries\EntryModel;
+use Daylog\Infrastructure\Storage\Entries\EntryFieldMapper;
+use Daylog\Domain\Services\Clock;
+use Daylog\Domain\Models\Entries\Entry;
+use DateTimeImmutable;
+
 /**
  * Base class for UC-5 UpdateEntry integration tests.
  *
@@ -65,4 +72,58 @@ abstract class BaseUpdateEntryIntegrationTest extends Unit
     {
         EntryFixture::cleanTable();
     }
+
+    /**
+     * Insert a single Entry via real model with both timestamps shifted into the past.
+     *
+     * Purpose:
+     * - Ensure BR-2 holds (updatedAt ≥ createdAt) while guaranteeing that
+     *   subsequent UC execution (with Clock::now()) produces a strictly newer updatedAt.
+     *
+     * Mechanics:
+     * - Take Clock::now(), shift by $shiftSpec (default "-1 hour").
+     * - Build domain Entry from EntryTestData with createdAt/updatedAt = shifted ISO.
+     * - Map to DB row and persist through EntryModel.
+     *
+     * @param string $shiftSpec Relative time spec for DateTimeImmutable::modify(), e.g. "-1 hour".
+     * @param array<string,string> $overrides Optional field overrides: title, body, date, createdAt, updatedAt.
+     * @return array{
+     *   id:string,
+     *   title:string,
+     *   body:string,
+     *   date:string,
+     *   createdAt:string,
+     *   updatedAt:string
+     * } Inserted entry payload (ISO-8601 UTC in timestamps).
+     */
+    protected function insertEntryWithPastTimestamps(string $shiftSpec = '-1 hour', array $overrides = []): array
+    {
+        // Baseline "now" in UTC (ISO-8601)
+        $nowIso = Clock::now();
+        $nowObj = new DateTimeImmutable($nowIso);
+
+        // Shift both timestamps into the past
+        $pastObj = $nowObj->modify($shiftSpec);
+        $pastIso = $pastObj->format(DATE_ATOM);
+
+        // Defaults (can be overridden)
+        $title = $overrides['title'] ?? 'Valid title';
+        $body  = $overrides['body']  ?? 'Valid body';
+        $date  = $overrides['date']  ?? '2025-09-10';
+
+        $createdAt = $overrides['createdAt'] ?? $pastIso;
+        $updatedAt = $overrides['updatedAt'] ?? $pastIso;
+
+        // Build domain entry from canonical test data
+        $data  = EntryTestData::getOne($title, $body, $date, $createdAt, $updatedAt);
+        $entry = Entry::fromArray($data);
+
+        // Map to DB row and persist via real model
+        $dbRow = EntryFieldMapper::toDbRowFromEntry($entry);
+
+        $model = new EntryModel($this->db);
+        $model->createEntry($dbRow);
+
+        return $data;
+    }    
 }

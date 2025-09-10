@@ -5,7 +5,6 @@ namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequest;
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
-use Daylog\Tests\Support\Fixture\EntryFixture;
 
 /**
  * AC-1 (happy path — title): Given a valid id and a non-empty title within limits,
@@ -29,15 +28,14 @@ use Daylog\Tests\Support\Fixture\EntryFixture;
 final class AC01_HappyPath_TitleOnlyTest extends BaseUpdateEntryIntegrationTest
 {
     /**
-     * AC-1 Happy path (title only): persists new title and refreshes updatedAt.
+     * AC-01 Happy path (title only): persists new title and refreshes updatedAt.
      *
      * @return void
      */
     public function testHappyPathUpdatesTitleAndRefreshesUpdatedAt(): void
     {
-        // Arrange
-        $rows = EntryFixture::insertRows(1);
-        $actualData = $rows[0];
+        // Arrange: insert one entry with past timestamps
+        $actualData = $this->insertEntryWithPastTimestamps();
 
         // Build a request with a new valid title only
         $newTitle = 'Updated title';
@@ -52,11 +50,12 @@ final class AC01_HappyPath_TitleOnlyTest extends BaseUpdateEntryIntegrationTest
         $request = UpdateEntryRequest::fromArray($payload);
 
         // Act: execute the real use case
+        usleep(1000);
         $response = $this->useCase->execute($request);
         $entry    = $response->getEntry();
 
         // Assert: DB row changed as expected
-        $this->assertSame($newTitle,                $entry->getTitle());
+        $this->assertSame($newTitle,          $entry->getTitle());
         $this->assertSame($actualData['body'],      $entry->getBody());
         $this->assertSame($actualData['date'],      $entry->getDate());
         $this->assertSame($actualData['createdAt'], $entry->getCreatedAt());

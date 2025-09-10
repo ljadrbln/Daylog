@@ -3,10 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Infrastructure\Storage\Entries;
 
-use DateTimeImmutable;
-use DateTimeInterface;
-use DateTimeZone;
 use Daylog\Domain\Models\Entries\Entry;
+use Daylog\Infrastructure\Utils\TimestampConverter;
 
 /**
  * Minimal mapper between domain Entry and DB row.
@@ -17,9 +15,6 @@ use Daylog\Domain\Models\Entries\Entry;
  */
 final class EntryFieldMapper
 {
-    /** @var array<int,string> */
-    private const ALLOWED_ORDER_DIRS = ['ASC', 'DESC'];
-
     /**
      * Map Domain Entry into DB row.
      *
@@ -35,13 +30,19 @@ final class EntryFieldMapper
      */
     public static function toDbRowFromEntry(Entry $entry): array
     {
+        $createdAt = $entry->getCreatedAt();
+        $updatedAt = $entry->getUpdatedAt();
+
+        $createdAt = TimestampConverter::isoToSqlUtc($createdAt);
+        $updatedAt = TimestampConverter::isoToSqlUtc($updatedAt);
+                
         $row = [
             'id'         => $entry->getId(),
             'title'      => $entry->getTitle(),
             'body'       => $entry->getBody(),
             'date'       => $entry->getDate(),
-            'created_at' => $entry->getCreatedAt(),
-            'updated_at' => $entry->getUpdatedAt(),
+            'created_at' => $createdAt,
+            'updated_at' => $updatedAt
         ];
 
         return $row;
@@ -57,19 +58,19 @@ final class EntryFieldMapper
      */
     public static function fromDbRow(array $row): array
     {
-        $tz   = new DateTimeZone('UTC');
-        $fmt  = DateTimeInterface::ATOM;
+        $createdAt = $row['created_at'];
+        $updatedAt = $row['updated_at'];
 
-        $created = new DateTimeImmutable($row['created_at'], $tz);
-        $updated = new DateTimeImmutable($row['updated_at'], $tz);
+        $createdAt = TimestampConverter::sqlToIsoUtc($createdAt);
+        $updatedAt = TimestampConverter::sqlToIsoUtc($updatedAt);
 
         return [
             'id'        => $row['id'],
             'title'     => $row['title'],
             'body'      => $row['body'],
             'date'      => $row['date'],
-            'createdAt' => $created->format($fmt),
-            'updatedAt' => $updated->format($fmt),
+            'createdAt' => $createdAt,
+            'updatedAt' => $updatedAt
         ];
     }
 

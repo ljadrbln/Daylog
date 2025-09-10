@@ -117,7 +117,7 @@ final class EntryFixture
      * - Execute a parameterized INSERT to persist the record.
      *
      * Notes:
-     * - All business rules (BR-1..BR-6) are already enforced at higher layers (DTO + validators).
+     * - All business rules (BR-1..BR-2, ENTRY-BR-1..ENTRY-BR-4) are already enforced at higher layers (DTO + validators).
      * - This method performs no validation; it assumes the Entry is consistent.
      *
      * @param Entry $entry Domain entity containing logical and timestamp fields.
