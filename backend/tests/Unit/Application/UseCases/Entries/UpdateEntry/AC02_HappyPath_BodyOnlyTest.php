@@ -5,14 +5,13 @@ namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequest;
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
-use Daylog\Application\Validators\Entries\UpdateEntry\UpdateEntryValidatorInterface;
 use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Domain\Services\DateService;
 use Daylog\Tests\Support\Helper\EntryTestData;
 
 /**
- * UC-5 / AC-2 — Happy path (body-only) for UpdateEntry use case.
+ * UC-5 / AC-02 — Happy path (body-only) for UpdateEntry use case.
  *
  * Purpose:
  * Ensure that when only the body is provided with a valid id, the use case
@@ -29,7 +28,7 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  * @covers \Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry::execute
  * @group UC-UpdateEntry
  */
-final class AC2_HappyPath_BodyOnlyTest extends BaseUpdateEntryUnitTest
+final class AC02_HappyPath_BodyOnlyTest extends BaseUpdateEntryUnitTest
 {
     /**
      * Validate body-only update behavior and response DTO integrity.

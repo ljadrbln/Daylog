@@ -9,7 +9,7 @@ use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Domain\Services\UuidGenerator;
 
 /**
- * UC-5 / AC-8 — No fields to update.
+ * UC-5 / AC-08 — No fields to update.
  *
  * Purpose:
  * Given only an id without any fields to update, the use case must fail
@@ -23,7 +23,7 @@ use Daylog\Domain\Services\UuidGenerator;
  * @covers \Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry::execute
  * @group UC-UpdateEntry
  */
-final class AC8_NoFieldsToUpdateTest extends BaseUpdateEntryUnitTest
+final class AC08_NoFieldsToUpdateTest extends BaseUpdateEntryUnitTest
 {
     /**
      * Validate that absence of updatable fields triggers NO_FIELDS_TO_UPDATE and repo remains untouched.

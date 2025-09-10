@@ -8,7 +8,7 @@ use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 
 /**
- * UC-5 / AC-5 — Missing id.
+ * UC-5 / AC-05 — Missing id.
  *
  * Purpose:
  * When the id is missing (empty after trimming), domain validation must fail
@@ -22,7 +22,7 @@ use Daylog\Application\Exceptions\DomainValidationException;
  * @covers \Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry::execute
  * @group UC-UpdateEntry
  */
-final class AC5_MissingIdTest extends BaseUpdateEntryUnitTest
+final class AC05_MissingIdTest extends BaseUpdateEntryUnitTest
 {
     /**
      * Validate that missing id triggers ID_REQUIRED and repo is not used.

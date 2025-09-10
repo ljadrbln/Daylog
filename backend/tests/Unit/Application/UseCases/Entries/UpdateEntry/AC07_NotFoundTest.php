@@ -9,7 +9,7 @@ use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Domain\Services\UuidGenerator;
 
 /**
- * UC-5 / AC-7 — Not found.
+ * UC-5 / AC-07 — Not found.
  *
  * Purpose:
  * Given a valid UUID that does not exist in the repository, the use case must
@@ -25,7 +25,7 @@ use Daylog\Domain\Services\UuidGenerator;
  * @covers \Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry::execute
  * @group UC-UpdateEntry
  */
-final class AC7_NotFoundTest extends BaseUpdateEntryUnitTest
+final class AC07_NotFoundTest extends BaseUpdateEntryUnitTest
 {
     /**
      * Validate not-found behavior and that repository remains untouched on failure.

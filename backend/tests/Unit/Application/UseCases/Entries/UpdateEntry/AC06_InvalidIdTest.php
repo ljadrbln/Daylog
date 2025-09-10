@@ -8,7 +8,7 @@ use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 
 /**
- * UC-5 / AC-6 — Invalid id.
+ * UC-5 / AC-06 — Invalid id.
  *
  * Purpose:
  * Given a non-UUID id, validation fails with ID_INVALID and repository is not touched.
@@ -21,7 +21,7 @@ use Daylog\Application\Exceptions\DomainValidationException;
  * @covers \Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry::execute
  * @group UC-UpdateEntry
  */
-final class AC6_InvalidIdTest extends BaseUpdateEntryUnitTest
+final class AC06_InvalidIdTest extends BaseUpdateEntryUnitTest
 {
     /**
      * Validate that a non-UUID id fails with ID_INVALID and repo remains untouched.

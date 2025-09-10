@@ -9,7 +9,7 @@ use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Domain\Services\UuidGenerator;
 
 /**
- * UC-5 / AC-9 — Empty title.
+ * UC-5 / AC-09 — Empty title.
  *
  * Purpose:
  * Given a title that is empty after trimming, validation must fail with
@@ -23,7 +23,7 @@ use Daylog\Domain\Services\UuidGenerator;
  * @covers \Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry::execute
  * @group UC-UpdateEntry
  */
-final class AC9_EmptyTitleTest extends BaseUpdateEntryUnitTest
+final class AC09_EmptyTitleTest extends BaseUpdateEntryUnitTest
 {
     /**
      * Validate that empty title fails with TITLE_REQUIRED and repo remains untouched.
