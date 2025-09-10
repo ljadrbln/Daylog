@@ -12,16 +12,33 @@ class EntryModel extends AbstractModel {
     protected string $DB_TABLE_NAME = 'entries';
     
     /**
-     * Create a new entry with given data.
+     * Create a new entry.
      *
-     * @param array $data
+     * @param array<string,mixed> $data
      * @return void
      */
-    public function create(array $data): void
+    public function createEntry(array $data): void
     {
         $this->reset();
         $this->copyfrom($data);
-        
+
+        $this->save();
+    }
+
+    /**
+     * Update an existing entry by id.
+     *
+     * @param string              $id
+     * @param array<string,mixed> $data
+     * @return void
+     */
+    public function updateEntry(string $id, array $data): void
+    {
+        $this->reset();
+        $this->load(['id = ?', $id]);
+
+        $this->copyfrom($data);
+
         $this->save();
     }
 

@@ -36,27 +36,25 @@ final class EntryStorage implements EntryStorageInterface
     }
 
     /**
-     * Insert the given Entry and return generated UUID.
-     *
-     * @param Entry  $entry Domain entry to persist.     
+     * @inheritDoc
      */
-    public function insert(Entry $entry): void
-    {
-        $data = EntryFieldMapper::toDbRowFromEntry($entry);
-        $this->model->create($data);
-    }
-
     public function save(Entry $entry): void
     {
         $id = $entry->getId();
 
-        $exists = $this->model->exists($id);
-        $data   = EntryFieldMapper::toDbRowFromEntry($entry);
-        
+        $existing = $this->findById($id);
+        $exists   = ($existing !== null);
+
+        $data = EntryFieldMapper::toDbRowFromEntry($entry);
+
         if ($exists) {
-            $this->model->update($id, $data);
+            // Do not touch immutable columns on update
+            unset($data['id']);
+            unset($data['created_at']);
+                        
+            $this->model->updateEntry($id, $data);
         } else {
-            $this->model->create($data);
+            $this->model->createEntry($data);
         }
     }
 
