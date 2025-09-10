@@ -15,16 +15,27 @@ use Daylog\Domain\Models\Entries\ListEntriesCriteria;
 interface EntryStorageInterface
 {
     /**
-     * Insert the given Entry into the database.
+     * Save an Entry to persistent storage.
      *
-     * Design:
-     * - Storage DOES NOT generate id/timestamps.
-     * - Return value indicates success of the INSERT.
+     * Purpose:
+     *   Provide a unified entry point for persisting domain entities, regardless of
+     *   whether they are new or existing. The caller (Repository/UseCase) does not
+     *   need to decide between INSERT or UPDATE operations.
      *
-     * @param Entry $entry Domain Entry ready to persist.
+     * Mechanics:
+     *   - Check if a row with the given Entry id already exists via the model.
+     *   - If it exists, update the row with the new field values.
+     *   - If it does not exist, create a new row using the mapped field data.
+     *
+     * Invariants:
+     *   - The id must be a valid UUID v4 (validated earlier in the flow).
+     *   - `createdAt` remains unchanged on update; `updatedAt` is refreshed
+     *     according to BR-2 (timestamps consistency & monotonicity).
+     *
+     * @param Entry $entry Domain entity to persist.
      * @return void
      */
-    public function insert(Entry $entry): void;
+    public function save(Entry $entry): void;
 
     /**
      * Retrieve a single Entry by its id (UC-3 GetEntry).

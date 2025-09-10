@@ -33,7 +33,7 @@ final class EntryRepository implements EntryRepositoryInterface
     /** @inheritDoc */
     public function save(Entry $entry): Entry
     {
-        $this->storage->insert($entry);
+        $this->storage->save($entry);
 
         return $entry;
     }

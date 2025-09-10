@@ -46,6 +46,20 @@ final class EntryStorage implements EntryStorageInterface
         $this->model->create($data);
     }
 
+    public function save(Entry $entry): void
+    {
+        $id = $entry->getId();
+
+        $exists = $this->model->exists($id);
+        $data   = EntryFieldMapper::toDbRowFromEntry($entry);
+        
+        if ($exists) {
+            $this->model->update($id, $data);
+        } else {
+            $this->model->create($data);
+        }
+    }
+
     /**
      * {@inheritDoc}
      *
