@@ -4,15 +4,15 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Infrastructure\Repositories;
 
 use Codeception\Test\Unit;
+use Daylog\Presentation\Requests\Entries\ListEntries\ListEntriesSanitizer;
+use Daylog\Application\Normalization\Entries\ListEntries\ListEntriesInputNormalizer;
 use Daylog\Domain\Models\Entries\Entry;
+use Daylog\Domain\Services\UuidGenerator;
+use Daylog\Domain\Models\Entries\ListEntriesCriteria;
 use Daylog\Infrastructure\Repositories\Entries\EntryRepository;
 use Daylog\Tests\Support\Fakes\FakeEntryStorage;
 use Daylog\Tests\Support\Helper\EntryTestData;
-use Daylog\Domain\Models\Entries\ListEntriesCriteria;
-
 use Daylog\Tests\Support\Helper\ListEntriesHelper;
-use Daylog\Application\Normalization\Entries\ListEntries\ListEntriesInputNormalizer;
-use Daylog\Presentation\Requests\Entries\ListEntries\ListEntriesSanitizer;
 
 
 /**
@@ -44,7 +44,7 @@ final class EntryRepositoryTest extends Unit
      * @return void
      * @covers \Daylog\Infrastructure\Repositories\Entries\EntryRepository::save
      */
-    public function testSaveDelegatesToStorageAndReturnsPayload(): void
+    public function testSaveDelegatesToStorageAndReturnsEntry(): void
     {
         // Arrange 
         $storage = new FakeEntryStorage();
@@ -100,7 +100,7 @@ final class EntryRepositoryTest extends Unit
         $entry = Entry::fromArray($data);
 
         // seed fake storage
-        $storage->insert($entry);
+        $storage->save($entry);
 
         $id = $entry->getId();
 
@@ -141,7 +141,7 @@ final class EntryRepositoryTest extends Unit
         $storage = new FakeEntryStorage();
         $repo    = new EntryRepository($storage);
 
-        $missingId = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
+        $missingId = UuidGenerator::generate();
 
         // Act
         $result = $repo->findById($missingId);
