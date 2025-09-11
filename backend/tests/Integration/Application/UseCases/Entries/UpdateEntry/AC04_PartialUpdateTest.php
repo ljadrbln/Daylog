@@ -3,8 +3,9 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequest;
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
+use Daylog\Domain\Models\Entries\Entry;
+use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Assertion\UpdateEntryTitleAndBodyAssertions;
 
 /**
  * AC-4 (partial update): Given a valid id and any subset of title, body, date,
@@ -29,39 +30,31 @@ use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
  */
 final class AC04_PartialUpdateTest extends BaseUpdateEntryIntegrationTest
 {
+    use UpdateEntryTitleAndBodyAssertions;
+
     /**
-     * AC-04 Partial update: only provided fields change, others remain intact.
+     * AC-04: only provided fields (title+body) change; date remains intact.
      *
      * @return void
      */
     public function testPartialUpdateChangesOnlyProvidedFields(): void
     {
-        // Arrange: insert one entry with past timestamps
-        $actualData = $this->insertEntryWithPastTimestamps();
+        // Arrange
+        $data = $this->insertEntryWithPastTimestamps();
+        $expected = Entry::fromArray($data);
 
-        // Build a request updating only a subset: title + date (omit body)
-        $newTitle = 'Updated title';
-        $newDate  = '2025-09-11';
+        $id        = $data['id'];
+        $newTitle  = 'Updated title';
+        $newBody   = 'Updated body';
 
-        /** @var array<string,string> $payload */
-        $payload = [
-            'id'    => $actualData['id'],
-            'title' => $newTitle,
-            'date'  => $newDate,
-        ];
+        /** @var \Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface $request */
+        $request = UpdateEntryTestRequestFactory::titleAndBody($id, $newTitle, $newBody);
 
-        /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryRequest::fromArray($payload);
-
-        // Act: execute the real use case
+        // Act
         $response = $this->useCase->execute($request);
-        $entry    = $response->getEntry();
+        $actual   = $response->getEntry();
 
-        // Assert: only provided fields changed; others preserved
-        $this->assertSame($newTitle,                 $entry->getTitle());
-        $this->assertSame($actualData['body'],       $entry->getBody());
-        $this->assertSame($newDate,                  $entry->getDate());
-        $this->assertSame($actualData['createdAt'],  $entry->getCreatedAt());
-        $this->assertNotSame($actualData['updatedAt'], $entry->getUpdatedAt());
+        // Assert
+        $this->assertTitleAndBodyUpdated($expected, $actual, $newTitle, $newBody);
     }
 }

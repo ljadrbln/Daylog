@@ -3,12 +3,10 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequest;
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
 use Daylog\Domain\Models\Entries\Entry;
-use Daylog\Domain\Services\UuidGenerator;
-use Daylog\Domain\Services\DateService;
 use Daylog\Tests\Support\Helper\EntryTestData;
+use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Assertion\UpdateEntryTitleAndBodyAssertions;
 
 /**
  * UC-5 / AC-04 — Partial update.
@@ -27,63 +25,37 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  */
 final class AC04_PartialUpdateTest extends BaseUpdateEntryUnitTest
 {
+    use UpdateEntryTitleAndBodyAssertions;
+
     /**
-     * Validate that only provided fields are changed; others remain intact.
+     * Validate that only provided fields (title+body) change; date remains intact.
      *
      * @return void
      */
     public function testPartialUpdateChangesOnlyProvidedFields(): void
     {
         // Arrange
-        $seedData = EntryTestData::getOne();
-        $existing = Entry::fromArray($seedData);
+        $data   = EntryTestData::getOne();
+        $expected = Entry::fromArray($data);
 
         $repo = $this->makeRepo();
-        $repo->save($existing);
+        $repo->save($expected);
 
-        $id       = $existing->getId();
+        $id       = $expected->getId();
         $newTitle = 'Updated title';
-        $newDate  = '2005-08-14';
+        $newBody  = 'Updated body';
 
-        $payload = [
-            'id'    => $id,
-            'title' => $newTitle,
-            'date'  => $newDate, // body intentionally omitted
-        ];
+        /** @var \Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface $request */
+        $request = UpdateEntryTestRequestFactory::titleAndBody($id, $newTitle, $newBody);
 
-        /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryRequest::fromArray($payload);
-
-        // Validator: once, OK
         $validator = $this->makeValidatorOk();
 
         // Act
         $useCase  = $this->makeUseCase($repo, $validator);
         $response = $useCase->execute($request);
+        $actual   = $response->getEntry();
 
         // Assert
-        $entry = $response->getEntry();
-
-        $entryId   = $entry->getId();
-        $isValidId = UuidGenerator::isValid($entryId);
-        $this->assertTrue($isValidId);
-        $this->assertSame($id, $entryId);
-
-        $this->assertSame($newTitle,          $entry->getTitle());
-        $this->assertSame($seedData['body'],  $entry->getBody());
-        $this->assertSame($newDate,           $entry->getDate());
-
-        $createdAt = $entry->getCreatedAt();
-        $updatedAt = $entry->getUpdatedAt();
-
-        $isCreatedAtValid = DateService::isValidIsoUtcDateTime($createdAt);
-        $isUpdatedAtValid = DateService::isValidIsoUtcDateTime($updatedAt);
-
-        $this->assertTrue($isCreatedAtValid);
-        $this->assertTrue($isUpdatedAtValid);
-
-        $createdTs = strtotime($createdAt);
-        $updatedTs = strtotime($updatedAt);
-        $this->assertGreaterThanOrEqual($createdTs, $updatedTs);
+        $this->assertTitleAndBodyUpdated($expected, $actual, $newTitle, $newBody);
     }
 }

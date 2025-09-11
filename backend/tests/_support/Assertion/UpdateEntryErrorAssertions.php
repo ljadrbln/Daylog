@@ -6,22 +6,22 @@ namespace Daylog\Tests\Support\Assertion;
 use Daylog\Application\Exceptions\DomainValidationException;
 
 /**
- * Cross-suite assertions for UC-5 errors.
+ * Assertions for UpdateEntry error flows.
  *
  * Purpose:
- * Unify exception expectations for AC-5..AC-9..AC-14.
+ * Provide unified expectations for common error codes.
  */
 trait UpdateEntryErrorAssertions
 {
     /**
-     * Expect ENTRY_NOT_FOUND.
+     * Expect ID_REQUIRED validation error.
      *
      * @return void
      */
-    protected function expectEntryNotFound(): void
+    protected function expectIdRequired(): void
     {
         $class   = DomainValidationException::class;
-        $message = 'ENTRY_NOT_FOUND';
+        $message = 'ID_REQUIRED';
 
         $this->expectException($class);
         $this->expectExceptionMessage($message);

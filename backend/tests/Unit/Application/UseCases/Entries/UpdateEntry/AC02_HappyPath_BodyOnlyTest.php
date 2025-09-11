@@ -9,6 +9,8 @@ use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Domain\Services\DateService;
 use Daylog\Tests\Support\Helper\EntryTestData;
+use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Assertion\UpdateEntryBodyOnlyAssertions;
 
 /**
  * UC-5 / AC-02 — Happy path (body-only) for UpdateEntry use case.
@@ -30,6 +32,8 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  */
 final class AC02_HappyPath_BodyOnlyTest extends BaseUpdateEntryUnitTest
 {
+    use UpdateEntryBodyOnlyAssertions;
+    
     /**
      * Validate body-only update behavior and response DTO integrity.
      *
@@ -37,54 +41,27 @@ final class AC02_HappyPath_BodyOnlyTest extends BaseUpdateEntryUnitTest
      */
     public function testHappyPathUpdatesBodyOnlyAndReturnsResponseDto(): void
     {
-        // Arrange: seed an existing entry
-        $seedData = EntryTestData::getOne();
-        $existing = Entry::fromArray($seedData);
+        // Arrange
+        $data   = EntryTestData::getOne();
+        $expected = Entry::fromArray($data);
 
         $repo = $this->makeRepo();
-        $repo->save($existing);
+        $repo->save($expected);
 
-        $id      = $existing->getId();
+        $id      = $expected->getId();
         $newBody = 'Updated body';
 
-        $payload = [
-            'id'   => $id,
-            'body' => $newBody,
-        ];
+        /** @var \Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface $request */
+        $request = UpdateEntryTestRequestFactory::bodyOnly($id, $newBody);
 
-        /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryRequest::fromArray($payload);
-
-        // Validator: once, OK
         $validator = $this->makeValidatorOk();
 
         // Act
         $useCase  = $this->makeUseCase($repo, $validator);
         $response = $useCase->execute($request);
+        $actual   = $response->getEntry();
 
         // Assert
-        $entry = $response->getEntry();
-
-        $entryId   = $entry->getId();
-        $isValidId = UuidGenerator::isValid($entryId);
-        $this->assertTrue($isValidId);
-
-        $this->assertSame($id, $entryId);
-        $this->assertSame($seedData['title'], $entry->getTitle());
-        $this->assertSame($newBody,           $entry->getBody());
-        $this->assertSame($seedData['date'],  $entry->getDate());
-
-        $createdAt = $entry->getCreatedAt();
-        $updatedAt = $entry->getUpdatedAt();
-
-        $isCreatedAtValid = DateService::isValidIsoUtcDateTime($createdAt);
-        $isUpdatedAtValid = DateService::isValidIsoUtcDateTime($updatedAt);
-
-        $this->assertTrue($isCreatedAtValid);
-        $this->assertTrue($isUpdatedAtValid);
-
-        $createdTs = strtotime($createdAt);
-        $updatedTs = strtotime($updatedAt);
-        $this->assertGreaterThanOrEqual($createdTs, $updatedTs);
+        $this->assertBodyOnlyUpdated($expected, $actual, $newBody);
     }
 }

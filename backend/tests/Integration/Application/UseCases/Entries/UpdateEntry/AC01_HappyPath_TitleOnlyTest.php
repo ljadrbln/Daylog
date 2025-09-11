@@ -37,7 +37,7 @@ final class AC01_HappyPath_TitleOnlyTest extends BaseUpdateEntryIntegrationTest
      */
     public function testHappyPathUpdatesTitleAndRefreshesUpdatedAt(): void
     {
-        // Arrange: seed one entry (returns domain-format array)
+        // Arrange
         $data = $this->insertEntryWithPastTimestamps();
         $expectedEntry = Entry::fromArray($data);
 

@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequest;
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
-use Daylog\Application\Exceptions\DomainValidationException;
+use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
+use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
 
 /**
  * AC-5 (missing id): Given no id, when updating, then validation fails with ID_REQUIRED.
@@ -27,6 +27,8 @@ use Daylog\Application\Exceptions\DomainValidationException;
  */
 final class AC05_MissingIdTest extends BaseUpdateEntryIntegrationTest
 {
+    use UpdateEntryErrorAssertions;
+
     /**
      * AC-05 Missing id: validation fails with ID_REQUIRED.
      *
@@ -34,29 +36,16 @@ final class AC05_MissingIdTest extends BaseUpdateEntryIntegrationTest
      */
     public function testMissingIdFailsValidationWithIdRequired(): void
     {
-        // Arrange: optional seed (keeps setup uniform across AC tests)
-        $this->insertEntryWithPastTimestamps();
-
-        // Build a request payload without 'id'
-        $newTitle = 'Updated title';
-
-        /** @var array<string,string> $payload */
-        $payload = [
-            'id'    => '', // missing after trimming
-            'title' => $newTitle,
-        ];
+        // Arrange
+        $title = 'Updated title';
 
         /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryRequest::fromArray($payload);
+        $request = UpdateEntryTestRequestFactory::missingIdWithTitle($title);
 
-        // Expect transport-level validation failure
-        $exceptionClass = DomainValidationException::class;
-        $this->expectException($exceptionClass);
+        // Expect
+        $this->expectIdRequired();
 
-        $errorCode = 'ID_REQUIRED';
-        $this->expectExceptionMessage($errorCode);
-
-        // Act: execute the real use case (should throw before any persistence)
+        // Act
         $this->useCase->execute($request);
     }
 }

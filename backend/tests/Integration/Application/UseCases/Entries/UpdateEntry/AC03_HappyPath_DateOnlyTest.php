@@ -3,8 +3,9 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequest;
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
+use Daylog\Domain\Models\Entries\Entry;
+use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Assertion\UpdateEntryDateOnlyAssertions;
 
 /**
  * AC-3 (happy path — date): Given a valid id and a valid date,
@@ -27,6 +28,8 @@ use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
  */
 final class AC03_HappyPath_DateOnlyTest extends BaseUpdateEntryIntegrationTest
 {
+    use UpdateEntryDateOnlyAssertions;
+
     /**
      * AC-03 Happy path (date only): persists new date and refreshes updatedAt.
      *
@@ -34,31 +37,21 @@ final class AC03_HappyPath_DateOnlyTest extends BaseUpdateEntryIntegrationTest
      */
     public function testHappyPathUpdatesDateAndRefreshesUpdatedAt(): void
     {
-        // Arrange: insert one entry with past timestamps
-        $actualData = $this->insertEntryWithPastTimestamps();
+        // Arrange
+        $data = $this->insertEntryWithPastTimestamps();
+        $expectedEntry = Entry::fromArray($data);
 
-        // Build a request with a new valid date only
-        $newDate = '2025-09-11';
+        $id      = $data['id'];
+        $newDate = '1999-12-01';
 
-        /** @var array<string,string> $payload */
-        $payload = [
-            'id'   => $actualData['id'],
-            'date' => $newDate,
-        ];
+        /** @var \Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface $request */
+        $request = UpdateEntryTestRequestFactory::dateOnly($id, $newDate);
 
-        /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryRequest::fromArray($payload);
-
-        // Act: execute the real use case
+        // Act
         $response = $this->useCase->execute($request);
-        $entry    = $response->getEntry();
+        $actualEntry = $response->getEntry();
 
-        // Assert: DB row changed as expected
-        $this->assertSame($actualData['title'],     $entry->getTitle());
-        $this->assertSame($actualData['body'],      $entry->getBody());
-        $this->assertSame($newDate,                 $entry->getDate());
-        $this->assertSame($actualData['createdAt'], $entry->getCreatedAt());
-
-        $this->assertNotSame($actualData['updatedAt'], $entry->getUpdatedAt());
+        // Assert
+        $this->assertDateOnlyUpdated($expectedEntry, $actualEntry, $newDate);
     }
 }

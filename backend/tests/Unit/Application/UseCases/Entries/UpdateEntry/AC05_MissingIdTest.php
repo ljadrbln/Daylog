@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequest;
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
-use Daylog\Application\Exceptions\DomainValidationException;
+use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
+use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
 
 /**
  * UC-5 / AC-05 — Missing id.
@@ -24,6 +24,8 @@ use Daylog\Application\Exceptions\DomainValidationException;
  */
 final class AC05_MissingIdTest extends BaseUpdateEntryUnitTest
 {
+    use UpdateEntryErrorAssertions;
+
     /**
      * Validate that missing id triggers ID_REQUIRED and repo is not used.
      *
@@ -32,26 +34,24 @@ final class AC05_MissingIdTest extends BaseUpdateEntryUnitTest
     public function testMissingIdFailsValidationAndRepoUntouched(): void
     {
         // Arrange
-        $payload = [
-            'id'    => '', // missing after trimming
-            'title' => 'Updated title',
-        ];
+        $title = 'Updated title';
 
         /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryRequest::fromArray($payload);
+        $request = UpdateEntryTestRequestFactory::missingIdWithTitle($title);
 
         $repo = $this->makeRepo();
 
         $errorCode = 'ID_REQUIRED';
         $validator = $this->makeValidatorThrows($errorCode);
 
-        $this->expectException(DomainValidationException::class);
+        // Expect
+        $this->expectIdRequired();
 
         // Act
         $useCase = $this->makeUseCase($repo, $validator);
         $useCase->execute($request);
 
-        // Assert: repository untouched
+        // Assert
         $saveCalls = $repo->getSaveCalls();
         $this->assertSame(0, $saveCalls);
     }
