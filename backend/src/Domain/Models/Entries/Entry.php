@@ -64,6 +64,27 @@ final class Entry
         return $entry;
     }
 
+    /**
+     * Compare two entries for structural equality.
+     *
+     * All fields (id, title, body, date, createdAt, updatedAt)
+     * must match exactly for equality.
+     *
+     * @param Entry $other Entry to compare against.
+     * @return bool True if entries are equal, false otherwise.
+     */
+    public function equals(Entry $other): bool
+    {
+        $result = $this->id        === $other->id
+               && $this->title     === $other->title
+               && $this->body      === $other->body
+               && $this->date      === $other->date
+               && $this->createdAt === $other->createdAt
+               && $this->updatedAt === $other->updatedAt;
+
+        return $result;
+    }
+
    /**
      * Title getter.
      *
