@@ -8,6 +8,7 @@ use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\Validators\Rules\Entries\TitleDomainRule;
 use Daylog\Application\Validators\Rules\Entries\BodyDomainRule;
 use Daylog\Application\Validators\Rules\Entries\DateDomainRule;
+use Daylog\Application\Validators\Rules\Common\IdRule;
 
 /**
  * Validates business rules for UpdateEntry request (UC-5).
@@ -46,6 +47,9 @@ final class UpdateEntryValidator implements UpdateEntryValidatorInterface
     {
         $this->assertAtLeastOneFieldProvided($request);
         
+        $id = $request->getId();
+        IdRule::assertValid($id);
+
         TitleDomainRule::assertValidOptional($request);
         BodyDomainRule::assertValidOptional($request);
         DateDomainRule::assertValidOptional($request);

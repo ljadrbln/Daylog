@@ -5,7 +5,7 @@ namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequest;
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
-use Daylog\Application\Exceptions\TransportValidationException;
+use Daylog\Application\Exceptions\DomainValidationException;
 
 /**
  * AC-5 (missing id): Given no id, when updating, then validation fails with ID_REQUIRED.
@@ -19,7 +19,7 @@ use Daylog\Application\Exceptions\TransportValidationException;
  *   - Seed a single entry via EntryFixture (not strictly required for this error, but keeps setup consistent).
  *   - Build a request payload without the 'id' key (e.g., only 'title' provided).
  *   - Execute the real use case obtained in BaseUpdateEntryIntegrationTest.
- *   - Assert: a TransportValidationException with message ID_REQUIRED is thrown and no DB mutation happens.
+ *   - Assert: a DomainValidationException with message ID_REQUIRED is thrown and no DB mutation happens.
  *
  * @covers \Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry
  *
@@ -42,6 +42,7 @@ final class AC05_MissingIdTest extends BaseUpdateEntryIntegrationTest
 
         /** @var array<string,string> $payload */
         $payload = [
+            'id'    => '', // missing after trimming
             'title' => $newTitle,
         ];
 
@@ -49,7 +50,7 @@ final class AC05_MissingIdTest extends BaseUpdateEntryIntegrationTest
         $request = UpdateEntryRequest::fromArray($payload);
 
         // Expect transport-level validation failure
-        $exceptionClass = TransportValidationException::class;
+        $exceptionClass = DomainValidationException::class;
         $this->expectException($exceptionClass);
 
         $errorCode = 'ID_REQUIRED';
