@@ -78,9 +78,7 @@ final class Entry
         $result = $this->id        === $other->id
                && $this->title     === $other->title
                && $this->body      === $other->body
-               && $this->date      === $other->date
-               && $this->createdAt === $other->createdAt
-               && $this->updatedAt === $other->updatedAt;
+               && $this->date      === $other->date;
 
         return $result;
     }

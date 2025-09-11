@@ -6,6 +6,7 @@ namespace Daylog\Tests\Unit\Domain\Models\Entries;
 use Codeception\Test\Unit;
 use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Tests\Support\Helper\EntryTestData;
+use Daylog\Domain\Services\UuidGenerator;
 
 /**
  * Unit test for the Entry domain model (creation path).
@@ -92,14 +93,14 @@ final class EntryTest extends Unit
      */
     public static function equalityProvider(): array
     {
+        $id = UuidGenerator::generate();
+
         return [
             'identical'          => [[], true],
-            'different id'       => [['id' => '00000000-0000-4000-8000-000000000000'], false],
+            'different id'       => [['id' => $id], false],
             'different title'    => [['title' => 'Another title'], false],
             'different body'     => [['body' => 'Another body'], false],
-            'different date'     => [['date' => '2025-08-14'], false],
-            'different createdAt'=> [['createdAt' => '2025-08-13T10:00:00Z'], false],
-            'different updatedAt'=> [['updatedAt' => '2025-08-13T11:00:00Z'], false],
+            'different date'     => [['date' => '2005-08-14'], false]
         ];
     }
 }
