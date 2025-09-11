@@ -44,6 +44,6 @@ final class GetEntryValidator implements GetEntryValidatorInterface
     private function validateId(GetEntryRequestInterface $request): void
     {
         $entryId = $request->getId();
-        IdRule::assertValid($entryId);
+        IdRule::assertValidRequired($entryId);
     }    
 }

@@ -14,7 +14,7 @@ use Daylog\Domain\Services\UuidGenerator;
  * Throws a domain-level validation error on violations.
  *
  * Mechanics:
- * - Call assertValid($id) from concrete UC validators (Update/Get/Delete).
+ * - Call assertValidRequired($id) from concrete UC validators (Update/Get/Delete).
  * - Presentation guarantees non-null string; sanitizers already trim.
  */
 final class IdRule
@@ -28,7 +28,7 @@ final class IdRule
      * @throws DomainValidationException When id is empty → ID_REQUIRED,
      *                                   or not a UUID v4 → ID_INVALID.
      */
-    public static function assertValid(string $id): void
+    public static function assertValidRequired(string $id): void
     {
         if ($id === '') {
             $message   = 'ID_REQUIRED';
@@ -40,7 +40,7 @@ final class IdRule
         if (UuidGenerator::isValid($id) === false) {
             $message   = 'ID_INVALID';
             $exception = new DomainValidationException($message);
-            
+
             throw $exception;
         }
     }

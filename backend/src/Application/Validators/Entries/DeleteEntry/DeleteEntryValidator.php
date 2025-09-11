@@ -45,6 +45,6 @@ final class DeleteEntryValidator implements DeleteEntryValidatorInterface
     private function validateId(DeleteEntryRequestInterface $request): void
     {
         $entryId = $request->getId();
-        IdRule::assertValid($entryId);
+        IdRule::assertValidRequired($entryId);
     }
 }

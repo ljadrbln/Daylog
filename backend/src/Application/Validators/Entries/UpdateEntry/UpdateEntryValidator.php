@@ -48,7 +48,7 @@ final class UpdateEntryValidator implements UpdateEntryValidatorInterface
         $this->assertAtLeastOneFieldProvided($request);
         
         $id = $request->getId();
-        IdRule::assertValid($id);
+        IdRule::assertValidRequired($id);
 
         TitleDomainRule::assertValidOptional($request);
         BodyDomainRule::assertValidOptional($request);
