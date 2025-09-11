@@ -23,7 +23,7 @@ trait IdDomainDataProvider
     public function provideInvalidUuidCases(): array
     {
         $cases = [
-            'empty string'       => ['',                                      'ID_INVALID'],
+            'empty string'       => ['',                                      'ID_REQUIRED'],
             'too short token'    => ['123',                                   'ID_INVALID'],
             'non-hex character'  => ['123e4567-e89b-12d3-a456-42661417400g',  'ID_INVALID'],
             'wrong length (35)'  => ['123e4567-e89b-12d3-a456-42661417400',   'ID_INVALID'],
