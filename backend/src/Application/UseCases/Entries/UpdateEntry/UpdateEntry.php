@@ -67,11 +67,18 @@ final class UpdateEntry implements UpdateEntryInterface
             $exception = new DomainValidationException($errorCode);
             
             throw $exception;
-        }
+        }        
 
         // Normalize (preserve id/createdAt, apply provided fields, refresh updatedAt)
         $params = UpdateEntryInputNormalizer::normalize($request, $current);
         $entry  = Entry::fromArray($params);
+
+        if($current->equals($entry)) {
+            $errorCode = 'NO_CHANGES_APPLIED';
+            $exception = new DomainValidationException($errorCode);
+            
+            throw $exception;            
+        }
 
         // Persist
         $this->repo->save($entry);
