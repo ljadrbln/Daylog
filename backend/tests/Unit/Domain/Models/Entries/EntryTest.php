@@ -60,96 +60,46 @@ final class EntryTest extends Unit
     }
 
     /**
-     * Equality behavior for Entry::equals() across multiple scenarios.
+     * Verify Entry::equals() behavior with various overrides.
      *
-     * Scenario:
-     * - Build a baseline Entry from a deterministic payload (EntryTestData::getOne()).
-     * - Clone payload and apply field overrides from the data provider.
-     * - Construct the second Entry and compare via equals().
-     * - Expectation is driven by the provider: identical → true, any single-field difference → false.
-     *
-     * Cases covered:
-     * - identical payloads (true)
-     * - different id (false)
-     * - different title (false)
-     * - different body (false)
-     * - different date (false)
-     * - different createdAt (false)
-     * - different updatedAt (false)
-     *
-     * @param array<string,string> $overrides Field overrides applied to the right-hand Entry payload.
+     * @param array<string,string> $overrides Field overrides for right-hand entry.
      * @param bool $expected Expected equality result.
      * @return void
      *
+     * @dataProvider equalityProvider
      * @covers \Daylog\Domain\Models\Entries\Entry::equals
-     * @covers \Daylog\Domain\Models\Entries\Entry::fromArray
-     * @dataProvider provideEqualityCases
      */
     public function testEqualsWithProvider(array $overrides, bool $expected): void
     {
-        // Arrange: baseline payload and entries
         $base = EntryTestData::getOne();
 
-        /** @var Entry $left */
-        $left = Entry::fromArray($base);
+        $left  = Entry::fromArray($base);
 
-        $rightData = array_merge($base, $overrides);
+        $right = array_merge($base, $overrides);
+        $right = Entry::fromArray($right);
 
-        /** @var Entry $right */
-        $right = Entry::fromArray($rightData);
-
-        // Act
         $result = $left->equals($right);
 
-        // Assert
         $this->assertSame($expected, $result);
     }
 
     /**
-     * Data provider for equals() behavior.
+     * Provides overrides for Entry::equals() cases.
      *
-     * Provides pairs of (overrides, expected):
-     * - []                              → true  (identical objects)
-     * - ['id' => ...]                   → false
-     * - ['title' => ...]                → false
-     * - ['body' => ...]                 → false
-     * - ['date' => ...]                 → false
-     * - ['createdAt' => ...]            → false
-     * - ['updatedAt' => ...]            → false
+     * Format: [overrides, expected]
      *
-     * @return array<string, array{0: array<string,string>, 1: bool}>
+     * @return array<string,array{array<string,string>,bool}>
      */
-    public function provideEqualityCases(): array
+    public static function equalityProvider(): array
     {
-        $cases = [];
-
-        $identicalOverrides = [];
-        $cases['identical'] = [$identicalOverrides, true];
-
-        $differentId = [];
-        $differentId['id'] = '00000000-0000-4000-8000-000000000000';
-        $cases['different id'] = [$differentId, false];
-
-        $differentTitle = [];
-        $differentTitle['title'] = 'Another title';
-        $cases['different title'] = [$differentTitle, false];
-
-        $differentBody = [];
-        $differentBody['body'] = 'Another body';
-        $cases['different body'] = [$differentBody, false];
-
-        $differentDate = [];
-        $differentDate['date'] = '2025-08-14';
-        $cases['different date'] = [$differentDate, false];
-
-        $differentCreatedAt = [];
-        $differentCreatedAt['createdAt'] = '2025-08-13T10:00:00Z';
-        $cases['different createdAt'] = [$differentCreatedAt, false];
-
-        $differentUpdatedAt = [];
-        $differentUpdatedAt['updatedAt'] = '2025-08-13T11:00:00Z';
-        $cases['different updatedAt'] = [$differentUpdatedAt, false];
-
-        return $cases;
+        return [
+            'identical'          => [[], true],
+            'different id'       => [['id' => '00000000-0000-4000-8000-000000000000'], false],
+            'different title'    => [['title' => 'Another title'], false],
+            'different body'     => [['body' => 'Another body'], false],
+            'different date'     => [['date' => '2025-08-14'], false],
+            'different createdAt'=> [['createdAt' => '2025-08-13T10:00:00Z'], false],
+            'different updatedAt'=> [['updatedAt' => '2025-08-13T11:00:00Z'], false],
+        ];
     }
 }
