@@ -54,7 +54,7 @@ final class DateDomainRule
     public static function assertValidOptional(
         AddEntryRequestInterface|UpdateEntryRequestInterface $request
     ): void {
-        $date = $request->getBody();
+        $date = $request->getDate();
 
         if ($date === null) {
             return;
