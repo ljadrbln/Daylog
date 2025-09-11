@@ -37,6 +37,11 @@ class EntryModel extends AbstractModel {
         $this->reset();
         $this->load(['id = ?', $id]);
 
+        $isDry = $this->dry();
+        if ($isDry) {
+            return;
+        }
+                
         $this->copyfrom($data);
 
         $this->save();
