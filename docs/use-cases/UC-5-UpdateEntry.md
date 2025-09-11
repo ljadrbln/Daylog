@@ -1,4 +1,4 @@
-# UC-4 — Update Entry
+# UC-5 — Update Entry
 
 ## Intent
 Update an existing diary entry’s mutable fields (`title`, `body`, `date`) by id.
