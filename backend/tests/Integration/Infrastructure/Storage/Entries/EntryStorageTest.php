@@ -64,7 +64,7 @@ final class EntryStorageTest extends Unit
         $entry = Entry::fromArray($data);
 
         // Act
-        $storage->insert($entry);
+        $storage->save($entry);
 
         // Assert: UUID assigned and valid v4
         $id      = $entry->getId();

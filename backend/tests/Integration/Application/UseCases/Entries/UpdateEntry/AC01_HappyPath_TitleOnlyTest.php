@@ -3,8 +3,9 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequest;
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
+use Daylog\Domain\Models\Entries\Entry;
+use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Assertion\UpdateEntryTitleOnlyAssertions;
 
 /**
  * AC-1 (happy path — title): Given a valid id and a non-empty title within limits,
@@ -27,6 +28,8 @@ use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
  */
 final class AC01_HappyPath_TitleOnlyTest extends BaseUpdateEntryIntegrationTest
 {
+    use UpdateEntryTitleOnlyAssertions;
+
     /**
      * AC-01 Happy path (title only): persists new title and refreshes updatedAt.
      *
@@ -34,31 +37,21 @@ final class AC01_HappyPath_TitleOnlyTest extends BaseUpdateEntryIntegrationTest
      */
     public function testHappyPathUpdatesTitleAndRefreshesUpdatedAt(): void
     {
-        // Arrange: insert one entry with past timestamps
-        $actualData = $this->insertEntryWithPastTimestamps();
+        // Arrange: seed one entry (returns domain-format array)
+        $data = $this->insertEntryWithPastTimestamps();
+        $expectedEntry = Entry::fromArray($data);
 
-        // Build a request with a new valid title only
+        $id       = $data['id'];
         $newTitle = 'Updated title';
 
-        /** @var array<string,string> $payload */
-        $payload = [
-            'id'    => $actualData['id'],
-            'title' => $newTitle,
-        ];
+        /** @var \Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface $request */
+        $request = UpdateEntryTestRequestFactory::titleOnly($id, $newTitle);
 
-        /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryRequest::fromArray($payload);
-        
-        // Act: execute the real use case
+        // Act
         $response = $this->useCase->execute($request);
-        $entry    = $response->getEntry();
+        $actualEntry = $response->getEntry();
 
-        // Assert: DB row changed as expected
-        $this->assertSame($newTitle,                $entry->getTitle());
-        $this->assertSame($actualData['body'],      $entry->getBody());
-        $this->assertSame($actualData['date'],      $entry->getDate());
-        $this->assertSame($actualData['createdAt'], $entry->getCreatedAt());
-
-        $this->assertNotSame($actualData['updatedAt'], $entry->getUpdatedAt());
+        // Assert
+        $this->assertTitleOnlyUpdated($expectedEntry, $actualEntry, $newTitle);
     }
 }
