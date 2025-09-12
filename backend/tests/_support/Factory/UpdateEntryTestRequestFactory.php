@@ -150,4 +150,79 @@ final class UpdateEntryTestRequestFactory
 
         return $request;
     }
+
+    /**
+     * Build invalid request: body empty after trimming.
+     *
+     * @param string $id Valid UUID v4 identifier.
+     * @return UpdateEntryRequestInterface
+     */
+    public static function emptyBody(string $id): UpdateEntryRequestInterface
+    {
+        $payload = [
+            'id'   => $id,
+            'body' => '   ', // becomes empty after trimming
+        ];
+
+        /** @var UpdateEntryRequestInterface $request */
+        $request = UpdateEntryRequest::fromArray($payload);
+
+        return $request;
+    }
+
+    /**
+     * Build invalid request: body too long (> 50000 chars).
+     *
+     * @param string $id Valid UUID v4 identifier.
+     * @return UpdateEntryRequestInterface
+     */
+    public static function tooLongBody(string $id): UpdateEntryRequestInterface
+    {
+        $length   = EntryConstraints::BODY_MAX + 1;
+        $longBody = str_repeat('A', $length);
+
+        $payload = [
+            'id'   => $id,
+            'body' => $longBody,
+        ];
+
+        /** @var UpdateEntryRequestInterface $request */
+        $request = UpdateEntryRequest::fromArray($payload);
+
+        return $request;
+    }
+
+    /**
+     * Build invalid request: invalid date (malformed or impossible calendar date).
+     *
+     * @param string $id Valid UUID v4 identifier.
+     * @return UpdateEntryRequestInterface
+     */
+    public static function invalidDate(string $id): UpdateEntryRequestInterface
+    {
+        $payload = [
+            'id'   => $id,
+            'date' => '2025-02-30', // invalid calendar date
+        ];
+
+        /** @var UpdateEntryRequestInterface $request */
+        $request = UpdateEntryRequest::fromArray($payload);
+
+        return $request;
+    }
+
+    /**
+     * Build no-op UpdateEntry request: values identical to current entry.
+     *
+     * @param array<string,string> $data Existing entry data (id, title, body, date).
+     * @return UpdateEntryRequestInterface
+     */
+    public static function noOp(array $data): UpdateEntryRequestInterface
+    {
+        /** @var UpdateEntryRequestInterface $request */
+        $request = UpdateEntryRequest::fromArray($data);
+
+        return $request;
+    }
+
 }

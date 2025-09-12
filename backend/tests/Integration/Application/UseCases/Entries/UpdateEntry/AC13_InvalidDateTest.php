@@ -3,14 +3,13 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequest;
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Domain\Services\UuidGenerator;
+use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
 
 /**
- * AC-13 (invalid date): Given a date that doesn’t match YYYY-MM-DD or is not a real date,
- * when updating, then validation fails with DATE_INVALID.
+ * UC-5 / AC-13 — Invalid date.
  *
  * Purpose:
  *   Ensure Application-layer validation rejects malformed or non-existent calendar dates
@@ -19,17 +18,16 @@ use Daylog\Domain\Services\UuidGenerator;
  *
  * Mechanics:
  *   - Keep DB state uniform by seeding once (optional).
- *   - Build a payload with a valid UUID v4 and an invalid 'date' value.
+ *   - Generate a valid UUID v4 and build a request with an invalid 'date' value.
  *   - Execute the real use case and assert DATE_INVALID.
  *
  * @covers \Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry
- *
  * @group UC-UpdateEntry
  */
 final class AC13_InvalidDateTest extends BaseUpdateEntryIntegrationTest
 {
     /**
-     * AC-13 Invalid date: malformed or impossible date fails with DATE_INVALID.
+     * AC-13: Invalid date (malformed or impossible) → DATE_INVALID.
      *
      * @return void
      */
@@ -38,18 +36,11 @@ final class AC13_InvalidDateTest extends BaseUpdateEntryIntegrationTest
         // Arrange: optional seed to keep setup uniform
         $this->insertEntryWithPastTimestamps();
 
-        // Arrange
         $id = UuidGenerator::generate();
 
-        $payload = [
-            'id'   => $id,
-            'date' => '2025-02-30', // invalid calendar date
-        ];
-
         /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryRequest::fromArray($payload);
+        $request = UpdateEntryTestRequestFactory::invalidDate($id);
 
-        // Expect domain-level validation error: DATE_INVALID
         $exceptionClass = DomainValidationException::class;
         $this->expectException($exceptionClass);
 
