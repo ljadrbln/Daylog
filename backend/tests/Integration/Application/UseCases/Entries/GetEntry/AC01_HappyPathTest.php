@@ -8,7 +8,7 @@ use Daylog\Presentation\Requests\Entries\GetEntry\GetEntryRequestInterface;
 use Daylog\Tests\Support\Fixture\EntryFixture;
 
 /**
- * AC-1: Given existing entry id, the system returns the Entry.
+ * AC-01: Given existing entry id, the system returns the Entry.
  *
  * Purpose:
  *   Verify the happy path using real wiring (Provider + SqlFactory) and a clean DB
@@ -29,10 +29,10 @@ use Daylog\Tests\Support\Fixture\EntryFixture;
  * 
  * @group UC-GetEntry
  */
-final class AC1_HappyPathTest extends BaseGetEntryIntegrationTest
+final class AC01_HappyPathTest extends BaseGetEntryIntegrationTest
 {
     /**
-     * AC-1 Happy path: returns the seeded Entry by id.
+     * AC-01 Happy path: returns the seeded Entry by id.
      *
      * @return void
      */

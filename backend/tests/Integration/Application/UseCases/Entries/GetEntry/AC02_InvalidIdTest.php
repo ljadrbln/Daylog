@@ -8,7 +8,7 @@ use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Presentation\Requests\Entries\GetEntry\GetEntryRequestFactory;
 
 /**
- * AC-2 Invalid id: ensures that non-UUID input is rejected.
+ * AC-02 Invalid id: ensures that non-UUID input is rejected.
  *
  * Mechanics:
  * - Build payload with invalid id (not a valid UUID v4).
@@ -23,7 +23,7 @@ use Daylog\Presentation\Requests\Entries\GetEntry\GetEntryRequestFactory;
  * 
  * @group UC-GetEntry
  */
-final class AC2_InvalidIdTest extends BaseGetEntryIntegrationTest
+final class AC02_InvalidIdTest extends BaseGetEntryIntegrationTest
 {
     /**
      * Verifies that a non-UUID id triggers validation error `ID_INVALID`.

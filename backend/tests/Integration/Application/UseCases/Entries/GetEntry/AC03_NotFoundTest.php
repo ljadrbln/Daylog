@@ -10,7 +10,7 @@ use Daylog\Presentation\Requests\Entries\GetEntry\GetEntryRequestFactory;
 use Daylog\Tests\Support\Fixture\EntryFixture;
 
 /**
- * AC-3 Not found: ensures that a valid UUID v4 which does not exist
+ * AC-03 Not found: ensures that a valid UUID v4 which does not exist
  * leads to a domain-level "ENTRY_NOT_FOUND" error.
  *
  * Mechanics:
@@ -27,7 +27,7 @@ use Daylog\Tests\Support\Fixture\EntryFixture;
  *
  * @group UC-GetEntry
  */
-final class AC3_NotFoundTest extends BaseGetEntryIntegrationTest
+final class AC03_NotFoundTest extends BaseGetEntryIntegrationTest
 {
     /**
      * Verifies that a valid-but-absent UUID triggers "ENTRY_NOT_FOUND".
