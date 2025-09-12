@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
-use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
+use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
  * UC-5 / AC-11 — Empty body.
@@ -23,7 +23,7 @@ use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
  */
 final class AC11_EmptyBodyTest extends BaseUpdateEntryUnitTest
 {
-    use UpdateEntryErrorAssertions;
+    use EntryValidationAssertions;
 
     /**
      * Validate that empty (after trimming) body triggers BODY_REQUIRED and repo remains untouched.

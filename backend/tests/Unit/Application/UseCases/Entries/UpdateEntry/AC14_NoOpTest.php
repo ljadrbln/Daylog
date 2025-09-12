@@ -5,7 +5,7 @@ namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
 use Daylog\Tests\Support\Helper\EntryTestData;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
-use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
+use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
  * UC-5 / AC-14 — No-op update.
@@ -26,7 +26,7 @@ use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
  */
 final class AC14_NoOpTest extends BaseUpdateEntryUnitTest
 {
-    use UpdateEntryErrorAssertions;
+    use EntryValidationAssertions;
 
     /**
      * Verify that identical values cause validator to throw NO_CHANGES_APPLIED and repo remains untouched.

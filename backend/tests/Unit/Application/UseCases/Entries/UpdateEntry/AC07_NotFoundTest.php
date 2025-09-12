@@ -4,8 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
-use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
-
+use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
  * UC-5 / AC-07 — Not found.
@@ -26,7 +25,7 @@ use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
  */
 final class AC07_NotFoundTest extends BaseUpdateEntryUnitTest
 {
-    use UpdateEntryErrorAssertions;
+    use EntryValidationAssertions;
 
     /**
      * Validate not-found behavior and that repository remains untouched on failure.

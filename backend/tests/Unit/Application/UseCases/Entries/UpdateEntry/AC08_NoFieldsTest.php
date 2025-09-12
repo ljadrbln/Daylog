@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
-use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
+use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
  * UC-5 / AC-08 — No fields to update.
@@ -23,7 +23,7 @@ use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
  */
 final class AC08_NoFieldsTest extends BaseUpdateEntryUnitTest
 {
-    use UpdateEntryErrorAssertions;
+    use EntryValidationAssertions;
 
     /**
      * Validate that absence of updatable fields triggers NO_FIELDS_TO_UPDATE and repo remains untouched.

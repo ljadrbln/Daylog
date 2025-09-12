@@ -3,9 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
-use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
+use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
  * UC-5 / AC-13 — Invalid date.
@@ -24,7 +23,7 @@ use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
  */
 final class AC13_InvalidDateTest extends BaseUpdateEntryUnitTest
 {
-    use UpdateEntryErrorAssertions;
+    use EntryValidationAssertions;
 
     /**
      * Validate that invalid date triggers DATE_INVALID and repo remains untouched.

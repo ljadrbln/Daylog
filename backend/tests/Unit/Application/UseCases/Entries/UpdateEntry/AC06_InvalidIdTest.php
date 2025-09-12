@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
-use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
+use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
  * UC-5 / AC-06 — Invalid id.
@@ -23,7 +23,7 @@ use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
  */
 final class AC06_InvalidIdTest extends BaseUpdateEntryUnitTest
 {
-    use UpdateEntryErrorAssertions;
+    use EntryValidationAssertions;
 
     /**
      * Validate that a non-UUID id triggers ID_INVALID and repo stays untouched.
