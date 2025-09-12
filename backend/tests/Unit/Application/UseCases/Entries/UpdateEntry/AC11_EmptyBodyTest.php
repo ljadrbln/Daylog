@@ -3,10 +3,9 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
-use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
 
 /**
  * UC-5 / AC-11 — Empty body.
@@ -25,6 +24,8 @@ use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
  */
 final class AC11_EmptyBodyTest extends BaseUpdateEntryUnitTest
 {
+    use UpdateEntryErrorAssertions;
+
     /**
      * Validate that empty (after trimming) body triggers BODY_REQUIRED and repo remains untouched.
      *
@@ -35,16 +36,13 @@ final class AC11_EmptyBodyTest extends BaseUpdateEntryUnitTest
         // Arrange
         $id = UuidGenerator::generate();
 
-        /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryTestRequestFactory::emptyBody($id);
-
-        $repo = $this->makeRepo();
-
         $errorCode = 'BODY_REQUIRED';
         $validator = $this->makeValidatorThrows($errorCode);
-
-        $exceptionClass = DomainValidationException::class;
-        $this->expectException($exceptionClass);
+        $request   = UpdateEntryTestRequestFactory::emptyBody($id);
+        $repo      = $this->makeRepo();
+        
+        // Expect
+        $this->expectBodyRequired();
 
         // Act
         $useCase = $this->makeUseCase($repo, $validator);

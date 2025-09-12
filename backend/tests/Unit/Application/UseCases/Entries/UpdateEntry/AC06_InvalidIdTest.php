@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
-use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
+
 
 /**
  * UC-5 / AC-06 — Invalid id.
@@ -24,6 +24,8 @@ use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
  */
 final class AC06_InvalidIdTest extends BaseUpdateEntryUnitTest
 {
+    use UpdateEntryErrorAssertions;
+
     /**
      * Validate that a non-UUID id triggers ID_INVALID and repo stays untouched.
      *
@@ -32,16 +34,13 @@ final class AC06_InvalidIdTest extends BaseUpdateEntryUnitTest
     public function testInvalidIdFailsValidationAndRepoUntouched(): void
     {
         // Arrange
-        /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryTestRequestFactory::invalidId();
-
-        $repo = $this->makeRepo();
-
         $errorCode = 'ID_INVALID';
         $validator = $this->makeValidatorThrows($errorCode);
+        $request   = UpdateEntryTestRequestFactory::invalidId();
+        $repo      = $this->makeRepo();
 
-        $exceptionClass = DomainValidationException::class;
-        $this->expectException($exceptionClass);
+        // Expect
+        $this->expectIdInvalid();
 
         // Act
         $useCase = $this->makeUseCase($repo, $validator);

@@ -3,10 +3,9 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
-use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
 
 /**
  * UC-5 / AC-13 — Invalid date.
@@ -25,6 +24,8 @@ use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
  */
 final class AC13_InvalidDateTest extends BaseUpdateEntryUnitTest
 {
+    use UpdateEntryErrorAssertions;
+
     /**
      * Validate that invalid date triggers DATE_INVALID and repo remains untouched.
      *
@@ -35,16 +36,13 @@ final class AC13_InvalidDateTest extends BaseUpdateEntryUnitTest
         // Arrange
         $id = UuidGenerator::generate();
 
-        /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryTestRequestFactory::invalidDate($id);
-
-        $repo = $this->makeRepo();
-
         $errorCode = 'DATE_INVALID';
         $validator = $this->makeValidatorThrows($errorCode);
+        $request   = UpdateEntryTestRequestFactory::invalidDate($id);
+        $repo      = $this->makeRepo();
 
-        $exceptionClass = DomainValidationException::class;
-        $this->expectException($exceptionClass);
+        // Expect
+        $this->expectDateInvalid();
 
         // Act
         $useCase = $this->makeUseCase($repo, $validator);

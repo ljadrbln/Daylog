@@ -133,6 +133,25 @@ final class UpdateEntryTestRequestFactory
     }    
 
     /**
+     * Build invalid request: empty title (after trimming).
+     * @param string $id Valid UUID v4 identifier of an existing entry
+     *                   (ensures the error path is TITLE_REQUIRED, not ENTRY_NOT_FOUND).
+     * @return UpdateEntryRequestInterface
+     */
+    public static function emptyTitle(string $id): UpdateEntryRequestInterface
+    {
+        $payload = [
+            'id'    => $id,
+            'title' => '   ', // becomes empty after trimming
+        ];
+
+        /** @var UpdateEntryRequestInterface $request */
+        $request = UpdateEntryRequest::fromArray($payload);
+
+        return $request;
+    }    
+
+    /**
      * Build invalid request: title too long (> 200 chars).
      *
      * @param string $id Valid UUID v4 identifier.
@@ -256,24 +275,6 @@ final class UpdateEntryTestRequestFactory
         $payload = [
             'id'    => UuidGenerator::generate(),
             'title' => 'Updated title',
-        ];
-
-        /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryRequest::fromArray($payload);
-
-        return $request;
-    }
-
-    /**
-     * Build invalid request: empty title (after trimming).
-     *
-     * @return UpdateEntryRequestInterface
-     */
-    public static function emptyTitle(): UpdateEntryRequestInterface
-    {
-        $payload = [
-            'id'    => UuidGenerator::generate(),
-            'title' => '   ', // becomes empty after trimming
         ];
 
         /** @var UpdateEntryRequestInterface $request */

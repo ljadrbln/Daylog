@@ -3,14 +3,13 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequest;
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Domain\Services\UuidGenerator;
+use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
 
 /**
- * AC-11 (empty body): Given body that is empty after trimming,
- * when updating, then validation fails with BODY_REQUIRED.
+ * UC-5 / AC-11 — Empty body.
  *
  * Purpose:
  *   Ensure Application-layer validation rejects an explicitly provided
@@ -19,40 +18,30 @@ use Daylog\Domain\Services\UuidGenerator;
  *
  * Mechanics:
  *   - Optionally seed one entry to keep fixture flow uniform.
- *   - Build a payload with a valid UUID v4 id and an empty body ('').
+ *   - Build a request with a valid UUID v4 id and a whitespace-only body ('   ') which becomes empty after trimming.
  *   - Execute the real use case obtained in BaseUpdateEntryIntegrationTest.
- *   - Assert: DomainValidationException with message BODY_REQUIRED is thrown.
+ *   - Assert: DomainValidationException with message 'BODY_REQUIRED' is thrown.
  *
  * @covers \Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry
- *
  * @group UC-UpdateEntry
  */
 final class AC11_EmptyBodyTest extends BaseUpdateEntryIntegrationTest
 {
     /**
-     * AC-11 Empty body: provided empty body fails with BODY_REQUIRED.
+     * AC-11: Provided empty (after trimming) body → BODY_REQUIRED.
      *
      * @return void
      */
     public function testEmptyBodyFailsValidationWithBodyRequired(): void
     {
-        // Arrange: optional seed to keep setup uniform
+        // Arrange
         $this->insertEntryWithPastTimestamps();
 
-        // Valid UUID v4; body provided but empty after trimming
-        $id        = UuidGenerator::generate();
-        $emptyBody = '';
-
-        /** @var array<string,string> $payload */
-        $payload = [
-            'id'   => $id,
-            'body' => $emptyBody,
-        ];
+        $id = UuidGenerator::generate();
 
         /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryRequest::fromArray($payload);
+        $request = UpdateEntryTestRequestFactory::emptyBody($id);
 
-        // Expect domain-level validation error: BODY_REQUIRED
         $exceptionClass = DomainValidationException::class;
         $this->expectException($exceptionClass);
 

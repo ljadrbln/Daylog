@@ -8,6 +8,7 @@ use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Tests\Support\Helper\EntryTestData;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
 
 /**
  * UC-5 / AC-14 — No-op update.
@@ -28,6 +29,8 @@ use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
  */
 final class AC14_NoOpTest extends BaseUpdateEntryUnitTest
 {
+    use UpdateEntryErrorAssertions;
+
     /**
      * Verify that identical values cause validator to throw NO_CHANGES_APPLIED and repo remains untouched.
      *
@@ -36,20 +39,14 @@ final class AC14_NoOpTest extends BaseUpdateEntryUnitTest
     public function testNoOpUpdateThrowsAndRepoUntouched(): void
     {
         // Arrange
-        $data  = EntryTestData::getOne();
-        $entry = Entry::fromArray($data);
-
-        $repo = $this->makeRepo();
-        $repo->save($entry);
-
-        /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryTestRequestFactory::noOp($data);
-
+        $data      = EntryTestData::getOne();
         $errorCode = 'NO_CHANGES_APPLIED';
         $validator = $this->makeValidatorThrows($errorCode);
+        $request   = UpdateEntryTestRequestFactory::noOp($data);
+        $repo      = $this->makeRepo();
 
-        $exceptionClass = DomainValidationException::class;
-        $this->expectException($exceptionClass);
+        // Expect
+        $this->expectNoChangesApplied();
 
         // Act
         $useCase = $this->makeUseCase($repo, $validator);

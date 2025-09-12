@@ -33,8 +33,11 @@ final class AC09_EmptyTitleTest extends BaseUpdateEntryIntegrationTest
     public function testEmptyTitleFailsValidationWithTitleRequired(): void
     {
         // Arrange
+        $row = $this->insertEntryWithPastTimestamps();
+        $id  = $row['id'];
+
         /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryTestRequestFactory::emptyTitle();
+        $request = UpdateEntryTestRequestFactory::emptyTitle($id);
 
         $exceptionClass = DomainValidationException::class;
         $this->expectException($exceptionClass);
