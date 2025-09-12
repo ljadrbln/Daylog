@@ -3,14 +3,11 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequest;
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
-use Daylog\Application\Exceptions\DomainValidationException;
+use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
 
 /**
- * AC-14 (no-op): Given values identical to current ones,
- * when updating, then the system reports NO_CHANGES_APPLIED
- * and does not modify updatedAt.
+ * UC-5 / AC-14 — No-op update.
  *
  * Purpose:
  *   Verify that UpdateEntry detects a no-op update (all provided values
@@ -26,39 +23,27 @@ use Daylog\Application\Exceptions\DomainValidationException;
  *     remains equal to the original timestamp.
  *
  * @covers \Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry
- *
  * @group UC-UpdateEntry
  */
 final class AC14_NoOpTest extends BaseUpdateEntryIntegrationTest
 {
+    use UpdateEntryErrorAssertions;
+
     /**
-     * AC-14 No-op: identical values trigger NO_CHANGES_APPLIED.
+     * AC-14: Identical values trigger NO_CHANGES_APPLIED.
      *
      * @return void
      */
     public function testNoOpUpdateReportsNoChangesApplied(): void
     {
-        // Arrange: insert one entry with past timestamps
-        $actualData = $this->insertEntryWithPastTimestamps();
+        // Arrange
+        $row = $this->insertEntryWithPastTimestamps();
+        $request = UpdateEntryTestRequestFactory::noOp($row);
 
-        /** @var array<string,string> $payload */
-        $payload = [
-            'id'    => $actualData['id'],
-            'title' => $actualData['title'],
-            'body'  => $actualData['body'],
-            'date'  => $actualData['date'],
-        ];
+        // Expect
+        $this->expectNoChangesApplied();
 
-        /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryRequest::fromArray($payload);
-
-        // Expect informational domain error: NO_CHANGES_APPLIED
-        $exceptionClass = DomainValidationException::class;
-        $this->expectException($exceptionClass);
-
-        $message = 'NO_CHANGES_APPLIED';
-        $this->expectExceptionMessage($message);
-
+        // Act
         $this->useCase->execute($request);
     }
 }

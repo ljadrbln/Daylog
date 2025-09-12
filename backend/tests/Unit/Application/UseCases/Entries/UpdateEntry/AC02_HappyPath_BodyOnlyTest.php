@@ -51,10 +51,8 @@ final class AC02_HappyPath_BodyOnlyTest extends BaseUpdateEntryUnitTest
         $id      = $expected->getId();
         $newBody = 'Updated body';
 
-        /** @var \Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface $request */
-        $request = UpdateEntryTestRequestFactory::bodyOnly($id, $newBody);
-
         $validator = $this->makeValidatorOk();
+        $request   = UpdateEntryTestRequestFactory::bodyOnly($id, $newBody);
 
         // Act
         $useCase  = $this->makeUseCase($repo, $validator);

@@ -41,7 +41,7 @@ final class AC03_HappyPath_DateOnlyTest extends BaseUpdateEntryUnitTest
      */
     public function testHappyPathUpdatesDateOnlyAndReturnsResponseDto(): void
     {
-        // Arrange: seed an existing entry
+        // Arrange
         $seedData = EntryTestData::getOne();
         $expected = Entry::fromArray($seedData);
 
@@ -56,11 +56,8 @@ final class AC03_HappyPath_DateOnlyTest extends BaseUpdateEntryUnitTest
             'date' => $expectedDate,
         ];
 
-        /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryRequest::fromArray($payload);
-
-        // Validator: once, OK
         $validator = $this->makeValidatorOk();
+        $request   = UpdateEntryRequest::fromArray($payload);
 
         // Act
         $useCase  = $this->makeUseCase($repo, $validator);

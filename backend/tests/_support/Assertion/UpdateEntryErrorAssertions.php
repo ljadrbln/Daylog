@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Support\Assertion;
 
 use Daylog\Application\Exceptions\DomainValidationException;
-use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
+use Daylog\Tests\Support\Fakes\FakeEntryRepository;
 
 /**
  * Assertions for UpdateEntry error flows.
@@ -17,10 +17,10 @@ trait UpdateEntryErrorAssertions
     /**
      * Assert that repository has not been touched (no save calls).
      *
-     * @param EntryRepositoryInterface $repo FakeEntryRepository with getSaveCalls() method.
+     * @param FakeEntryRepository $repo FakeEntryRepository with getSaveCalls() method.
      * @return void
      */
-    protected function assertRepoUntouched(EntryRepositoryInterface $repo): void
+    protected function assertRepoUntouched(FakeEntryRepository $repo): void
     {
         $saveCalls = $repo->getSaveCalls();
         $this->assertSame(0, $saveCalls);

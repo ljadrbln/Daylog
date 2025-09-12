@@ -6,7 +6,6 @@ namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
 use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
 
-
 /**
  * UC-5 / AC-06 — Invalid id.
  *

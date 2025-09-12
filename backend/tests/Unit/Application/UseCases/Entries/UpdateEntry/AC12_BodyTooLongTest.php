@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
 use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
 
@@ -34,11 +33,9 @@ final class AC12_BodyTooLongTest extends BaseUpdateEntryUnitTest
     public function testTooLongBodyFailsValidationAndRepoUntouched(): void
     {
         // Arrange
-        $id = UuidGenerator::generate();
-
         $errorCode = 'BODY_TOO_LONG';
         $validator = $this->makeValidatorThrows($errorCode);
-        $request   = UpdateEntryTestRequestFactory::tooLongBody($id);
+        $request   = UpdateEntryTestRequestFactory::tooLongBody();
         $repo      = $this->makeRepo();
 
         // Expect

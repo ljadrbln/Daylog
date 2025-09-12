@@ -3,10 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
-use Daylog\Application\Exceptions\DomainValidationException;
-use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
 
 /**
  * UC-5 / AC-08 — No fields to update.
@@ -16,7 +14,6 @@ use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
  *   fails early with DomainValidationException('NO_FIELDS_TO_UPDATE') before touching storage.
  *
  * Mechanics:
- *   - Optionally seed one row to keep the integration flow uniform (not required for this error path).
  *   - Generate a valid UUID v4 that may or may not exist — irrelevant for this validation branch.
  *   - Build a request via the shared test factory with only the id (no title/body/date).
  *   - Execute the real use case from the base integration class.
@@ -27,6 +24,8 @@ use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
  */
 final class AC08_NoFieldsTest extends BaseUpdateEntryIntegrationTest
 {
+    use UpdateEntryErrorAssertions;
+
     /**
      * AC-08: Only id provided → NO_FIELDS_TO_UPDATE.
      *
@@ -35,14 +34,10 @@ final class AC08_NoFieldsTest extends BaseUpdateEntryIntegrationTest
     public function testNoFieldsToUpdateFailsValidationWithNoFieldsToUpdate(): void
     {
         // Arrange
-        /** @var UpdateEntryRequestInterface $request */
         $request = UpdateEntryTestRequestFactory::idOnly();
 
-        $exceptionClass = DomainValidationException::class;
-        $this->expectException($exceptionClass);
-
-        $message = 'NO_FIELDS_TO_UPDATE';
-        $this->expectExceptionMessage($message);
+        // Expect
+        $this->expectNoFieldsToUpdate();
 
         // Act
         $this->useCase->execute($request);

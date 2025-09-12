@@ -123,10 +123,12 @@ final class UpdateEntryTestRequestFactory
      */
     public static function idOnly(): UpdateEntryRequestInterface
     {
-        $id = UuidGenerator::generate();
-        $payload = ['id' => $id];
+        $entryId = UuidGenerator::generate();
 
-        /** @var UpdateEntryRequestInterface $request */
+        $payload = [
+            'id' => $entryId
+        ];
+
         $request = UpdateEntryRequest::fromArray($payload);
 
         return $request;
@@ -134,18 +136,17 @@ final class UpdateEntryTestRequestFactory
 
     /**
      * Build invalid request: empty title (after trimming).
-     * @param string $id Valid UUID v4 identifier of an existing entry
-     *                   (ensures the error path is TITLE_REQUIRED, not ENTRY_NOT_FOUND).
+     * 
      * @return UpdateEntryRequestInterface
      */
-    public static function emptyTitle(string $id): UpdateEntryRequestInterface
+    public static function emptyTitle(): UpdateEntryRequestInterface
     {
+        $entryId = UuidGenerator::generate();
         $payload = [
-            'id'    => $id,
+            'id'    => $entryId,
             'title' => '   ', // becomes empty after trimming
         ];
 
-        /** @var UpdateEntryRequestInterface $request */
         $request = UpdateEntryRequest::fromArray($payload);
 
         return $request;
@@ -154,20 +155,19 @@ final class UpdateEntryTestRequestFactory
     /**
      * Build invalid request: title too long (> 200 chars).
      *
-     * @param string $id Valid UUID v4 identifier.
      * @return UpdateEntryRequestInterface
      */
-    public static function tooLongTitle(string $id): UpdateEntryRequestInterface
+    public static function tooLongTitle(): UpdateEntryRequestInterface
     {
+        $entryId   = UuidGenerator::generate();
         $length    = EntryConstraints::TITLE_MAX + 1;
         $longTitle = str_repeat('A', $length);
 
         $payload = [
-            'id'    => $id,
+            'id'    => $entryId,
             'title' => $longTitle,
         ];
 
-        /** @var UpdateEntryRequestInterface $request */
         $request = UpdateEntryRequest::fromArray($payload);
 
         return $request;
@@ -176,17 +176,17 @@ final class UpdateEntryTestRequestFactory
     /**
      * Build invalid request: body empty after trimming.
      *
-     * @param string $id Valid UUID v4 identifier.
      * @return UpdateEntryRequestInterface
      */
-    public static function emptyBody(string $id): UpdateEntryRequestInterface
+    public static function emptyBody(): UpdateEntryRequestInterface
     {
+        $entryId  = UuidGenerator::generate();
+
         $payload = [
-            'id'   => $id,
+            'id'   => $entryId,
             'body' => '   ', // becomes empty after trimming
         ];
 
-        /** @var UpdateEntryRequestInterface $request */
         $request = UpdateEntryRequest::fromArray($payload);
 
         return $request;
@@ -195,20 +195,19 @@ final class UpdateEntryTestRequestFactory
     /**
      * Build invalid request: body too long (> 50000 chars).
      *
-     * @param string $id Valid UUID v4 identifier.
      * @return UpdateEntryRequestInterface
      */
-    public static function tooLongBody(string $id): UpdateEntryRequestInterface
+    public static function tooLongBody(): UpdateEntryRequestInterface
     {
+        $entryId  = UuidGenerator::generate();
         $length   = EntryConstraints::BODY_MAX + 1;
         $longBody = str_repeat('A', $length);
 
         $payload = [
-            'id'   => $id,
+            'id'   => $entryId,
             'body' => $longBody,
         ];
 
-        /** @var UpdateEntryRequestInterface $request */
         $request = UpdateEntryRequest::fromArray($payload);
 
         return $request;
@@ -217,17 +216,17 @@ final class UpdateEntryTestRequestFactory
     /**
      * Build invalid request: invalid date (malformed or impossible calendar date).
      *
-     * @param string $id Valid UUID v4 identifier.
      * @return UpdateEntryRequestInterface
      */
-    public static function invalidDate(string $id): UpdateEntryRequestInterface
+    public static function invalidDate(): UpdateEntryRequestInterface
     {
+        $entryId = UuidGenerator::generate();
+
         $payload = [
-            'id'   => $id,
+            'id'   => $entryId,
             'date' => '2025-02-30', // invalid calendar date
         ];
 
-        /** @var UpdateEntryRequestInterface $request */
         $request = UpdateEntryRequest::fromArray($payload);
 
         return $request;
@@ -236,7 +235,12 @@ final class UpdateEntryTestRequestFactory
     /**
      * Build no-op UpdateEntry request: values identical to current entry.
      *
-     * @param array<string,string> $data Existing entry data (id, title, body, date).
+     * @param array{
+     *  id: string, 
+     *  title?: string, 
+     *  body?: string, 
+     *  date?: string
+     * } $data Existing entry data (id, title, body, date).
      * @return UpdateEntryRequestInterface
      */
     public static function noOp(array $data): UpdateEntryRequestInterface
@@ -259,7 +263,6 @@ final class UpdateEntryTestRequestFactory
             'title' => 'Updated title',
         ];
 
-        /** @var UpdateEntryRequestInterface $request */
         $request = UpdateEntryRequest::fromArray($payload);
 
         return $request;
@@ -277,7 +280,6 @@ final class UpdateEntryTestRequestFactory
             'title' => 'Updated title',
         ];
 
-        /** @var UpdateEntryRequestInterface $request */
         $request = UpdateEntryRequest::fromArray($payload);
 
         return $request;

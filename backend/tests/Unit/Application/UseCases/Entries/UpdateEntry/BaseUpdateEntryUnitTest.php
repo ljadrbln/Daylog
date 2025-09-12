@@ -26,9 +26,9 @@ abstract class BaseUpdateEntryUnitTest extends Unit
     /**
      * Create a fresh fake repository instance.
      *
-     * @return EntryRepositoryInterface
+     * @return FakeEntryRepository
      */
-    protected function makeRepo(): EntryRepositoryInterface
+    protected function makeRepo(): FakeEntryRepository
     {
         $repo = new FakeEntryRepository();
         return $repo;
@@ -55,6 +55,7 @@ abstract class BaseUpdateEntryUnitTest extends Unit
      * Create a validator mock that throws DomainValidationException with a given code.
      *
      * @param string $errorCode Domain error code to throw (e.g. TITLE_REQUIRED).
+     * 
      * @return UpdateEntryValidatorInterface
      */
     protected function makeValidatorThrows(string $errorCode): UpdateEntryValidatorInterface
@@ -77,11 +78,13 @@ abstract class BaseUpdateEntryUnitTest extends Unit
      *
      * @param EntryRepositoryInterface $repo
      * @param UpdateEntryValidatorInterface $validator
+     * 
      * @return UpdateEntry
      */
     protected function makeUseCase(EntryRepositoryInterface $repo, UpdateEntryValidatorInterface $validator): UpdateEntry
     {
         $useCase = new UpdateEntry($repo, $validator);
+
         return $useCase;
     }
 }

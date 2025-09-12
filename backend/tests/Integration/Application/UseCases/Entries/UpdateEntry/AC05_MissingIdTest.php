@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
 use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
 
@@ -36,7 +35,6 @@ final class AC05_MissingIdTest extends BaseUpdateEntryIntegrationTest
     public function testMissingIdFailsValidationWithIdRequired(): void
     {
         // Arrange
-        /** @var UpdateEntryRequestInterface $request */
         $request = UpdateEntryTestRequestFactory::missingId();
 
         // Expect

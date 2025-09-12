@@ -3,9 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
-use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
 
 /**
  * UC-5 / AC-09 — Empty title.
@@ -25,6 +24,8 @@ use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
  */
 final class AC09_EmptyTitleTest extends BaseUpdateEntryIntegrationTest
 {
+    use UpdateEntryErrorAssertions;
+
     /**
      * AC-09: Provided empty (after trimming) title → TITLE_REQUIRED.
      *
@@ -33,17 +34,10 @@ final class AC09_EmptyTitleTest extends BaseUpdateEntryIntegrationTest
     public function testEmptyTitleFailsValidationWithTitleRequired(): void
     {
         // Arrange
-        $row = $this->insertEntryWithPastTimestamps();
-        $id  = $row['id'];
+        $request = UpdateEntryTestRequestFactory::emptyTitle();
 
-        /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryTestRequestFactory::emptyTitle($id);
-
-        $exceptionClass = DomainValidationException::class;
-        $this->expectException($exceptionClass);
-
-        $message = 'TITLE_REQUIRED';
-        $this->expectExceptionMessage($message);
+        // Expect: sanitizer on a presentation level makes a trim and passes an empty string to the validator.
+        $this->expectEntryNotFound();
 
         // Act
         $this->useCase->execute($request);

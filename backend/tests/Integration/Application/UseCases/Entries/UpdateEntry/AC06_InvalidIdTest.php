@@ -3,9 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
-use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
 
 /**
  * AC-6 (invalid id): Given a non-UUID id, when updating, then validation fails with ID_INVALID.
@@ -25,6 +24,8 @@ use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
  */
 final class AC06_InvalidIdTest extends BaseUpdateEntryIntegrationTest
 {
+    use UpdateEntryErrorAssertions;
+
     /**
      * AC-06: Non-UUID id fails validation with ID_INVALID.
      *
@@ -33,14 +34,10 @@ final class AC06_InvalidIdTest extends BaseUpdateEntryIntegrationTest
     public function testInvalidIdFailsValidationWithIdInvalid(): void
     {
         // Arrange
-        /** @var UpdateEntryRequestInterface $request */
         $request = UpdateEntryTestRequestFactory::invalidId();
 
-        $exceptionClass = DomainValidationException::class;
-        $this->expectException($exceptionClass);
-
-        $message = 'ID_INVALID';
-        $this->expectExceptionMessage($message);
+        // Expect
+        $this->expectIdInvalid();
 
         // Act
         $this->useCase->execute($request);

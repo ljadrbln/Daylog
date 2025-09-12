@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
 use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
 

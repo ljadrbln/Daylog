@@ -3,11 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
-use Daylog\Application\Exceptions\DomainValidationException;
-use Daylog\Domain\Models\Entries\EntryConstraints;
-use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
 
 /**
  * UC-5 / AC-10 — Title too long.
@@ -28,6 +25,8 @@ use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
  */
 final class AC10_TitleTooLongTest extends BaseUpdateEntryIntegrationTest
 {
+    use UpdateEntryErrorAssertions;
+
     /**
      * AC-10: Provided title > 200 chars → TITLE_TOO_LONG.
      *
@@ -35,19 +34,11 @@ final class AC10_TitleTooLongTest extends BaseUpdateEntryIntegrationTest
      */
     public function testTitleTooLongFailsValidationWithTitleTooLong(): void
     {
-        // Arrange: optional seed to keep setup uniform
-        $this->insertEntryWithPastTimestamps();
+        // Arrange
+        $request = UpdateEntryTestRequestFactory::tooLongTitle();
 
-        $id = UuidGenerator::generate();
-
-        /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryTestRequestFactory::tooLongTitle($id);
-
-        $exceptionClass = DomainValidationException::class;
-        $this->expectException($exceptionClass);
-
-        $message = 'TITLE_TOO_LONG';
-        $this->expectExceptionMessage($message);
+        // Expect
+        $this->expectTitleTooLong();
 
         // Act
         $this->useCase->execute($request);

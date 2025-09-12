@@ -3,10 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
-use Daylog\Application\Exceptions\DomainValidationException;
-use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
 
 /**
  * AC-7 (not found): Given a valid UUID that doesn’t exist, when updating,
@@ -30,6 +28,8 @@ use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
  */
 final class AC07_NotFoundTest extends BaseUpdateEntryIntegrationTest
 {
+    use UpdateEntryErrorAssertions;
+
     /**
      * AC-7 Not found: valid, absent UUID yields ENTRY_NOT_FOUND.
      *
@@ -38,14 +38,10 @@ final class AC07_NotFoundTest extends BaseUpdateEntryIntegrationTest
     public function testNotFoundFailsWithEntryNotFound(): void
     {
         // Arrange
-        /** @var UpdateEntryRequestInterface $request */
         $request = UpdateEntryTestRequestFactory::notFound();
 
-        $exceptionClass = DomainValidationException::class;
-        $this->expectException($exceptionClass);
-
-        $message = 'ENTRY_NOT_FOUND';
-        $this->expectExceptionMessage($message);
+        // Expect
+        $this->expectEntryNotFound();
 
         // Act
         $this->useCase->execute($request);

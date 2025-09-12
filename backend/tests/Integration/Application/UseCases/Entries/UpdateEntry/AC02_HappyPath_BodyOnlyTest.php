@@ -38,19 +38,18 @@ final class AC02_HappyPath_BodyOnlyTest extends BaseUpdateEntryIntegrationTest
     {
         // Arrange
         $data = $this->insertEntryWithPastTimestamps();
-        $expectedEntry = Entry::fromArray($data);
+        $expected = Entry::fromArray($data);
 
         $id      = $data['id'];
         $newBody = 'Updated body';
 
-        /** @var \Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface $request */
         $request = UpdateEntryTestRequestFactory::bodyOnly($id, $newBody);
 
         // Act
         $response = $this->useCase->execute($request);
-        $actualEntry = $response->getEntry();
+        $actual   = $response->getEntry();
 
         // Assert
-        $this->assertBodyOnlyUpdated($expectedEntry, $actualEntry, $newBody);
+        $this->assertBodyOnlyUpdated($expected, $actual, $newBody);
     }
 }

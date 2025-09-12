@@ -34,11 +34,9 @@ final class AC13_InvalidDateTest extends BaseUpdateEntryUnitTest
     public function testInvalidDateFailsValidationAndRepoUntouched(): void
     {
         // Arrange
-        $id = UuidGenerator::generate();
-
         $errorCode = 'DATE_INVALID';
         $validator = $this->makeValidatorThrows($errorCode);
-        $request   = UpdateEntryTestRequestFactory::invalidDate($id);
+        $request   = UpdateEntryTestRequestFactory::invalidDate();
         $repo      = $this->makeRepo();
 
         // Expect

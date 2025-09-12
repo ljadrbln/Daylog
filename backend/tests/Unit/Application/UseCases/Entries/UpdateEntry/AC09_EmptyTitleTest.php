@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
 use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
 
@@ -34,11 +33,9 @@ final class AC09_EmptyTitleTest extends BaseUpdateEntryUnitTest
     public function testEmptyTitleFailsValidationAndRepoUntouched(): void
     {
         // Arrange
-        $id = UuidGenerator::generate();
-
         $errorCode = 'TITLE_REQUIRED';
         $validator = $this->makeValidatorThrows($errorCode);
-        $request   = UpdateEntryTestRequestFactory::emptyTitle($id);
+        $request   = UpdateEntryTestRequestFactory::emptyTitle();
         $repo      = $this->makeRepo();
 
         // Expect

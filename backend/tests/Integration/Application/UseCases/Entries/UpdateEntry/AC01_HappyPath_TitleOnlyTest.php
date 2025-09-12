@@ -39,19 +39,18 @@ final class AC01_HappyPath_TitleOnlyTest extends BaseUpdateEntryIntegrationTest
     {
         // Arrange
         $data = $this->insertEntryWithPastTimestamps();
-        $expectedEntry = Entry::fromArray($data);
+        $expected = Entry::fromArray($data);
 
         $id       = $data['id'];
         $newTitle = 'Updated title';
 
-        /** @var \Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface $request */
         $request = UpdateEntryTestRequestFactory::titleOnly($id, $newTitle);
 
         // Act
         $response = $this->useCase->execute($request);
-        $actualEntry = $response->getEntry();
+        $actual   = $response->getEntry();
 
         // Assert
-        $this->assertTitleOnlyUpdated($expectedEntry, $actualEntry, $newTitle);
+        $this->assertTitleOnlyUpdated($expected, $actual, $newTitle);
     }
 }

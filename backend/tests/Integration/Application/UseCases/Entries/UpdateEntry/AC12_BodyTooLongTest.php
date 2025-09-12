@@ -3,10 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
-use Daylog\Application\Exceptions\DomainValidationException;
-use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
 
 /**
  * UC-5 / AC-12 — Body too long.
@@ -17,7 +15,6 @@ use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
  *   before any storage interaction. Uses real wiring (Provider + SqlFactory).
  *
  * Mechanics:
- *   - Optionally seed one entry to keep fixture flow uniform.
  *   - Generate a valid UUID v4 and build a request with body length = 50001.
  *   - Execute the real use case obtained in BaseUpdateEntryIntegrationTest.
  *   - Assert: DomainValidationException with message 'BODY_TOO_LONG' is thrown.
@@ -27,6 +24,8 @@ use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
  */
 final class AC12_BodyTooLongTest extends BaseUpdateEntryIntegrationTest
 {
+    use UpdateEntryErrorAssertions;
+
     /**
      * AC-12: Provided body > 50000 chars → BODY_TOO_LONG.
      *
@@ -34,19 +33,11 @@ final class AC12_BodyTooLongTest extends BaseUpdateEntryIntegrationTest
      */
     public function testBodyTooLongFailsValidationWithBodyTooLong(): void
     {
-        // Arrange: optional seed to keep setup uniform
-        $this->insertEntryWithPastTimestamps();
+        // Arrange
+        $request = UpdateEntryTestRequestFactory::tooLongBody();
 
-        $id = UuidGenerator::generate();
-
-        /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryTestRequestFactory::tooLongBody($id);
-
-        $exceptionClass = DomainValidationException::class;
-        $this->expectException($exceptionClass);
-
-        $message = 'BODY_TOO_LONG';
-        $this->expectExceptionMessage($message);
+        // Expect
+        $this->expectBodyTooLong();
 
         // Act
         $this->useCase->execute($request);

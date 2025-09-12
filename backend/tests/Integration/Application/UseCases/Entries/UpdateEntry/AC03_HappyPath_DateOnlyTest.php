@@ -39,19 +39,18 @@ final class AC03_HappyPath_DateOnlyTest extends BaseUpdateEntryIntegrationTest
     {
         // Arrange
         $data = $this->insertEntryWithPastTimestamps();
-        $expectedEntry = Entry::fromArray($data);
+        $expected = Entry::fromArray($data);
 
         $id      = $data['id'];
         $newDate = '1999-12-01';
 
-        /** @var \Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface $request */
         $request = UpdateEntryTestRequestFactory::dateOnly($id, $newDate);
 
         // Act
         $response = $this->useCase->execute($request);
-        $actualEntry = $response->getEntry();
+        $actual   = $response->getEntry();
 
         // Assert
-        $this->assertDateOnlyUpdated($expectedEntry, $actualEntry, $newDate);
+        $this->assertDateOnlyUpdated($expected, $actual, $newDate);
     }
 }

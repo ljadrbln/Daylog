@@ -3,10 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
-use Daylog\Application\Exceptions\DomainValidationException;
-use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
 
 /**
  * UC-5 / AC-13 — Invalid date.
@@ -17,7 +15,6 @@ use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
  *   Uses real wiring (Provider + SqlFactory) and a clean DB from the base class.
  *
  * Mechanics:
- *   - Keep DB state uniform by seeding once (optional).
  *   - Generate a valid UUID v4 and build a request with an invalid 'date' value.
  *   - Execute the real use case and assert DATE_INVALID.
  *
@@ -26,6 +23,8 @@ use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
  */
 final class AC13_InvalidDateTest extends BaseUpdateEntryIntegrationTest
 {
+    use UpdateEntryErrorAssertions;
+
     /**
      * AC-13: Invalid date (malformed or impossible) → DATE_INVALID.
      *
@@ -33,19 +32,11 @@ final class AC13_InvalidDateTest extends BaseUpdateEntryIntegrationTest
      */
     public function testInvalidDateFailsValidationAndRepoUntouched(): void
     {
-        // Arrange: optional seed to keep setup uniform
-        $this->insertEntryWithPastTimestamps();
+        // Arrange
+        $request = UpdateEntryTestRequestFactory::invalidDate();
 
-        $id = UuidGenerator::generate();
-
-        /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryTestRequestFactory::invalidDate($id);
-
-        $exceptionClass = DomainValidationException::class;
-        $this->expectException($exceptionClass);
-
-        $message = 'DATE_INVALID';
-        $this->expectExceptionMessage($message);
+        // Expect
+        $this->expectDateInvalid();
 
         // Act
         $this->useCase->execute($request);

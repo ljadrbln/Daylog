@@ -3,9 +3,6 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
-use Daylog\Application\Exceptions\DomainValidationException;
-use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Tests\Support\Helper\EntryTestData;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
 use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
