@@ -3,18 +3,14 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\GetEntry;
 
-use Daylog\Application\DTO\Entries\GetEntry\GetEntryRequestInterface;
-use Daylog\Application\Exceptions\DomainValidationException;
-use Daylog\Domain\Services\UuidGenerator;
-use Daylog\Presentation\Requests\Entries\GetEntry\GetEntryRequestFactory;
-use Daylog\Tests\Support\Fixture\EntryFixture;
+use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
+use Daylog\Tests\Support\Factory\GetEntryTestRequestFactory;
 
 /**
  * AC-03 Not found: ensures that a valid UUID v4 which does not exist
  * leads to a domain-level "ENTRY_NOT_FOUND" error.
  *
  * Mechanics:
- * - Seed exactly one entry via EntryFixture to ensure the repository works.
  * - Build a request DTO with another (valid v4) UUID that is not present in DB.
  * - Execute the GetEntry use case.
  * - Expect DomainValidationException; verify the error list contains only "ENTRY_NOT_FOUND".
@@ -29,6 +25,8 @@ use Daylog\Tests\Support\Fixture\EntryFixture;
  */
 final class AC03_NotFoundTest extends BaseGetEntryIntegrationTest
 {
+    use EntryValidationAssertions;
+
     /**
      * Verifies that a valid-but-absent UUID triggers "ENTRY_NOT_FOUND".
      *
@@ -37,17 +35,10 @@ final class AC03_NotFoundTest extends BaseGetEntryIntegrationTest
     public function testValidAbsentUuidTriggersEntryNotFound(): void
     {
         // Arrange
-        EntryFixture::insertRows(1);
-        
-        $missingId = UuidGenerator::generate();
-        $payload   = ['id' => $missingId];
+        $request = GetEntryTestRequestFactory::notFound();
 
-        /** @var GetEntryRequestInterface $request */
-        $request = GetEntryRequestFactory::fromArray($payload);
-
-        // Expectation
-        $this->expectException(DomainValidationException::class);
-        $this->expectExceptionMessage('ENTRY_NOT_FOUND');
+        // Expect
+        $this->expectEntryNotFound();
 
         // Act
         $this->useCase->execute($request);

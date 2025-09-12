@@ -3,9 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\GetEntry;
 
-use Daylog\Application\DTO\Entries\GetEntry\GetEntryRequestInterface;
-use Daylog\Application\Exceptions\DomainValidationException;
-use Daylog\Presentation\Requests\Entries\GetEntry\GetEntryRequestFactory;
+use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
+use Daylog\Tests\Support\Factory\GetEntryTestRequestFactory;
 
 /**
  * AC-02 Invalid id: ensures that non-UUID input is rejected.
@@ -25,6 +24,8 @@ use Daylog\Presentation\Requests\Entries\GetEntry\GetEntryRequestFactory;
  */
 final class AC02_InvalidIdTest extends BaseGetEntryIntegrationTest
 {
+    use EntryValidationAssertions;
+
     /**
      * Verifies that a non-UUID id triggers validation error `ID_INVALID`.
      *
@@ -33,14 +34,10 @@ final class AC02_InvalidIdTest extends BaseGetEntryIntegrationTest
     public function testInvalidIdTriggersValidationError(): void
     {
         // Arrange
-        $payload = ['id' => 'not-a-uuid'];
-
-        /** @var GetEntryRequestInterface $request */
-        $request = GetEntryRequestFactory::fromArray($payload);
+        $request = GetEntryTestRequestFactory::invalidId();
 
         // Assert
-        $this->expectException(DomainValidationException::class);
-        $this->expectExceptionMessage('ID_INVALID');
+        $this->expectIdInvalid();
 
         // Act
         $this->useCase->execute($request);        

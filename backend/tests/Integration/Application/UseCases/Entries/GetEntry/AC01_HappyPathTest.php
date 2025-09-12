@@ -3,9 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\GetEntry;
 
-use Daylog\Presentation\Requests\Entries\GetEntry\GetEntryRequestFactory;
-use Daylog\Presentation\Requests\Entries\GetEntry\GetEntryRequestInterface;
 use Daylog\Tests\Support\Fixture\EntryFixture;
+use Daylog\Tests\Support\Factory\GetEntryTestRequestFactory;
 
 /**
  * AC-01: Given existing entry id, the system returns the Entry.
@@ -38,19 +37,12 @@ final class AC01_HappyPathTest extends BaseGetEntryIntegrationTest
      */
     public function testHappyPathReturnsSeededEntry(): void
     {
-        // Arrange: seed one row
+        // Arrange
         $rows = EntryFixture::insertRows(1);
         $row  = $rows[0];
 
-        // Sanity: exactly one row present
-        $rowsCount = EntryFixture::countRows();
-        $this->assertSame(1, $rowsCount);
-
-        // Build request
-        $payload = ['id' => $row['id']];
-
-        /** @var GetEntryRequestInterface $request */
-        $request = GetEntryRequestFactory::fromArray($payload);
+        $entryId = $row['id'];
+        $request = GetEntryTestRequestFactory::happy($entryId);
 
         // Act
         $response = $this->useCase->execute($request);
