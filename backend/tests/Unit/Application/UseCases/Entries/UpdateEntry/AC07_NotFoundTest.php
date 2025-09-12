@@ -34,12 +34,9 @@ final class AC07_NotFoundTest extends BaseUpdateEntryUnitTest
      */
     public function testValidAbsentUuidTriggersEntryNotFound(): void
     {
-        // Arrange: request with a valid but absent UUID
-        $id      = UuidGenerator::generate();
-        $newTitle = 'Updated title';
-
+        // Arrange
         /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryTestRequestFactory::titleOnly($id, $newTitle);
+        $request = UpdateEntryTestRequestFactory::notFound();
 
         $repo = $this->makeRepo();
 
@@ -53,7 +50,7 @@ final class AC07_NotFoundTest extends BaseUpdateEntryUnitTest
         $useCase = $this->makeUseCase($repo, $validator);
         $useCase->execute($request);
 
-        // Assert: repository untouched
+        // Assert
         $saveCalls = $repo->getSaveCalls();
         $this->assertSame(0, $saveCalls);
     }

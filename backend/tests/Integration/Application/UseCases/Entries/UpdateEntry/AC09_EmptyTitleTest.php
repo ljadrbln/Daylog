@@ -5,7 +5,6 @@ namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
-use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
 
 /**
@@ -17,7 +16,6 @@ use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
  *   Uses real wiring (Provider + SqlFactory).
  *
  * Mechanics:
- *   - Optionally seed one entry to keep fixture flow uniform (not required for this error path).
  *   - Build a request with a valid UUID v4 id and a whitespace-only title ('   ') which becomes empty after trimming.
  *   - Execute the real use case obtained in BaseUpdateEntryIntegrationTest.
  *   - Assert: DomainValidationException with message 'TITLE_REQUIRED' is thrown.
@@ -34,14 +32,9 @@ final class AC09_EmptyTitleTest extends BaseUpdateEntryIntegrationTest
      */
     public function testEmptyTitleFailsValidationWithTitleRequired(): void
     {
-        // Arrange: optional seed to keep setup uniform
-        $this->insertEntryWithPastTimestamps();
-
-        $id         = UuidGenerator::generate();
-        $emptyTitle = '   '; // becomes empty after trimming per BR-1
-
+        // Arrange
         /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryTestRequestFactory::titleOnly($id, $emptyTitle);
+        $request = UpdateEntryTestRequestFactory::emptyTitle();
 
         $exceptionClass = DomainValidationException::class;
         $this->expectException($exceptionClass);

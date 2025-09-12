@@ -6,6 +6,7 @@ namespace Daylog\Tests\Support\Factory;
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequest;
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
 use Daylog\Domain\Models\Entries\EntryConstraints;
+use Daylog\Domain\Services\UuidGenerator;
 
 /**
  * Test factory for UpdateEntry requests.
@@ -100,12 +101,14 @@ final class UpdateEntryTestRequestFactory
     /**
      * Build invalid request: missing id (empty after trimming).
      *
-     * @param string $title
      * @return UpdateEntryRequestInterface
      */
-    public static function missingIdWithTitle(string $title): UpdateEntryRequestInterface
+    public static function missingId(): UpdateEntryRequestInterface
     {
-        $payload = ['id' => '', 'title' => $title];
+        $payload = [
+            'id'    => '',
+            'title' => 'Updated title', // arbitrary valid value
+        ];
 
         /** @var UpdateEntryRequestInterface $request */
         $request = UpdateEntryRequest::fromArray($payload);
@@ -116,11 +119,11 @@ final class UpdateEntryTestRequestFactory
     /**
      * Build invalid request: id only (no updatable fields).
      *
-     * @param string $id
      * @return UpdateEntryRequestInterface
      */
-    public static function idOnly(string $id): UpdateEntryRequestInterface
+    public static function idOnly(): UpdateEntryRequestInterface
     {
+        $id = UuidGenerator::generate();
         $payload = ['id' => $id];
 
         /** @var UpdateEntryRequestInterface $request */
@@ -225,4 +228,57 @@ final class UpdateEntryTestRequestFactory
         return $request;
     }
 
+    /**
+     * Build invalid request: non-UUID id with valid title.
+     *
+     * @return UpdateEntryRequestInterface
+     */
+    public static function invalidId(): UpdateEntryRequestInterface
+    {
+        $payload = [
+            'id'    => 'not-a-uuid',
+            'title' => 'Updated title',
+        ];
+
+        /** @var UpdateEntryRequestInterface $request */
+        $request = UpdateEntryRequest::fromArray($payload);
+
+        return $request;
+    }
+
+    /**
+     * Build invalid request: valid UUID not found in storage.
+     *
+     * @return UpdateEntryRequestInterface
+     */
+    public static function notFound(): UpdateEntryRequestInterface
+    {
+        $payload = [
+            'id'    => UuidGenerator::generate(),
+            'title' => 'Updated title',
+        ];
+
+        /** @var UpdateEntryRequestInterface $request */
+        $request = UpdateEntryRequest::fromArray($payload);
+
+        return $request;
+    }
+
+    /**
+     * Build invalid request: empty title (after trimming).
+     *
+     * @return UpdateEntryRequestInterface
+     */
+    public static function emptyTitle(): UpdateEntryRequestInterface
+    {
+        $payload = [
+            'id'    => UuidGenerator::generate(),
+            'title' => '   ', // becomes empty after trimming
+        ];
+
+        /** @var UpdateEntryRequestInterface $request */
+        $request = UpdateEntryRequest::fromArray($payload);
+
+        return $request;
+    }
 }

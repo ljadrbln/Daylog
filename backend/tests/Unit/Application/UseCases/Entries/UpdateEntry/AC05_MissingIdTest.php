@@ -34,10 +34,8 @@ final class AC05_MissingIdTest extends BaseUpdateEntryUnitTest
     public function testMissingIdFailsValidationAndRepoUntouched(): void
     {
         // Arrange
-        $title = 'Updated title';
-
         /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryTestRequestFactory::missingIdWithTitle($title);
+        $request = UpdateEntryTestRequestFactory::missingId();
 
         $repo = $this->makeRepo();
 

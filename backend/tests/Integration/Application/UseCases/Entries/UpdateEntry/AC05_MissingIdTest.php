@@ -16,7 +16,6 @@ use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
  *   uses real wiring (Provider + SqlFactory) and a clean DB prepared by the base class.
  *
  * Mechanics:
- *   - Seed a single entry via EntryFixture (not strictly required for this error, but keeps setup consistent).
  *   - Build a request payload without the 'id' key (e.g., only 'title' provided).
  *   - Execute the real use case obtained in BaseUpdateEntryIntegrationTest.
  *   - Assert: a DomainValidationException with message ID_REQUIRED is thrown and no DB mutation happens.
@@ -37,10 +36,8 @@ final class AC05_MissingIdTest extends BaseUpdateEntryIntegrationTest
     public function testMissingIdFailsValidationWithIdRequired(): void
     {
         // Arrange
-        $title = 'Updated title';
-
         /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryTestRequestFactory::missingIdWithTitle($title);
+        $request = UpdateEntryTestRequestFactory::missingId();
 
         // Expect
         $this->expectIdRequired();

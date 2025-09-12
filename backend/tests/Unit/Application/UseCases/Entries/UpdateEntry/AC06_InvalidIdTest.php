@@ -32,11 +32,8 @@ final class AC06_InvalidIdTest extends BaseUpdateEntryUnitTest
     public function testInvalidIdFailsValidationAndRepoUntouched(): void
     {
         // Arrange
-        $invalidId = 'not-a-uuid';
-        $newTitle  = 'Updated title';
-
         /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryTestRequestFactory::titleOnly($invalidId, $newTitle);
+        $request = UpdateEntryTestRequestFactory::invalidId();
 
         $repo = $this->makeRepo();
 

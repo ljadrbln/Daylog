@@ -34,13 +34,9 @@ final class AC08_NoFieldsTest extends BaseUpdateEntryIntegrationTest
      */
     public function testNoFieldsToUpdateFailsValidationWithNoFieldsToUpdate(): void
     {
-        // Arrange: optional seed to keep setup uniform
-        $this->insertEntryWithPastTimestamps();
-
-        $id = UuidGenerator::generate();
-
+        // Arrange
         /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryTestRequestFactory::idOnly($id);
+        $request = UpdateEntryTestRequestFactory::idOnly();
 
         $exceptionClass = DomainValidationException::class;
         $this->expectException($exceptionClass);

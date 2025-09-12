@@ -37,12 +37,9 @@ final class AC07_NotFoundTest extends BaseUpdateEntryIntegrationTest
      */
     public function testNotFoundFailsWithEntryNotFound(): void
     {
-        // Arrange: keep table empty to guarantee absence (Base::_before already truncates)
-        $absentId = UuidGenerator::generate();
-        $newTitle = 'Updated title';
-
+        // Arrange
         /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryTestRequestFactory::titleOnly($absentId, $newTitle);
+        $request = UpdateEntryTestRequestFactory::notFound();
 
         $exceptionClass = DomainValidationException::class;
         $this->expectException($exceptionClass);
