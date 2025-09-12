@@ -33,14 +33,11 @@ final class AC05_MissingIdTest extends BaseUpdateEntryUnitTest
      */
     public function testMissingIdFailsValidationAndRepoUntouched(): void
     {
-        // Arrange
-        /** @var UpdateEntryRequestInterface $request */
-        $request = UpdateEntryTestRequestFactory::missingId();
-
-        $repo = $this->makeRepo();
-
+        // Arrange        
         $errorCode = 'ID_REQUIRED';
         $validator = $this->makeValidatorThrows($errorCode);
+        $request   = UpdateEntryTestRequestFactory::missingId();
+        $repo      = $this->makeRepo();
 
         // Expect
         $this->expectIdRequired();
@@ -50,7 +47,6 @@ final class AC05_MissingIdTest extends BaseUpdateEntryUnitTest
         $useCase->execute($request);
 
         // Assert
-        $saveCalls = $repo->getSaveCalls();
-        $this->assertSame(0, $saveCalls);
+        $this->assertRepoUntouched($repo);
     }
 }

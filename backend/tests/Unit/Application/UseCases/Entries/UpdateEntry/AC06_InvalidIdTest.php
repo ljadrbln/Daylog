@@ -47,7 +47,6 @@ final class AC06_InvalidIdTest extends BaseUpdateEntryUnitTest
         $useCase->execute($request);
 
         // Assert
-        $saveCalls = $repo->getSaveCalls();
-        $this->assertSame(0, $saveCalls);
+        $this->assertRepoUntouched($repo);
     }
 }
