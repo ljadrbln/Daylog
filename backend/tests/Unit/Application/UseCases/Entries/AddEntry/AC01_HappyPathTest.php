@@ -23,7 +23,7 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  * @covers \Daylog\Application\UseCases\Entries\AddEntry\AddEntry::execute
  * @group UC-AddEntry
  */
-final class AC1_HappyPathTest extends BaseAddEntryUnitTest
+final class AC01_HappyPathTest extends BaseAddEntryUnitTest
 {
     /**
      * Validate happy path behavior and response DTO integrity.
