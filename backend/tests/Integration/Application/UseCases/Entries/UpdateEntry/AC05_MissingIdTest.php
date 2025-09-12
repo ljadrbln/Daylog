@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Tests\Support\Assertion\UpdateEntryErrorAssertions;
+use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
 
 /**
@@ -25,7 +25,7 @@ use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
  */
 final class AC05_MissingIdTest extends BaseUpdateEntryIntegrationTest
 {
-    use UpdateEntryErrorAssertions;
+    use EntryValidationAssertions;
 
     /**
      * AC-05 Missing id: validation fails with ID_REQUIRED.
