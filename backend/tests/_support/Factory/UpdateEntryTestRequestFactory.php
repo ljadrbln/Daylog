@@ -5,6 +5,7 @@ namespace Daylog\Tests\Support\Factory;
 
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequest;
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
+use Daylog\Domain\Models\Entries\EntryConstraints;
 
 /**
  * Test factory for UpdateEntry requests.
@@ -124,7 +125,29 @@ final class UpdateEntryTestRequestFactory
 
         /** @var UpdateEntryRequestInterface $request */
         $request = UpdateEntryRequest::fromArray($payload);
-        
+
         return $request;
     }    
+
+    /**
+     * Build invalid request: title too long (> 200 chars).
+     *
+     * @param string $id Valid UUID v4 identifier.
+     * @return UpdateEntryRequestInterface
+     */
+    public static function tooLongTitle(string $id): UpdateEntryRequestInterface
+    {
+        $length    = EntryConstraints::TITLE_MAX + 1;
+        $longTitle = str_repeat('A', $length);
+
+        $payload = [
+            'id'    => $id,
+            'title' => $longTitle,
+        ];
+
+        /** @var UpdateEntryRequestInterface $request */
+        $request = UpdateEntryRequest::fromArray($payload);
+
+        return $request;
+    }
 }
