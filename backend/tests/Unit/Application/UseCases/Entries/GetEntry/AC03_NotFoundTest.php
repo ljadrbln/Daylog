@@ -3,10 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\GetEntry;
 
-use Daylog\Application\DTO\Entries\GetEntry\GetEntryRequest;
-use Daylog\Application\DTO\Entries\GetEntry\GetEntryRequestInterface;
-use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
+use Daylog\Tests\Support\Factory\GetEntryTestRequestFactory;
 
 /**
  * UC-3 / AC-03 — Not found — Unit.
@@ -36,13 +34,9 @@ final class AC03_NotFoundTest extends BaseGetEntryUnitTest
     public function testAbsentIdYieldsEntryNotFound(): void
     {
         // Arrange
-        $id = UuidGenerator::generate();
-
-        /** @var GetEntryRequestInterface $request */
-        $request = GetEntryRequest::fromArray(['id' => $id]);
-
-        $repo      = $this->makeRepo();
         $validator = $this->makeValidatorOk();
+        $request   = GetEntryTestRequestFactory::notFound();
+        $repo      = $this->makeRepo();
 
         // Expect
         $this->expectEntryNotFound();

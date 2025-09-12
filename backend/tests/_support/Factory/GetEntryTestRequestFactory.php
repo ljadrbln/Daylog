@@ -22,12 +22,14 @@ final class GetEntryTestRequestFactory
 {
     /**
      * Build a happy-path request using fixture id.
+     * 
+     * @param string $entryId
      *
      * @return GetEntryRequestInterface
      */
-    public static function happy(): GetEntryRequestInterface
+    public static function happy($entryId): GetEntryRequestInterface
     {
-        $payload = EntryTestData::getOne();
+        $payload = ['id' => $entryId];
         $request = GetEntryRequest::fromArray($payload);
 
         return $request;

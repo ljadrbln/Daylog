@@ -4,9 +4,6 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\GetEntry;
 
 use Daylog\Domain\Models\Entries\Entry;
-use Daylog\Domain\Services\UuidGenerator;
-use Daylog\Application\DTO\Entries\GetEntry\GetEntryRequest;
-use Daylog\Application\DTO\Entries\GetEntry\GetEntryRequestInterface;
 use Daylog\Tests\Support\Helper\EntryTestData;
 use Daylog\Tests\Support\Factory\GetEntryTestRequestFactory;
 
@@ -36,9 +33,14 @@ final class AC01_HappyPathTest extends BaseGetEntryUnitTest
     public function testHappyPathReturnsEntryById(): void
     {
         // Arrange
+        $data = EntryTestData::getOne();
+        $entryId  = $data['id'];
+        $expected = Entry::fromArray($data);
+
         $validator = $this->makeValidatorOk();
-        $request   = GetEntryTestRequestFactory::happy();
+        $request   = GetEntryTestRequestFactory::happy($entryId);
         $repo      = $this->makeRepo();
+        $repo->save($expected);
 
         // Act
         $useCase  = $this->makeUseCase($repo, $validator);
@@ -46,10 +48,7 @@ final class AC01_HappyPathTest extends BaseGetEntryUnitTest
         $actual   = $response->getEntry();
 
         // Assert
-        $actualId   = $actual->getId();
-        $isValidId  = UuidGenerator::isValid($actualId);
-
-        $this->assertTrue($isValidId);
-        $this->assertSame($id, $actualId);
+        $areEqual = $expected->equals($actual);
+        $this->assertTrue($areEqual);
     }
 }
