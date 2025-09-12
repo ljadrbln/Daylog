@@ -6,6 +6,7 @@ namespace Daylog\Tests\Integration\Application\UseCases\Entries\AddEntry;
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
 use Daylog\Tests\Support\Helper\EntryTestData;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
+use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
 
 /**
  * AC-7: Invalid date input format → DATE_INVALID.
@@ -36,10 +37,9 @@ final class AC7_InvalidDateFormatTest extends BaseAddEntryIntegrationTest
     public function testInvalidDateFormatFailsWithDateInvalid(): void
     {
         // Arrange
-        $data    = EntryTestData::getOne(date: '2025/08/30');
-        $request = AddEntryRequest::fromArray($data);
+        $request = AddEntryTestRequestFactory::invalidDateFormat();
 
-        // Expectation
+        // Expect
         $this->expectDateInvalid();
 
         // Act

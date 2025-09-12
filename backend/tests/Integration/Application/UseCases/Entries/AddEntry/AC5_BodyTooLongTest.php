@@ -3,10 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\AddEntry;
 
-use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
-use Daylog\Tests\Support\Helper\EntryTestData;
-use Daylog\Domain\Models\Entries\EntryConstraints;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
+use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
 
 /**
  * AC-5: Body too long → BODY_TOO_LONG.
@@ -36,9 +34,7 @@ final class AC5_BodyTooLongTest extends BaseAddEntryIntegrationTest
     public function testBodyTooLongFailsWithBodyTooLong(): void
     {
         // Arrange
-        $body    = str_repeat('B', EntryConstraints::BODY_MAX+1);
-        $data    = EntryTestData::getOne(body: $body);
-        $request = AddEntryRequest::fromArray($data);
+        $request = AddEntryTestRequestFactory::bodyTooLong();
 
         // Expect
         $this->expectBodyTooLong();

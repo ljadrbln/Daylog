@@ -3,9 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\AddEntry;
 
-use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
-use Daylog\Tests\Support\Helper\EntryTestData;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
+use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
 
 /**
  * UC-1 / AC-02 — Empty title — Unit.
@@ -34,10 +33,9 @@ final class AC02_EmptyTitleTest extends BaseAddEntryUnitTest
     public function testEmptyTitleFailsWithTitleRequiredAndRepoUntouched(): void
     {
         // Arrange        
-        $data      = EntryTestData::getOne();
-        $request   = AddEntryRequest::fromArray($data);
         $errorCode = 'TITLE_REQUIRED';
         $validator = $this->makeValidatorThrows($errorCode);
+        $request   = AddEntryTestRequestFactory::emptyTitle();
         $repo      = $this->makeRepo();
 
         // Expect

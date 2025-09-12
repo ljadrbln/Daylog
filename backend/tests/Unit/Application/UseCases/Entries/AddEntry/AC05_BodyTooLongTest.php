@@ -3,10 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\AddEntry;
 
-use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
-use Daylog\Application\Exceptions\DomainValidationException;
-use Daylog\Tests\Support\Helper\EntryTestData;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
+use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
 
 /**
  * UC-1 / AC-05 — Body too long — Unit.
@@ -28,11 +26,10 @@ final class AC05_BodyTooLongTest extends BaseAddEntryUnitTest
      */
     public function testBodyTooLongStopsBeforePersistence(): void
     {
-        // Arrange
-        $data      = EntryTestData::getOne();
-        $request   = AddEntryRequest::fromArray($data);
+        // Arrange        
         $errorCode = 'BODY_TOO_LONG';
         $validator = $this->makeValidatorThrows($errorCode);
+        $request   = AddEntryTestRequestFactory::bodyTooLong();
         $repo      = $this->makeRepo();
 
         // Expect

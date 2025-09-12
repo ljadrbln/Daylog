@@ -3,9 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\AddEntry;
 
-use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
-use Daylog\Tests\Support\Helper\EntryTestData;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
+use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
 
 /**
  * AC-4: Empty body → BODY_REQUIRED.
@@ -35,10 +34,9 @@ final class AC4_EmptyBodyTest extends BaseAddEntryIntegrationTest
     public function testEmptyBodyFailsWithBodyRequired(): void
     {
         // Arrange
-        $data    = EntryTestData::getOne(body: '');
-        $request = AddEntryRequest::fromArray($data);
+        $request = AddEntryTestRequestFactory::emptyBody();
 
-        // Expectation
+        // Expect
         $this->expectBodyRequired();
 
         // Act

@@ -3,9 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\AddEntry;
 
-use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
-use Daylog\Tests\Support\Helper\EntryTestData;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
+use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
 
 /**
  * UC-1 / AC-06 — Missing date — Unit.
@@ -27,11 +26,10 @@ final class AC06_MissingDateTest extends BaseAddEntryUnitTest
      */
     public function testMissingDateFailsWithDateRequired(): void
     {
-        // Arrange
-        $data    = EntryTestData::getOne();
-        $request = AddEntryRequest::fromArray($data);
+        // Arrange        
         $errorCode = 'DATE_REQUIRED';
         $validator = $this->makeValidatorThrows($errorCode);
+        $request   = AddEntryTestRequestFactory::missingDate();
         $repo      = $this->makeRepo();
 
         // Expect

@@ -3,10 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\AddEntry;
 
-use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
-use Daylog\Tests\Support\Helper\EntryTestData;
-use Daylog\Domain\Models\Entries\EntryConstraints;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
+use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
 
 /**
  * AC-3: Title too long → TITLE_TOO_LONG.
@@ -36,11 +34,9 @@ final class AC3_TitleTooLongTest extends BaseAddEntryIntegrationTest
     public function testTitleTooLongFailsWithTitleTooLong(): void
     {
         // Arrange
-        $title   = str_repeat('A', EntryConstraints::TITLE_MAX+1);
-        $data    = EntryTestData::getOne(title: $title);
-        $request = AddEntryRequest::fromArray($data);
+        $request = AddEntryTestRequestFactory::titleTooLong();
 
-        // Expectation
+        // Expect
         $this->expectTitleTooLong();
 
         // Act
