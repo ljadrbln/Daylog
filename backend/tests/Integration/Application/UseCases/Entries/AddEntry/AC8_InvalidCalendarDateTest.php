@@ -7,6 +7,7 @@ use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Tests\Support\Helper\EntryTestData;
+use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
  * AC-8: Invalid calendar date → DATE_INVALID.
@@ -27,6 +28,8 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  */
 final class AC8_InvalidCalendarDateTest extends BaseAddEntryIntegrationTest
 {
+    use EntryValidationAssertions;
+
     /**
      * AC-8 Negative path: invalid calendar date fails with DATE_INVALID.
      *
@@ -35,19 +38,16 @@ final class AC8_InvalidCalendarDateTest extends BaseAddEntryIntegrationTest
     public function testInvalidCalendarDateFailsWithDateInvalid(): void
     {
         // Arrange
-        $data = EntryTestData::getOne(date: '2025-02-30');
-
-        /** @var AddEntryRequestInterface $request */
+        $data    = EntryTestData::getOne(date: '2025-02-30');
         $request = AddEntryRequest::fromArray($data);
 
         // Expectation
-        $this->expectException(DomainValidationException::class);
-        $this->expectExceptionMessage('DATE_INVALID');
+        $this->expectDateInvalid();
 
         // Act
         $this->useCase->execute($request);
 
-        // Safety (should not reach)
+        // Safety
         $message = 'DomainValidationException was expected for invalid calendar date';
         $this->fail($message);
     }

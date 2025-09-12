@@ -4,9 +4,8 @@ declare(strict_types=1);
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\AddEntry;
 
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
-use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
-use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Tests\Support\Helper\EntryTestData;
+use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
  * AC-6: Missing date → DATE_REQUIRED.
@@ -26,6 +25,8 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  */
 final class AC6_MissingDateTest extends BaseAddEntryIntegrationTest
 {
+    use EntryValidationAssertions;
+
     /**
      * AC-6 Negative path: missing date fails with DATE_REQUIRED.
      *
@@ -37,17 +38,15 @@ final class AC6_MissingDateTest extends BaseAddEntryIntegrationTest
         $data = EntryTestData::getOne();
         unset($data['date']);
 
-        /** @var AddEntryRequestInterface $request */
         $request = AddEntryRequest::fromArray($data);
 
         // Expectation
-        $this->expectException(DomainValidationException::class);
-        $this->expectExceptionMessage('DATE_REQUIRED');
+        $this->expectDateRequired();
 
         // Act
         $this->useCase->execute($request);
 
-        // Safety (should not reach)
+        // Safety
         $message = 'DomainValidationException was expected for missing date';
         $this->fail($message);
     }

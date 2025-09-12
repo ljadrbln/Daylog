@@ -4,10 +4,9 @@ declare(strict_types=1);
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\AddEntry;
 
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
-use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
-use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Tests\Support\Helper\EntryTestData;
 use Daylog\Domain\Models\Entries\EntryConstraints;
+use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
  * AC-5: Body too long → BODY_TOO_LONG.
@@ -27,6 +26,8 @@ use Daylog\Domain\Models\Entries\EntryConstraints;
  */
 final class AC5_BodyTooLongTest extends BaseAddEntryIntegrationTest
 {
+    use EntryValidationAssertions;
+
     /**
      * AC-5 Negative path: over-limit body fails with BODY_TOO_LONG.
      *
@@ -35,21 +36,17 @@ final class AC5_BodyTooLongTest extends BaseAddEntryIntegrationTest
     public function testBodyTooLongFailsWithBodyTooLong(): void
     {
         // Arrange
-        $data = EntryTestData::getOne();
-        $tooLong = str_repeat('B', EntryConstraints::BODY_MAX+1);
-        $data['body'] = $tooLong;
-
-        /** @var AddEntryRequestInterface $request */
+        $body    = str_repeat('B', EntryConstraints::BODY_MAX+1);
+        $data    = EntryTestData::getOne(body: $body);
         $request = AddEntryRequest::fromArray($data);
 
-        // Expectation
-        $this->expectException(DomainValidationException::class);
-        $this->expectExceptionMessage('BODY_TOO_LONG');
+        // Expect
+        $this->expectBodyTooLong();
 
         // Act
         $this->useCase->execute($request);
 
-        // Safety (should not reach)
+        // Safety
         $message = 'DomainValidationException was expected for over-limit body';
         $this->fail($message);
     }

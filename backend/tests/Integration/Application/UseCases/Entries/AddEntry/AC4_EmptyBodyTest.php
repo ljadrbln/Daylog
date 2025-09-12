@@ -4,9 +4,8 @@ declare(strict_types=1);
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\AddEntry;
 
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
-use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
-use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Tests\Support\Helper\EntryTestData;
+use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
  * AC-4: Empty body → BODY_REQUIRED.
@@ -26,6 +25,8 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  */
 final class AC4_EmptyBodyTest extends BaseAddEntryIntegrationTest
 {
+    use EntryValidationAssertions;
+
     /**
      * AC-4 Negative path: empty body fails with BODY_REQUIRED.
      *
@@ -34,19 +35,16 @@ final class AC4_EmptyBodyTest extends BaseAddEntryIntegrationTest
     public function testEmptyBodyFailsWithBodyRequired(): void
     {
         // Arrange
-        $data = EntryTestData::getOne(body: '');
-
-        /** @var AddEntryRequestInterface $request */
+        $data    = EntryTestData::getOne(body: '');
         $request = AddEntryRequest::fromArray($data);
 
         // Expectation
-        $this->expectException(DomainValidationException::class);
-        $this->expectExceptionMessage('BODY_REQUIRED');
+        $this->expectBodyRequired();
 
         // Act
         $this->useCase->execute($request);
 
-        // Safety (should not reach)
+        // Safety
         $message = 'DomainValidationException was expected for empty body';
         $this->fail($message);
     }

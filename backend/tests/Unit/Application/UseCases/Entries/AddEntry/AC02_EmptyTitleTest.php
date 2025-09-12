@@ -4,9 +4,8 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\AddEntry;
 
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
-use Daylog\Application\Validators\Entries\AddEntry\AddEntryValidatorInterface;
-use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Tests\Support\Helper\EntryTestData;
+use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
  * UC-1 / AC-02 — Empty title — Unit.
@@ -25,6 +24,8 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  */
 final class AC02_EmptyTitleTest extends BaseAddEntryUnitTest
 {
+    use EntryValidationAssertions;
+
     /**
      * Validator throws TITLE_REQUIRED; repo must remain untouched.
      *
@@ -32,26 +33,21 @@ final class AC02_EmptyTitleTest extends BaseAddEntryUnitTest
      */
     public function testEmptyTitleFailsWithTitleRequiredAndRepoUntouched(): void
     {
-        // Arrange
-        $data = EntryTestData::getOne();
-
-        /** @var \Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface $request */
-        $request = AddEntryRequest::fromArray($data);
-
-        $repo      = $this->makeRepo();
+        // Arrange        
+        $data      = EntryTestData::getOne();
+        $request   = AddEntryRequest::fromArray($data);
         $errorCode = 'TITLE_REQUIRED';
         $validator = $this->makeValidatorThrows($errorCode);
+        $repo      = $this->makeRepo();
 
         // Expect
-        $exceptionClass = DomainValidationException::class;
-        $this->expectException($exceptionClass);
+        $this->expectTitleRequired();
 
         // Act
         $useCase = $this->makeUseCase($repo, $validator);
         $useCase->execute($request);
 
         // Assert
-        $saveCalls = $repo->getSaveCalls();
-        $this->assertSame(0, $saveCalls);
+        $this->assertRepoUntouched($repo);
     }
 }

@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\AddEntry;
 
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
-use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Tests\Support\Helper\EntryTestData;
+use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
  * UC-1 / AC-04 — Empty body — Unit.
@@ -18,6 +18,8 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  */
 final class AC04_EmptyBodyTest extends BaseAddEntryUnitTest
 {
+    use EntryValidationAssertions;
+
     /**
      * BODY_REQUIRED must stop execution before persistence.
      *
@@ -26,25 +28,20 @@ final class AC04_EmptyBodyTest extends BaseAddEntryUnitTest
     public function testEmptyBodyFailsWithBodyRequired(): void
     {
         // Arrange
-        $data = EntryTestData::getOne();
-
-        /** @var \Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface $request */
-        $request = AddEntryRequest::fromArray($data);
-
-        $repo      = $this->makeRepo();
+        $data      = EntryTestData::getOne();
+        $request   = AddEntryRequest::fromArray($data);
         $errorCode = 'BODY_REQUIRED';
         $validator = $this->makeValidatorThrows($errorCode);
+        $repo      = $this->makeRepo();
 
         // Expect
-        $exceptionClass = \Daylog\Application\Exceptions\DomainValidationException::class;
-        $this->expectException($exceptionClass);
+        $this->expectBodyRequired();
 
         // Act
         $useCase = $this->makeUseCase($repo, $validator);
         $useCase->execute($request);
 
         // Assert
-        $saveCalls = $repo->getSaveCalls();
-        $this->assertSame(0, $saveCalls);
+        $this->assertRepoUntouched($repo);
     }
 }

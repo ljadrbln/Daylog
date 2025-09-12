@@ -4,9 +4,8 @@ declare(strict_types=1);
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\AddEntry;
 
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
-use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
-use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Tests\Support\Helper\EntryTestData;
+use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
  * AC-2: Empty title → TITLE_REQUIRED.
@@ -25,22 +24,26 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  */
 final class AC2_EmptyTitleTest extends BaseAddEntryIntegrationTest
 {
+    use EntryValidationAssertions;
+
+    /**
+     * Validator throws TITLE_REQUIRED; repo must remain untouched.
+     *
+     * @return void
+     */
     public function testEmptyTitleFailsWithTitleRequired(): void
     {
         // Arrange
-        $data = EntryTestData::getOne(title: '');
-
-        /** @var AddEntryRequestInterface $request */
+        $data    = EntryTestData::getOne(title: '');
         $request = AddEntryRequest::fromArray($data);
 
         // Expectation
-        $this->expectException(DomainValidationException::class);
-        $this->expectExceptionMessage('TITLE_REQUIRED');
+        $this->expectTitleRequired();
 
         // Act
         $this->useCase->execute($request);
 
-        // Safety (should not reach)
+        // Safety
         $message = 'DomainValidationException was expected for empty title';
         $this->fail($message);
     }

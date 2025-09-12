@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\AddEntry;
 
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
-use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Tests\Support\Helper\EntryTestData;
+use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
  * UC-1 / AC-08 — Invalid calendar date — Unit.
@@ -22,6 +22,8 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  */
 final class AC08_InvalidCalendarDateTest extends BaseAddEntryUnitTest
 {
+    use EntryValidationAssertions;
+
     /**
      * DATE_INVALID must stop execution before persistence for calendar violations.
      *
@@ -30,25 +32,20 @@ final class AC08_InvalidCalendarDateTest extends BaseAddEntryUnitTest
     public function testInvalidCalendarDateStopsBeforePersistence(): void
     {
         // Arrange
-        $data = EntryTestData::getOne();
-
-        /** @var \Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface $request */
-        $request = AddEntryRequest::fromArray($data);
-
-        $repo      = $this->makeRepo();
+        $data      = EntryTestData::getOne();
+        $request   = AddEntryRequest::fromArray($data);
         $errorCode = 'DATE_INVALID';
         $validator = $this->makeValidatorThrows($errorCode);
+        $repo      = $this->makeRepo();
 
         // Expect
-        $exceptionClass = DomainValidationException::class;
-        $this->expectException($exceptionClass);
+        $this->expectDateInvalid();
 
         // Act
         $useCase = $this->makeUseCase($repo, $validator);
         $useCase->execute($request);
 
         // Assert
-        $saveCalls = $repo->getSaveCalls();
-        $this->assertSame(0, $saveCalls);
+        $this->assertRepoUntouched($repo);
     }
 }

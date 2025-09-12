@@ -4,9 +4,8 @@ declare(strict_types=1);
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\AddEntry;
 
 use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
-use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
-use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Tests\Support\Helper\EntryTestData;
+use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
  * AC-7: Invalid date input format → DATE_INVALID.
@@ -27,6 +26,8 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  */
 final class AC7_InvalidDateFormatTest extends BaseAddEntryIntegrationTest
 {
+    use EntryValidationAssertions;
+
     /**
      * AC-7 Negative path: invalid format fails with DATE_INVALID.
      *
@@ -35,19 +36,16 @@ final class AC7_InvalidDateFormatTest extends BaseAddEntryIntegrationTest
     public function testInvalidDateFormatFailsWithDateInvalid(): void
     {
         // Arrange
-        $data = EntryTestData::getOne(date: '2025/08/30');
-
-        /** @var AddEntryRequestInterface $request */
+        $data    = EntryTestData::getOne(date: '2025/08/30');
         $request = AddEntryRequest::fromArray($data);
 
         // Expectation
-        $this->expectException(DomainValidationException::class);
-        $this->expectExceptionMessage('DATE_INVALID');
+        $this->expectDateInvalid();
 
         // Act
         $this->useCase->execute($request);
 
-        // Safety (should not reach)
+        // Safety
         $message = 'DomainValidationException was expected for invalid date format';
         $this->fail($message);
     }
