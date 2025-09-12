@@ -9,6 +9,8 @@ use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Domain\Services\DateService;
 use Daylog\Tests\Support\Helper\EntryTestData;
+use Daylog\Tests\Support\Assertion\UpdateEntryDateOnlyAssertions;
+
 
 /**
  * UC-5 / AC-03 — Happy path (date-only) for UpdateEntry use case.
@@ -30,6 +32,8 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  */
 final class AC03_HappyPath_DateOnlyTest extends BaseUpdateEntryUnitTest
 {
+    use UpdateEntryDateOnlyAssertions;
+
     /**
      * Validate date-only update behavior and response DTO integrity.
      *
@@ -39,17 +43,17 @@ final class AC03_HappyPath_DateOnlyTest extends BaseUpdateEntryUnitTest
     {
         // Arrange: seed an existing entry
         $seedData = EntryTestData::getOne();
-        $existing = Entry::fromArray($seedData);
+        $expected = Entry::fromArray($seedData);
 
         $repo = $this->makeRepo();
-        $repo->save($existing);
+        $repo->save($expected);
 
-        $id      = $existing->getId();
-        $newDate = '2005-08-14';
+        $id      = $expected->getId();
+        $expectedDate = '2005-08-14';
 
         $payload = [
             'id'   => $id,
-            'date' => $newDate,
+            'date' => $expectedDate,
         ];
 
         /** @var UpdateEntryRequestInterface $request */
@@ -61,30 +65,9 @@ final class AC03_HappyPath_DateOnlyTest extends BaseUpdateEntryUnitTest
         // Act
         $useCase  = $this->makeUseCase($repo, $validator);
         $response = $useCase->execute($request);
+        $actual   = $response->getEntry();
 
         // Assert
-        $entry = $response->getEntry();
-
-        $entryId   = $entry->getId();
-        $isValidId = UuidGenerator::isValid($entryId);
-        $this->assertTrue($isValidId);
-
-        $this->assertSame($id, $entryId);
-        $this->assertSame($seedData['title'], $entry->getTitle());
-        $this->assertSame($seedData['body'],  $entry->getBody());
-        $this->assertSame($newDate,           $entry->getDate());
-
-        $createdAt = $entry->getCreatedAt();
-        $updatedAt = $entry->getUpdatedAt();
-
-        $isCreatedAtValid = DateService::isValidIsoUtcDateTime($createdAt);
-        $isUpdatedAtValid = DateService::isValidIsoUtcDateTime($updatedAt);
-
-        $this->assertTrue($isCreatedAtValid);
-        $this->assertTrue($isUpdatedAtValid);
-
-        $createdTs = strtotime($createdAt);
-        $updatedTs = strtotime($updatedAt);
-        $this->assertGreaterThanOrEqual($createdTs, $updatedTs);
+        $this->assertDateOnlyUpdated($expected, $actual, $expectedDate);
     }
 }

@@ -35,19 +35,17 @@ final class AC04_PartialUpdateTest extends BaseUpdateEntryUnitTest
     public function testPartialUpdateChangesOnlyProvidedFields(): void
     {
         // Arrange
-        $data   = EntryTestData::getOne();
-        $expected = Entry::fromArray($data);
+        $data  = EntryTestData::getOne();
+        $entry = Entry::fromArray($data);
 
         $repo = $this->makeRepo();
-        $repo->save($expected);
+        $repo->save($entry);
 
-        $id       = $expected->getId();
+        $id       = $entry->getId();
         $newTitle = 'Updated title';
         $newBody  = 'Updated body';
 
-        /** @var \Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface $request */
-        $request = UpdateEntryTestRequestFactory::titleAndBody($id, $newTitle, $newBody);
-
+        $request   = UpdateEntryTestRequestFactory::titleAndBody($id, $newTitle, $newBody);
         $validator = $this->makeValidatorOk();
 
         // Act
@@ -56,6 +54,6 @@ final class AC04_PartialUpdateTest extends BaseUpdateEntryUnitTest
         $actual   = $response->getEntry();
 
         // Assert
-        $this->assertTitleAndBodyUpdated($expected, $actual, $newTitle, $newBody);
+        $this->assertTitleAndBodyUpdated($entry, $actual, $newTitle, $newBody);
     }
 }
