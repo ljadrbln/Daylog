@@ -7,7 +7,7 @@ use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
 
 /**
- * AC-8: Invalid calendar date → DATE_INVALID.
+ * AC-08: Invalid calendar date → DATE_INVALID.
  *
  * Purpose:
  *   Ensure that a date which matches the YYYY-MM-DD format but is not a real
@@ -23,7 +23,7 @@ use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
  * 
  * @group UC-AddEntry
  */
-final class AC8_InvalidCalendarDateTest extends BaseAddEntryIntegrationTest
+final class AC08_InvalidCalendarDateTest extends BaseAddEntryIntegrationTest
 {
     use EntryValidationAssertions;
 
