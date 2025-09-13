@@ -5,60 +5,41 @@ namespace Daylog\Tests\Support\Factory;
 
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequest;
 use Daylog\Application\DTO\Entries\ListEntries\ListEntriesRequestInterface;
+use Daylog\Tests\Support\Helper\ListEntriesHelper;
 
 /**
  * Factory for building ListEntries test requests.
  *
  * Purpose:
- * Provide focused builders for UC-2 scenarios, starting from a minimal,
- * valid baseline and allowing targeted overrides per test case.
+ * Provide compact builders for UC-2 scenarios (happy path, invalid date, etc.).
  *
  * Mechanics:
- * - Baseline uses defaults: page=1, perPage=20, sort=date DESC; no filters.
- * - Override any field by passing $overrides; keys not provided are left as defaults.
+ * - Baseline from ListEntriesHelper::getData().
+ * - Overrides fields for negative cases.
  */
 final class ListEntriesTestRequestFactory
 {
     /**
-     * Build a baseline request with optional overrides.
-     *
-     * @param array<string,mixed> $overrides
      * @return ListEntriesRequestInterface
      */
-    public static function fromArray(array $overrides = []): ListEntriesRequestInterface
+    public static function happy(): ListEntriesRequestInterface
     {
-        $payload = [
-            'page'      => 1,
-            'perPage'   => 20,
-            'sortField' => 'date',
-            'sortDir'   => 'DESC',
-            'date'      => null,
-            'dateFrom'  => null,
-            'dateTo'    => null,
-            'query'     => null,
-        ];
-
-        foreach ($overrides as $key => $value) {
-            $payload[$key] = $value;
-        }
-
-        $request = ListEntriesRequest::fromArray($payload);
-
+        $data = ListEntriesHelper::getData();
+        $request = ListEntriesRequest::fromArray($data);
         return $request;
     }
 
     /**
-     * Build a request overriding a single date-like field.
-     *
-     * @param string $field One of: date|dateFrom|dateTo
-     * @param string $value Raw string value to inject (may be invalid).
+     * @param string $field
+     * @param string $value
      * @return ListEntriesRequestInterface
      */
-    public static function withDate(string $field, string $value): ListEntriesRequestInterface
+    public static function withInvalidDate(string $field, string $value): ListEntriesRequestInterface
     {
-        $overrides = [$field => $value];
-        $request   = self::fromArray($overrides);
+        $data = ListEntriesHelper::getData();
+        $data[$field] = $value;
 
+        $request = ListEntriesRequest::fromArray($data);
         return $request;
     }
 }

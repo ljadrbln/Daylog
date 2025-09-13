@@ -38,7 +38,7 @@ final class AC06_InvalidDateInputTest extends BaseListEntriesUnitTest
     public function testInvalidDateInputTriggersValidationError(string $field, string $value): void
     {
         // Arrange
-        $request   = ListEntriesTestRequestFactory::withDate($field, $value);
+        $request   = ListEntriesTestRequestFactory::withInvalidDate($field, $value);
         $validator = $this->makeValidatorThrows('DATE_INVALID');
         $repo      = $this->makeRepo();
 
