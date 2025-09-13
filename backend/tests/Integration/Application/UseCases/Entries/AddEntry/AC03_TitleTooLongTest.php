@@ -7,7 +7,7 @@ use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
 
 /**
- * AC-3: Title too long → TITLE_TOO_LONG.
+ * AC-03: Title too long → TITLE_TOO_LONG.
  *
  * Purpose:
  *   Ensure that a title exceeding ENTRY-BR-1 limit (after trimming) triggers a validation error.
@@ -22,7 +22,7 @@ use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
  * 
  * @group UC-AddEntry
  */
-final class AC3_TitleTooLongTest extends BaseAddEntryIntegrationTest
+final class AC03_TitleTooLongTest extends BaseAddEntryIntegrationTest
 {
     use EntryValidationAssertions;
 

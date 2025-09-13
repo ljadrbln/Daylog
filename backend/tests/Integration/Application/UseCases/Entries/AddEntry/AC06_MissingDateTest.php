@@ -7,7 +7,7 @@ use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
 
 /**
- * AC-6: Missing date → DATE_REQUIRED.
+ * AC-06: Missing date → DATE_REQUIRED.
  *
  * Purpose:
  *   Ensure that when no date is provided, the use case fails business validation.
@@ -22,7 +22,7 @@ use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
  * 
  * @group UC-AddEntry
  */
-final class AC6_MissingDateTest extends BaseAddEntryIntegrationTest
+final class AC06_MissingDateTest extends BaseAddEntryIntegrationTest
 {
     use EntryValidationAssertions;
 

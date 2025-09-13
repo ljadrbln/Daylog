@@ -8,7 +8,7 @@ use Daylog\Tests\Support\Fixture\EntryFixture;
 use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
 
 /**
- * AC-1: Given valid title/body/date, the system returns a new id and persists the entry.
+ * AC-01: Given valid title/body/date, the system returns a new id and persists the entry.
  *
  * Purpose:
  *   Verify the happy path using real wiring (Provider + SqlFactory) and a clean DB
@@ -24,7 +24,7 @@ use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
  * 
  * @group UC-AddEntry
  */
-final class AC1_HappyPathTest extends BaseAddEntryIntegrationTest
+final class AC01_HappyPathTest extends BaseAddEntryIntegrationTest
 {
     /**
      * AC-1 Happy path: persists and returns UUID.

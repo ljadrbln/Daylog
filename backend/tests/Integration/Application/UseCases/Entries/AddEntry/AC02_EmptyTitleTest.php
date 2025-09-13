@@ -7,7 +7,7 @@ use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
 
 /**
- * AC-2: Empty title → TITLE_REQUIRED.
+ * AC-02: Empty title → TITLE_REQUIRED.
  *
  * Purpose:
  *   Ensure that an empty (after trimming) title triggers DomainValidationException.
@@ -21,7 +21,7 @@ use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
  * 
  * @group UC-AddEntry
  */
-final class AC2_EmptyTitleTest extends BaseAddEntryIntegrationTest
+final class AC02_EmptyTitleTest extends BaseAddEntryIntegrationTest
 {
     use EntryValidationAssertions;
 

@@ -7,7 +7,7 @@ use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
 
 /**
- * AC-5: Body too long → BODY_TOO_LONG.
+ * AC-05: Body too long → BODY_TOO_LONG.
  *
  * Purpose:
  *   Ensure that a body exceeding ENTRY-BR-2 limit (after trimming) triggers a validation error.
@@ -22,7 +22,7 @@ use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
  * 
  * @group UC-AddEntry
  */
-final class AC5_BodyTooLongTest extends BaseAddEntryIntegrationTest
+final class AC05_BodyTooLongTest extends BaseAddEntryIntegrationTest
 {
     use EntryValidationAssertions;
 

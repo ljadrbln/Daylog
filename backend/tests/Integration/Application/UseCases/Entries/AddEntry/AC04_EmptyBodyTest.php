@@ -7,7 +7,7 @@ use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
 
 /**
- * AC-4: Empty body → BODY_REQUIRED.
+ * AC-04: Empty body → BODY_REQUIRED.
  *
  * Purpose:
  *   Ensure that an empty (post-trim) body triggers a validation error.
@@ -22,7 +22,7 @@ use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
  * 
  * @group UC-AddEntry
  */
-final class AC4_EmptyBodyTest extends BaseAddEntryIntegrationTest
+final class AC04_EmptyBodyTest extends BaseAddEntryIntegrationTest
 {
     use EntryValidationAssertions;
 

@@ -3,13 +3,11 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\AddEntry;
 
-use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
-use Daylog\Tests\Support\Helper\EntryTestData;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
 
 /**
- * AC-7: Invalid date input format → DATE_INVALID.
+ * AC-07: Invalid date input format → DATE_INVALID.
  *
  * Purpose:
  *   Ensure that a date not matching strict YYYY-MM-DD format
@@ -25,7 +23,7 @@ use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
  * 
  * @group UC-AddEntry
  */
-final class AC7_InvalidDateFormatTest extends BaseAddEntryIntegrationTest
+final class AC07_InvalidDateFormatTest extends BaseAddEntryIntegrationTest
 {
     use EntryValidationAssertions;
 
