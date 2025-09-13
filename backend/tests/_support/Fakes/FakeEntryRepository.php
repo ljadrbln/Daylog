@@ -103,17 +103,25 @@ final class FakeEntryRepository implements EntryRepositoryInterface
         $pool = $this->entries;
 
         // Filtering
-        $from = $criteria->getDateFrom();
-        $to   = $criteria->getDateTo();
+        $target = $criteria->getDate();
+        $from   = $criteria->getDateFrom();
+        $to     = $criteria->getDateTo();
 
-        $pool = array_filter($this->entries, function (Entry $e) use ($from, $to): bool {
+        $pool = array_filter($this->entries, function (Entry $e) use ($from, $to, $target): bool {
             $date = $e->getDate();
+            
             if ($from !== null && $date < $from) {
                 return false;
             }
+
             if ($to !== null && $date > $to) {
                 return false;
             }
+
+            if ($target !== null && $date !== $target) {
+                return false;
+            }
+
             return true;
         });        
 

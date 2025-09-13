@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries;
 
 use Daylog\Tests\Support\Fixture\EntryFixture;
-use Daylog\Tests\Support\Helper\ListEntriesHelper;
 use Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries\BaseListEntriesIntegrationTest;
+use Daylog\Tests\Support\Factory\ListEntriesTestRequestFactory;
 
 /**
- * AC-7: With date=YYYY-MM-DD, only entries with an exact logical date match are returned.
+ * AC-07: With date=YYYY-MM-DD, only entries with an exact logical date match are returned.
  *
  * Purpose: 
  *   - Ensure the single-date filter returns exclusively entries whose logical 'date' equals the requested value; 
@@ -26,58 +26,35 @@ use Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries\BaseListEn
  * 
  * @group UC-ListEntries
  */
-final class AC7_SingleDateExactMatchTest extends BaseListEntriesIntegrationTest
+final class AC07_SingleDateExactMatchTest extends BaseListEntriesIntegrationTest
 {
     /** 
-     * AC-7: Single-date filter returns only exact logical-date matches (ordered by date DESC). 
+     * AC-07: Single-date filter returns only exact logical-date matches (ordered by date DESC). 
      * 
      * @return void
      */
     public function testSingleDateFilterReturnsOnlyExactMatches(): void
     {
         // Arrange
-        $rows = EntryFixture::insertRows(5, 0);
-
+        $rows = EntryFixture::insertRows(3, 1);
         $targetDate = $rows[0]['date'];
-        $otherDate1 = '2025-08-10';
-        $otherDate2 = '2025-08-11';
-        $otherDate3 = '2025-08-13';
-
-        $id1 = $rows[0]['id'];
-        $id2 = $rows[1]['id'];
-        $id3 = $rows[2]['id'];
-        $id4 = $rows[3]['id'];
-        $id5 = $rows[4]['id'];
-
-        EntryFixture::updateById($id3, ['date' => $otherDate1]);
-        EntryFixture::updateById($id4, ['date' => $otherDate2]);
-        EntryFixture::updateById($id5, ['date' => $otherDate3]);
+        
+        $request = ListEntriesTestRequestFactory::withDate('date', $targetDate);
 
         // Act
-        $data = ListEntriesHelper::getData();
-        $data['date'] = $targetDate;
-
-        $request  = ListEntriesHelper::buildRequest($data);
         $response = $this->useCase->execute($request);
-
         $items = $response->getItems();
 
         // Collect returned IDs (order-agnostic check)
-        $actualIds = [];
-        foreach ($items as $item) {
-            $actualIds[] = $item['id'];
-        }
-
-        $expectedIds = [$id1, $id2];
-        sort($expectedIds);
-        sort($actualIds);
+        $actualIds   = array_column($items, 'id');
+        $expectedIds = [$rows[0]['id']];
 
         // Assert: only exact logical-date matches are returned
-        $this->assertSame(2, count($items));
+        $this->assertSame(1, count($items));
         $this->assertSame($expectedIds, $actualIds);
 
         // Assert: pagination metadata is consistent
-        $this->assertSame(2, $response->getTotal());
+        $this->assertSame(1, $response->getTotal());
         $this->assertSame(1, $response->getPage());
         $this->assertSame(1, $response->getPagesCount());
     }
