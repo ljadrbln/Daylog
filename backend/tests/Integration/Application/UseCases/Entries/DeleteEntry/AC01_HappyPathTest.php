@@ -3,12 +3,11 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\DeleteEntry;
 
-use Daylog\Presentation\Requests\Entries\DeleteEntry\DeleteEntryRequestFactory;
-use Daylog\Presentation\Requests\Entries\DeleteEntry\DeleteEntryRequestInterface;
 use Daylog\Tests\Support\Fixture\EntryFixture;
+use Daylog\Tests\Support\Factory\DeleteEntryTestRequestFactory;
 
 /**
- * AC-1: Given existing entry id, the system deletes the Entry.
+ * AC-01: Given existing entry id, the system deletes the Entry.
  *
  * Purpose:
  *   Verify the happy path using real wiring (Provider + SqlFactory) and a clean DB
@@ -16,7 +15,7 @@ use Daylog\Tests\Support\Fixture\EntryFixture;
  *
  * Mechanics:
  *   - Seed a single row into the 'entries' table using a real DB connection.
- *   - Build a request DTO via the Presentation factory.
+ *   - Build a request DTO via the test factory helper.
  *   - Execute the use case and assert the entry is deleted.
  *
  * Assertions:
@@ -28,10 +27,10 @@ use Daylog\Tests\Support\Fixture\EntryFixture;
  *
  * @group UC-DeleteEntry
  */
-final class AC1_HappyPathTest extends BaseDeleteEntryIntegrationTest
+final class AC01_HappyPathTest extends BaseDeleteEntryIntegrationTest
 {
     /**
-     * AC-1 Happy path: deletes the seeded Entry by id.
+     * AC-01 Happy path: deletes the seeded Entry by id.
      *
      * @return void
      */
@@ -45,11 +44,9 @@ final class AC1_HappyPathTest extends BaseDeleteEntryIntegrationTest
         $rowsCount = EntryFixture::countRows();
         $this->assertSame(1, $rowsCount);
 
-        // Build request
-        $payload = ['id' => $row['id']];
-
-        /** @var DeleteEntryRequestInterface $request */
-        $request = DeleteEntryRequestFactory::fromArray($payload);
+        // Build request via factory
+        $entryId = $row['id'];
+        $request = DeleteEntryTestRequestFactory::happy($entryId);
 
         // Act
         $this->useCase->execute($request);
