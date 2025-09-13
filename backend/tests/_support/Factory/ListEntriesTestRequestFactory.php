@@ -69,6 +69,21 @@ final class ListEntriesTestRequestFactory
     }
 
     /**
+     * Build request with substring query.
+     *
+     * @param string $query Query string (case-insensitive).
+     * @return ListEntriesRequestInterface
+     */
+    public static function query(string $query): ListEntriesRequestInterface
+    {
+        $data = ListEntriesHelper::getData();
+        $data['query'] = $query;
+
+        $request = ListEntriesRequest::fromArray($data);
+        return $request;
+    }
+
+    /**
      * Build a request from targeted overrides (escape hatch).
      *
      * @param array<string,mixed> $overrides
