@@ -40,7 +40,7 @@ final class AC06_InvalidDateInputTest extends BaseListEntriesIntegrationTest
     public function testInvalidDateInputThrowsValidationException(string $field, string $value): void
     {
         // Arrange
-        $request = ListEntriesTestRequestFactory::withInvalidDate($field, $value);
+        $request = ListEntriesTestRequestFactory::withDate($field, $value);
 
         // Expectation
         $this->expectDateInvalid();

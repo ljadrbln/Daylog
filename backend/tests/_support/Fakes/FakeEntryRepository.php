@@ -102,6 +102,21 @@ final class FakeEntryRepository implements EntryRepositoryInterface
         // Use all entries as pool
         $pool = $this->entries;
 
+        // Filtering
+        $from = $criteria->getDateFrom();
+        $to   = $criteria->getDateTo();
+
+        $pool = array_filter($this->entries, function (Entry $e) use ($from, $to): bool {
+            $date = $e->getDate();
+            if ($from !== null && $date < $from) {
+                return false;
+            }
+            if ($to !== null && $date > $to) {
+                return false;
+            }
+            return true;
+        });        
+
         // Sorting: date DESC, then createdAt DESC (stable)
         usort($pool, function (Entry $a, Entry $b): int {
             $primary = strcmp($b->getDate(), $a->getDate());
