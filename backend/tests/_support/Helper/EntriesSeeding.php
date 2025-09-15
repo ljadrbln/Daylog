@@ -63,6 +63,21 @@ final class EntriesSeeding
 
             EntryFixture::insertOne($id, $title, $body, $date);
 
+            $patch = [];
+            $createdAt = $row['createdAt'] ?? null;
+            if($createdAt !== null) {
+                $patch['created_at'] = $createdAt;
+            }
+
+            $updatedAt = $row['updatedAt'] ?? null;
+            if($updatedAt !== null) {
+                $patch['updated_at'] = $updatedAt;
+            }
+
+            if($patch !== []) {
+                EntryFixture::updateById($id, $patch);
+            }
+
             $result[] = $row;
         }
     }

@@ -115,7 +115,7 @@ final class AC05_SortingByTimestampsTest extends BaseListEntriesIntegrationTest
                 $cmp = $leftPrimary <=> $rightPrimary;
 
                 if ($cmp === 0) {
-                    // Stable secondary: createdAt DESC
+                    // Stable secondary: createdAt DESC (always, independent of $sortDir)
                     /** @var string */
                     $leftCreated = $a['createdAt'];
                     $leftCreated = strtotime($leftCreated);
@@ -124,16 +124,15 @@ final class AC05_SortingByTimestampsTest extends BaseListEntriesIntegrationTest
                     $rightCreated = $b['createdAt'];
                     $rightCreated = strtotime($rightCreated);
 
-                    $cmp = -1 * ($leftCreated <=> $rightCreated);
-                }
-
-                if ($sortDir === 'DESC') {
+                    $cmp = $rightCreated <=> $leftCreated;
+                } elseif ($sortDir === 'DESC') {
                     $cmp = -$cmp;
                 }
 
                 return $cmp;
             }
         );
+
 
         $expectedIds = array_column($pairs, 'id');
 
