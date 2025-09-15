@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries;
 
-use Daylog\Tests\Support\Fixture\EntryFixture;
 use Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries\BaseListEntriesIntegrationTest;
 use Daylog\Tests\Support\Factory\ListEntriesTestRequestFactory;
 use Daylog\Tests\Support\Scenarios\Entries\ListEntriesScenario;

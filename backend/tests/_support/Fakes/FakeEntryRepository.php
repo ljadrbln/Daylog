@@ -106,8 +106,9 @@ final class FakeEntryRepository implements EntryRepositoryInterface
         $target = $criteria->getDate();
         $from   = $criteria->getDateFrom();
         $to     = $criteria->getDateTo();
+        $query  = $criteria->getQuery();
 
-        $pool = array_filter($this->entries, function (Entry $e) use ($from, $to, $target): bool {
+        $pool = array_filter($this->entries, function (Entry $e) use ($from, $to, $target, $query): bool {
             $date = $e->getDate();
             
             if ($from !== null && $date < $from) {
@@ -120,6 +121,27 @@ final class FakeEntryRepository implements EntryRepositoryInterface
 
             if ($target !== null && $date !== $target) {
                 return false;
+            }
+
+            if ($query !== null) {
+                $q = strtolower($query);
+
+                $title = $e->getTitle();
+                $body  = $e->getBody();
+
+                $titleLower = strtolower($title);
+                $bodyLower  = strtolower($body);
+
+                $posInTitle = strpos($titleLower, $q);
+                $posInBody  = strpos($bodyLower, $q);
+
+                $matchInTitle = ($posInTitle !== false);
+                $matchInBody  = ($posInBody !== false);
+
+                $matches = $matchInTitle || $matchInBody;
+                if (!$matches) {
+                    return false;
+                }
             }
 
             return true;

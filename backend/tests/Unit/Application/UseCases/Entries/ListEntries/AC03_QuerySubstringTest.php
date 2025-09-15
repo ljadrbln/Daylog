@@ -7,6 +7,9 @@ use Daylog\Tests\Support\Factory\ListEntriesTestRequestFactory;
 use Daylog\Tests\Support\Helper\EntryTestData;
 use Daylog\Domain\Models\Entries\Entry;
 
+use Daylog\Tests\Support\Scenarios\Entries\ListEntriesScenario;
+use Daylog\Tests\Support\Helper\EntriesSeeding;
+
 /**
  * UC-2 / AC-03 — Query substring (case-insensitive) — Unit.
  *
@@ -31,24 +34,16 @@ final class AC03_QuerySubstringTest extends BaseListEntriesUnitTest
      */
     public function testQueryFiltersTitleOrBodyCaseInsensitive(): void
     {
-        // Arrange: seed three entries
-        $repo = $this->makeRepo();
+        // Arrange
+        $repo    = $this->makeRepo();
+        $dataset = ListEntriesScenario::ac03QueryTitleOrBodyCaseInsensitive();
+        
+        $rows  = $dataset['rows'];
+        $query = $dataset['query'];
+        $expectedIds = $dataset['expectedIds'];
 
-        $data = [
-            ['date'  => '2025-08-10', 'title' => 'Alpha note',      'body'  => 'Regular body'],
-            ['date'  => '2025-08-11', 'title' => 'Regular title',   'body'  => 'This body has aLpHa inside'],
-            ['date'  => '2025-08-12', 'title' => 'Unrelated title', 'body'  => 'Something else']
-        ];
-
-        for($i=0; $i<count($data); $i++) {
-            $item = $data[$i];
-
-            $entryData = EntryTestData::getOne($item['title'], $item['body'], $item['date']);
-            $entry     = Entry::fromArray($entryData);
-            $repo->save($entry);
-        }
-
-        $query    = 'alpha';
+        EntriesSeeding::intoFakeRepo($repo, $rows);
+        
         $request  = ListEntriesTestRequestFactory::fromOverrides(['query' => $query]);
         $validator = $this->makeValidatorOk();
         $useCase   = $this->makeUseCase($repo, $validator);
@@ -57,9 +52,9 @@ final class AC03_QuerySubstringTest extends BaseListEntriesUnitTest
         $response = $useCase->execute($request);
         $items    = $response->getItems();
 
-        // Assert: two hits (D11 body match; D10 title match), ordered by date DESC
+        // Assert
         $this->assertCount(2, $items);
-        $this->assertSame($data[1]['date'], $items[0]['date']);
-        $this->assertSame($data[0]['date'], $items[1]['date']);
+        $this->assertSame($expectedIds[0], $items[0]['id']);
+        $this->assertSame($expectedIds[1], $items[1]['id']);
     }
 }

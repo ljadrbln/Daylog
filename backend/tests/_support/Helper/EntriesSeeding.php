@@ -20,7 +20,14 @@ final class EntriesSeeding
      * Put scenario rows into a fake repository (Unit tests).
      *
      * @param EntryRepositoryInterface $repo
-     * @param array<int,array>         $rows
+     * @param array<int,array{
+     *     id: string,
+     *     title: string,
+     *     body: string,
+     *     date: string,
+     *     createdAt?: string|null,
+     *     updatedAt?: string|null
+     * }> $rows Rows of entry data (as associative arrays).
      * @return void
      */
     public static function intoFakeRepo(EntryRepositoryInterface $repo, array $rows): void
@@ -34,32 +41,29 @@ final class EntriesSeeding
     /**
      * Insert scenario rows into the real DB (Integration tests) using fixture.
      *
-     * @param array<int,array> $rows
-     * @return array<int,array> Rows with DB-assigned values if fixture mutates anything
+     * @param array<int,array{
+     *     id: string,
+     *     title: string,
+     *     body: string,
+     *     date: string,
+     *     createdAt?: string|null,
+     *     updatedAt?: string|null
+     * }> $rows Rows of entry data (as associative arrays).
+     * @return void
      */
-    public static function intoDb(array $rows): array
+    public static function intoDb(array $rows): void
     {
         $result = [];
 
         foreach ($rows as $row) {
-            /** @var string */
+            $id    = $row['id'];            
             $title = $row['title'];
-
-            /** @var string */
             $body  = $row['body'];
-
-            /** @var string */
             $date  = $row['date'];
 
-            /** @var string */
-            $id  = $row['id'];            
-
-            $id = EntryFixture::insertOne($id, $title, $body, $date);
-            $row['id'] = $id;
+            EntryFixture::insertOne($id, $title, $body, $date);
 
             $result[] = $row;
         }
-
-        return $result;
     }
 }
