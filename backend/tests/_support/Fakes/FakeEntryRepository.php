@@ -148,14 +148,7 @@ final class FakeEntryRepository implements EntryRepositoryInterface
         });        
 
         // Sorting: date DESC, then createdAt DESC (stable)
-        usort($pool, function (Entry $a, Entry $b): int {
-            $primary = strcmp($b->getDate(), $a->getDate());
-            if ($primary !== 0) {
-                return $primary;
-            }
-
-            return strcmp($b->getCreatedAt(), $a->getCreatedAt());
-        });
+        usort($pool, self::makeComparator($criteria));
 
         // Pagination
         $total   = count($pool);
@@ -201,4 +194,89 @@ final class FakeEntryRepository implements EntryRepositoryInterface
         $reindexed = array_values($this->entries);
         $this->entries = $reindexed;
     }
+
+    /**
+     * Build comparator for Entries.
+     *
+     * Purpose:
+     * Sorts by $criteria->sortField (ASC|DESC). If values are equal, applies
+     * stable secondary order: createdAt DESC.
+     *
+     * Usage:
+     * Pass result directly to usort() for UC-2 ListEntries.
+     *
+     * @param ListEntriesCriteria $criteria
+     * @return callable(Entry,Entry):int
+     */
+    public static function makeComparator(ListEntriesCriteria $criteria): callable
+    {
+        $sortDescriptior = $criteria->getSortDescriptor();
+
+        $sortField = $sortDescriptior[0]['field'];
+        $sortDir   = $sortDescriptior[0]['direction'];
+
+        return static function (Entry $a, Entry $b) use ($sortField, $sortDir): int {
+
+            // Primary key as ISO-like strings to keep lexicographic order time-safe
+            $aPrimary = $sortField === 'date'
+                ? $a->getDate()
+                : ($sortField === 'createdAt' 
+                    ? $a->getCreatedAt() 
+                    : $a->getUpdatedAt()
+                );
+
+            $bPrimary = $sortField === 'date'
+                ? $b->getDate()
+                : ($sortField === 'createdAt' 
+                    ? $b->getCreatedAt() 
+                    : $b->getUpdatedAt());
+
+            $cmp = strcmp($aPrimary, $bPrimary);
+
+            if ($sortDir === 'DESC') {
+                $cmp = -$cmp;
+            }
+
+            if ($cmp === 0) {
+                // Stable secondary: createdAt DESC (independent of $dir)
+                $aCreated = $a->getCreatedAt();
+                $bCreated = $b->getCreatedAt();
+
+                $cmp = strcmp($bCreated, $aCreated); // DESC
+            }
+
+            return $cmp;
+        };
+    }
 }
+
+
+
+/**
+ * Sort pool according to UC-2:
+ * Primary: $sortField with $sortDir (ASC|DESC) over {date, createdAt, updatedAt}.
+ * Tie-breaker: ALWAYS createdAt DESC when primary keys are equal.
+ *
+ * @param array<int,Entry> $pool
+ * @param string           $sortField One of: 'date'|'createdAt'|'updatedAt'
+ * @param 'ASC'|'DESC'     $sortDir
+ *
+ * @return array<int,Entry>
+ */
+// private function sortPool(array $pool, string $sortField, string $sortDir): array
+// {
+//     $field = $sortField;
+//     $dir   = $sortDir;
+
+//     usort(
+//         $pool,
+//         static function (Entry $a, Entry $b) use ($field, $dir): int {
+
+//             $result = $cmp;
+//             return $result;
+//         }
+//     );
+
+//     $result = $pool;
+//     return $result;
+// }
