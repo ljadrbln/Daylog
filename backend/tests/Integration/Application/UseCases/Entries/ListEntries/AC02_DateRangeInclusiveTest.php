@@ -5,6 +5,8 @@ namespace Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries;
 
 use Daylog\Tests\Support\Fixture\EntryFixture;
 use Daylog\Tests\Support\Factory\ListEntriesTestRequestFactory;
+use Daylog\Tests\Support\Scenarios\Entries\ListEntriesScenario;
+use Daylog\Tests\Support\Helper\EntriesSeeding;
 
 /**
  * UC-2 / AC-2 — Date range inclusive — Integration.
@@ -32,24 +34,24 @@ final class AC02_DateRangeInclusiveTest extends BaseListEntriesIntegrationTest
     public function testDateRangeInclusiveReturnsMatchingItems(): void
     {
         // Arrange
-        $rows = EntryFixture::insertRows(3, 1);
+        $dataset = ListEntriesScenario::ac02DateRangeInclusive();
 
-        $dateFrom = $rows[0]['date'];
-        $dateTo   = $rows[1]['date'];
-
+        $rows        = $dataset['rows'];
+        $dateFrom    = $dataset['from'];        
+        $dateTo      = $dataset['to'];        
+        $expectedIds = $dataset['expectedIds'];
+        
         $request = ListEntriesTestRequestFactory::rangeInclusive($dateFrom, $dateTo);
+        EntriesSeeding::intoDb($rows);
 
         // Act
-        $response = $this->useCase->execute($request);
-        $items    = $response->getItems();
-
+        $response  = $this->useCase->execute($request);
+        $items     = $response->getItems();
+        
         // Assert
-        $this->assertCount(2, $items);
+        $this->assertSame(2, count($items));
 
-        $actualDateTo   = $items[0]['date'];
-        $actualDateFrom = $items[1]['date'];
-
-        $this->assertSame($dateTo,   $actualDateTo);
-        $this->assertSame($dateFrom, $actualDateFrom);
+        $actualIds = array_column($items, 'id');
+        $this->assertSame($expectedIds, $actualIds);
     }
 }

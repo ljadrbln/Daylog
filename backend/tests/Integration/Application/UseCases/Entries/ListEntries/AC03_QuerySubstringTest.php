@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries;
 
-use Daylog\Tests\Support\Fixture\EntryFixture;
 use Daylog\Tests\Support\Factory\ListEntriesTestRequestFactory;
 use Daylog\Tests\Support\Scenarios\Entries\ListEntriesScenario;
 use Daylog\Tests\Support\Helper\EntriesSeeding;
@@ -47,10 +46,11 @@ final class AC03_QuerySubstringTest extends BaseListEntriesIntegrationTest
         // Act
         $response  = $this->useCase->execute($request);
         $items     = $response->getItems();
-        $actualIds = array_column($items, 'id');
-
+        
         // Assert
         $this->assertSame(2, count($items));
+        
+        $actualIds = array_column($items, 'id');
         $this->assertSame($expectedIds, $actualIds);
     }
 }
