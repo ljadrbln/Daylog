@@ -38,23 +38,23 @@ final class AC07_SingleDateExactMatchTest extends BaseListEntriesIntegrationTest
     {
         // Arrange
         $dataset = ListEntriesScenario::ac07SingleDateExact();
-        $rows    = $dataset['rows'];
+        
+        $rows        = $dataset['rows'];
+        $targetDate  = $dataset['targetDate'];        
+        $expectedIds = $dataset['expectedIds'];
+        
+        $request = ListEntriesTestRequestFactory::withDate('date', $targetDate);
         EntriesSeeding::intoDb($rows);
 
-        $targetDate = $dataset['targetDate'];        
-        $request    = ListEntriesTestRequestFactory::withDate('date', $targetDate);
-
         // Act
-        $response = $this->useCase->execute($request);
-        $items = $response->getItems();
-
-        $actualIds   = array_column($items, 'id');
-        $expectedIds = $dataset['expectedIds'];
+        $response  = $this->useCase->execute($request);
+        $items     = $response->getItems();
+        $actualIds = array_column($items, 'id');
 
         // Assert
-        $this->assertSame(1, count($items));
+        $this->assertSame(2, count($items));
         $this->assertSame($expectedIds, $actualIds);
-        $this->assertSame(1, $response->getTotal());
+        $this->assertSame(2, $response->getTotal());
         $this->assertSame(1, $response->getPage());
         $this->assertSame(1, $response->getPagesCount());
     }

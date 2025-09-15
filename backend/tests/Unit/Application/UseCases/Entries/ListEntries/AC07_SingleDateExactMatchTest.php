@@ -37,28 +37,27 @@ final class AC07_SingleDateExactMatchTest extends BaseListEntriesUnitTest
     public function testSingleDateFilterReturnsOnlyExactMatches(): void
     {
         // Arrange
-        $repo = $this->makeRepo();
-
         $dataset = ListEntriesScenario::ac07SingleDateExact();
         
-        $rows = $dataset['rows'];
-        EntriesSeeding::intoFakeRepo($repo, $rows);
+        $rows        = $dataset['rows'];
+        $targetDate  = $dataset['targetDate'];
+        $expectedIds = $dataset['expectedIds'];
         
-        $targetDate = $dataset['targetDate'];
-        $request    = ListEntriesTestRequestFactory::withDate('date', $targetDate);
-
+        $repo      = $this->makeRepo();
+        $request   = ListEntriesTestRequestFactory::withDate('date', $targetDate);
         $validator = $this->makeValidatorOk();
         $useCase   = $this->makeUseCase($repo, $validator);
+
+        EntriesSeeding::intoFakeRepo($repo, $rows);
 
         // Act
         $response = $useCase->execute($request);
         $items    = $response->getItems();
 
         // Assert
-        $actualIds   = array_column($items, 'id');
-        $expectedIds = $dataset['expectedIds'];
+        $this->assertCount(2, $items);
 
-        $this->assertCount(1, $items);
+        $actualIds = array_column($items, 'id');
         $this->assertSame($expectedIds, $actualIds);
     }
 }

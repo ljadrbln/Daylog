@@ -35,18 +35,18 @@ final class AC03_QuerySubstringTest extends BaseListEntriesUnitTest
     public function testQueryFiltersTitleOrBodyCaseInsensitive(): void
     {
         // Arrange
-        $repo    = $this->makeRepo();
         $dataset = ListEntriesScenario::ac03QueryTitleOrBodyCaseInsensitive();
         
-        $rows  = $dataset['rows'];
-        $query = $dataset['query'];
+        $rows        = $dataset['rows'];
+        $query       = $dataset['query'];
         $expectedIds = $dataset['expectedIds'];
 
-        EntriesSeeding::intoFakeRepo($repo, $rows);
-        
-        $request  = ListEntriesTestRequestFactory::fromOverrides(['query' => $query]);
+        $repo      = $this->makeRepo();
+        $request   = ListEntriesTestRequestFactory::fromOverrides(['query' => $query]);
         $validator = $this->makeValidatorOk();
         $useCase   = $this->makeUseCase($repo, $validator);
+
+        EntriesSeeding::intoFakeRepo($repo, $rows);
 
         // Act
         $response = $useCase->execute($request);
@@ -54,7 +54,8 @@ final class AC03_QuerySubstringTest extends BaseListEntriesUnitTest
 
         // Assert
         $this->assertCount(2, $items);
-        $this->assertSame($expectedIds[0], $items[0]['id']);
-        $this->assertSame($expectedIds[1], $items[1]['id']);
+
+        $actualIds = array_column($items, 'id');
+        $this->assertSame($expectedIds, $actualIds);
     }
 }

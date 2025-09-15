@@ -76,9 +76,13 @@ final class ListEntriesScenario
     public static function ac07SingleDateExact(int $count = 5, int $stepDays = 1): array
     {
         $rows = EntryTestData::getMany($count, $stepDays);
+        $rows[1]['date'] = $rows[0]['date'];
+        
+        $targetDate = $rows[0]['date'];
 
-        $targetDate  = $rows[0]['date'];
-        $expectedIds = [$rows[0]['id']];
+        $id0 = $rows[0]['id'];
+        $id1 = $rows[1]['id'];
+        $expectedIds = [$id0, $id1];
 
         $dataset = [
             'rows'       => $rows,
