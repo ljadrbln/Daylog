@@ -130,6 +130,40 @@ final class ListEntriesScenario
     }
 
     /**
+     * AC-04: perPage clamping and valid empty pages. 
+     *
+     * @return array{
+     *   rows: array<int, array{
+     *     id: string,
+     *     title: string,
+     *     body: string,
+     *     date: string,
+     *     createdAt?: string|null,
+     *     updatedAt?: string|null
+     *   }>,
+     *   expectedIds: array<int, string>
+     * }
+     */
+    public static function ac04PaginationBoundsClamp(): array {
+        $rows = EntryTestData::getMany(5, 1);
+
+        $id0  = $rows[0]['id'];
+        $id1  = $rows[1]['id'];
+        $id2  = $rows[2]['id'];
+        $id3  = $rows[3]['id'];
+        $id4  = $rows[4]['id'];
+
+        $expectedIds = [$id4, $id3, $id2, $id1, $id0];
+
+        $dataset = [
+            'rows'        => $rows,
+            'expectedIds' => $expectedIds
+        ];
+
+        return $dataset;
+    }
+
+    /**
      * AC-07: date=YYYY-MM-DD returns only exact logical-date matches.
      *
      * @param int $count
