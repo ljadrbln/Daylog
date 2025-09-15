@@ -19,6 +19,39 @@ use Daylog\Tests\Support\Helper\EntryTestData;
 final class ListEntriesScenario
 {
     /**
+     * AC-01: happy path returns boundary items, ordered by date DESC.
+     *
+     * @return array{
+     *   rows: array<int, array{
+     *     id: string,
+     *     title: string,
+     *     body: string,
+     *     date: string,
+     *     createdAt?: string|null,
+     *     updatedAt?: string|null
+     *   }>,
+     *   expectedIds: array<int,string>
+     * }
+     */
+    public static function ac01HappyPath(): array
+    {
+        $rows = EntryTestData::getMany(3, 1);
+
+        $id0  = $rows[0]['id'];
+        $id1  = $rows[1]['id'];
+        $id2  = $rows[2]['id'];
+
+        $expectedIds = [$id2, $id1, $id0];
+
+        $dataset = [
+            'rows'        => $rows,
+            'expectedIds' => $expectedIds
+        ];
+
+        return $dataset;
+    }
+
+    /**
      * AC-02: dateFrom..dateTo returns boundary items, ordered by date DESC.
      *
      * @return array{
