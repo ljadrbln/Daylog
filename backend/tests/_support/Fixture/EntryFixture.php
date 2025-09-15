@@ -128,20 +128,20 @@ final class EntryFixture
      *   - Used in integration tests to seed a single entry with specific values.
      *   - Typical case: AC happy-path preparation where exactly one entry is required.
      *
+     * @param string $id    UUID v4 identifier of the newly inserted entry.
      * @param string $title Non-empty title string (expected to be valid per ENTRY-BR-1).
      * @param string $body  Non-empty body string (expected to be valid per ENTRY-BR-2).
      * @param string $date  Logical date in strict YYYY-MM-DD format (expected to be valid per ENTRY-BR-4).
      *
-     * @return string UUID v4 identifier of the newly inserted entry.
+     * @return void
      */
-    public static function insertOne(string $title, string $body, string $date): string {
-            $payload = EntryTestData::getOne(title: $title, body: $body, date: $date);
-            $entry   = Entry::fromArray($payload);
+    public static function insertOne(string $id, string $title, string $body, string $date): void {
+        $payload = EntryTestData::getOne(title: $title, body: $body, date: $date);
+        $payload['id'] = $id;
+        
+        $entry   = Entry::fromArray($payload);
 
-            self::insertEntry($entry);
-
-            $id = $entry->getId();
-            return $id;
+        self::insertEntry($entry);
     }
 
     /**

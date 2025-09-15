@@ -23,9 +23,20 @@ final class ListEntriesScenario
      *
      * @param int $count
      * @param int $stepDays
-     * @return array{rows:array<int,array>, targetDate:string, expectedIds:array<int,string>}
+     * @return array{
+     *   rows: array<int, array{
+     *     id: string,
+     *     title: string,
+     *     body: string,
+     *     date: string,
+     *     createdAt?: string|null,
+     *     updatedAt?: string|null
+     *   }>,
+     *   targetDate: string,
+     *   expectedIds: array<int, string>
+     * }
      */
-    public static function ac07SingleDateExact(int $count = 3, int $stepDays = 1): array
+    public static function ac07SingleDateExact(int $count = 5, int $stepDays = 1): array
     {
         $rows = EntryTestData::getMany($count, $stepDays);
 

@@ -7,6 +7,8 @@ namespace Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries;
 use Daylog\Tests\Support\Fixture\EntryFixture;
 use Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries\BaseListEntriesIntegrationTest;
 use Daylog\Tests\Support\Factory\ListEntriesTestRequestFactory;
+use Daylog\Tests\Support\Scenarios\Entries\ListEntriesScenario;
+use Daylog\Tests\Support\Helper\EntriesSeeding;
 
 /**
  * AC-07: With date=YYYY-MM-DD, only entries with an exact logical date match are returned.
@@ -36,24 +38,23 @@ final class AC07_SingleDateExactMatchTest extends BaseListEntriesIntegrationTest
     public function testSingleDateFilterReturnsOnlyExactMatches(): void
     {
         // Arrange
-        $rows = EntryFixture::insertRows(3, 1);
-        $targetDate = $rows[0]['date'];
-        
-        $request = ListEntriesTestRequestFactory::withDate('date', $targetDate);
+        $dataset = ListEntriesScenario::ac07SingleDateExact();
+        $rows    = $dataset['rows'];
+        EntriesSeeding::intoDb($rows);
+
+        $targetDate = $dataset['targetDate'];        
+        $request    = ListEntriesTestRequestFactory::withDate('date', $targetDate);
 
         // Act
         $response = $this->useCase->execute($request);
         $items = $response->getItems();
 
-        // Collect returned IDs (order-agnostic check)
         $actualIds   = array_column($items, 'id');
-        $expectedIds = [$rows[0]['id']];
+        $expectedIds = $dataset['expectedIds'];
 
-        // Assert: only exact logical-date matches are returned
+        // Assert
         $this->assertSame(1, count($items));
         $this->assertSame($expectedIds, $actualIds);
-
-        // Assert: pagination metadata is consistent
         $this->assertSame(1, $response->getTotal());
         $this->assertSame(1, $response->getPage());
         $this->assertSame(1, $response->getPagesCount());

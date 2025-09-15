@@ -51,7 +51,10 @@ final class EntriesSeeding
             /** @var string */
             $date  = $row['date'];
 
-            $id = EntryFixture::insertOne($title, $body, $date);
+            /** @var string */
+            $id  = $row['id'];            
+
+            $id = EntryFixture::insertOne($id, $title, $body, $date);
             $row['id'] = $id;
 
             $result[] = $row;
