@@ -242,4 +242,51 @@ final class ListEntriesScenario
 
         return $dataset;
     }
+
+    /**
+     * AC-08: Equal primary keys fall back to stable secondary order by createdAt DESC.
+     *
+     * @return array{
+     *   rows: array<int, array{
+     *     id: string,
+     *     title: string,
+     *     body: string,
+     *     date: string,
+     *     createdAt: string,
+     *     updatedAt: string
+     *   }>,
+     *   expectedIds: array<int, string>
+     * }
+     */
+    public static function ac08StableSecondaryOrder(): array
+    {
+        $rows = EntryTestData::getMany(3, 0);
+
+        $startDate = $rows[0]['date'];
+        $dateBase  = new \DateTimeImmutable($startDate);
+
+        $baseCreated = $dateBase->setTime(10, 0, 0);
+        $baseUpdated = $dateBase->setTime(10, 5, 0);
+
+        $stepHours = 1;
+
+        for ($i = 0; $i < count($rows); $i++) {
+            $shiftHour = sprintf('+%s hours', $i * $stepHours);
+            $createdAt = $baseCreated->modify($shiftHour);
+
+            $rows[$i]['createdAt'] = $createdAt->format('Y-m-d H:i:s');
+            $rows[$i]['updatedAt'] = $baseUpdated->format('Y-m-d H:i:s');
+        }
+
+        $expectedIds = [
+            $rows[2]['id'], // latest createdAt
+            $rows[1]['id'],
+            $rows[0]['id'],
+        ];
+
+        return [
+            'rows'        => $rows,
+            'expectedIds' => $expectedIds,
+        ];
+    }
 }
