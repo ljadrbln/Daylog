@@ -162,6 +162,48 @@ final class ListEntriesScenario
 
         return $dataset;
     }
+    
+    /**
+     * AC-05: Three rows with the same logical date but distinct created/updated timestamps.
+     *
+     * @return array{
+     *   rows: array<int, array{
+     *     id: string,
+     *     title: string,
+     *     body: string,
+     *     date: string,
+     *     createdAt?: string|null,
+     *     updatedAt?: string|null
+     *   }>
+     * }
+     */
+    public static function ac05SortingByTimestamps(): array
+    {
+        $rows = EntryTestData::getMany(3, 0);
+
+        $startDate = $rows[0]['date'];
+        $dateBase  = new \DateTimeImmutable($startDate);
+
+        $baseCreated = $dateBase->setTime(10, 0, 0);
+        $baseUpdated = $dateBase->setTime(10, 5, 0);
+
+        $stepHours = 1;
+
+        for ($i = 0; $i < count($rows); $i++) {
+            $shiftHour = sprintf('+%s hours', $i * $stepHours);
+            $createdAt = $baseCreated->modify($shiftHour);
+            $updatedAt = $baseUpdated->modify($shiftHour);
+
+            $rows[$i]['createdAt'] = $createdAt->format('Y-m-d H:i:s');
+            $rows[$i]['updatedAt'] = $updatedAt->format('Y-m-d H:i:s');
+        }
+
+        $dataset = [
+            'rows' => $rows
+        ];
+        
+        return $dataset;
+    }
 
     /**
      * AC-07: date=YYYY-MM-DD returns only exact logical-date matches.
