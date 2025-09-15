@@ -100,12 +100,48 @@ final class EntryFixture
 
         for ($i = 0; $i < count($rows); $i++) {
             $row = $rows[$i];
-            $row = Entry::fromArray($row);
+            $entry = Entry::fromArray($row);
 
-            self::insertRow($row);
+            self::insertEntry($entry);
         }
 
         return $rows;
+    }
+
+    /**
+     * Insert a single entry row into the database.
+     *
+     * Purpose:
+     *   Provide a convenient way for tests to persist one Entry without
+     *   constructing the domain entity manually. Accepts primitive values
+     *   (title, body, date), builds the Entry internally, maps it to DB
+     *   format and executes an INSERT.
+     *
+     * Mechanics:
+     *   - Generate a new UUID for the entry id.
+     *   - Normalize title, body and date into a domain Entry instance.
+     *   - Convert the Entry to a snake_case DB row via EntryFieldMapper.
+     *   - Execute a parameterized INSERT statement on the shared test DB.
+     *   - Return the generated id for further assertions in tests.
+     *
+     * Scenarios:
+     *   - Used in integration tests to seed a single entry with specific values.
+     *   - Typical case: AC happy-path preparation where exactly one entry is required.
+     *
+     * @param string $title Non-empty title string (expected to be valid per ENTRY-BR-1).
+     * @param string $body  Non-empty body string (expected to be valid per ENTRY-BR-2).
+     * @param string $date  Logical date in strict YYYY-MM-DD format (expected to be valid per ENTRY-BR-4).
+     *
+     * @return string UUID v4 identifier of the newly inserted entry.
+     */
+    public static function insertOne(string $title, string $body, string $date): string {
+            $payload = EntryTestData::getOne(title: $title, body: $body, date: $date);
+            $entry   = Entry::fromArray($payload);
+
+            self::insertEntry($entry);
+
+            $id = $entry->getId();
+            return $id;
     }
 
     /**
@@ -123,7 +159,7 @@ final class EntryFixture
      * @param Entry $entry Domain entity containing logical and timestamp fields.
      * @return void
      */
-    private static function insertRow(Entry $entry): void
+    private static function insertEntry(Entry $entry): void
     {
         $sql = 'INSERT INTO entries (id, title, body, date, created_at, updated_at) 
                 VALUES (:id, :title, :body, :date, :created_at, :updated_at)';

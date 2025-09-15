@@ -3,9 +3,10 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\ListEntries;
 
-use Daylog\Tests\Support\Factory\ListEntriesTestRequestFactory;
-use Daylog\Tests\Support\Helper\EntryTestData;
 use Daylog\Domain\Models\Entries\Entry;
+use Daylog\Tests\Support\Helper\EntriesSeeding;
+use Daylog\Tests\Support\Scenarios\Entries\ListEntriesScenario;
+use Daylog\Tests\Support\Factory\ListEntriesTestRequestFactory;
 
 /**
  * UC-2 / AC-07 — Single-date exact match — Unit.
@@ -38,16 +39,14 @@ final class AC07_SingleDateExactMatchTest extends BaseListEntriesUnitTest
         // Arrange
         $repo = $this->makeRepo();
 
-        $rows = EntryTestData::getMany(3, 1);
-        $targetDate = $rows[0]['date'];
+        $dataset = ListEntriesScenario::ac07SingleDateExact();
+        
+        $rows = $dataset['rows'];
+        EntriesSeeding::intoFakeRepo($repo, $rows);
+        
+        $targetDate = $dataset['targetDate'];
+        $request    = ListEntriesTestRequestFactory::withDate('date', $targetDate);
 
-        for($i=0; $i<count($rows); $i++) {
-            $row   = $rows[$i];
-            $entry = Entry::fromArray($row);
-            $repo->save($entry);
-        }
-
-        $request   = ListEntriesTestRequestFactory::withDate('date', $targetDate);
         $validator = $this->makeValidatorOk();
         $useCase   = $this->makeUseCase($repo, $validator);
 
@@ -57,7 +56,7 @@ final class AC07_SingleDateExactMatchTest extends BaseListEntriesUnitTest
 
         // Assert
         $actualIds   = array_column($items, 'id');
-        $expectedIds = [$rows[0]['id']];
+        $expectedIds = $dataset['expectedIds'];
 
         $this->assertCount(1, $items);
         $this->assertSame($expectedIds, $actualIds);
