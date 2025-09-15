@@ -249,34 +249,3 @@ final class FakeEntryRepository implements EntryRepositoryInterface
         };
     }
 }
-
-
-
-/**
- * Sort pool according to UC-2:
- * Primary: $sortField with $sortDir (ASC|DESC) over {date, createdAt, updatedAt}.
- * Tie-breaker: ALWAYS createdAt DESC when primary keys are equal.
- *
- * @param array<int,Entry> $pool
- * @param string           $sortField One of: 'date'|'createdAt'|'updatedAt'
- * @param 'ASC'|'DESC'     $sortDir
- *
- * @return array<int,Entry>
- */
-// private function sortPool(array $pool, string $sortField, string $sortDir): array
-// {
-//     $field = $sortField;
-//     $dir   = $sortDir;
-
-//     usort(
-//         $pool,
-//         static function (Entry $a, Entry $b) use ($field, $dir): int {
-
-//             $result = $cmp;
-//             return $result;
-//         }
-//     );
-
-//     $result = $pool;
-//     return $result;
-// }

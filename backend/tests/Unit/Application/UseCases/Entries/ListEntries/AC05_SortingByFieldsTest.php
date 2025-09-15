@@ -8,6 +8,7 @@ use Daylog\Tests\Support\Factory\ListEntriesTestRequestFactory;
 use Daylog\Tests\Support\Scenarios\Entries\ListEntriesScenario;
 use Daylog\Tests\Support\Helper\EntriesSeeding;
 use Daylog\Tests\Support\DataProviders\ListEntriesSortingDataProvider;
+use Daylog\Tests\Support\Helper\ListEntriesExpectationHelper;
 
 /**
  * AC-05: Sorting by createdAt/updatedAt supports ASC/DESC.
@@ -28,6 +29,7 @@ use Daylog\Tests\Support\DataProviders\ListEntriesSortingDataProvider;
  */
 final class AC05_SortingByFieldsTest extends BaseListEntriesUnitTest
 {
+    use ListEntriesExpectationHelper;
     use ListEntriesSortingDataProvider;
 
     /**
@@ -64,81 +66,7 @@ final class AC05_SortingByFieldsTest extends BaseListEntriesUnitTest
 
         // Assert
         $actualIds   = array_column($items, 'id');
-        $expectedIds = $this->getExpectedIds($rows, $sortField, $sortDir);
+        $expectedIds = $this->buildExpectedIds($rows, $sortField, $sortDir);
         $this->assertSame($expectedIds, $actualIds);
     }
-
-    /**
-     * Build expected id order from seeded rows using the requested sort.
-     *
-     * Purpose:
-     * Derive the expected UUID sequence at runtime without symbolic markers.
-     * Uses primary sort by the requested timestamp field and a stable secondary
-     * order by createdAt DESC (per UC-2 AC-8) to avoid flakiness on equal keys.
-     *
-     * Mechanics:
-     * - $seeded rows must contain 'id', 'createdAt', 'updatedAt' (strings: 'Y-m-d H:i:s').
-     * - Primary key: $sortField ∈ {'createdAt','updatedAt'}.
-     * - Direction: $sortDir ∈ {'ASC','DESC'}.
-     * - Tie-breaker: createdAt DESC.
-     *
-     * @param array<int,array<string,mixed>> $rows      Rows with real UUIDs.
-     * @param string                         $sortField One of: 'createdAt'|'updatedAt'.
-     * @param 'ASC'|'DESC'                   $sortDir   Sorting direction.
-     *
-     * @return array<int,string>                        Ordered list of expected UUIDs.
-     */
-    private function getExpectedIds(array $rows, string $sortField, string $sortDir): array
-    {
-        $pairs = [];
-
-        foreach ($rows as $row) {
-            $id        = $row['id'];
-            $primary   = $row[$sortField];   // 'createdAt' or 'updatedAt'
-            $createdAt = $row['createdAt'];  // for stable tie-breaker
-
-            $pairs[] = [
-                'id'        => $id,
-                'primary'   => $primary,
-                'createdAt' => $createdAt,
-            ];
-        }
-
-        usort(
-            $pairs,
-            static function (array $a, array $b) use ($sortDir): int {
-                /** @var string */
-                $leftPrimary = $a['primary'];
-                $leftPrimary = strtotime($leftPrimary);
-
-                /** @var string */
-                $rightPrimary = $b['primary'];
-                $rightPrimary = strtotime($rightPrimary);
-
-                $cmp = $leftPrimary <=> $rightPrimary;
-
-                if ($cmp === 0) {
-                    // Stable secondary: createdAt DESC (always, independent of $sortDir)
-                    /** @var string */
-                    $leftCreated = $a['createdAt'];
-                    $leftCreated = strtotime($leftCreated);
-
-                    /** @var string */
-                    $rightCreated = $b['createdAt'];
-                    $rightCreated = strtotime($rightCreated);
-
-                    $cmp = $rightCreated <=> $leftCreated;
-                } elseif ($sortDir === 'DESC') {
-                    $cmp = -$cmp;
-                }
-
-                return $cmp;
-            }
-        );
-
-
-        $expectedIds = array_column($pairs, 'id');
-
-        return $expectedIds;
-    }    
 }
