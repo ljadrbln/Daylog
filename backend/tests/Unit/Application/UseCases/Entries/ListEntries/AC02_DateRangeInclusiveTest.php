@@ -4,8 +4,9 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\ListEntries;
 
 use Daylog\Tests\Support\Factory\ListEntriesTestRequestFactory;
-use Daylog\Tests\Support\Helper\EntryTestData;
-use Daylog\Domain\Models\Entries\Entry;
+
+use Daylog\Tests\Support\Scenarios\Entries\ListEntriesScenario;
+use Daylog\Tests\Support\Helper\EntriesSeeding;
 
 /**
  * UC-2 / AC-2 — Date range inclusive — Unit.
@@ -31,27 +32,21 @@ final class AC02_DateRangeInclusiveTest extends BaseListEntriesUnitTest
     public function testDateRangeInclusiveReturnsMatchingItems(): void
     {
         // Arrange
+        $dataset = ListEntriesScenario::ac02DateRangeInclusive();
+        
+        $rows        = $dataset['rows'];
+        $to          = $dataset['to'];
+        $from        = $dataset['from'];
+        $expectedIds = $dataset['expectedIds'];
+
         $repo = $this->makeRepo();
 
-        $d1 = '2025-08-10';
-        $d2 = '2025-08-11';
-        $d3 = '2025-08-12';
-
-        $data1  = EntryTestData::getOne('Valid title', 'Valid body', $d1);
-        $entry1 = Entry::fromArray($data1);
-        $repo->save($entry1);
-
-        $data2  = EntryTestData::getOne('Valid title', 'Valid body', $d2);
-        $entry2 = Entry::fromArray($data2);
-        $repo->save($entry2);
-
-        $data3  = EntryTestData::getOne('Valid title', 'Valid body', $d3);
-        $entry3 = Entry::fromArray($data3);
-        $repo->save($entry3);
-
-        $request   = ListEntriesTestRequestFactory::rangeInclusive($d1, $d2);
+        $repo      = $this->makeRepo();
+        $request   = ListEntriesTestRequestFactory::rangeInclusive($from, $to);
         $validator = $this->makeValidatorOk();
         $useCase   = $this->makeUseCase($repo, $validator);
+
+        EntriesSeeding::intoFakeRepo($repo, $rows);
 
         // Act
         $response = $useCase->execute($request);
@@ -59,7 +54,8 @@ final class AC02_DateRangeInclusiveTest extends BaseListEntriesUnitTest
 
         // Assert
         $this->assertCount(2, $items);
-        $this->assertSame($d2, $items[0]['date']);
-        $this->assertSame($d1, $items[1]['date']);
+
+        $actualIds = array_column($items, 'id');
+        $this->assertSame($expectedIds, $actualIds);
     }
 }

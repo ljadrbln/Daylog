@@ -19,6 +19,47 @@ use Daylog\Tests\Support\Helper\EntryTestData;
 final class ListEntriesScenario
 {
     /**
+     * AC-02: dateFrom..dateTo returns boundary items, ordered by date DESC.
+     *
+     * @return array{
+     *   rows: array<int, array{
+     *     id: string,
+     *     title: string,
+     *     body: string,
+     *     date: string,
+     *     createdAt?: string|null,
+     *     updatedAt?: string|null
+     *   }>,
+     *   from: string,
+     *   to: string,
+     *   expectedIds: array<int,string>
+     * }
+     */
+    public static function ac02DateRangeInclusive(): array
+    {
+        $rows = EntryTestData::getMany(3, 1);
+        $r0   = $rows[0];
+        $r1   = $rows[1];
+
+        $id0  = $r0['id'];
+        $id1  = $r1['id'];
+
+        $from = $r0['date'];
+        $to   = $r1['date'];
+
+        $expectedIds = [$id1, $id0];
+
+        $dataset = [
+            'rows'        => $rows,
+            'from'        => $from,
+            'to'          => $to,
+            'expectedIds' => $expectedIds
+        ];
+
+        return $dataset;
+    }
+
+    /**
      * AC-03: query matches title OR body, case-insensitive.
      *
      * @return array{
