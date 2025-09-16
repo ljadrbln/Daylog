@@ -5,6 +5,7 @@ namespace Daylog\Tests\Support\Helper;
 
 use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Domain\Services\Clock;
+use DateTimeImmutable;
 
 /**
  * Test data builder for Entry in camelCase shape (Application-wide, except Storage).
@@ -94,12 +95,22 @@ final class EntryTestData
     ): array {
         $items = [];
 
+        // fix base time to avoid midnight rollover in tests
+        $baseTime = sprintf('%s 10:00:00', $startDate);
+        $baseTime = new DateTimeImmutable($baseTime);
+
         for ($i = 0; $i < $count; $i++) {
-            $dateBase = new \DateTimeImmutable($startDate);
-            $dateShift = $dateBase->modify('+' . ($i * $stepDays) . ' days');
+            $dateBase  = new DateTimeImmutable($startDate);
+            
+            $dateShift = sprintf('+%s days', $i * $stepDays);
+            $dateShift = $dateBase->modify($dateShift);
             $dateValue = $dateShift->format('Y-m-d');
 
-            $one = self::getOne($title, $body, $dateValue, null, null);
+            $timeShift = sprintf('+%s seconds', $i);
+            $createdAt = $baseTime->modify($timeShift)->format('Y-m-d H:i:s');
+            $updatedAt = $createdAt;
+
+            $one = self::getOne($title, $body, $dateValue, $createdAt, $updatedAt);
             $items[] = $one;
         }
 

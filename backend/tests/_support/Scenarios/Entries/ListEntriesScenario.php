@@ -232,7 +232,7 @@ final class ListEntriesScenario
 
         $id0 = $rows[0]['id'];
         $id1 = $rows[1]['id'];
-        $expectedIds = [$id0, $id1];
+        $expectedIds = [$id1, $id0];
 
         $dataset = [
             'rows'       => $rows,
@@ -278,11 +278,10 @@ final class ListEntriesScenario
             $rows[$i]['updatedAt'] = $baseUpdated->format('Y-m-d H:i:s');
         }
 
-        $expectedIds = [
-            $rows[2]['id'], // latest createdAt
-            $rows[1]['id'],
-            $rows[0]['id'],
-        ];
+        $id0 = $rows[0]['id'];
+        $id1 = $rows[1]['id'];
+        $id2 = $rows[2]['id'];
+        $expectedIds = [$id2, $id1, $id0];
 
         return [
             'rows'        => $rows,
