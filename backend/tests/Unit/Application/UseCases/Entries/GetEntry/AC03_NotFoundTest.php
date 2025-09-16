@@ -5,19 +5,21 @@ namespace Daylog\Tests\Unit\Application\UseCases\Entries\GetEntry;
 
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 use Daylog\Tests\Support\Factory\GetEntryTestRequestFactory;
+use Daylog\Tests\Support\Helper\EntriesSeeding;
+use Daylog\Tests\Support\Scenarios\Entries\GetEntryScenario;
 
 /**
  * UC-3 / AC-03 — Not found — Unit.
  *
  * Purpose:
- * Ensure that when the requested id does not exist in the repository,
- * the use case fails with ENTRY_NOT_FOUND and does not perform persistence.
+ *   Ensure that when the requested id does not exist in the repository,
+ *   the use case fails with ENTRY_NOT_FOUND and performs no persistence.
  *
  * Mechanics:
- * - Build request with a fresh UUID v4.
- * - Do not seed the repository so findById() returns null.
- * - Validator is expected to run exactly once and succeed (failure is not from validator).
- * - Expect DomainValidationException('ENTRY_NOT_FOUND') from the use case.
+ *   - Build a deterministic dataset via GetEntryScenario::ac01HappyPath() and seed the Fake repo;
+ *   - Create a request with a fresh UUID v4 that is absent in the repo (factory::notFound());
+ *   - Run the use case with a validator that succeeds exactly once;
+ *   - Expect DomainValidationException('ENTRY_NOT_FOUND') and verify the repo is untouched.
  *
  * @covers \Daylog\Application\UseCases\Entries\GetEntry\GetEntry::execute
  * @group UC-GetEntry
@@ -34,9 +36,14 @@ final class AC03_NotFoundTest extends BaseGetEntryUnitTest
     public function testAbsentIdYieldsEntryNotFound(): void
     {
         // Arrange
-        $validator = $this->makeValidatorOk();
+        $dataset = GetEntryScenario::ac01HappyPath();
+        $rows    = $dataset['rows'];
+
+        $repo = $this->makeRepo();
+        EntriesSeeding::intoFakeRepo($repo, $rows);
+
         $request   = GetEntryTestRequestFactory::notFound();
-        $repo      = $this->makeRepo();
+        $validator = $this->makeValidatorOk();
 
         // Expect
         $this->expectEntryNotFound();

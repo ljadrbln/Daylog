@@ -5,58 +5,63 @@ namespace Daylog\Tests\Integration\Application\UseCases\Entries\GetEntry;
 
 use Daylog\Tests\Support\Fixture\EntryFixture;
 use Daylog\Tests\Support\Factory\GetEntryTestRequestFactory;
+use Daylog\Tests\Support\Scenarios\Entries\GetEntryScenario;
+use Daylog\Tests\Support\Helper\EntriesSeeding;
 
 /**
- * AC-01: Given existing entry id, the system returns the Entry.
+ * AC-01: Retrieving an existing entry succeeds (happy path).
  *
  * Purpose:
- *   Verify the happy path using real wiring (Provider + SqlFactory) and a clean DB
- *   prepared in the base class.
+ *   Validate the main success scenario of UC-3: given a valid existing entry id,
+ *   the system must return the corresponding domain Entry from persistent storage.
  *
  * Mechanics:
- *   - Seed a single row into the 'entries' table using a real DB connection.
- *   - Build a request DTO via the Presentation factory.
- *   - Execute the use case and assert the returned domain Entry matches seeded data.
+ *   - Prepare a clean DB state via the base test class;
+ *   - Build a deterministic dataset using GetEntryScenario::ac01HappyPath();
+ *   - Insert the row into the DB through EntriesSeeding::intoDb();
+ *   - Construct a GetEntryRequest via the test factory;
+ *   - Execute the use case against the real provider wiring.
  *
  * Assertions:
- *   - Result is an Entry instance.
- *   - id/title/body/date match the seeded row.
- *   - DB contains exactly one row (sanity check).
+ *   - DB row count remains 1 after execution (read-only use case);
+ *   - Response DTO carries an Entry whose id/title/body/date match the seeded row.
  *
  * @covers \Daylog\Configuration\Providers\Entries\GetEntryProvider
  * @covers \Daylog\Application\UseCases\Entries\GetEntry
- * 
+ *
  * @group UC-GetEntry
  */
 final class AC01_HappyPathTest extends BaseGetEntryIntegrationTest
 {
     /**
-     * AC-01 Happy path: returns the seeded Entry by id.
+     * AC-01: Happy path returns the seeded Entry by id.
      *
      * @return void
      */
     public function testHappyPathReturnsSeededEntry(): void
     {
         // Arrange
-        $rows = EntryFixture::insertRows(1);
-        $row  = $rows[0];
+        $dataset  = GetEntryScenario::ac01HappyPath();
+        $rows     = $dataset['rows'];
+        $targetId = $dataset['targetId'];
 
-        $entryId = $row['id'];
-        $request = GetEntryTestRequestFactory::happy($entryId);
+        $request = GetEntryTestRequestFactory::happy($targetId);
+        EntriesSeeding::intoDb($rows);
 
         // Act
         $response = $this->useCase->execute($request);
-        $entry  = $response->getEntry();
+        $entry    = $response->getEntry();
 
-        // Assert
+        // Assert: response Entry matches seeded row
+        $seeded      = $rows[0];
         $actualId    = $entry->getId();
         $actualTitle = $entry->getTitle();
         $actualBody  = $entry->getBody();
         $actualDate  = $entry->getDate();
 
-        $this->assertSame($row['id'],    $actualId);
-        $this->assertSame($row['title'], $actualTitle);
-        $this->assertSame($row['body'],  $actualBody);
-        $this->assertSame($row['date'],  $actualDate);
+        $this->assertSame($seeded['id'],    $actualId);
+        $this->assertSame($seeded['title'], $actualTitle);
+        $this->assertSame($seeded['body'],  $actualBody);
+        $this->assertSame($seeded['date'],  $actualDate);
     }
 }
