@@ -51,12 +51,18 @@ final class AC01_HappyPathTest extends BaseDeleteEntryIntegrationTest
         $rowsCountBefore = EntryFixture::countRows();
 
         // Act
-        $this->useCase->execute($request);
+        $response = $this->useCase->execute($request);
 
         // Assert
         $rowsCountAfter      = EntryFixture::countRows();
         $numberOfDeletedRows = $rowsCountBefore - $rowsCountAfter;
 
         $this->assertSame(1, $numberOfDeletedRows);
+
+        // Assert: response echoes the same id (DTO → Entry → id)
+        $entry    = $response->getEntry();
+        $actualId = $entry->getId();
+
+        $this->assertSame($targetId, $actualId);        
     }
 }

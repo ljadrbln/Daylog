@@ -48,11 +48,11 @@ final class AC01_HappyPathTest extends BaseDeleteEntryUnitTest
         // Act
         $response = $useCase->execute($request);
 
-        // Assert: repository no longer contains the entry
+        // Assert
         $foundAfter = $repo->findById($targetId);
         $this->assertNull($foundAfter);
 
-        // Assert: response echoes the same id (DTO → Entry → id)
+        // Assert
         $entry   = $response->getEntry();
         $actualId = $entry->getId();
 

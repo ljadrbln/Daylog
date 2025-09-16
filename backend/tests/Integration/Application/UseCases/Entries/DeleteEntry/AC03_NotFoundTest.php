@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\DeleteEntry;
 
-use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
-use Daylog\Tests\Support\Factory\DeleteEntryTestRequestFactory;
 use Daylog\Tests\Support\Fixture\EntryFixture;
+use Daylog\Tests\Support\Factory\DeleteEntryTestRequestFactory;
+use Daylog\Tests\Support\Scenarios\Entries\DeleteEntryScenario;
+use Daylog\Tests\Support\Helper\EntriesSeeding;
+use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
  * AC-03 Not found: ensures that a valid UUID v4 which does not exist
@@ -38,14 +40,14 @@ final class AC03_NotFoundTest extends BaseDeleteEntryIntegrationTest
      */
     public function testValidAbsentUuidTriggersEntryNotFound(): void
     {
-        // Arrange: seed exactly one existing entry
-        EntryFixture::insertRows(1);
+        // Arrange
+        $dataset  = DeleteEntryScenario::ac01HappyPath();
+        $rows     = $dataset['rows'];
+
+        $request = DeleteEntryTestRequestFactory::notFound();
+        EntriesSeeding::intoDb($rows);
 
         $rowsCountBefore = EntryFixture::countRows();
-        $this->assertSame(1, $rowsCountBefore);
-
-        // Build request with a valid but absent UUID
-        $request = DeleteEntryTestRequestFactory::notFound();
 
         // Expect
         $this->expectEntryNotFound();
@@ -53,8 +55,8 @@ final class AC03_NotFoundTest extends BaseDeleteEntryIntegrationTest
         // Act
         $this->useCase->execute($request);
 
-        // Assert: DB still has the original row (no side effects)
+        // Assert
         $rowsCountAfter = EntryFixture::countRows();
-        $this->assertSame(1, $rowsCountAfter);
+        $this->assertSame($rowsCountBefore, $rowsCountAfter);
     }
 }
