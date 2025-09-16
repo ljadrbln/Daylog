@@ -6,6 +6,7 @@ namespace Daylog\Tests\Unit\Infrastructure\Storage\Entries;
 use Codeception\Test\Unit;
 use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Domain\Services\DateService;
+use Daylog\Infrastructure\Utils\TimestampConverter;
 use Daylog\Infrastructure\Storage\Entries\EntryFieldMapper;
 use Daylog\Tests\Support\Helper\EntryTestData;
 
@@ -78,12 +79,18 @@ final class EntryFieldMapperTest extends Unit
         // Act
         $row = EntryFieldMapper::toDbRowFromEntry($entry);
 
+        $createdAt = $data['createdAt'];
+        $createdAt = TimestampConverter::isoToSqlUtc($createdAt);
+
+        $updatedAt = $data['updatedAt'];
+        $updatedAt = TimestampConverter::isoToSqlUtc($updatedAt);
+
         // Assert
         $this->assertSame($data['id'],        $row['id']);
         $this->assertSame($data['title'],     $row['title']);
         $this->assertSame($data['body'],      $row['body']);
         $this->assertSame($data['date'],      $row['date']);
-        $this->assertSame($data['createdAt'], $row['created_at']);
-        $this->assertSame($data['updatedAt'], $row['updated_at']);
+        $this->assertSame($createdAt, $row['created_at']);
+        $this->assertSame($updatedAt, $row['updated_at']);
     }
 }
