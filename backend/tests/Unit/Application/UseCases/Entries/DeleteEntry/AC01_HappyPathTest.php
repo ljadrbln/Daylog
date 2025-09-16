@@ -3,22 +3,23 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\DeleteEntry;
 
-use Daylog\Domain\Models\Entries\Entry;
-use Daylog\Tests\Support\Helper\EntryTestData;
 use Daylog\Tests\Support\Factory\DeleteEntryTestRequestFactory;
+use Daylog\Tests\Support\Helper\EntriesSeeding;
+use Daylog\Tests\Support\Scenarios\Entries\DeleteEntryScenario;
 
 /**
  * UC-4 / AC-01 — Happy path — Unit.
  *
  * Purpose:
- * Verify that DeleteEntry validates the request, deletes the entry by id from repository,
- * and returns a response DTO echoing the same id (valid UUID v4).
+ *   Verify that DeleteEntry validates the request, removes the targeted entity from the repository,
+ *   and returns a response DTO that echoes the same Entry id (UUID v4).
  *
  * Mechanics:
- * - Seed FakeEntryRepository with a valid Entry built from fixture.
- * - Build request DTO with the same id via factory helper.
- * - Validator is expected to run exactly once and succeed.
- * - Execute the use case; assert the response echoes id and the entity is absent in repo.
+ *   - Build a deterministic dataset via DeleteEntryScenario::ac01HappyPath();
+ *   - Seed a Fake repository with a single row;
+ *   - Build a request DTO for the seeded id via the test factory;
+ *   - Run the use case with a validator that succeeds exactly once;
+ *   - Assert: the entity is no longer present and the response echoes the id.
  *
  * @covers \Daylog\Application\UseCases\Entries\DeleteEntry\DeleteEntry::execute
  * @group UC-DeleteEntry
@@ -26,33 +27,35 @@ use Daylog\Tests\Support\Factory\DeleteEntryTestRequestFactory;
 final class AC01_HappyPathTest extends BaseDeleteEntryUnitTest
 {
     /**
-     * Validate happy path behavior: entry is deleted and response carries the same UUID.
+     * AC-01: Deleting an existing entry removes it from the repository and echoes the same id in response DTO.
      *
      * @return void
      */
     public function testHappyPathDeletesEntryAndReturnsResponseDto(): void
     {
         // Arrange
-        $data     = EntryTestData::getOne();
-        $entryId  = $data['id'];
-        $expected = Entry::fromArray($data);
+        $dataset  = DeleteEntryScenario::ac01HappyPath();
+        $rows     = $dataset['rows'];
+        $targetId = $dataset['targetId'];
 
+        $repo = $this->makeRepo();
+        EntriesSeeding::intoFakeRepo($repo, $rows);
+
+        $request   = DeleteEntryTestRequestFactory::happy($targetId);
         $validator = $this->makeValidatorOk();
-        $request   = DeleteEntryTestRequestFactory::happy($entryId);
-        $repo      = $this->makeRepo();
-        $repo->save($expected);
+        $useCase   = $this->makeUseCase($repo, $validator);
 
         // Act
-        $useCase  = $this->makeUseCase($repo, $validator);
         $response = $useCase->execute($request);
-        $actual   = $response->getEntry();
-        $actualId = $actual->getId();
 
-        // Assert: response echoes the same id
-        $this->assertSame($entryId, $actualId);
-
-        // Assert: entity is removed from storage
-        $foundAfter = $repo->findById($entryId);
+        // Assert: repository no longer contains the entry
+        $foundAfter = $repo->findById($targetId);
         $this->assertNull($foundAfter);
+
+        // Assert: response echoes the same id (DTO → Entry → id)
+        $entry   = $response->getEntry();
+        $actualId = $entry->getId();
+
+        $this->assertSame($targetId, $actualId);
     }
 }
