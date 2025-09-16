@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Daylog\Tests\Support\Scenarios\Entries;
 
 use DateTimeImmutable;
-use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Domain\Services\Clock;
 use Daylog\Tests\Support\Helper\EntryTestData;
 
@@ -12,15 +11,17 @@ use Daylog\Tests\Support\Helper\EntryTestData;
  * Centralized scenarios for UC-5 UpdateEntry.
  *
  * Purpose:
- * Provide deterministic datasets shared by Unit and Integration tests.
- * AC-01 (title-only) ensures both timestamps are shifted into the past so that
- * executing the use case at Clock::now() monotonically increases 'updatedAt'.
+ * Provide deterministic datasets reused in Unit and Integration tests.
+ * Each AC method specifies which fields change; time shifting and baseline
+ * row generation are encapsulated in a common helper.
  *
  * Mechanics:
- * - Take Clock::now() (ISO-8601 UTC) and shift createdAt/updatedAt by "-1 hour";
+ * - Shift createdAt/updatedAt into the past to guarantee BR-2 monotonicity;
  * - Build a canonical Entry payload via EntryTestData::getOne();
- * - Return a single-row dataset with explicit 'targetId' and 'newTitle'.
- *
+ * - Each dataset returns:
+ *     - `rows`: array with one baseline row,
+ *     - `targetId`: id of that row,
+ *     - plus new field values (title/body/date) depending on the case.
  */
 final class UpdateEntryScenario
 {
@@ -28,13 +29,13 @@ final class UpdateEntryScenario
      * AC-01 (title-only) happy path dataset.
      *
      * @return array{
-     *   rows: array<int, array{
+     *   rows: array<int,array{
      *     id: string,
      *     title: string,
      *     body: string,
      *     date: string,
-     *     createdAt?: string|null,
-     *     updatedAt?: string|null
+     *     createdAt: string,
+     *     updatedAt: string
      *   }>,
      *   targetId: string,
      *   newTitle: string
@@ -42,20 +43,7 @@ final class UpdateEntryScenario
      */
     public static function ac01TitleOnly(): array
     {
-        $nowIso = Clock::now();
-
-        $nowObj = new DateTimeImmutable($nowIso);
-        $pastObj = $nowObj->modify('-1 hour');
-        $pastIso = $pastObj->format(DATE_ATOM);
-
-        $title = 'Valid title';
-        $body  = 'Valid body';
-        $date  = '2025-09-10';
-
-        $createdAt = $pastIso;
-        $updatedAt = $pastIso;
-
-        $row  = EntryTestData::getOne($title, $body, $date, $createdAt, $updatedAt);
+        $row  = self::buildBaselineRowWithPastTimestamps();
         $rows = [$row];
 
         $targetId = $row['id'];
@@ -74,13 +62,13 @@ final class UpdateEntryScenario
      * AC-02 (body-only) happy path dataset.
      *
      * @return array{
-     *   rows: array<int, array{
+     *   rows: array<int,array{
      *     id: string,
      *     title: string,
      *     body: string,
      *     date: string,
-     *     createdAt?: string|null,
-     *     updatedAt?: string|null
+     *     createdAt: string,
+     *     updatedAt: string
      *   }>,
      *   targetId: string,
      *   newBody: string
@@ -88,20 +76,7 @@ final class UpdateEntryScenario
      */
     public static function ac02BodyOnly(): array
     {
-        $nowIso = Clock::now();
-
-        $nowObj = new DateTimeImmutable($nowIso);
-        $pastObj = $nowObj->modify('-1 hour');
-        $pastIso = $pastObj->format(DATE_ATOM);
-
-        $title = 'Valid title';
-        $body  = 'Valid body';
-        $date  = '2025-09-10';
-
-        $createdAt = $pastIso;
-        $updatedAt = $pastIso;
-
-        $row  = EntryTestData::getOne($title, $body, $date, $createdAt, $updatedAt);
+        $row  = self::buildBaselineRowWithPastTimestamps();
         $rows = [$row];
 
         $targetId = $row['id'];
@@ -120,13 +95,13 @@ final class UpdateEntryScenario
      * AC-03 (date-only) happy path dataset.
      *
      * @return array{
-     *   rows: array<int, array{
+     *   rows: array<int,array{
      *     id: string,
      *     title: string,
      *     body: string,
      *     date: string,
-     *     createdAt?: string|null,
-     *     updatedAt?: string|null
+     *     createdAt: string,
+     *     updatedAt: string
      *   }>,
      *   targetId: string,
      *   newDate: string
@@ -134,20 +109,7 @@ final class UpdateEntryScenario
      */
     public static function ac03DateOnly(): array
     {
-        $nowIso = Clock::now();
-
-        $nowObj = new DateTimeImmutable($nowIso);
-        $pastObj = $nowObj->modify('-1 hour');
-        $pastIso = $pastObj->format(DATE_ATOM);
-
-        $title = 'Valid title';
-        $body  = 'Valid body';
-        $date  = '2025-09-10';
-
-        $createdAt = $pastIso;
-        $updatedAt = $pastIso;
-
-        $row  = EntryTestData::getOne($title, $body, $date, $createdAt, $updatedAt);
+        $row  = self::buildBaselineRowWithPastTimestamps();
         $rows = [$row];
 
         $targetId = $row['id'];
@@ -161,18 +123,18 @@ final class UpdateEntryScenario
 
         return $dataset;
     }
-    
-   /**
+
+    /**
      * AC-04 (partial update: title+body) happy path dataset.
      *
      * @return array{
-     *   rows: array<int, array{
+     *   rows: array<int,array{
      *     id: string,
      *     title: string,
      *     body: string,
      *     date: string,
-     *     createdAt?: string|null,
-     *     updatedAt?: string|null
+     *     createdAt: string,
+     *     updatedAt: string
      *   }>,
      *   targetId: string,
      *   newTitle: string,
@@ -181,20 +143,7 @@ final class UpdateEntryScenario
      */
     public static function ac04TitleAndBody(): array
     {
-        $nowIso = Clock::now();
-
-        $nowObj = new DateTimeImmutable($nowIso);
-        $pastObj = $nowObj->modify('-1 hour');
-        $pastIso = $pastObj->format(DATE_ATOM);
-
-        $title = 'Valid title';
-        $body  = 'Valid body';
-        $date  = '2025-09-10';
-
-        $createdAt = $pastIso;
-        $updatedAt = $pastIso;
-
-        $row  = EntryTestData::getOne($title, $body, $date, $createdAt, $updatedAt);
+        $row  = self::buildBaselineRowWithPastTimestamps();
         $rows = [$row];
 
         $targetId = $row['id'];
@@ -209,5 +158,47 @@ final class UpdateEntryScenario
         ];
 
         return $dataset;
-    }    
+    }
+
+    /**
+     * Build a canonical Entry row with past timestamps.
+     *
+     * Purpose:
+     * Create a deterministic Entry payload where both `createdAt` and `updatedAt`
+     * are shifted into the past. This guarantees that any subsequent use case
+     * execution at Clock::now() produces a strictly newer `updatedAt`,
+     * thus maintaining BR-2 monotonicity.
+     *
+     * Mechanics:
+     * - Take the current UTC timestamp via Clock::now();
+     * - Convert to DateTimeImmutable and shift by $shiftSpec (default "-1 hour");
+     * - Format as ISO-8601 and assign to both `createdAt` and `updatedAt`;
+     * - Call EntryTestData::getOne() with named parameters for these timestamps.
+     *
+     * @param string $shiftSpec Relative modification spec for DateTimeImmutable::modify(),
+     *                          e.g. "-1 hour", "-2 days".
+     * @return array{
+     *   id: string,
+     *   title: string,
+     *   body: string,
+     *   date: string,
+     *   createdAt: string,
+     *   updatedAt: string
+     * }
+     */
+    private static function buildBaselineRowWithPastTimestamps(string $shiftSpec = '-1 hour'): array
+    {
+        $nowIso = Clock::now();
+        $nowObj = new DateTimeImmutable($nowIso);
+
+        $pastObj = $nowObj->modify($shiftSpec);
+        $pastIso = $pastObj->format(DATE_ATOM);
+
+        $createdAt = $pastIso;
+        $updatedAt = $pastIso;
+
+        $row = EntryTestData::getOne(createdAt: $createdAt, updatedAt: $updatedAt);
+
+        return $row;
+    }
 }
