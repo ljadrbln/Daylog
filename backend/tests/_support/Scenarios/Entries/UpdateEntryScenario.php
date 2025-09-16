@@ -161,6 +161,41 @@ final class UpdateEntryScenario
     }
 
     /**
+     * AC-14 (no-op) dataset: request equals stored values.
+     *
+     * Purpose:
+     * Provide a single-row dataset where the incoming request repeats the stored
+     * values (id/title/body/date). The use case must detect no effective changes
+     * and raise NO_CHANGES_APPLIED without touching updatedAt.
+     *
+     * Mechanics:
+     * - Build a baseline row with past timestamps to make any accidental update
+     *   detectable by monotonicity checks (should not change in this case).
+     *
+     * @return array{
+     *   rows: array<int,array{
+     *     id: string,
+     *     title: string,
+     *     body: string,
+     *     date: string,
+     *     createdAt: string,
+     *     updatedAt: string
+     *   }>
+     * }
+     */
+    public static function ac14NoOp(): array
+    {
+        $row  = self::buildBaselineRowWithPastTimestamps();
+        $rows = [$row];
+
+        $dataset = [
+            'rows' => $rows,
+        ];
+
+        return $dataset;
+    }
+
+    /**
      * Build a canonical Entry row with past timestamps.
      *
      * Purpose:

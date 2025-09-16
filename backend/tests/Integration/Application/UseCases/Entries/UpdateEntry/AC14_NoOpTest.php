@@ -4,24 +4,25 @@ declare(strict_types=1);
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Helper\EntriesSeeding;
+use Daylog\Tests\Support\Scenarios\Entries\UpdateEntryScenario;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
  * UC-5 / AC-14 — No-op update.
  *
  * Purpose:
- *   Verify that UpdateEntry detects a no-op update (all provided values
- *   equal to current stored values) and responds with DomainValidationException
- *   carrying NO_CHANGES_APPLIED. The Entry must remain unchanged in DB,
- *   including an intact updatedAt timestamp.
+ * Verify that UpdateEntry detects a no-op (all provided values are identical to
+ * the stored ones) and raises DomainValidationException with NO_CHANGES_APPLIED.
+ * The stored Entry must remain unchanged, including an intact updatedAt.
  *
  * Mechanics:
- *   - Seed a single entry via EntryFixture with known values.
- *   - Build a request with the same id, title, body, and date as stored.
- *   - Execute the real use case obtained in BaseUpdateEntryIntegrationTest.
- *   - Assert: DomainValidationException with NO_CHANGES_APPLIED, and updatedAt
- *     remains equal to the original timestamp.
+ * - Seed a single row via EntriesSeeding::intoDb() from UpdateEntryScenario;
+ * - Build a no-op request containing the same id/title/body/date as stored;
+ * - Execute the real use case (prepared in the base class);
+ * - Expect NO_CHANGES_APPLIED via EntryValidationAssertions helper.
  *
+ * @covers \Daylog\Configuration\Providers\Entries\UpdateEntryProvider
  * @covers \Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry
  * @group UC-UpdateEntry
  */
@@ -37,8 +38,12 @@ final class AC14_NoOpTest extends BaseUpdateEntryIntegrationTest
     public function testNoOpUpdateReportsNoChangesApplied(): void
     {
         // Arrange
-        $row = $this->insertEntryWithPastTimestamps();
+        $dataset = UpdateEntryScenario::ac14NoOp();
+        $rows    = $dataset['rows'];
+        $row     = $rows[0];
+        
         $request = UpdateEntryTestRequestFactory::noOp($row);
+        EntriesSeeding::intoDb($rows);
 
         // Expect
         $this->expectNoChangesApplied();
