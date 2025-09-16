@@ -108,8 +108,7 @@ final class EntryTestData
 
             $timeShift = sprintf('+%s seconds', $i);
             $createdAt = $baseTime->modify($timeShift)->format('Y-m-d H:i:s');
-            $updatedAt = $createdAt;                  
-            var_dump($createdAt);
+            $updatedAt = $createdAt;
 
             $one = self::getOne($title, $body, $dateValue, $createdAt, $updatedAt);
             $items[] = $one;

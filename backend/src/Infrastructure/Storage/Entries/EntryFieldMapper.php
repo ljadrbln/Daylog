@@ -32,7 +32,7 @@ final class EntryFieldMapper
     {
         $createdAt = $entry->getCreatedAt();
         $updatedAt = $entry->getUpdatedAt();
-
+        
         $createdAt = TimestampConverter::isoToSqlUtc($createdAt);
         $updatedAt = TimestampConverter::isoToSqlUtc($updatedAt);
                 

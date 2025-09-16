@@ -11,6 +11,7 @@ use Daylog\Infrastructure\Storage\Entries\EntryModel;
 use Daylog\Infrastructure\Storage\Entries\EntryStorage;
 use Daylog\Tests\Support\Helper\EntryTestData;
 use Daylog\Tests\Support\Fixture\EntryFixture;
+use Daylog\Tests\Support\Helper\EntriesSeeding;
 use DB\SQL;
 
 /**
@@ -42,10 +43,12 @@ final class EntryStorageTest extends Unit
      */
     protected function _before(): void
     {
-        $this->db = SqlFactory::get();
+        $db = SqlFactory::get();
+        $this->db = $db;
 
-        $sql = 'DELETE FROM entries';
-        $this->db->exec($sql);
+        // Clean table and register in fixtures
+        EntryFixture::setDb($db);
+        EntryFixture::cleanTable();
     }
 
     /**
@@ -90,10 +93,12 @@ final class EntryStorageTest extends Unit
      */
     public function testFindByIdReturnsEntryWhenFound(): void
     {
-        // Arrange
-        $rows = EntryFixture::insertRows(1);
+        // Arrange    
+        $rows = EntryTestData::getMany(1);
         $row  = $rows[0];
         $id   = $row['id'];
+
+        EntriesSeeding::intoDb($rows);
 
         $model   = new EntryModel($this->db);
         $storage = new EntryStorage($model);
@@ -136,14 +141,15 @@ final class EntryStorageTest extends Unit
     public function testDeleteByIdRemovesExistingRow(): void
     {
         // Arrange
-        $model   = new EntryModel($this->db);
-        $storage = new EntryStorage($model);
-
-        $rows = EntryFixture::insertRows(1);
+        $rows = EntryTestData::getMany(1);
         $row  = $rows[0];
         $id   = $row['id'];
 
-        $before = $model->findById($id);
+        EntriesSeeding::intoDb($rows);
+
+        $model   = new EntryModel($this->db);
+        $storage = new EntryStorage($model);
+        $before  = $model->findById($id);
         $this->assertNotNull($before);
 
         // Act
