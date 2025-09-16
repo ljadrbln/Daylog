@@ -79,36 +79,6 @@ final class EntryFixture
     }
 
     /**
-     * Insert N rows with deterministic dates for integration tests.
-     *
-     * The helper generates consistent rows; each row is persisted.
-     *
-     * @param int $numberOfRows Positive number (>= 1).
-     * @param int $step         Day step between consecutive dates (can be 0).
-     * @return array<int,array{
-     *   id: string,
-     *   date: string,
-     *   title: string,
-     *   body: string,
-     *   createdAt: string,
-     *   updatedAt: string
-     * }>
-     */  
-    public static function insertRows(int $numberOfRows, int $step = 0): array
-    {
-        $rows = EntryTestData::getMany($numberOfRows, $step);
-
-        for ($i = 0; $i < count($rows); $i++) {
-            $row = $rows[$i];
-            $entry = Entry::fromArray($row);
-
-            self::insertEntry($entry);
-        }
-
-        return $rows;
-    }
-
-    /**
      * Insert a single entry row into the database.
      *
      * Purpose:
@@ -139,8 +109,7 @@ final class EntryFixture
         $payload = EntryTestData::getOne(title: $title, body: $body, date: $date);
         $payload['id'] = $id;
         
-        $entry   = Entry::fromArray($payload);
-
+        $entry = Entry::fromArray($payload);
         self::insertEntry($entry);
     }
 
