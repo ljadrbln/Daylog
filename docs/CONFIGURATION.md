@@ -81,3 +81,49 @@ echo $DAYLOG_DEV_DATABASE_URL
 ```
 
 These variables are now automatically loaded for all shell sessions.
+
+## Apache VirtualHost (Development)
+
+Create `/etc/apache2/sites-available/daylog.localhost.conf`:
+
+```bash
+Define DAYLOG_HOST daylog.localhost
+Define DAYLOG_ROOT /var/www/html/Daylog/public
+Define DAYLOG_LOG  /var/log/apache2/daylog
+
+<VirtualHost *:80>
+    ServerName  ${DAYLOG_HOST}
+    ServerAlias www.${DAYLOG_HOST} ${DAYLOG_HOST}.test www.${DAYLOG_HOST}.test
+
+    DocumentRoot ${DAYLOG_ROOT}
+
+    # Dev logs
+    ErrorLog  ${DAYLOG_LOG}-error.log
+    CustomLog ${DAYLOG_LOG}-access.log combined
+    LogLevel  warn
+
+    <Directory ${DAYLOG_ROOT}>
+        Options +FollowSymLinks -MultiViews -Indexes
+
+        # .htaccess enabled (dev)
+        AllowOverride All
+
+        Require all granted
+        DirectoryIndex index.php index.html
+    </Directory>
+
+    <FilesMatch "^\.">
+        Require all denied
+    </FilesMatch>
+    <FilesMatch "\.(?:ini|env|log|sql|sh)$">
+        Require all denied
+    </FilesMatch>
+</VirtualHost>
+```
+
+Enable with:
+
+```bash
+sudo a2ensite daylog.localhost.conf
+sudo systemctl reload apache2
+```
