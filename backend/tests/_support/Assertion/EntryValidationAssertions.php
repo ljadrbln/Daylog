@@ -163,4 +163,14 @@ trait EntryValidationAssertions
     {
         $this->expectError('QUERY_TOO_LONG');
     }
+
+    /**
+     * Expect DATE_RANGE_INVALID domain error.
+     *
+     * @return void
+     */
+    protected function expectDateRangeInvalid(): void
+    {
+        $this->expectError('DATE_RANGE_INVALID');
+    }
 }
