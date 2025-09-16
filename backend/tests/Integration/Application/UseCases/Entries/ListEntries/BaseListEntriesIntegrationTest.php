@@ -38,7 +38,7 @@ abstract class BaseListEntriesIntegrationTest extends Unit
     /**
      * Use case instance wired via configuration provider.
      *
-     * @var ListEntries
+     * @var ListEntriesInterface
      */    
     protected ListEntriesInterface $useCase;
 

@@ -3,17 +3,14 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequest;
-use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
 use Daylog\Domain\Models\Entries\Entry;
-use Daylog\Domain\Services\UuidGenerator;
-use Daylog\Domain\Services\DateService;
-use Daylog\Tests\Support\Helper\EntryTestData;
+use Daylog\Tests\Support\Helper\EntriesSeeding;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Scenarios\Entries\UpdateEntryScenario;
 use Daylog\Tests\Support\Assertion\UpdateEntryBodyOnlyAssertions;
 
 /**
- * UC-5 / AC-02 — Happy path (body-only) for UpdateEntry use case.
+ * UC-5 / AC-02 — Happy path (body-only) — Unit.
  *
  * Purpose:
  * Ensure that when only the body is provided with a valid id, the use case
@@ -21,11 +18,10 @@ use Daylog\Tests\Support\Assertion\UpdateEntryBodyOnlyAssertions;
  * and returns a response DTO holding a valid domain Entry snapshot.
  *
  * Mechanics:
- * - Seeds repository with a valid Entry from EntryTestData::getOne().
- * - Builds UpdateEntryRequest with {id, body} only.
+ * - Build deterministic rows via UpdateEntryScenario::ac02BodyOnly();
+ * - Seed a Fake repository through EntriesSeeding::intoFakeRepo();
+ * - Build a body-only request via UpdateEntryTestRequestFactory;
  * - Validator is expected to run exactly once (domain rules tested elsewhere).
- * - Asserts: id validity/preservation, field isolation, ISO timestamps, and
- *   BR-2 monotonicity (updatedAt ≥ createdAt).
  *
  * @covers \Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry::execute
  * @group UC-UpdateEntry
@@ -33,7 +29,7 @@ use Daylog\Tests\Support\Assertion\UpdateEntryBodyOnlyAssertions;
 final class AC02_HappyPath_BodyOnlyTest extends BaseUpdateEntryUnitTest
 {
     use UpdateEntryBodyOnlyAssertions;
-    
+
     /**
      * Validate body-only update behavior and response DTO integrity.
      *
@@ -42,24 +38,25 @@ final class AC02_HappyPath_BodyOnlyTest extends BaseUpdateEntryUnitTest
     public function testHappyPathUpdatesBodyOnlyAndReturnsResponseDto(): void
     {
         // Arrange
-        $data   = EntryTestData::getOne();
-        $expected = Entry::fromArray($data);
+        $dataset = UpdateEntryScenario::ac02BodyOnly();
+        
+        $rows    = $dataset['rows'];
+        $id      = $dataset['targetId'];
+        $newBody = $dataset['newBody'];
 
         $repo = $this->makeRepo();
-        $repo->save($expected);
+        EntriesSeeding::intoFakeRepo($repo, $rows);
 
-        $id      = $expected->getId();
-        $newBody = 'Updated body';
-
-        $validator = $this->makeValidatorOk();
         $request   = UpdateEntryTestRequestFactory::bodyOnly($id, $newBody);
+        $validator = $this->makeValidatorOk();
+        $useCase   = $this->makeUseCase($repo, $validator);
 
         // Act
-        $useCase  = $this->makeUseCase($repo, $validator);
         $response = $useCase->execute($request);
         $actual   = $response->getEntry();
 
         // Assert
+        $expected = Entry::fromArray($rows[0]);
         $this->assertBodyOnlyUpdated($expected, $actual, $newBody);
     }
 }

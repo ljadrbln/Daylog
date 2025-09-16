@@ -4,21 +4,23 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
 use Daylog\Domain\Models\Entries\Entry;
-use Daylog\Tests\Support\Helper\EntryTestData;
+use Daylog\Tests\Support\Helper\EntriesSeeding;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Scenarios\Entries\UpdateEntryScenario;
 use Daylog\Tests\Support\Assertion\UpdateEntryTitleAndBodyAssertions;
 
 /**
- * UC-5 / AC-04 — Partial update.
+ * UC-5 / AC-04 — Partial update (title+body) — Unit.
  *
  * Purpose:
- * Given a valid id and a subset of fields, only provided fields must change
+ * Given a valid id and a subset of fields (title+body), only provided fields must change
  * while others remain intact. The updatedAt timestamp is refreshed per BR-2.
  *
  * Mechanics:
- * - Seed repository with a valid Entry from EntryTestData::getOne().
- * - Build request with {id, title, date} while omitting body entirely.
- * - Validator is expected to run exactly once (domain specifics tested elsewhere).
+ * - Build deterministic rows via UpdateEntryScenario::ac04TitleAndBody();
+ * - Seed a Fake repository through EntriesSeeding::intoFakeRepo();
+ * - Build a request via UpdateEntryTestRequestFactory::titleAndBody();
+ * - Execute the use case and assert via shared trait.
  *
  * @covers \Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry::execute
  * @group UC-UpdateEntry
@@ -35,25 +37,26 @@ final class AC04_PartialUpdateTest extends BaseUpdateEntryUnitTest
     public function testPartialUpdateChangesOnlyProvidedFields(): void
     {
         // Arrange
-        $seedData = EntryTestData::getOne();
-        $expected = Entry::fromArray($seedData);
+        $dataset  = UpdateEntryScenario::ac04TitleAndBody();
+
+        $rows     = $dataset['rows'];
+        $targetId = $dataset['targetId'];
+        $newTitle = $dataset['newTitle'];
+        $newBody  = $dataset['newBody'];
 
         $repo = $this->makeRepo();
-        $repo->save($expected);
+        EntriesSeeding::intoFakeRepo($repo, $rows);
 
-        $id       = $expected->getId();
-        $newTitle = 'Updated title';
-        $newBody  = 'Updated body';
-
-        $request   = UpdateEntryTestRequestFactory::titleAndBody($id, $newTitle, $newBody);
+        $request   = UpdateEntryTestRequestFactory::titleAndBody($targetId, $newTitle, $newBody);
         $validator = $this->makeValidatorOk();
+        $useCase   = $this->makeUseCase($repo, $validator);
 
         // Act
-        $useCase  = $this->makeUseCase($repo, $validator);
         $response = $useCase->execute($request);
         $actual   = $response->getEntry();
 
         // Assert
+        $expected = Entry::fromArray($rows[0]);
         $this->assertTitleAndBodyUpdated($expected, $actual, $newTitle, $newBody);
     }
 }

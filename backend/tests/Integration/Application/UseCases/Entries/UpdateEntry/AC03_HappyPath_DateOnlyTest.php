@@ -5,6 +5,8 @@ namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
 use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Helper\EntriesSeeding;
+use Daylog\Tests\Support\Scenarios\Entries\UpdateEntryScenario;
 use Daylog\Tests\Support\Assertion\UpdateEntryDateOnlyAssertions;
 
 /**
@@ -12,18 +14,17 @@ use Daylog\Tests\Support\Assertion\UpdateEntryDateOnlyAssertions;
  * when updating, then the system persists the new date and refreshes updatedAt.
  *
  * Purpose:
- *   Verify that UpdateEntry changes only the provided 'date' field and refreshes
- *   the 'updatedAt' timestamp while keeping 'createdAt' intact, using real wiring
- *   (Provider + SqlFactory) and a clean DB prepared by the base class.
+ * Verify that UpdateEntry changes only the provided 'date' and refreshes 'updatedAt'
+ * while keeping 'createdAt' intact, using real wiring (Provider + SqlFactory).
  *
  * Mechanics:
- *   - Seed a single entry via EntryFixture and capture its timestamps and fields.
- *   - Build a request containing the same id and a new valid logical date (YYYY-MM-DD).
- *   - Execute the real use case obtained in BaseUpdateEntryIntegrationTest.
- *   - Assert: DB row has the new date, title/body are unchanged, and updatedAt changed.
+ * - Seed a single row via EntriesSeeding::intoDb() from UpdateEntryScenario;
+ * - Build a date-only request for the seeded id;
+ * - Execute the real use case (prepared in the base class);
+ * - Assert via shared trait that only date changes and updatedAt increases.
  *
+ * @covers \Daylog\Configuration\Providers\Entries\UpdateEntryProvider
  * @covers \Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry
- *
  * @group UC-UpdateEntry
  */
 final class AC03_HappyPath_DateOnlyTest extends BaseUpdateEntryIntegrationTest
@@ -38,19 +39,21 @@ final class AC03_HappyPath_DateOnlyTest extends BaseUpdateEntryIntegrationTest
     public function testHappyPathUpdatesDateAndRefreshesUpdatedAt(): void
     {
         // Arrange
-        $data = $this->insertEntryWithPastTimestamps();
-        $expected = Entry::fromArray($data);
+        $dataset = UpdateEntryScenario::ac03DateOnly();
 
-        $id      = $data['id'];
-        $newDate = '1999-12-01';
-
+        $rows    = $dataset['rows'];
+        $id      = $dataset['targetId'];
+        $newDate = $dataset['newDate'];
+        
         $request = UpdateEntryTestRequestFactory::dateOnly($id, $newDate);
+        EntriesSeeding::intoDb($rows);
 
         // Act
         $response = $this->useCase->execute($request);
         $actual   = $response->getEntry();
 
         // Assert
+        $expected = Entry::fromArray($rows[0]);
         $this->assertDateOnlyUpdated($expected, $actual, $newDate);
     }
 }
