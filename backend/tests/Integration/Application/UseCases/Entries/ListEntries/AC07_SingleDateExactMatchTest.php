@@ -38,7 +38,7 @@ final class AC07_SingleDateExactMatchTest extends BaseListEntriesIntegrationTest
     {
         // Arrange
         $dataset = ListEntriesScenario::ac07SingleDateExact();
-        
+    
         $rows        = $dataset['rows'];
         $targetDate  = $dataset['targetDate'];        
         $expectedIds = $dataset['expectedIds'];

@@ -95,20 +95,21 @@ final class EntryTestData
     ): array {
         $items = [];
 
+        $dateBase = new DateTimeImmutable($startDate);
+
         // fix base time to avoid midnight rollover in tests
         $baseTime = sprintf('%s 10:00:00', $startDate);
         $baseTime = new DateTimeImmutable($baseTime);
 
         for ($i = 0; $i < $count; $i++) {
-            $dateBase  = new DateTimeImmutable($startDate);
-            
             $dateShift = sprintf('+%s days', $i * $stepDays);
             $dateShift = $dateBase->modify($dateShift);
             $dateValue = $dateShift->format('Y-m-d');
 
             $timeShift = sprintf('+%s seconds', $i);
             $createdAt = $baseTime->modify($timeShift)->format('Y-m-d H:i:s');
-            $updatedAt = $createdAt;
+            $updatedAt = $createdAt;                  
+            var_dump($createdAt);
 
             $one = self::getOne($title, $body, $dateValue, $createdAt, $updatedAt);
             $items[] = $one;
