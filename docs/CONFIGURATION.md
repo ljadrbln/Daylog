@@ -55,32 +55,76 @@ variables.
 
 ### Setup on Linux
 
-Create a shell script under `/etc/profile.d/`:
+To make environment variables available both in the console and in `phpinfo()`, define them in a single file and connect it to the Apache systemd unit.
+
+### Steps
+
+1. Create a shared environment file:
+
+```bash
+sudo nano /etc/webenv/daylog.env
+```
+
+Example content:
+
+```
+APP_ENV=local
+DAYLOG_DEV_DATABASE_URL=mysql://user:pass@127.0.0.1:3306/daylog_dev
+DAYLOG_TEST_DATABASE_URL=mysql://user:pass@127.0.0.1:3306/daylog_test
+```
+
+2. Load this file for interactive shells:
 
 ```bash
 sudo nano /etc/profile.d/daylog_env.sh
 ```
 
-Add variables:
+Content:
 
-```bash
-export DAYLOG_DEV_DATABASE_URL="postgres://user:pass@127.0.0.1:5432/daylog_dev"
-export DAYLOG_TEST_DATABASE_URL="postgres://user:pass@127.0.0.1:5432/daylog_test"
+```sh
+# Load Daylog env into interactive shells
+file="/etc/webenv/daylog.env"
+[ -r "$file" ] || return 0
+set -a
+. "$file"
+set +a
 ```
 
-Reload your shell session or run:
+If you want to use the variables without restarting your session, run:
 
 ```bash
 source /etc/profile.d/daylog_env.sh
 ```
 
-Verify:
+3. Load the same file for Apache:
 
 ```bash
-echo $DAYLOG_DEV_DATABASE_URL
+sudo systemctl edit apache2
 ```
 
-These variables are now automatically loaded for all shell sessions.
+Insert in the editor:
+
+```
+[Service]
+EnvironmentFile=/etc/webenv/daylog.env
+```
+
+Save and exit, then reload Apache:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart apache2
+```
+
+### Verification
+
+- In the console:
+
+```bash
+printenv | grep DAYLOG
+```
+
+- In PHP (mod_php): open `phpinfo()` and check the **Environment** section or call `getenv("DAYLOG_DEV_DATABASE_URL")`.
 
 ## Apache VirtualHost (Development)
 
