@@ -1,0 +1,20 @@
+<?php
+declare(strict_types=1);
+
+namespace Daylog\Presentation\Controllers\Entries\Page;
+
+/**
+ * Controller for displaying the entries list page (HTML).
+ */
+final class EntriesListPageController
+{
+    /**
+     * Show the entries list page.
+     *
+     * @return void
+     */
+    public function show(): void
+    {
+        echo 'Entries list';
+    }
+}
