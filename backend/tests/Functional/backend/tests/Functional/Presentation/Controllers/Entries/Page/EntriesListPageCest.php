@@ -15,12 +15,9 @@ use Daylog\Tests\FunctionalTester;
  * Mechanics:
  *   - Send a GET request to /entries.
  *   - Expect HTTP 200 response code.
- *   - Content body may be empty at this stage (echo '').
- *
- * Future:
- *   Later assertions may include template rendering, meta tags, and entry list HTML.
  *
  * @covers \Daylog\Presentation\Controllers\Entries\Page\EntriesListPageController::show
+ * @group ui-page
  */
 final class EntriesListPageCest
 {
