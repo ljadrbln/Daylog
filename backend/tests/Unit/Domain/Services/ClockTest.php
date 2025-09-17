@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Daylog\Tests\Unit\Infrastructure\Utils;
+namespace Daylog\Tests\Unit\Domain\Services;
 
 use Codeception\Test\Unit;
 use Daylog\Domain\Services\Clock;
@@ -18,7 +18,7 @@ use DateTimeImmutable;
  *  - Verify UTC offset (+00:00) and zero seconds offset.
  *  - Verify the timestamp is close to system UTC time (≤ 2 seconds).
  *
- * @covers \Daylog\Infrastructure\Utils\Clock
+ * @covers \Daylog\Domain\Services\Clock
  */
 final class ClockTest extends Unit
 {

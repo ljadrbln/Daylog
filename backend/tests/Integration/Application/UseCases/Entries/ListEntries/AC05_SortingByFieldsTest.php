@@ -28,7 +28,7 @@ use Daylog\Tests\Support\Helper\ListEntriesExpectationHelper;
  *
  * @group UC-ListEntries
  */
-final class AC05_SortingByTimestampsTest extends BaseListEntriesIntegrationTest
+final class AC05_SortingByFieldsTest extends BaseListEntriesIntegrationTest
 {
     use ListEntriesExpectationHelper;
     use ListEntriesSortingDataProvider;
