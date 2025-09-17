@@ -78,7 +78,7 @@ abstract class BaseGetEntryFunctionalCest
         $format = '%s/%s';
         $url = sprintf($format, $base, $id);
 
-        $I->sendGET($url);
+        $I->sendGet($url);
     }
 
     /**
