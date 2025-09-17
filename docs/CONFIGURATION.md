@@ -68,7 +68,6 @@ sudo nano /etc/webenv/daylog.env
 Example content:
 
 ```
-APP_ENV=local
 DAYLOG_DEV_DATABASE_URL=mysql://user:pass@127.0.0.1:3306/daylog_dev
 DAYLOG_TEST_DATABASE_URL=mysql://user:pass@127.0.0.1:3306/daylog_test
 ```
@@ -170,4 +169,19 @@ Enable with:
 ```bash
 sudo a2ensite daylog.localhost.conf
 sudo systemctl reload apache2
+```
+
+## Local host mapping
+
+Add the following lines to your `/etc/hosts` file:
+
+```bash
+sudo nano /etc/hosts
+```
+
+Example content:
+
+```bash
+127.0.0.1 daylog.localhost www.daylog.localhost
+127.0.0.1 daylog.localhost.test www.daylog.localhost.test
 ```
