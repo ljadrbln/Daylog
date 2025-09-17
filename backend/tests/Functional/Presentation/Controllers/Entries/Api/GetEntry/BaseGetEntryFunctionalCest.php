@@ -6,7 +6,6 @@ namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\GetEntry;
 use Codeception\Util\HttpCode;
 use Daylog\Configuration\Bootstrap\SqlFactory;
 use Daylog\Tests\Support\Fixture\EntryFixture;
-use Daylog\Tests\Support\Scenarios\Entries\GetEntryScenario;
 use Daylog\Tests\Support\Helper\EntriesSeeding;
 use Daylog\Tests\FunctionalTester;
 
