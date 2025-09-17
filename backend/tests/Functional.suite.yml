@@ -1,0 +1,7 @@
+actor: FunctionalTester
+suite_namespace: Daylog\Tests\Functional
+modules:
+    # enable helpers as array
+    enabled:
+        - PhpBrowser:
+            url: http://daylog.localhost.test
