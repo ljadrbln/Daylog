@@ -26,7 +26,7 @@ final class AC02_InvalidIdCest extends BaseGetEntryFunctionalCest
      * @param \FunctionalTester $I
      * @return void
      */
-    public function testInvalidIdFailsWithIdInvalid(\FunctionalTester $I): void
+    public function testInvalidIdFailsWithIdInvalid(FunctionalTester $I): void
     {
         // Arrange
         $this->withJsonHeaders($I);

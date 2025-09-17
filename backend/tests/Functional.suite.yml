@@ -1,7 +1,12 @@
 actor: FunctionalTester
 suite_namespace: Daylog\Tests\Functional
 modules:
-    # enable helpers as array
-    enabled:
-        - PhpBrowser:
-            url: http://daylog.localhost.test
+  enabled:
+    - Asserts
+    - PhpBrowser:
+        url: http://daylog.localhost.test
+        headers:
+          Accept: 'application/json'
+    - REST:
+        depends: PhpBrowser
+        part: Json
