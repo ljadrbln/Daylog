@@ -7,43 +7,43 @@ use Daylog\Presentation\Http\HttpRequest;
 use Daylog\Presentation\Http\ResponseCode;
 use Daylog\Presentation\Views\ResponsePayload;
 use Daylog\Presentation\Controllers\BaseController;
-use Daylog\Presentation\Requests\Entries\GetEntry\GetEntryRequestFactory;
+use Daylog\Presentation\Requests\Entries\DeleteEntry\DeleteEntryRequestFactory;
 
 use Daylog\Application\Exceptions\NotFoundException;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\Exceptions\TransportValidationException;
 
-use Daylog\Configuration\Providers\Entries\GetEntryProvider;
+use Daylog\Configuration\Providers\Entries\DeleteEntryProvider;
 use Throwable;
 
 /**
- * GetEntryController (GET /api/entries/798637ef-9aec-4ad6-8c71-daeaef927c5b
+ * DeleteEntryController (DELETE /api/entries/:id)
  *
  * Purpose:
- * Handle the REST endpoint for fetching a single entry by id (UC-3) without framework coupling.
- * Reads query parameters from superglobals, builds a typed DTO via Presentation factory,
- * resolves UC-3 via Configuration provider, executes it, and emits standardized JSON.
+ * Handle the REST endpoint for deleting a single entry by id (UC-4) without framework coupling.
+ * Reads path/query parameters from superglobals, builds a typed DTO via Presentation factory,
+ * resolves UC-4 via Configuration provider, executes it, and emits standardized JSON.
  *
  * Mechanics:
- * - Extract raw query from superglobals ($_GET);
- * - Build GetEntryRequestInterface using factory (no business validation here);
- * - Resolve GetEntryInterface via GetEntryProvider::useCase();
- * - Execute use case and pass UseCaseResponse to JsonResponder (stubbed here via var_dump).
+ * - Extract raw request params ($_GET/$_POST merged by HttpRequest);
+ * - Build DeleteEntryRequestInterface using factory (transport validation only);
+ * - Resolve DeleteEntryInterface via DeleteEntryProvider::useCase();
+ * - Execute use case and map known exceptions to 400/404/422, unexpected to 500.
  */
-final class GetEntryController extends BaseController
+final class DeleteEntryController extends BaseController
 {
     /**
-     * Show a single entry by id (UC-3).
+     * Delete a single entry by id (UC-4).
      *
      * @return void
      */
-    public function show(): void
+    public function remove(): void
     {
         try {
             $request = HttpRequest::params();
-            $request = GetEntryRequestFactory::fromArray($request);
-            $useCase = GetEntryProvider::useCase();
-            
+            $request = DeleteEntryRequestFactory::fromArray($request);
+            $useCase = DeleteEntryProvider::useCase();
+
             $response = $useCase->execute($request);
 
             $payload = ResponsePayload::success()
@@ -72,5 +72,5 @@ final class GetEntryController extends BaseController
         }
 
         $this->response->setJson($payload);
-    }    
+    }
 }
