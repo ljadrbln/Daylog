@@ -5,6 +5,7 @@ namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\DeleteEnt
 
 use Daylog\Tests\Support\Scenarios\Entries\DeleteEntryScenario;
 use Daylog\Tests\Support\Helper\EntriesSeeding;
+use Daylog\Tests\Support\Fixture\EntryFixture;
 use Daylog\Tests\FunctionalTester;
 
 /**
@@ -54,6 +55,6 @@ final class AC01_HappyPathCest extends BaseDeleteEntryFunctionalCest
         $I->seeResponseContainsJson($expectedId);
 
         // Assert (DB no longer contains entry)
-        $I->dontSeeInDatabase('entries', ['id' => $targetId]);
+        EntryFixture::existsById($targetId);
     }
 }

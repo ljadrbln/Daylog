@@ -173,6 +173,20 @@ final class EntryFixture
     }
 
     /**
+     * Check whether an entry exists by id.
+     *
+     * @param string $id UUID of the entry.
+     * @return bool True if entry exists, false otherwise.
+     */
+    public static function existsById(string $id): bool
+    {
+        $sql = 'SELECT COUNT(*) AS cnt FROM entries WHERE id = ?';
+        $row = self::$db->exec($sql, [$id]);
+
+        return ((int) $row[0]['cnt']) > 0;
+    }
+
+    /**
      * Count rows in the 'entries' table for assertions in integration tests.
      *
      * Purpose:
