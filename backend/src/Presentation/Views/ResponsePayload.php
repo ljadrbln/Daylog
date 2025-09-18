@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Daylog\Presentation\Views;
 
-use Daylog\Application\Constants\ResponseCode;
-
 /**
  * ResponsePayload is a unified container for rendering in View layer.
  *
@@ -22,7 +20,7 @@ final class ResponsePayload
 {
     private bool $success;
     private ?int $status = null;
-    private ?ResponseCode $code = null;
+    private ?string $code = null;
 
     /** @var array<string,mixed>|null */
     private ?array $data = null;
@@ -69,10 +67,10 @@ final class ResponsePayload
     /**
      * Attach semantic response code.
      *
-     * @param ResponseCode $code
+     * @param string $code
      * @return self
      */
-    public function withCode(ResponseCode $code): self
+    public function withCode(string $code): self
     {
         $this->code = $code;
         return $this;

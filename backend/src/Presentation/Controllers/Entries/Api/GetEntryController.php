@@ -3,6 +3,10 @@ declare(strict_types=1);
 
 namespace Daylog\Presentation\Controllers\Entries\Api;
 
+use Daylog\Presentation\Http\HttpRequest;
+use Daylog\Presentation\Http\ResponseCode;
+use Daylog\Presentation\Views\ResponsePayload;
+
 use Daylog\Presentation\Requests\Entries\GetEntry\GetEntryRequestFactory;
 use Daylog\Configuration\Providers\Entries\GetEntryProvider;
 // use Daylog\Presentation\Http\JsonResponder;
@@ -10,7 +14,12 @@ use Daylog\Application\DTO\Entries\GetEntry\GetEntryRequestInterface;
 use Daylog\Application\UseCases\Entries\GetEntry\GetEntryInterface;
 use Daylog\Application\Responses\UseCaseResponseInterface;
 
+
 use Daylog\Presentation\Controllers\BaseController;
+
+use Daylog\Application\Exceptions\DomainValidationException;
+use Daylog\Application\Exceptions\TransportValidationException;
+use Throwable;
 
 /**
  * GetEntryController (GET /api/entries/798637ef-9aec-4ad6-8c71-daeaef927c5b
@@ -33,22 +42,57 @@ final class GetEntryController extends BaseController
      *
      * @return void
      */
+    // public function show(): void
+    // {
+    //     $request = HttpRequest::params();
+
+    //     /** @var GetEntryRequestInterface $request */
+    //     $request = GetEntryRequestFactory::fromArray($request);
+
+    //     /** @var GetEntryInterface $useCase */
+    //     $useCase = GetEntryProvider::useCase();
+
+    //     /** @var UseCaseResponseInterface $response */
+    //     $response = $useCase->execute($request);
+
+    //     // JsonResponder::emit($response);
+    //     $payload = $response->toArray();
+    //     var_dump($payload);
+    //     exit;
+    // }
+
     public function show(): void
     {
-        $query = $_GET;
+        try {
+            $request = HttpRequest::params();
+            $request = GetEntryRequestFactory::fromArray($request);
+            $useCase = GetEntryProvider::useCase();
+            
+            $response = $useCase->execute($request);
 
-        /** @var GetEntryRequestInterface $request */
-        $request = GetEntryRequestFactory::fromArray($query);
+            // UC completed without exceptions → success 200
+            $payload = ResponsePayload::success()
+                ->withStatus(200)
+                ->withData($response->toArray());
 
-        /** @var GetEntryInterface $useCase */
-        $useCase = GetEntryProvider::useCase();
+        } catch (TransportValidationException $e) {
+            $payload = ResponsePayload::failure()
+                ->withStatus(400)
+                ->withCode(ResponseCode::TRANSPORT_INVALID_INPUT)
+                ->withError($e->getMessage());
+        } catch (DomainValidationException $e) {
+            $payload = ResponsePayload::failure()
+                ->withStatus(422)
+                ->withCode($e->getError());
+        } catch (Throwable $e) {
+            $payload = ResponsePayload::failure()
+                ->withStatus(500)
+                ->withCode(ResponseCode::UNEXPECTED_ERROR)
+                ->withError($e->getMessage());
+        }
 
-        /** @var UseCaseResponseInterface $response */
-        $response = $useCase->execute($request);
-
-        // JsonResponder::emit($response);
-        $payload = $response->toArray();
-        var_dump($payload);
+        $result = $payload->toArray();
+        var_dump($result);
         exit;
-    }
+    }    
 }
