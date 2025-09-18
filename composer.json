@@ -42,13 +42,18 @@
       "chown -R $USER:www-data backend/tmp backend/logs",
       "chmod -R 775 backend/tmp backend/logs"
     ],
+    "set-git-commit-template": [
+      "git config commit.template .gitmessage || true"
+    ],    
     "post-install-cmd": [
       "@remove-codeception-banner",
-      "@prepare-writable-dirs"
+      "@prepare-writable-dirs",
+      "@set-git-commit-template"
     ],
     "post-update-cmd": [
       "@remove-codeception-banner",
-      "@prepare-writable-dirs"
+      "@prepare-writable-dirs",
+      "@set-git-commit-template"
     ],
     "stan": "phpstan analyse -c phpstan.neon.dist"
   },
