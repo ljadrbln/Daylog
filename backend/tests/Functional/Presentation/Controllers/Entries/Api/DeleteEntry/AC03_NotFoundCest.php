@@ -1,26 +1,26 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\GetEntry;
+namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\DeleteEntry;
 
-use Daylog\Tests\Support\Scenarios\Entries\GetEntryScenario;
+use Daylog\Tests\Support\Scenarios\Entries\DeleteEntryScenario;
 use Daylog\Tests\FunctionalTester;
 
 /**
- * UC-3 / AC-03 — Not found — Functional.
+ * UC-4 / AC-03 — Not found — Functional.
  *
  * Purpose:
  *   Valid UUID that doesn't exist must yield 404 with ENTRY_NOT_FOUND.
  *
  * Mechanics:
  *   - Use scenario to obtain a valid UUID that is not inserted;
- *   - GET /api/entries/{id};
- *   - Assert 404 contract and ENTRY_NOT_FOUND in errors.
+ *   - DELETE /api/entries/{id};
+ *   - Assert 404 contract and ENTRY_NOT_FOUND code in response.
  *
- * @covers \Daylog\Presentation\Controllers\Entries\Api\GetEntryController::show
- * @group UC-GetEntry
+ * @covers \Daylog\Presentation\Controllers\Entries\Api\DeleteEntryController::delete
+ * @group UC-DeleteEntry
  */
-final class AC03_NotFoundCest extends BaseGetEntryFunctionalCest
+final class AC03_NotFoundCest extends BaseDeleteEntryFunctionalCest
 {
     /**
      * AC-03: Non-existent id → 404 with ENTRY_NOT_FOUND.
@@ -33,11 +33,11 @@ final class AC03_NotFoundCest extends BaseGetEntryFunctionalCest
         // Arrange
         $this->withJsonHeaders($I);
 
-        $dataset  = GetEntryScenario::ac01HappyPath();
+        $dataset  = DeleteEntryScenario::ac01HappyPath();
         $targetId = $dataset['targetId'];
 
         // Act
-        $this->getEntry($I, $targetId);
+        $this->deleteEntry($I, $targetId);
 
         // Assert
         $this->assertNotFoundContract($I);
