@@ -37,11 +37,18 @@
     "remove-codeception-banner": [
       "sed -i \"s/\\. ' https:\\/\\/stand-with-ukraine\\.pp\\.ua'//\" vendor/codeception/codeception/src/Codeception/Command/Run.php"
     ],
+    "prepare-writable-dirs": [
+      "mkdir -p backend/tmp backend/logs",
+      "chown -R $USER:www-data backend/tmp backend/logs",
+      "chmod -R 775 backend/tmp backend/logs"
+    ],
     "post-install-cmd": [
-      "@remove-codeception-banner"
+      "@remove-codeception-banner",
+      "@prepare-writable-dirs"
     ],
     "post-update-cmd": [
-      "@remove-codeception-banner"
+      "@remove-codeception-banner",
+      "@prepare-writable-dirs"
     ],
     "stan": "phpstan analyse -c phpstan.neon.dist"
   },
