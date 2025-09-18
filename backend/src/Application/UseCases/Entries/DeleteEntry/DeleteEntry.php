@@ -10,6 +10,7 @@ use Daylog\Application\DTO\Entries\DeleteEntry\DeleteEntryResponseInterface;
 use Daylog\Application\Validators\Entries\DeleteEntry\DeleteEntryValidatorInterface;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 
+use Daylog\Application\Exceptions\NotFoundException;
 use Daylog\Application\Exceptions\DomainValidationException;
 
 /**
@@ -42,16 +43,19 @@ final class DeleteEntry implements DeleteEntryInterface
     }
 
     /**
-     * Execute UC-4 Delete Entry.
+     * Execute UC-4: Delete Entry.
      *
      * Purpose:
-     * Validate request, ensure entry exists, delete it, and return a response
-     * built from the pre-fetched domain snapshot.
+     * Orchestrates the use case of removing an existing Entry identified by UUID v4.
+     * The request is validated, the Entry is looked up, and if found, it is deleted
+     * from storage. A response DTO is returned with a snapshot of the deleted Entry.
      *
-     * @param DeleteEntryRequestInterface $request
-     * @return DeleteEntryResponseInterface
+     * @param DeleteEntryRequestInterface $request DTO carrying the target entry id.
+     * @return DeleteEntryResponseInterface DTO wrapping the deleted Entry snapshot.
      *
-     * @throws DomainValidationException When entry is not found.
+     * @throws DomainValidationException If the provided id violates UC constraints
+     *                                   (e.g., not a strict UUID v4).
+     * @throws NotFoundException         If no Entry with the given id exists in storage.
      */
     public function execute(DeleteEntryRequestInterface $request): DeleteEntryResponseInterface
     {
@@ -63,7 +67,7 @@ final class DeleteEntry implements DeleteEntryInterface
 
         if (is_null($entry)) {
             $errorCode = 'ENTRY_NOT_FOUND';
-            $exception = new DomainValidationException($errorCode);
+            $exception = new NotFoundException($errorCode);
 
             throw $exception;
         }

@@ -6,7 +6,10 @@ namespace Daylog\Application\UseCases\Entries\UpdateEntry;
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryResponse;
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryResponseInterface;
+
+use Daylog\Application\Exceptions\NotFoundException;
 use Daylog\Application\Exceptions\DomainValidationException;
+
 use Daylog\Application\Normalization\Entries\UpdateEntry\UpdateEntryInputNormalizer;
 use Daylog\Application\Validators\Entries\UpdateEntry\UpdateEntryValidatorInterface;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
@@ -46,12 +49,21 @@ final class UpdateEntry implements UpdateEntryInterface
     ) {}
 
     /**
-     * Execute UC-5 Update Entry.
+     * Execute UC-5: Update Entry.
+     *
+     * Purpose:
+     * Handles partial update of an existing Entry identified by UUID v4.
+     * Validates request parameters, loads the current Entry, applies provided
+     * field changes (title, body, date), refreshes timestamps if modified,
+     * persists the updated Entry, and returns a response DTO.
      *
      * @param UpdateEntryRequestInterface $request Input DTO with id and optional fields.
-     * @return UpdateEntryResponseInterface Response DTO with updated entry and timestamps.
+     * @return UpdateEntryResponseInterface Response DTO with updated entry snapshot.
      *
-     * @throws DomainValidationException When validation fails or entry is not found.
+     * @throws DomainValidationException If input violates business rules
+     *                                   (e.g., TITLE_TOO_LONG, BODY_REQUIRED, DATE_INVALID)
+     *                                   or if no effective changes are detected (NO_CHANGES_APPLIED).
+     * @throws NotFoundException         If no Entry with the given id exists in storage.
      */
     public function execute(UpdateEntryRequestInterface $request): UpdateEntryResponseInterface
     {
@@ -64,7 +76,7 @@ final class UpdateEntry implements UpdateEntryInterface
 
         if (is_null($current)) {
             $errorCode = 'ENTRY_NOT_FOUND';
-            $exception = new DomainValidationException($errorCode);
+            $exception = new NotFoundException($errorCode);
             
             throw $exception;
         }        

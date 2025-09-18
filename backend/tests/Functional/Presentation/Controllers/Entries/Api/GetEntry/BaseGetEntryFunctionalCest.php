@@ -96,7 +96,7 @@ abstract class BaseGetEntryFunctionalCest
         $ok = ['success' => true];
         $I->seeResponseContainsJson($ok);
 
-        $needle = '"errors"';
+        $needle = '"code"';
         $I->dontSeeResponseContains($needle);
     }
 
