@@ -10,6 +10,8 @@ use Daylog\Application\DTO\Entries\GetEntry\GetEntryRequestInterface;
 use Daylog\Application\UseCases\Entries\GetEntry\GetEntryInterface;
 use Daylog\Application\Responses\UseCaseResponseInterface;
 
+use Daylog\Presentation\Controllers\BaseController;
+
 /**
  * GetEntryController (GET /api/entries/798637ef-9aec-4ad6-8c71-daeaef927c5b
  *
@@ -24,7 +26,7 @@ use Daylog\Application\Responses\UseCaseResponseInterface;
  * - Resolve GetEntryInterface via GetEntryProvider::useCase();
  * - Execute use case and pass UseCaseResponse to JsonResponder (stubbed here via var_dump).
  */
-final class GetEntryController
+final class GetEntryController extends BaseController
 {
     /**
      * Show a single entry by id (UC-3).
