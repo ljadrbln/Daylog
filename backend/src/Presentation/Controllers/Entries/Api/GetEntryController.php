@@ -91,8 +91,6 @@ final class GetEntryController extends BaseController
                 ->withError($e->getMessage());
         }
 
-        $result = $payload->toArray();
-        var_dump($result);
-        exit;
+        $this->response->setJson($payload);
     }    
 }

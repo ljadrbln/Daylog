@@ -8,10 +8,10 @@ use Daylog\Application\DTO\Entries\GetEntry\GetEntryRequestInterface;
 use Daylog\Application\DTO\Entries\GetEntry\GetEntryResponse;
 use Daylog\Application\DTO\Entries\GetEntry\GetEntryResponseInterface;
 
+use Daylog\Application\Exceptions\NotFoundException;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\Validators\Entries\GetEntry\GetEntryValidatorInterface;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
-use Daylog\Domain\Models\Entries\Entry;
 
 /**
  * Use Case: GetEntry.
@@ -47,12 +47,19 @@ final class GetEntry implements GetEntryInterface
     }
 
     /**
-     * Execute UC: return Entry by id or raise ENTRY_NOT_FOUND.
+     * Execute UC-3: Get Entry by id.
      *
-     * @param GetEntryRequestInterface $request DTO with target identifier.
-     * @return GetEntryResponseInterface DTO with retrieved domain Entry.
+     * Purpose:
+     * Orchestrates the use case of retrieving a single Entry by its UUID v4.
+     * Validates request against business rules, loads the entity from storage,
+     * and returns a response DTO if found.
      *
-     * @throws DomainValidationException On invalid id or when entry is absent.
+     * @param GetEntryRequestInterface $request DTO carrying the target entry id.
+     * @return GetEntryResponseInterface DTO wrapping the retrieved Entry fields.
+     *
+     * @throws DomainValidationException If the provided id violates UC constraints
+     *                                   (e.g., not a strict UUID v4).
+     * @throws NotFoundException         If no Entry with the given id exists in storage.
      */
     public function execute(GetEntryRequestInterface $request): GetEntryResponseInterface
     {
@@ -64,7 +71,7 @@ final class GetEntry implements GetEntryInterface
 
         if ($entry === null) {
             $error     = 'ENTRY_NOT_FOUND';
-            $exception = new DomainValidationException($error);
+            $exception = new NotFoundException($error);
 
             throw $exception;
         }

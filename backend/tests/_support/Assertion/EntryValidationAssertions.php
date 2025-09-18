@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Support\Assertion;
 
 use Daylog\Application\Exceptions\DomainValidationException;
+use Daylog\Application\Exceptions\NotFoundException;
 use Daylog\Tests\Support\Fakes\FakeEntryRepository;
 
 /**
@@ -37,7 +38,7 @@ trait EntryValidationAssertions
      * @param string $code Expected error code.
      * @return void
      */
-    private function expectError(string $code): void
+    private function expectDomainError(string $code): void
     {
         $class = DomainValidationException::class;
         $this->expectException($class);
@@ -51,7 +52,7 @@ trait EntryValidationAssertions
      */
     protected function expectIdRequired(): void
     {
-        $this->expectError('ID_REQUIRED');
+        $this->expectDomainError('ID_REQUIRED');
     }
 
     /**
@@ -61,17 +62,19 @@ trait EntryValidationAssertions
      */
     protected function expectIdInvalid(): void
     {
-        $this->expectError('ID_INVALID');
+        $this->expectDomainError('ID_INVALID');
     }
 
     /**
-     * Expect ENTRY_NOT_FOUND domain error.
+     * Expect ENTRY_NOT_FOUND (NotFoundException).
      *
      * @return void
      */
     protected function expectEntryNotFound(): void
     {
-        $this->expectError('ENTRY_NOT_FOUND');
+        $class = NotFoundException::class;
+        $this->expectException($class);
+        $this->expectExceptionMessage('ENTRY_NOT_FOUND');
     }
 
     /**
@@ -81,7 +84,7 @@ trait EntryValidationAssertions
      */
     protected function expectNoFieldsToUpdate(): void
     {
-        $this->expectError('NO_FIELDS_TO_UPDATE');
+        $this->expectDomainError('NO_FIELDS_TO_UPDATE');
     }
 
     /**
@@ -91,7 +94,7 @@ trait EntryValidationAssertions
      */
     protected function expectNoChangesApplied(): void
     {
-        $this->expectError('NO_CHANGES_APPLIED');
+        $this->expectDomainError('NO_CHANGES_APPLIED');
     }
 
     /**
@@ -101,7 +104,7 @@ trait EntryValidationAssertions
      */
     protected function expectTitleRequired(): void
     {
-        $this->expectError('TITLE_REQUIRED');
+        $this->expectDomainError('TITLE_REQUIRED');
     }
 
     /**
@@ -111,7 +114,7 @@ trait EntryValidationAssertions
      */
     protected function expectTitleTooLong(): void
     {
-        $this->expectError('TITLE_TOO_LONG');
+        $this->expectDomainError('TITLE_TOO_LONG');
     }
 
     /**
@@ -121,7 +124,7 @@ trait EntryValidationAssertions
      */
     protected function expectBodyRequired(): void
     {
-        $this->expectError('BODY_REQUIRED');
+        $this->expectDomainError('BODY_REQUIRED');
     }
 
     /**
@@ -131,7 +134,7 @@ trait EntryValidationAssertions
      */
     protected function expectBodyTooLong(): void
     {
-        $this->expectError('BODY_TOO_LONG');
+        $this->expectDomainError('BODY_TOO_LONG');
     }
 
     /**
@@ -141,7 +144,7 @@ trait EntryValidationAssertions
      */
     protected function expectDateRequired(): void
     {
-        $this->expectError('DATE_REQUIRED');
+        $this->expectDomainError('DATE_REQUIRED');
     }
 
     /**
@@ -151,7 +154,7 @@ trait EntryValidationAssertions
      */
     protected function expectDateInvalid(): void
     {
-        $this->expectError('DATE_INVALID');
+        $this->expectDomainError('DATE_INVALID');
     }
 
     /**
@@ -161,7 +164,7 @@ trait EntryValidationAssertions
      */
     protected function expectQueryTooLong(): void
     {
-        $this->expectError('QUERY_TOO_LONG');
+        $this->expectDomainError('QUERY_TOO_LONG');
     }
 
     /**
@@ -171,6 +174,6 @@ trait EntryValidationAssertions
      */
     protected function expectDateRangeInvalid(): void
     {
-        $this->expectError('DATE_RANGE_INVALID');
+        $this->expectDomainError('DATE_RANGE_INVALID');
     }
 }
