@@ -147,18 +147,7 @@ abstract class BaseGetEntryFunctionalCest
      */
     protected function assertErrorCode(FunctionalTester $I, string $code): void
     {
-        $errors = ['errors' => [$code]];
-        $I->seeResponseContainsJson($errors);
-    }
-
-    /**
-     * Seed deterministic rows into real DB.
-     *
-     * @param array<int,array<string,mixed>> $rows
-     * @return void
-     */
-    protected function seedIntoDb(array $rows): void
-    {
-        EntriesSeeding::intoDb($rows);
+        $errorCode = ['code' => $code];
+        $I->seeResponseContainsJson($errorCode);
     }
 }

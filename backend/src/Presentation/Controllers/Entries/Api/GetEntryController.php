@@ -17,6 +17,7 @@ use Daylog\Application\Responses\UseCaseResponseInterface;
 
 use Daylog\Presentation\Controllers\BaseController;
 
+use Daylog\Application\Exceptions\NotFoundException;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\Exceptions\TransportValidationException;
 use Throwable;
@@ -70,7 +71,6 @@ final class GetEntryController extends BaseController
             
             $response = $useCase->execute($request);
 
-            // UC completed without exceptions → success 200
             $payload = ResponsePayload::success()
                 ->withStatus(200)
                 ->withData($response->toArray());
@@ -78,17 +78,22 @@ final class GetEntryController extends BaseController
         } catch (TransportValidationException $e) {
             $payload = ResponsePayload::failure()
                 ->withStatus(400)
-                ->withCode(ResponseCode::TRANSPORT_INVALID_INPUT)
-                ->withError($e->getMessage());
+                ->withCode($e->getError());
+
+        } catch (NotFoundException $e) {
+            $payload = ResponsePayload::failure()
+                ->withStatus(404)
+                ->withCode(ResponseCode::ENTRY_NOT_FOUND);
+
         } catch (DomainValidationException $e) {
             $payload = ResponsePayload::failure()
                 ->withStatus(422)
                 ->withCode($e->getError());
+                
         } catch (Throwable $e) {
             $payload = ResponsePayload::failure()
                 ->withStatus(500)
-                ->withCode(ResponseCode::UNEXPECTED_ERROR)
-                ->withError($e->getMessage());
+                ->withCode(ResponseCode::UNEXPECTED_ERROR);
         }
 
         $this->response->setJson($payload);
