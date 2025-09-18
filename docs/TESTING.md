@@ -6,6 +6,9 @@ We use Codeception with **Unit** and **Integration** suites.
 ```bash
 vendor/bin/codecept run Unit
 vendor/bin/codecept run Integration
+vendor/bin/codecept run Functional
+
+add -g UC-GetEntry to run useCase specific tests
 ```
 
 ## DB in integration tests
