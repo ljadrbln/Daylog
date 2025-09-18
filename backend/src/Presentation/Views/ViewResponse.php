@@ -3,78 +3,66 @@ declare(strict_types=1);
 
 namespace Daylog\Presentation\Views;
 
-use Daylog\Application\Responses\UseCaseResponseInterface;
-use InvalidArgumentException;
+use Daylog\Presentation\Views\Renderers\ViewRendererInterface;
+use Daylog\Presentation\Views\Renderers\HtmlView;
+use Daylog\Presentation\Views\Renderers\JsonView;
+use Daylog\Presentation\Views\ResponsePayload;
+
+use RuntimeException;
 
 /**
- * ViewResponse accumulates payloads from controllers and
- * renders them as HTTP responses (HTML or JSON).
- *
- * Purpose:
- * - Provide a single object for controllers to set data into.
- * - Normalize different input types (UseCaseResponse vs. plain array).
- * - Emit consistent output in afterroute().
- *
- * Mechanics:
- * - setJson() accepts UseCaseResponseInterface and stores as array.
- * - setHtml() accepts an array of template data.
- * - render() inspects type and outputs the final string with headers.
+ * ViewResponse accumulates a renderer and a ResponsePayload, then emits a string.
  */
 final class ViewResponse
 {
-    /** @var array{type:string,data:array<string,mixed>}|null */
-    private ?array $payload = null;
+    /** @var ViewRendererInterface|null */
+    private ?ViewRendererInterface $view = null;
+
+    /** @var ResponsePayload|null */
+    private ?ResponsePayload $payload = null;
 
     /**
-     * Accept UseCaseResponse for JSON API responses.
+     * Accept ResponsePayload for JSON API responses and select JSON renderer.
      *
-     * @param UseCaseResponseInterface $response
+     * @param ResponsePayload $response
      * @return void
      */
-    public function setJson(UseCaseResponseInterface $response): void
+    public function setJson(ResponsePayload $response): void
     {
-        $this->payload = [
-            'type' => 'json',
-            'data' => $response->toArray(),
-        ];
+        $this->payload = $response;
+        $this->view    = new JsonView();
     }
 
     /**
-     * Accept array data for HTML page rendering.
+     * Accept ResponsePayload for HTML page rendering and select HTML renderer.
      *
-     * @param array<string,mixed> $data
+     * @param ResponsePayload $response
      * @return void
      */
-    public function setHtml(array $data): void
+    public function setHtml(ResponsePayload $response): void
     {
-        $this->payload = [
-            'type' => 'html',
-            'data' => $data,
-        ];
+        $this->payload = $response;
+        $this->view    = new HtmlView();
     }
 
     /**
-     * Render the final response.
+     * Render final HTTP body using the selected renderer.
      *
      * @return string
      */
     public function render(): string
     {
-        if ($this->payload === null) {
-            throw new InvalidArgumentException('No payload set in ViewResponse.');
+        $view    = $this->view;
+        $payload = $this->payload;
+
+        if ($view === null || $payload === null) {
+            $message = 'ViewResponse is not prepared: renderer or payload is missing.';
+            throw new \RuntimeException($message);
         }
 
-        if ($this->payload['type'] === 'json') {
-            header('Content-Type: application/json');
-            return json_encode($this->payload['data'], JSON_UNESCAPED_UNICODE);
-        }
+        $data   = $this->payload->toArray();
+        $result = $this->view->render($data);
 
-        if ($this->payload['type'] === 'html') {
-            header('Content-Type: text/html; charset=utf-8');
-            // TODO: integrate with real template engine.
-            return '<pre>' . htmlspecialchars(print_r($this->payload['data'], true)) . '</pre>';
-        }
-
-        throw new InvalidArgumentException("Unsupported response type: {$this->payload['type']}");
+        return $result;
     }
 }
