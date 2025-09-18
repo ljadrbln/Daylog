@@ -44,16 +44,21 @@
     ],
     "set-git-commit-template": [
       "git config commit.template .gitmessage || true"
+    ],
+    "db-setup": [
+      "bash backend/scripts/init-db.sh"
     ],    
     "post-install-cmd": [
       "@remove-codeception-banner",
       "@prepare-writable-dirs",
-      "@set-git-commit-template"
+      "@set-git-commit-template",
+      "@db-setup"
     ],
     "post-update-cmd": [
       "@remove-codeception-banner",
       "@prepare-writable-dirs",
-      "@set-git-commit-template"
+      "@set-git-commit-template",
+      "@db-setup"
     ],
     "stan": "phpstan analyse -c phpstan.neon.dist"
   },
