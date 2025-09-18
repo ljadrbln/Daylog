@@ -19,19 +19,22 @@ final class HtmlView extends BaseView
     /**
      * Render response data into an HTML template.
      *
-     * @param array<string,mixed> $data
+     * @param array<string,mixed> $payload
      * @return string
      */
-    public function render(array $data): string
+    public function render(array $payload): string
     {
-        $this->setHeaders($data);
+        $this->setHeaders($payload);
 
-        $template = $data['template'] ?? 'templates/layout.html';
-        $vars     = $data['vars'] ?? [];
+        $data = $payload['data'];
+        
+        $template = $data['template'];
+        $script   = $data['script'];
 
-        Base::instance()->mset($vars);
-        $html = Template::instance()->render($template);
+        //Base::instance()->mset([]);
+        //$html = Template::instance()->render($template);
 
+        $html = sprintf('%s - %s', $template, $script);
         return $html;
     }
 }

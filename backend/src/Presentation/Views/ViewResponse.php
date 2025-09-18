@@ -22,6 +22,17 @@ final class ViewResponse
     private ?ResponsePayload $payload = null;
 
     /**
+     * Check whether both renderer and payload are prepared.
+     *
+     * @return bool
+     */
+    public function isReady(): bool
+    {
+        $ready = ($this->view !== null) && ($this->payload !== null);
+        return $ready;
+    }
+
+    /**
      * Accept ResponsePayload for JSON API responses and select JSON renderer.
      *
      * @param ResponsePayload $response
@@ -52,16 +63,8 @@ final class ViewResponse
      */
     public function render(): string
     {
-        $view    = $this->view;
-        $payload = $this->payload;
-
-        if ($view === null || $payload === null) {
-            $message = 'ViewResponse is not prepared: renderer or payload is missing.';
-            throw new \RuntimeException($message);
-        }
-
-        $data   = $this->payload->toArray();
-        $result = $this->view->render($data);
+        $payload = $this->payload->toArray();
+        $result  = $this->view->render($payload);
 
         return $result;
     }

@@ -12,7 +12,7 @@ namespace Daylog\Presentation\Views\Renderers;
  * for applying headers (e.g., Content-Type, status) and formatting.
  *
  * Mechanics:
- * - Controllers (via ViewResponse) pass a normalized data array.
+ * - Controllers (via ViewResponse) pass a normalized payload array.
  * - Implementations (e.g., HtmlView, JsonView) set headers internally
  *   and return the rendered body.
  */
@@ -23,11 +23,11 @@ interface ViewRendererInterface
      *
      * The implementation SHOULD set all necessary HTTP headers
      * (status code, Content-Type) before producing the body.
-     * Data is expected to be a normalized, presentation-ready array.
+     * Payload is expected to be a normalized, presentation-ready array.
      *
-     * @param array<string,mixed> $data Normalized payload prepared by the controller/ViewResponse.
+     * @param array<string,mixed> $payload Normalized payload prepared by the controller/ViewResponse.
      *
      * @return string Rendered HTTP body (ready to echo).
      */
-    public function render(array $data): string;
+    public function render(array $payload): string;
 }

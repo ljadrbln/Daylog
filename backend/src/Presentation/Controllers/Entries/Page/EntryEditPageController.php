@@ -2,7 +2,6 @@
 declare(strict_types=1);
 
 namespace Daylog\Presentation\Controllers\Entries\Page;
-
 use Daylog\Presentation\Controllers\BaseController;
 use Daylog\Presentation\Views\ResponsePayload;
 
@@ -34,3 +33,5 @@ final class EntryEditPageController extends BaseController
         $this->response->setHtml($payload);
     }
 }
+
+
