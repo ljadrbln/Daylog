@@ -62,7 +62,7 @@ final class AC02_HappyPath_BodyOnlyCest extends BaseUpdateEntryFunctionalCest
         EntriesSeeding::intoDb($rows);
 
         // Act
-        $this->updateEntry($I, $targetId, $payload);
+        $this->updateEntry($I, $payload);
 
         // Assert (HTTP + contract)
         $this->assertOkContract($I);

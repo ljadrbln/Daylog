@@ -62,7 +62,7 @@ final class AC03_HappyPath_DateOnlyCest extends BaseUpdateEntryFunctionalCest
         EntriesSeeding::intoDb($rows);
 
         // Act
-        $this->updateEntry($I, $targetId, $payload);
+        $this->updateEntry($I, $payload);
 
         // Assert (HTTP + contract)
         $this->assertOkContract($I);

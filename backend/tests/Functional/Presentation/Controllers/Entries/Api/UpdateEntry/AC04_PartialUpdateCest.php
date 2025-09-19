@@ -64,7 +64,7 @@ final class AC04_PartialUpdateCest extends BaseUpdateEntryFunctionalCest
         EntriesSeeding::intoDb($rows);
 
         // Act
-        $this->updateEntry($I, $targetId, $payload);
+        $this->updateEntry($I, $payload);
 
         // Assert (HTTP + contract)
         $this->assertOkContract($I);

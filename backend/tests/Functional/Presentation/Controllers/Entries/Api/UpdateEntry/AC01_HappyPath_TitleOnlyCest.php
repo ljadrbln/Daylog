@@ -56,11 +56,10 @@ final class AC01_HappyPath_TitleOnlyCest extends BaseUpdateEntryFunctionalCest
         $newTitle = $dataset['newTitle'];
 
         $payload  = UpdateEntryTestRequestFactory::titleOnlyPayload($targetId, $newTitle);
-
         EntriesSeeding::intoDb($rows);
 
         // Act
-        $this->updateEntry($I, $targetId, $payload);
+        $this->updateEntry($I, $payload);
 
         // Assert (HTTP + contract)
         $this->assertOkContract($I);

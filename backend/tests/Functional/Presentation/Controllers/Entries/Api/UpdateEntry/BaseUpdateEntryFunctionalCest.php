@@ -32,13 +32,18 @@ abstract class BaseUpdateEntryFunctionalCest extends BaseEntryApiFunctionalCest
      *   - Sends JSON payload directly to the API endpoint.
      *   - Delegates HTTP to Codeception's REST module via FunctionalTester.
      *
-     * @param FunctionalTester                                        $I       Codeception functional tester.
-     * @param string                                                  $id      Entry identifier (UUID v4).
-     * @param array{title?:string,body?:string,date?:string}          $payload Transport payload with updated entry data.
+     * @param FunctionalTester $I Codeception functional tester.
+     * @param array{
+     *   id:string, 
+     *   title?:string,
+     *   body?:string,
+     *   date?:string
+     * } $payload                 Transport payload with updated entry data.
      * @return void
      */
-    protected function updateEntry(FunctionalTester $I, string $id, array $payload): void
+    protected function updateEntry(FunctionalTester $I, array $payload): void
     {
+        $id  = $payload['id'];
         $url = '/api/entries/%s';
         $url = sprintf($url, $id);
 
