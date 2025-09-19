@@ -10,6 +10,7 @@ use Daylog\Presentation\Views\ResponsePayload;
 
 use Daylog\Presentation\Requests\Entries\UpdateEntry\UpdateEntryRequestFactory;
 
+use Daylog\Application\Exceptions\NotFoundException;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Application\Exceptions\TransportValidationException;
 
@@ -65,6 +66,11 @@ final class UpdateEntryController extends BaseController
             $payload = ResponsePayload::failure()
                 ->withStatus($code)
                 ->withCode($error);
+
+        } catch (NotFoundException $e) {
+            $payload = ResponsePayload::failure()
+                ->withStatus(404)
+                ->withCode(ResponseCode::ENTRY_NOT_FOUND);
 
         } catch (DomainValidationException $e) {
             $code  = 422;
