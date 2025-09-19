@@ -34,29 +34,15 @@ final class AC02_EmptyTitleCest extends BaseAddEntryFunctionalCest
     public function testEmptyTitleIsRejectedWithTitleRequired(FunctionalTester $I): void
     {
         // Arrange
-        /** @var array{title:string,body:string,date:string} $payload */
         $payload = AddEntryTestRequestFactory::emptyTitlePayload();
 
         // Act
         $this->addEntry($I, $payload);
 
-        // Assert — envelope & code
-        $I->seeResponseIsJson();
+        // Assert
+        $this->assertUnprocessableContract($I);
 
-        // If your project standard uses 422 for validation errors, keep this:
-        $I->seeResponseCodeIs(422);
-        // If you standardize on 400 instead, switch to:
-        // $I->seeResponseCodeIs(400);
-
-        $I->seeResponseContainsJson(['success' => false]);
-
-        // Check error code list contains TITLE_REQUIRED
-        $raw      = $I->grabResponse();
-        $decoded  = json_decode($raw, true);
-
-        $I->assertIsArray($decoded, 'Response must be a JSON object.');
-        $errors = $decoded['errors'] ?? [];
-        $I->assertIsArray($errors, 'Response must contain an errors array.');
-        $I->assertContains('TITLE_REQUIRED', $errors, 'TITLE_REQUIRED must be reported.');
+        $code = 'TITLE_REQUIRED';
+        $this->assertErrorCode($I, $code);
     }
 }
