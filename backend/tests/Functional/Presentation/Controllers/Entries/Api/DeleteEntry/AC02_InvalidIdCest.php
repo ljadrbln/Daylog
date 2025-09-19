@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\DeleteEntry;
 
 use Daylog\Tests\FunctionalTester;
+use Daylog\Tests\Support\Factory\DeleteEntryTestRequestFactory;
 
 /**
  * UC-4 / AC-02 — Invalid id — Functional.
@@ -32,10 +33,10 @@ final class AC02_InvalidIdCest extends BaseDeleteEntryFunctionalCest
         // Arrange
         $this->withJsonHeaders($I);
 
-        $id = 'not-a-uuid';
+        $payload = DeleteEntryTestRequestFactory::invalidIdPayload();
 
         // Act
-        $this->deleteEntry($I, $id);
+        $this->deleteEntry($I, $payload);
 
         // Assert
         $this->assertUnprocessableContract($I);

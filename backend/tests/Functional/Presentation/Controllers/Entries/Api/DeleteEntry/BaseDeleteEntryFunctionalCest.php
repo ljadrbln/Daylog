@@ -20,14 +20,23 @@ use Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\BaseEntryApiFun
 abstract class BaseDeleteEntryFunctionalCest extends BaseEntryApiFunctionalCest
 {
     /**
-     * Send DELETE request to /api/entries/{id}.
+     * Issue a DELETE request to the Entries API.
      *
-     * @param FunctionalTester $I
-     * @param string $id
+     * Purpose:
+     *   Send a canonical DELETE /api/entries/{id} call for UC-4 scenarios from functional tests.
+     *
+     * Mechanics:
+     *   - Accepts a typed array-shape payload with a single 'id' (UUID).
+     *   - Builds the route using a formatted pattern to avoid hardcoded concatenation.
+     *   - Delegates HTTP to Codeception's REST module via FunctionalTester.
+     *
+     * @param FunctionalTester      $I       Codeception functional tester.
+     * @param array{id:string}      $payload Transport payload with the entry UUID (e.g., ['id' => '...']).
      * @return void
      */
-    protected function deleteEntry(FunctionalTester $I, string $id): void
+    protected function deleteEntry(FunctionalTester $I, array $payload): void
     {
+        $id  = $payload['id'];
         $url = '/api/entries/%s';
         $url = sprintf($url, $id);
 

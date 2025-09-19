@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\DeleteEntry;
 
+use Daylog\Tests\Support\Factory\DeleteEntryTestRequestFactory;
 use Daylog\Tests\Support\Scenarios\Entries\DeleteEntryScenario;
 use Daylog\Tests\Support\Helper\EntriesSeeding;
 use Daylog\Tests\Support\Fixture\EntryFixture;
@@ -41,11 +42,12 @@ final class AC01_HappyPathCest extends BaseDeleteEntryFunctionalCest
         $dataset  = DeleteEntryScenario::ac01HappyPath();
         $rows     = $dataset['rows'];
         $targetId = $dataset['targetId'];
+        $payload  = DeleteEntryTestRequestFactory::happyPayload($targetId);
 
         EntriesSeeding::intoDb($rows);
 
         // Act
-        $this->deleteEntry($I, $targetId);
+        $this->deleteEntry($I, $payload);
 
         // Assert (HTTP + contract)
         $this->assertOkContract($I);

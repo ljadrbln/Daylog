@@ -20,10 +20,18 @@ use Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\BaseEntryApiFun
 abstract class BaseGetEntryFunctionalCest extends BaseEntryApiFunctionalCest
 {
     /**
-     * Send GET /api/entries/{id}.
+     * Issue a GET request to the Entries API.
      *
-     * @param FunctionalTester $I
-     * @param array $payload
+     * Purpose:
+     *   Send a canonical GET /api/entries/{id} call for UC-3 scenarios from functional tests.
+     *
+     * Mechanics:
+     *   - Accepts a typed array-shape payload with a single 'id' (UUID).
+     *   - Builds the route using a formatted pattern to avoid hardcoded concatenation.
+     *   - Delegates HTTP to Codeception's REST module via FunctionalTester.
+     *
+     * @param FunctionalTester      $I       Codeception functional tester.
+     * @param array{id:string}      $payload Transport payload with the entry UUID (e.g., ['id' => '...']).
      * @return void
      */
     protected function getEntry(FunctionalTester $I, array $payload): void
