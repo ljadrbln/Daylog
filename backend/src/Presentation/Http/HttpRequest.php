@@ -24,7 +24,7 @@ final class HttpRequest
     public static function get(): array
     {
         /** @var array<string,string|int|float|null> $query */
-        $query  = (array)\Base::instance()->get('GET');
+        $query  = Base::instance()->get('GET');
         $result = $query;
 
         return $result;
@@ -36,7 +36,7 @@ final class HttpRequest
     public static function post(): array
     {
         /** @var array<string,mixed> $post */
-        $post   = (array)\Base::instance()->get('POST');
+        $post   = Base::instance()->get('POST');
         $result = $post;
 
         return $result;
@@ -47,27 +47,17 @@ final class HttpRequest
      */
     public static function body(): array
     {
-        $raw = (string)\Base::instance()->get('BODY');
-
         $data = [];
-        if ($raw !== '') {
-            /** @var mixed $decoded */
+        $raw  = Base::instance()->get('BODY');
+
+        if($raw) {
             $decoded = json_decode($raw, true);
-            if (is_array($decoded)) {
-                /** @var array<string,mixed> $data */
+            if(is_array($decoded)) {
                 $data = $decoded;
             }
         }
 
-        if ($data === []) {
-            /** @var array<string,mixed> $fallback */
-            $fallback = (array)\Base::instance()->get('POST');
-            $data     = $fallback;
-        }
-
-        $result = $data;
-
-        return $result;
+        return $data;
     }
 
     /**
