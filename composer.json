@@ -34,32 +34,25 @@
     }
   },
   "scripts": {
-    "remove-codeception-banner": [
-      "sed -i \"s/\\. ' https:\\/\\/stand-with-ukraine\\.pp\\.ua'//\" vendor/codeception/codeception/src/Codeception/Command/Run.php"
-    ],
-    "prepare-writable-dirs": [
-      "mkdir -p backend/tmp backend/logs",
-      "chown -R $USER:www-data backend/tmp backend/logs",
-      "chmod -R 775 backend/tmp backend/logs"
-    ],
-    "set-git-commit-template": [
-      "git config commit.template .gitmessage || true"
-    ],
-    "db-setup": [
-      "bash backend/scripts/init-db.sh"
-    ],    
+    "prepare-writable-dirs":     "php backend/scripts/prepare-writable-dirs.php",
+    "remove-codeception-banner": "php backend/scripts/remove-codeception-banner.php",
+    "set-git-commit-template":   "php backend/scripts/set-git-commit-template.php",
+    "db-setup":                  "php backend/scripts/db-setup.php",
+    
     "post-install-cmd": [
       "@remove-codeception-banner",
       "@prepare-writable-dirs",
       "@set-git-commit-template",
       "@db-setup"
     ],
+    
     "post-update-cmd": [
       "@remove-codeception-banner",
       "@prepare-writable-dirs",
       "@set-git-commit-template",
       "@db-setup"
     ],
+    
     "stan": "phpstan analyse -c phpstan.neon.dist"
   },
   "minimum-stability": "stable",
