@@ -6,6 +6,7 @@ namespace Daylog\Tests\Support\Helper;
 use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Tests\Support\Fixture\EntryFixture;
+use Daylog\Infrastructure\Utils\TimestampConverter;
 
 /**
  * Seeding helpers for different layers (fake repo vs real DB).
@@ -66,11 +67,13 @@ final class EntriesSeeding
             $patch = [];
             $createdAt = $row['createdAt'] ?? null;
             if($createdAt !== null) {
+                $createdAt = TimestampConverter::isoToSqlUtc($createdAt);
                 $patch['created_at'] = $createdAt;
             }
 
             $updatedAt = $row['updatedAt'] ?? null;
             if($updatedAt !== null) {
+                $updatedAt = TimestampConverter::isoToSqlUtc($updatedAt);
                 $patch['updated_at'] = $updatedAt;
             }
 

@@ -6,7 +6,8 @@ namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\UpdateEnt
 use Daylog\Tests\FunctionalTester;
 use Daylog\Tests\Support\Helper\EntriesSeeding;
 use Daylog\Tests\Support\Scenarios\Entries\UpdateEntryScenario;
-
+use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Domain\Services\UuidGenerator;
 /**
  * AC-01 (happy path — title): Update only the title and refresh updatedAt.
  *
@@ -28,68 +29,72 @@ use Daylog\Tests\Support\Scenarios\Entries\UpdateEntryScenario;
 final class AC01_HappyPath_TitleOnlyCest extends BaseUpdateEntryFunctionalCest
 {
     /**
-     * API accepts title-only update and refreshes updatedAt.
+     * UC-5 / AC-1 — Happy path updates title and refreshes updatedAt.
      *
-     * @param FunctionalTester $I Codeception functional tester.
-     * @return void
+     * Purpose:
+     * Validate that updating only the title:
+     * - preserves id, body, date, createdAt;
+     * - changes title to the provided value;
+     * - strictly increases updatedAt (monotonicity per BR-2).
+     *
+     * Mechanics:
+     * - Seed DB with a known row set (baseline);
+     * - Send PUT with JSON payload (title only);
+     * - Assert HTTP contract (200 + JSON envelope);
+     * - Compare fields and verify updatedAt is strictly greater.
+     *
+     * @covers \Daylog\Presentation\Controllers\Entries\Api\UpdateEntry\UpdateEntryController
      */
     public function testHappyPathUpdatesTitleAndRefreshesUpdatedAt(FunctionalTester $I): void
     {
         // Arrange — seed DB and prepare request
+        $this->withJsonHeaders($I);
+
         $dataset  = UpdateEntryScenario::ac01TitleOnly();
         $rows     = $dataset['rows'];
         $targetId = $dataset['targetId'];
         $newTitle = $dataset['newTitle'];
 
+        $payload  = UpdateEntryTestRequestFactory::titleOnlyPayload($targetId, $newTitle);
+
         EntriesSeeding::intoDb($rows);
 
-        $payload = ['title' => $newTitle];
-
-        // Act — call API
+        // Act
         $this->updateEntry($I, $targetId, $payload);
 
-        // Assert — 200 OK and success envelope
-        $I->seeResponseCodeIs(200);
-        $I->seeResponseIsJson();
+        // Assert (HTTP + contract)
+        $this->assertOkContract($I);
 
-        $successEnvelope = ['success' => true];
-        $I->seeResponseContainsJson($successEnvelope);
+        // Assert (response contains a valid UUID id and expected fields)
+        $raw     = $I->grabResponse();
+        $decoded = json_decode($raw, true);
 
-        // Decode response for field-level assertions
-        $rawResponse = $I->grabResponse();
-        $decoded     = json_decode($rawResponse, true);
-
-        $data   = $decoded['data'] ?? [];
-        $entry  = $data['entry'] ?? [];
-
-        // Baseline (pre-update) values
+        /** @var array{id: string, title: string, body: string, date: string, createdAt: string, updatedAt: string} $after */
+        $after  = $decoded['data'];
         $before = $rows[0];
 
-        // Guard: ensure shape contains expected keys
-        $requiredKeys = ['id', 'title', 'body', 'date', 'createdAt', 'updatedAt'];
-        foreach ($requiredKeys as $key) {
-            $message = sprintf('Response entry must contain key "%s"', $key);
-            $I->assertArrayHasKey($key, $entry, $message);
-        }
+        $returnedId  = $after['id'];
+        $isValidUuid = UuidGenerator::isValid($returnedId);
+
+        $I->assertTrue($isValidUuid);
+        $I->assertSame($targetId, $returnedId);
 
         // Field equality / inequality checks
-        $message = 'Response id must match the target id';
-        $I->assertSame($targetId, $entry['id'], $message);
+        $I->assertSame($before['id'],        $after['id']);
+        $I->assertSame($payload['title'],    $after['title']);
+        $I->assertSame($before['body'],      $after['body']);
+        $I->assertSame($before['date'],      $after['date']);
+        $I->assertSame($before['createdAt'], $after['createdAt']);
 
-        $message = 'Title must be updated to the new value';
-        $I->assertSame($newTitle, $entry['title'], $message);
+        // updatedAt must be strictly greater than before (ISO-8601 string compare is valid)
+        /** @var string $afterUpdatedAt */
+        $afterUpdatedAt  = $after['updatedAt'];
 
-        $message = 'Body must remain unchanged when only title is updated';
-        $I->assertSame($before['body'], $entry['body'], $message);
+        /** @var string $beforeUpdatedAt */
+        $beforeUpdatedAt = $before['updatedAt'];
 
-        $message = 'Date must remain unchanged when only title is updated';
-        $I->assertSame($before['date'], $entry['date'], $message);
-
-        $message = 'createdAt must remain unchanged after update';
-        $I->assertSame($before['createdAt'], $entry['createdAt'], $message);
-
-        // updatedAt must be strictly greater than before (ISO-8601 lexicographic compare is valid)
-        $message = 'updatedAt must be strictly greater than the previous value';
-        $I->assertTrue($entry['updatedAt'] > $before['updatedAt'], $message);
+        $isStrictlyGreater = strcmp($afterUpdatedAt, $beforeUpdatedAt) > 0;
+        $I->assertTrue($isStrictlyGreater);
     }
+
 }
