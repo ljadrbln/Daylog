@@ -63,7 +63,7 @@ final class ViewResponse
      */
     public function render(): string
     {
-        $payload = $this->payload->toArray();
+        $payload = $this->payload->toArray();        
         $result  = $this->view->render($payload);
 
         return $result;

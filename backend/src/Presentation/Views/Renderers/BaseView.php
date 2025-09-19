@@ -37,9 +37,7 @@ abstract class BaseView implements ViewRendererInterface
         http_response_code($status);
 
         $contentType = $this->getDefaultContentType();
-        if ($contentType !== null) {
-            header("Content-Type: {$contentType}");
-        }
+        header("Content-Type: {$contentType}");
     }
 
     /**
