@@ -107,7 +107,10 @@ final class EntryTestData
             $dateValue = $dateShift->format('Y-m-d');
 
             $timeShift = sprintf('+%s seconds', $i);
-            $createdAt = $baseTime->modify($timeShift)->format('Y-m-d H:i:s');
+            $createdAt = $baseTime
+                ->modify($timeShift)
+                ->format('Y-m-d\TH:i:s+00:00');
+
             $updatedAt = $createdAt;
 
             $one = self::getOne($title, $body, $dateValue, $createdAt, $updatedAt);

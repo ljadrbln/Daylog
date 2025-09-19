@@ -49,7 +49,7 @@ final class AddEntryController extends BaseController
 
             $code    = 200;
             $data    = $response->toArray();
-            
+
             $payload = ResponsePayload::success()
                 ->withStatus($code)
                 ->withData($data);

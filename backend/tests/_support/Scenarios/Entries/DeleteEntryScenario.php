@@ -35,7 +35,7 @@ final class DeleteEntryScenario
      */
     public static function ac01HappyPath(): array
     {
-        $rows = EntryTestData::getMany(1, 1);
+        $rows = EntryTestData::getMany(1, 0);
         $targetId = $rows[0]['id'];
 
         $dataset = [

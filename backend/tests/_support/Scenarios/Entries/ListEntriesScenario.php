@@ -194,8 +194,8 @@ final class ListEntriesScenario
             $createdAt = $baseCreated->modify($shiftHour);
             $updatedAt = $baseUpdated->modify($shiftHour);
 
-            $rows[$i]['createdAt'] = $createdAt->format('Y-m-d H:i:s');
-            $rows[$i]['updatedAt'] = $updatedAt->format('Y-m-d H:i:s');
+            $rows[$i]['createdAt'] = $createdAt->format('Y-m-d\TH:i:s+00:00');
+            $rows[$i]['updatedAt'] = $updatedAt->format('Y-m-d\TH:i:s+00:00');
         }
 
         $dataset = [
@@ -274,8 +274,8 @@ final class ListEntriesScenario
             $shiftHour = sprintf('+%s hours', $i * $stepHours);
             $createdAt = $baseCreated->modify($shiftHour);
 
-            $rows[$i]['createdAt'] = $createdAt->format('Y-m-d H:i:s');
-            $rows[$i]['updatedAt'] = $baseUpdated->format('Y-m-d H:i:s');
+            $rows[$i]['createdAt'] = $createdAt->format('Y-m-d\TH:i:s+00:00');
+            $rows[$i]['updatedAt'] = $baseUpdated->format('Y-m-d\TH:i:s+00:00');
         }
 
         $id0 = $rows[0]['id'];
