@@ -88,7 +88,7 @@ final class UpdateEntry implements UpdateEntryInterface
         if($current->equals($entry)) {
             $errorCode = 'NO_CHANGES_APPLIED';
             $exception = new DomainValidationException($errorCode);
-            
+
             throw $exception;            
         }
 
