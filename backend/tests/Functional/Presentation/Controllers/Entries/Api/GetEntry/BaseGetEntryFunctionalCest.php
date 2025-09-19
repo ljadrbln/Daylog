@@ -23,11 +23,12 @@ abstract class BaseGetEntryFunctionalCest extends BaseEntryApiFunctionalCest
      * Send GET /api/entries/{id}.
      *
      * @param FunctionalTester $I
-     * @param string $id
+     * @param array $payload
      * @return void
      */
-    protected function getEntry(FunctionalTester $I, string $id): void
+    protected function getEntry(FunctionalTester $I, array $payload): void
     {
+        $id  = $payload['id'];
         $url = '/api/entries/%s';
         $url = sprintf($url, $id);
 

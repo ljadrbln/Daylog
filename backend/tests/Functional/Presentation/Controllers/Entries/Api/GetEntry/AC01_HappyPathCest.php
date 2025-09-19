@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\GetEntry;
-
+use Daylog\Tests\Support\Factory\GetEntryTestRequestFactory;
 use Daylog\Tests\Support\Scenarios\Entries\GetEntryScenario;
 use Daylog\Tests\Support\Helper\EntriesSeeding;
 use Daylog\Tests\FunctionalTester;
@@ -38,11 +38,12 @@ final class AC01_HappyPathCest extends BaseGetEntryFunctionalCest
         $dataset  = GetEntryScenario::ac01HappyPath();
         $rows     = $dataset['rows'];
         $targetId = $dataset['targetId'];
+        $payload  = GetEntryTestRequestFactory::happyPayload($targetId);
 
         EntriesSeeding::intoDb($rows);
 
-        // Act
-        $this->getEntry($I, $targetId);
+        // Act        
+        $this->getEntry($I, $payload);
 
         // Assert (HTTP + contract)
         $this->assertOkContract($I);

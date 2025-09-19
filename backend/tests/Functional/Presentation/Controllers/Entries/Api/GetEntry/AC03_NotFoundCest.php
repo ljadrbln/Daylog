@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\GetEntry;
 
 use Daylog\Tests\Support\Scenarios\Entries\GetEntryScenario;
+use Daylog\Tests\Support\Factory\GetEntryTestRequestFactory;
+use Daylog\Tests\Support\Helper\EntriesSeeding;
 use Daylog\Tests\FunctionalTester;
 
 /**
@@ -33,11 +35,14 @@ final class AC03_NotFoundCest extends BaseGetEntryFunctionalCest
         // Arrange
         $this->withJsonHeaders($I);
 
-        $dataset  = GetEntryScenario::ac01HappyPath();
-        $targetId = $dataset['targetId'];
+        $dataset = GetEntryScenario::ac01HappyPath();
+        $rows    = $dataset['rows'];
+
+        EntriesSeeding::intoDb($rows);
+        $payload = GetEntryTestRequestFactory::notFoundPayload();
 
         // Act
-        $this->getEntry($I, $targetId);
+        $this->getEntry($I, $payload);
 
         // Assert
         $this->assertNotFoundContract($I);
