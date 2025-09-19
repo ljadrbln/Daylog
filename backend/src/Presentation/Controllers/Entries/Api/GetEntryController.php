@@ -46,9 +46,12 @@ final class GetEntryController extends BaseController
             
             $response = $useCase->execute($request);
 
+            $code    = 200;
+            $data    = $response->toArray();
+
             $payload = ResponsePayload::success()
-                ->withStatus(200)
-                ->withData($response->toArray());
+                ->withStatus($code)
+                ->withData($data);
 
         } catch (TransportValidationException $e) {
             $payload = ResponsePayload::failure()

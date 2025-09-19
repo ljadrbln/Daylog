@@ -46,29 +46,44 @@ final class DeleteEntryController extends BaseController
 
             $response = $useCase->execute($request);
 
+            $code    = 200;
+            $data    = $response->toArray();
+
             $payload = ResponsePayload::success()
-                ->withStatus(200)
-                ->withData($response->toArray());
+                ->withStatus($code)
+                ->withData($data);
 
         } catch (TransportValidationException $e) {
+            $code    = 400;
+            $error   = $e->getError();
+
             $payload = ResponsePayload::failure()
-                ->withStatus(400)
-                ->withCode($e->getError());
+                ->withStatus($code)
+                ->withCode($error);
 
         } catch (NotFoundException $e) {
+            $code    = 404;
+            $error   = ResponseCode::ENTRY_NOT_FOUND;
+
             $payload = ResponsePayload::failure()
                 ->withStatus(404)
-                ->withCode(ResponseCode::ENTRY_NOT_FOUND);
+                ->withCode($error);
 
         } catch (DomainValidationException $e) {
+            $code    = 422;
+            $error   = $e->getError();
+
             $payload = ResponsePayload::failure()
-                ->withStatus(422)
-                ->withCode($e->getError());
+                ->withStatus($code)
+                ->withCode($error);
 
         } catch (Throwable $e) {
+            $code    = 500;
+            $error   = ResponseCode::UNEXPECTED_ERROR;
+
             $payload = ResponsePayload::failure()
-                ->withStatus(500)
-                ->withCode(ResponseCode::UNEXPECTED_ERROR);
+                ->withStatus($code)
+                ->withCode($error);
         }
 
         $this->response->setJson($payload);
