@@ -6,6 +6,7 @@ Start here to navigate the project documentation.
 - [Project Charter](PROJECT_CHARTER.md)
 - [Requirements (Overview)](REQUIREMENTS.md)
 - [Global Business Rules](BUSINESS_RULES.md)
+- [Install & Setup](INSTALL.md)
 
 ## Use Cases
 - [Use Cases Index](USE_CASES.md)
