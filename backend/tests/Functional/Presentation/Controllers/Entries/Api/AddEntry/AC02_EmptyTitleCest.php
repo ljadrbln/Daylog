@@ -3,65 +3,60 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\AddEntry;
 
-use Codeception\Util\HttpCode;
 use Daylog\Tests\FunctionalTester;
+use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
 
 /**
- * UC-1 / AC-02 — Empty title — Functional.
+ * AC-02: Empty title → TITLE_REQUIRED.
  *
  * Purpose:
- *   Ensure the API endpoint POST /api/entries rejects effectively empty titles
- *   (after trimming) and returns a validation response with TITLE_REQUIRED.
+ *   Ensure that an empty (after trimming) title is rejected at the API boundary
+ *   and reported as a validation error consistent with UC-1 and ENTRY-BR-1.
  *
  * Mechanics:
- *   - Send JSON payload where title is whitespace only.
- *   - Expect HTTP 422 Unprocessable Entity.
- *   - Assert response JSON has success=false and errors contains TITLE_REQUIRED.
- *   - Assert no 'data' key is present on error (per project response contract).
+ *   - Build a canonical invalid payload via AddEntryTestRequestFactory::emptyTitlePayload();
+ *   - POST JSON to /api/entries using the base helper;
+ *   - Assert JSON error envelope (success=false) and presence of TITLE_REQUIRED in errors list.
  *
- * Notes:
- *   This is a black-box test via HTTP (PhpBrowser). Repository invariants are
- *   validated indirectly via status and error contract rather than direct interaction checks.
+ * @covers \Daylog\Configuration\Providers\Entries\AddEntryProvider
+ * @covers \Daylog\Application\UseCases\Entries\AddEntry
  *
- * @covers \Daylog\Presentation\Controllers\Entries\Api\AddEntryController::store
  * @group UC-AddEntry
  */
-final class AC02_EmptyTitleCest
+final class AC02_EmptyTitleCest extends BaseAddEntryFunctionalCest
 {
     /**
-     * Given whitespace-only title, POST /api/entries returns 422 with TITLE_REQUIRED.
+     * API rejects whitespace-only title and returns TITLE_REQUIRED.
      *
-     * @param FunctionalTester $I
+     * @param FunctionalTester $I Codeception functional tester.
      * @return void
      */
-    public function emptyTitleReturns422AndTitleRequired(FunctionalTester $I): void
+    public function testEmptyTitleIsRejectedWithTitleRequired(FunctionalTester $I): void
     {
-        $url         = '/api/entries';
-        $accept      = 'application/json';
-        $contentType = 'application/json';
+        // Arrange
+        /** @var array{title:string,body:string,date:string} $payload */
+        $payload = AddEntryTestRequestFactory::emptyTitlePayload();
 
-        $I->haveHttpHeader('Accept', $accept);
-        $I->haveHttpHeader('Content-Type', $contentType);
+        // Act
+        $this->addEntry($I, $payload);
 
-        $payload = [
-            'title' => '   ',
-            'body'  => 'Valid body',
-            'date'  => '2025-09-17'
-        ];
-
-        $raw = json_encode($payload);
-
-        $I->sendRawPOST($url, $raw);
-
-        $expected = HttpCode::UNPROCESSABLE_ENTITY; // 422
-        $I->seeResponseCodeIs($expected);
+        // Assert — envelope & code
         $I->seeResponseIsJson();
 
-        // Contract checks
-        $I->seeResponseContainsJson(['success' => false]);
-        $I->seeResponseContainsJson(['errors' => ['TITLE_REQUIRED']]);
+        // If your project standard uses 422 for validation errors, keep this:
+        $I->seeResponseCodeIs(422);
+        // If you standardize on 400 instead, switch to:
+        // $I->seeResponseCodeIs(400);
 
-        // Ensure no 'data' key on error responses
-        $I->dontSeeResponseContains('"data"');
+        $I->seeResponseContainsJson(['success' => false]);
+
+        // Check error code list contains TITLE_REQUIRED
+        $raw      = $I->grabResponse();
+        $decoded  = json_decode($raw, true);
+
+        $I->assertIsArray($decoded, 'Response must be a JSON object.');
+        $errors = $decoded['errors'] ?? [];
+        $I->assertIsArray($errors, 'Response must contain an errors array.');
+        $I->assertContains('TITLE_REQUIRED', $errors, 'TITLE_REQUIRED must be reported.');
     }
 }

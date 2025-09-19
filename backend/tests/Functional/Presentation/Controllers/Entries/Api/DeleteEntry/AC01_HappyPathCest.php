@@ -57,6 +57,7 @@ final class AC01_HappyPathCest extends BaseDeleteEntryFunctionalCest
         $I->seeResponseContainsJson($expectedId);
 
         // Assert (DB no longer contains entry)
-        EntryFixture::existsById($targetId);
+        $exists = EntryFixture::existsById($targetId);
+        $I->assertFalse($exists, 'Entry must be deleted from database.');
     }
 }
