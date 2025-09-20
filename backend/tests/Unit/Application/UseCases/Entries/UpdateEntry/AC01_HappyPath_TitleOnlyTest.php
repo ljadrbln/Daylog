@@ -4,11 +4,8 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
 use Daylog\Domain\Models\Entries\Entry;
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
-use Daylog\Tests\Support\Scenarios\Entries\UpdateEntryScenario;
 use Daylog\Tests\Support\Assertion\UpdateEntryTitleOnlyAssertions;
-
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 /**
  * UC-5 / AC-01 — Happy path (title-only) — Unit.
  *
@@ -37,25 +34,23 @@ final class AC01_HappyPath_TitleOnlyTest extends BaseUpdateEntryUnitTest
     public function testHappyPathUpdatesTitleOnlyAndReturnsResponseDto(): void
     {
         // Arrange
-        $dataset  = UpdateEntryScenario::ac01TitleOnly();
+        $repo    = $this->makeRepo();
+        $dataset = UpdateEntryDataset::ac01TitleOnly();
+        $this->seedFromDataset($repo, $dataset);
 
-        $rows     = $dataset['rows'];
-        $targetId = $dataset['targetId'];
-        $newTitle = $dataset['newTitle'];
-
-        $repo = $this->makeRepo();
-        EntriesSeeding::intoFakeRepo($repo, $rows);
-
-        $request   = UpdateEntryTestRequestFactory::titleOnly($targetId, $newTitle);
         $validator = $this->makeValidatorOk();
         $useCase   = $this->makeUseCase($repo, $validator);
 
         // Act
+        $request  = $dataset['request'];
         $response = $useCase->execute($request);
         $actualEntry = $response->getEntry();
 
         // Assert
-        $expectedEntry = Entry::fromArray($rows[0]);
+        $newTitle = $dataset['payload']['title'];
+
+        $expectedEntry = $dataset['rows'][0];
+        $expectedEntry = Entry::fromArray($expectedEntry);
         $this->assertTitleOnlyUpdated($expectedEntry, $actualEntry, $newTitle);
     }
 }
