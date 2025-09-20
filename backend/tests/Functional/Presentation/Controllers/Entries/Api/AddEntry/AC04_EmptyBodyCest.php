@@ -34,6 +34,7 @@ final class AC04_EmptyBodyCest extends BaseAddEntryFunctionalCest
     public function testEmptyBodyIsRejectedWithBodyRequired(FunctionalTester $I): void
     {
         // Arrange
+        $this->withJsonHeaders($I);
         $payload = AddEntryTestRequestFactory::emptyBodyPayload();
 
         // Act

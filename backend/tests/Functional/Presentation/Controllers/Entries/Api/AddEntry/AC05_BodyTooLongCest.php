@@ -34,6 +34,7 @@ final class AC05_BodyTooLongCest extends BaseAddEntryFunctionalCest
     public function testBodyTooLongIsRejectedWithBodyTooLong(FunctionalTester $I): void
     {
         // Arrange
+        $this->withJsonHeaders($I);
         $payload = AddEntryTestRequestFactory::bodyTooLongPayload();
 
         // Act

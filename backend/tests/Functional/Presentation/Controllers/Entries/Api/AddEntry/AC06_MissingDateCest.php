@@ -34,6 +34,7 @@ final class AC06_MissingDateCest extends BaseAddEntryFunctionalCest
     public function testMissingDateIsRejectedWithDateRequired(FunctionalTester $I): void
     {
         // Arrange
+        $this->withJsonHeaders($I);
         $payload = AddEntryTestRequestFactory::missingDatePayload();
 
         // Act

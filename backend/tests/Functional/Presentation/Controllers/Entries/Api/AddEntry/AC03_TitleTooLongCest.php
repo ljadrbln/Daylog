@@ -34,6 +34,7 @@ final class AC03_TitleTooLongCest extends BaseAddEntryFunctionalCest
     public function testTitleTooLongIsRejectedWithTitleTooLong(FunctionalTester $I): void
     {
         // Arrange
+        $this->withJsonHeaders($I);
         $payload = AddEntryTestRequestFactory::titleTooLongPayload();
 
         // Act

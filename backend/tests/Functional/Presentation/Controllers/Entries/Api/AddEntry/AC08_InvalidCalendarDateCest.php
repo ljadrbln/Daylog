@@ -34,6 +34,7 @@ final class AC08_InvalidCalendarDateCest extends BaseAddEntryFunctionalCest
     public function testInvalidCalendarDateIsRejectedWithDateInvalid(FunctionalTester $I): void
     {
         // Arrange
+        $this->withJsonHeaders($I);
         $payload = AddEntryTestRequestFactory::invalidCalendarDatePayload();
 
         // Act

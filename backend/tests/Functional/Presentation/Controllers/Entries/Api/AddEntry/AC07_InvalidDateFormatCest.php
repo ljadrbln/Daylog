@@ -34,6 +34,7 @@ final class AC07_InvalidDateFormatCest extends BaseAddEntryFunctionalCest
     public function testInvalidDateFormatIsRejectedWithDateInvalid(FunctionalTester $I): void
     {
         // Arrange
+        $this->withJsonHeaders($I);
         $payload = AddEntryTestRequestFactory::invalidDateFormatPayload();
 
         // Act
