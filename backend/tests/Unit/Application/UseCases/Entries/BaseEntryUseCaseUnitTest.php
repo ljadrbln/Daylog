@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Daylog\Tests\Unit\Entries;
+namespace Daylog\Tests\Unit\Application\UseCases\Entries;
 
 use Codeception\Test\Unit;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
@@ -22,7 +22,7 @@ use Daylog\Tests\Support\Helper\EntriesSeeding;
  * Notes:
  * - Intended to be extended by concrete unit tests for Add/Get/Update/Delete use cases.
  */
-abstract class BaseEntryUnitTest extends Unit
+abstract class BaseEntryUseCaseUnitTest extends Unit
 {
     /**
      * Seed fake repository with rows from a dataset (UC-specific builder).

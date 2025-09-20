@@ -22,7 +22,7 @@ use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
  * @covers \Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry::execute
  * @group UC-UpdateEntry
  */
-final class AC01_HappyPath_TitleOnlyTest extends BaseUpdateEntryUnitTest
+final class AC01_HappyPath_TitleOnlyTest extends BaseEntryUseCaseUnitTest
 {
     use UpdateEntryTitleOnlyAssertions;
 
@@ -44,13 +44,14 @@ final class AC01_HappyPath_TitleOnlyTest extends BaseUpdateEntryUnitTest
         // Act
         $request  = $dataset['request'];
         $response = $useCase->execute($request);
-        $actualEntry = $response->getEntry();
-
+        
         // Assert
         $newTitle = $dataset['payload']['title'];
 
         $expectedEntry = $dataset['rows'][0];
         $expectedEntry = Entry::fromArray($expectedEntry);
+        $actualEntry   = $response->getEntry();
+
         $this->assertTitleOnlyUpdated($expectedEntry, $actualEntry, $newTitle);
     }
 }
