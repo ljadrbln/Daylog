@@ -83,6 +83,19 @@ final class AddEntryTestRequestFactory
     }
 
     /**
+     * Payload with an missing title
+     *
+     * @return array{body:string,date:string}
+     */
+    public static function missingTitlePayload(): array
+    {
+        $payload = self::emptyTitlePayload();
+        unset($payload['title']);
+
+        return $payload;
+    }
+
+    /**
      * DTO with an empty title (after trimming).
      *
      * @return AddEntryRequestInterface
