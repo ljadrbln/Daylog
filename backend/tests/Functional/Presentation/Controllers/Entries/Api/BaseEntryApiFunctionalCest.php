@@ -6,6 +6,7 @@ namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api;
 use Codeception\Util\HttpCode;
 use Daylog\Configuration\Bootstrap\SqlFactory;
 use Daylog\Tests\Support\Fixture\EntryFixture;
+use Daylog\Tests\Support\Helper\EntriesSeeding;
 use Daylog\Tests\FunctionalTester;
 
 /**
@@ -22,6 +23,7 @@ use Daylog\Tests\FunctionalTester;
  * - Offer small HTTP helpers: getEntry(), deleteEntry();
  * - Offer assertion helpers:
  *   • assertOkContract() — 200 + success=true + data present;
+ *   • assertBadRequestContract() — 400 + success=false, no data;
  *   • assertNotFoundContract() — 404 + success=false, no data;
  *   • assertUnprocessableContract() — 422 + success=false, no data;
  *   • assertErrorCode($code) — code equals a specific semantic identifier;
@@ -30,6 +32,7 @@ use Daylog\Tests\FunctionalTester;
  * Notes:
  * Real wiring is used end-to-end (web → controller → use case → repository).
  */
+
 abstract class BaseEntryApiFunctionalCest
 {
     /**
@@ -195,4 +198,27 @@ abstract class BaseEntryApiFunctionalCest
         $needle = '"code"';
         $I->dontSeeResponseContains($needle);
     }
+
+    /**
+     * Seed DB with rows from a dataset (UC-specific builder).
+     *
+     * @param FunctionalTester $I Codeception tester (unused but kept for symmetry).
+     * @param array{
+     *     rows: array<int, array{
+     *         id: string,
+     *         title: string,
+     *         body: string,
+     *         date: string,
+     *         createdAt: string,
+     *         updatedAt: string
+     *     }>
+     * } $dataset Deterministic dataset containing prepared DB rows.
+     *
+     * @return void
+     */
+    protected function seedFromDataset(FunctionalTester $I, array $dataset): void
+    {
+        $rows = $dataset['rows'];
+        EntriesSeeding::intoDb($rows);
+    }    
 }
