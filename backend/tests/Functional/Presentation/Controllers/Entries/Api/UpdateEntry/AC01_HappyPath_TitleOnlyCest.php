@@ -5,7 +5,7 @@ namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\UpdateEnt
 
 use Daylog\Tests\FunctionalTester;
 use Daylog\Tests\Support\Helper\EntriesSeeding;
-use Daylog\Tests\Support\Scenarios\Entries\UpdateEntryScenario;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
 use Daylog\Domain\Services\UuidGenerator;
 /**
@@ -48,18 +48,12 @@ final class AC01_HappyPath_TitleOnlyCest extends BaseUpdateEntryFunctionalCest
     public function testHappyPathUpdatesTitleAndRefreshesUpdatedAt(FunctionalTester $I): void
     {
         // Arrange — seed DB and prepare request
-        $this->withJsonHeaders($I);
-
-        $dataset  = UpdateEntryScenario::ac01TitleOnly();
-        $rows     = $dataset['rows'];
-        $targetId = $dataset['targetId'];
-        $newTitle = $dataset['newTitle'];
-
-        $payload  = UpdateEntryTestRequestFactory::titleOnlyPayload($targetId, $newTitle);
-        EntriesSeeding::intoDb($rows);
+        $dataset = UpdateEntryDataset::ac01TitleOnly();
+        $this->seedFromDataset($I, $dataset);
 
         // Act
-        $this->updateEntry($I, $payload);
+        $this->withJsonHeaders($I);
+        $this->updateEntryFromDataset($I, $dataset);
 
         // Assert (HTTP + contract)
         $this->assertOkContract($I);
@@ -67,11 +61,13 @@ final class AC01_HappyPath_TitleOnlyCest extends BaseUpdateEntryFunctionalCest
         // Assert (response contains a valid UUID id and expected fields)
         $raw     = $I->grabResponse();
         $decoded = json_decode($raw, true);
+        $payload = $dataset['payload'];
 
         /** @var array{id: string, title: string, body: string, date: string, createdAt: string, updatedAt: string} $after */
         $after  = $decoded['data'];
-        $before = $rows[0];
+        $before = $dataset['rows'][0];
 
+        $targetId    = $payload['id'];
         $returnedId  = $after['id'];
         $isValidUuid = UuidGenerator::isValid($returnedId);
 
@@ -95,5 +91,4 @@ final class AC01_HappyPath_TitleOnlyCest extends BaseUpdateEntryFunctionalCest
         $isStrictlyGreater = strcmp($afterUpdatedAt, $beforeUpdatedAt) > 0;
         $I->assertTrue($isStrictlyGreater);
     }
-
 }

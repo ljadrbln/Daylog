@@ -220,5 +220,43 @@ abstract class BaseEntryApiFunctionalCest
     {
         $rows = $dataset['rows'];
         EntriesSeeding::intoDb($rows);
-    }    
+    }   
+    
+    /**
+     * Grab "data" from the standard JSON envelope and narrow static types.
+     *
+     * Purpose:
+     * Centralize JSON decoding + envelope validation,
+     * returning the typed "data" section for further assertions.
+     *
+     * Mechanics:
+     * - Uses JSON_THROW_ON_ERROR;
+     * - Asserts envelope + "data" presence;
+     * - Narrows to the provided @return shape to satisfy PHPStan.
+     *
+     * @param FunctionalTester $I
+     * @return array{id: string, title: string, body: string, date: string, createdAt: string, updatedAt: string}
+     */
+    protected function grabTypedDataEnvelope(FunctionalTester $I): array
+    {
+        $raw = $I->grabResponse();
+        $decoded = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
+
+        $I->assertIsArray($decoded);
+        $I->assertArrayHasKey('data', $decoded);
+
+        /** @var array{
+         *   success: bool,
+         *   status?: int,
+         *   code?: string,
+         *   data: array{id: string, title: string, body: string, date: string, createdAt: string, updatedAt: string}
+         * } $envelope
+         */
+        $envelope = $decoded;
+
+        /** @var array{id: string, title: string, body: string, date: string, createdAt: string, updatedAt: string} $data */
+        $data = $envelope['data'];
+
+        return $data;
+    }
 }

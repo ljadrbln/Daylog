@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\UpdateEntry;
 
+use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
+
 use Daylog\Tests\FunctionalTester;
 use Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\BaseEntryApiFunctionalCest;
 
@@ -20,30 +22,31 @@ use Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\BaseEntryApiFun
 abstract class BaseUpdateEntryFunctionalCest extends BaseEntryApiFunctionalCest
 {
     /**
-     * Issue a PUT request to the Entries API.
+     * Send PUT /api/entries/{id} using dataset contents.
      *
      * Purpose:
-     *   Send a canonical PUT /api/entries/{id} call for UC-5 scenarios from functional tests.
+     * Reuse canonical datasets (rows + payload + request) directly in functional tests.
+     * This wrapper extracts the `payload` from the dataset and issues the HTTP call
+     * against the UpdateEntry API, avoiding duplication of request-building logic.
      *
      * Mechanics:
-     *   - Accepts a typed array-shape payload with fields allowed by UC-5
-     *     (`title?`, `body?`, `date?`).
-     *   - Interpolates the provided entry id into the canonical API URL.
-     *   - Sends JSON payload directly to the API endpoint.
-     *   - Delegates HTTP to Codeception's REST module via FunctionalTester.
+     * - Build URL via entry id from dataset (payload['id']);
+     * - Send JSON payload with standard headers (already set in Arrange);
+     * - Used in AC happy-path and error-path functional tests for UC-5.
      *
-     * @param FunctionalTester $I Codeception functional tester.
+     * @param FunctionalTester $I
      * @param array{
-     *   id:string, 
-     *   title?:string,
-     *   body?:string,
-     *   date?:string
-     * } $payload                 Transport payload with updated entry data.
+     *   rows: array<int,array<string,string>>,
+     *   payload: array{id:string,title?:string,body?:string,date?:string},
+     *   request: UpdateEntryRequestInterface
+     * } $dataset
      * @return void
      */
-    protected function updateEntry(FunctionalTester $I, array $payload): void
+    protected function updateEntryFromDataset(FunctionalTester $I, array $dataset): void
     {
-        $id  = $payload['id'];
+        $payload = $dataset['payload'];
+        $id      = $payload['id'];
+
         $url = '/api/entries/%s';
         $url = sprintf($url, $id);
 
