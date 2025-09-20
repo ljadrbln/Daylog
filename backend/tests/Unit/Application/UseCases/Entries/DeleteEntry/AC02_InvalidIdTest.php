@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\DeleteEntry;
 
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
-use Daylog\Tests\Support\Factory\DeleteEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\DeleteEntryDataset;
 
 /**
  * UC-4 / AC-02 — Invalid id — Unit.
@@ -32,9 +32,11 @@ final class AC02_InvalidIdTest extends BaseDeleteEntryUnitTest
     public function testInvalidIdTriggersValidationError(): void
     {
         // Arrange
+        $dataset   = DeleteEntryDataset::ac02InvalidId();
+        $request   = $dataset['request'];
+        
         $errorCode = 'ID_INVALID';
         $validator = $this->makeValidatorThrows($errorCode);
-        $request   = DeleteEntryTestRequestFactory::invalidId();
         $repo      = $this->makeRepo();
 
         // Expect

@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\DeleteEntry;
 
-use Codeception\Test\Unit;
+use Daylog\Tests\Unit\Application\UseCases\Entries\BaseEntryUseCaseUnitTest;
+
 use Daylog\Application\UseCases\Entries\DeleteEntry\DeleteEntry;
 use Daylog\Application\Validators\Entries\DeleteEntry\DeleteEntryValidatorInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
@@ -21,7 +22,7 @@ use Daylog\Tests\Support\Fakes\FakeEntryRepository;
  * - Uses FakeEntryRepository (in-memory) as persistence surface.
  * - Provides helpers for validator mocks: success or throwing with given error code.
  */
-abstract class BaseDeleteEntryUnitTest extends Unit
+abstract class BaseDeleteEntryUnitTest extends BaseEntryUseCaseUnitTest
 {
     /**
      * Create a fresh fake repository instance.

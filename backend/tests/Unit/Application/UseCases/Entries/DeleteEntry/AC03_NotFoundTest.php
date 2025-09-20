@@ -4,9 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\DeleteEntry;
 
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
-use Daylog\Tests\Support\Factory\DeleteEntryTestRequestFactory;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
-use Daylog\Tests\Support\Scenarios\Entries\DeleteEntryScenario;
+use Daylog\Tests\Support\Datasets\Entries\DeleteEntryDataset;
 
 /**
  * UC-4 / AC-03 — Not found — Unit.
@@ -36,14 +34,11 @@ final class AC03_NotFoundTest extends BaseDeleteEntryUnitTest
     public function testAbsentIdYieldsEntryNotFound(): void
     {
         // Arrange
-        $dataset  = DeleteEntryScenario::ac01HappyPath();
-        $rows     = $dataset['rows'];
+        $dataset   = DeleteEntryDataset::ac03NotFound();
+        $request   = $dataset['request'];
 
         $validator = $this->makeValidatorOk();
-        $request   = DeleteEntryTestRequestFactory::notFound();
-        
         $repo      = $this->makeRepo();
-        EntriesSeeding::intoFakeRepo($repo, $rows);
 
         // Expect
         $this->expectEntryNotFound();

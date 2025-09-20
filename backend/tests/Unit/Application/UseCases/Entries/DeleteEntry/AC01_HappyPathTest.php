@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\DeleteEntry;
 
-use Daylog\Tests\Support\Factory\DeleteEntryTestRequestFactory;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
-use Daylog\Tests\Support\Scenarios\Entries\DeleteEntryScenario;
+use Daylog\Domain\Models\Entries\Entry;
+use Daylog\Tests\Support\Assertion\UpdateEntryTitleOnlyAssertions;
+use Daylog\Tests\Support\Datasets\Entries\DeleteEntryDataset;
 
 /**
  * UC-4 / AC-01 — Happy path — Unit.
@@ -34,26 +34,24 @@ final class AC01_HappyPathTest extends BaseDeleteEntryUnitTest
     public function testHappyPathDeletesEntryAndReturnsResponseDto(): void
     {
         // Arrange
-        $dataset  = DeleteEntryScenario::ac01HappyPath();
-        $rows     = $dataset['rows'];
-        $targetId = $dataset['targetId'];
+        $repo    = $this->makeRepo();
+        $dataset = DeleteEntryDataset::ac01ExistingId();
+        $this->seedFromDataset($repo, $dataset);
 
-        $repo = $this->makeRepo();
-        EntriesSeeding::intoFakeRepo($repo, $rows);
-
-        $request   = DeleteEntryTestRequestFactory::happy($targetId);
         $validator = $this->makeValidatorOk();
         $useCase   = $this->makeUseCase($repo, $validator);
-
+        
         // Act
-        $response = $useCase->execute($request);
+        $request  = $dataset['request'];
+        $response = $useCase->execute($request);        
 
         // Assert
+        $targetId   = $dataset['payload']['id'];
         $foundAfter = $repo->findById($targetId);
         $this->assertNull($foundAfter);
 
         // Assert
-        $entry   = $response->getEntry();
+        $entry    = $response->getEntry();
         $actualId = $entry->getId();
 
         $this->assertSame($targetId, $actualId);
