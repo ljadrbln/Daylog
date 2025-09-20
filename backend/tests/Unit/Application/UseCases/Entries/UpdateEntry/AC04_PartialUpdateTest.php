@@ -4,10 +4,8 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
 use Daylog\Domain\Models\Entries\Entry;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
-use Daylog\Tests\Support\Scenarios\Entries\UpdateEntryScenario;
 use Daylog\Tests\Support\Assertion\UpdateEntryTitleAndBodyAssertions;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 
 /**
  * UC-5 / AC-04 — Partial update (title+body) — Unit.
@@ -37,26 +35,25 @@ final class AC04_PartialUpdateTest extends BaseUpdateEntryUnitTest
     public function testPartialUpdateChangesOnlyProvidedFields(): void
     {
         // Arrange
-        $dataset  = UpdateEntryScenario::ac04TitleAndBody();
+        $repo    = $this->makeRepo();
+        $dataset = UpdateEntryDataset::ac04TitleAndBody();
+        $this->seedFromDataset($repo, $dataset);
 
-        $rows     = $dataset['rows'];
-        $targetId = $dataset['targetId'];
-        $newTitle = $dataset['newTitle'];
-        $newBody  = $dataset['newBody'];
-
-        $repo = $this->makeRepo();
-        EntriesSeeding::intoFakeRepo($repo, $rows);
-
-        $request   = UpdateEntryTestRequestFactory::titleAndBody($targetId, $newTitle, $newBody);
         $validator = $this->makeValidatorOk();
         $useCase   = $this->makeUseCase($repo, $validator);
 
         // Act
+        $request  = $dataset['request'];
         $response = $useCase->execute($request);
-        $actual   = $response->getEntry();
-
+        
         // Assert
-        $expected = Entry::fromArray($rows[0]);
-        $this->assertTitleAndBodyUpdated($expected, $actual, $newTitle, $newBody);
+        $newTitle = $dataset['payload']['title'];
+        $newBody  = $dataset['payload']['body'];
+
+        $expectedEntry = $dataset['rows'][0];
+        $expectedEntry = Entry::fromArray($expectedEntry);
+        $actualEntry   = $response->getEntry();
+
+        $this->assertTitleAndBodyUpdated($expectedEntry, $actualEntry, $newTitle, $newBody);
     }
 }

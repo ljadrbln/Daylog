@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Tests\Unit\Entries\BaseEntryUnitTest;
+use Daylog\Tests\Unit\Application\UseCases\Entries\BaseEntryUseCaseUnitTest;
+
 use Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry;
 use Daylog\Application\Validators\Entries\UpdateEntry\UpdateEntryValidatorInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
@@ -21,7 +22,7 @@ use Daylog\Tests\Support\Fakes\FakeEntryRepository;
  * - Uses FakeEntryRepository (in-memory) for persistence surface.
  * - Provides helpers to create validator mocks with expected behavior.
  */
-abstract class BaseUpdateEntryUnitTest extends BaseEntryUnitTest
+abstract class BaseUpdateEntryUnitTest extends BaseEntryUseCaseUnitTest
 {
     /**
      * Create a fresh fake repository instance.

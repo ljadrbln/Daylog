@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
@@ -33,11 +33,13 @@ final class AC05_MissingIdTest extends BaseUpdateEntryUnitTest
     public function testMissingIdFailsValidationAndRepoUntouched(): void
     {
         // Arrange        
+        $dataset   = UpdateEntryDataset::ac05MissingId();
+        $request   = $dataset['request'];
+
         $errorCode = 'ID_REQUIRED';
         $validator = $this->makeValidatorThrows($errorCode);
-        $request   = UpdateEntryTestRequestFactory::missingId();
         $repo      = $this->makeRepo();
-
+        
         // Expect
         $this->expectIdRequired();
 

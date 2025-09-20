@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
@@ -33,9 +33,11 @@ final class AC10_TitleTooLongTest extends BaseUpdateEntryUnitTest
     public function testTooLongTitleFailsValidationAndRepoUntouched(): void
     {
         // Arrange
+        $dataset   = UpdateEntryDataset::ac06InvalidId();
+        $request   = $dataset['request'];
+
         $errorCode = 'TITLE_TOO_LONG';
         $validator = $this->makeValidatorThrows($errorCode);
-        $request   = UpdateEntryTestRequestFactory::tooLongTitle();
         $repo      = $this->makeRepo();
 
         // Expect

@@ -6,6 +6,7 @@ namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 use Daylog\Domain\Models\Entries\Entry;
 use Daylog\Tests\Support\Assertion\UpdateEntryTitleOnlyAssertions;
 use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
+
 /**
  * UC-5 / AC-01 — Happy path (title-only) — Unit.
  *
@@ -22,7 +23,7 @@ use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
  * @covers \Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry::execute
  * @group UC-UpdateEntry
  */
-final class AC01_HappyPath_TitleOnlyTest extends BaseEntryUseCaseUnitTest
+final class AC01_HappyPath_TitleOnlyTest extends BaseUpdateEntryUnitTest
 {
     use UpdateEntryTitleOnlyAssertions;
 

@@ -4,10 +4,8 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
 use Daylog\Domain\Models\Entries\Entry;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
-use Daylog\Tests\Support\Scenarios\Entries\UpdateEntryScenario;
 use Daylog\Tests\Support\Assertion\UpdateEntryBodyOnlyAssertions;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 
 /**
  * UC-5 / AC-02 — Happy path (body-only) — Unit.
@@ -38,25 +36,24 @@ final class AC02_HappyPath_BodyOnlyTest extends BaseUpdateEntryUnitTest
     public function testHappyPathUpdatesBodyOnlyAndReturnsResponseDto(): void
     {
         // Arrange
-        $dataset = UpdateEntryScenario::ac02BodyOnly();
-        
-        $rows    = $dataset['rows'];
-        $id      = $dataset['targetId'];
-        $newBody = $dataset['newBody'];
+        $repo    = $this->makeRepo();
+        $dataset = UpdateEntryDataset::ac02BodyOnly();
+        $this->seedFromDataset($repo, $dataset);
 
-        $repo = $this->makeRepo();
-        EntriesSeeding::intoFakeRepo($repo, $rows);
-
-        $request   = UpdateEntryTestRequestFactory::bodyOnly($id, $newBody);
         $validator = $this->makeValidatorOk();
         $useCase   = $this->makeUseCase($repo, $validator);
 
         // Act
+        $request  = $dataset['request'];
         $response = $useCase->execute($request);
-        $actual   = $response->getEntry();
-
+        
         // Assert
-        $expected = Entry::fromArray($rows[0]);
-        $this->assertBodyOnlyUpdated($expected, $actual, $newBody);
+        $newBody = $dataset['payload']['body'];
+
+        $expectedEntry = $dataset['rows'][0];
+        $expectedEntry = Entry::fromArray($expectedEntry);
+        $actualEntry   = $response->getEntry();
+
+        $this->assertBodyOnlyUpdated($expectedEntry, $actualEntry, $newBody);
     }
 }

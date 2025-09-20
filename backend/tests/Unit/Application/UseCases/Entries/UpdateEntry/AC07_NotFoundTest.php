@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
@@ -35,8 +35,10 @@ final class AC07_NotFoundTest extends BaseUpdateEntryUnitTest
     public function testValidAbsentUuidTriggersEntryNotFound(): void
     {
         // Arrange
+        $dataset   = UpdateEntryDataset::ac06InvalidId();
+        $request   = $dataset['request'];
+
         $validator = $this->makeValidatorOk();
-        $request   = UpdateEntryTestRequestFactory::notFound();
         $repo      = $this->makeRepo();
 
         // Expect

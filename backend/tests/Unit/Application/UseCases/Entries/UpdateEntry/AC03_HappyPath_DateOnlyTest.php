@@ -4,10 +4,8 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
 use Daylog\Domain\Models\Entries\Entry;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
-use Daylog\Tests\Support\Scenarios\Entries\UpdateEntryScenario;
 use Daylog\Tests\Support\Assertion\UpdateEntryDateOnlyAssertions;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 
 /**
  * UC-5 / AC-03 — Happy path (date-only) — Unit.
@@ -38,25 +36,24 @@ final class AC03_HappyPath_DateOnlyTest extends BaseUpdateEntryUnitTest
     public function testHappyPathUpdatesDateOnlyAndReturnsResponseDto(): void
     {
         // Arrange
-        $dataset = UpdateEntryScenario::ac03DateOnly();
-        $rows    = $dataset['rows'];
-        $id      = $dataset['targetId'];
-        $newDate = $dataset['newDate'];
+        $repo    = $this->makeRepo();
+        $dataset = UpdateEntryDataset::ac03DateOnly();
+        $this->seedFromDataset($repo, $dataset);
 
-        $repo = $this->makeRepo();
-        EntriesSeeding::intoFakeRepo($repo, $rows);
-
-        $request = UpdateEntryTestRequestFactory::dateOnly($id, $newDate);
         $validator = $this->makeValidatorOk();
-
-        $useCase = $this->makeUseCase($repo, $validator);
+        $useCase   = $this->makeUseCase($repo, $validator);
 
         // Act
+        $request  = $dataset['request'];
         $response = $useCase->execute($request);
-        $actual   = $response->getEntry();
-
+        
         // Assert
-        $expected = Entry::fromArray($rows[0]);
-        $this->assertDateOnlyUpdated($expected, $actual, $newDate);
+        $newDate = $dataset['payload']['date'];
+
+        $expectedEntry = $dataset['rows'][0];
+        $expectedEntry = Entry::fromArray($expectedEntry);
+        $actualEntry   = $response->getEntry();
+
+        $this->assertDateOnlyUpdated($expectedEntry, $actualEntry, $newDate);
     }
 }

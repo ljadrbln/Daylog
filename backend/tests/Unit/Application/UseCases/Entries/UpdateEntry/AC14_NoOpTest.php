@@ -4,8 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
 use Daylog\Tests\Support\Helper\EntriesSeeding;
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
-use Daylog\Tests\Support\Scenarios\Entries\UpdateEntryScenario;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
@@ -37,21 +36,19 @@ final class AC14_NoOpTest extends BaseUpdateEntryUnitTest
     public function testNoOpUpdateThrowsAndRepoUntouched(): void
     {
         // Arrange
-        $dataset = UpdateEntryScenario::ac14NoOp();
-        $rows    = $dataset['rows'];
-        $row     = $rows[0];
+        $repo    = $this->makeRepo();
+        $dataset = UpdateEntryDataset::ac14NoOp();
+        $this->seedFromDataset($repo, $dataset);
 
-        $repo = $this->makeRepo();
-        EntriesSeeding::intoFakeRepo($repo, $rows);
-
-        $request   = UpdateEntryTestRequestFactory::noOp($row);
-        $validator = $this->makeValidatorThrows('NO_CHANGES_APPLIED');
+        $errorCode = 'NO_CHANGES_APPLIED';
+        $validator = $this->makeValidatorThrows($errorCode);
+        $useCase   = $this->makeUseCase($repo, $validator);
 
         // Expect
         $this->expectNoChangesApplied();
 
         // Act
-        $useCase = $this->makeUseCase($repo, $validator);
+        $request = $dataset['request'];
         $useCase->execute($request);
 
         // Assert

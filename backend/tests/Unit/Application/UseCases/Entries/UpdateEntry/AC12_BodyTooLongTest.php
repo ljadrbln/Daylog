@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
@@ -33,9 +33,11 @@ final class AC12_BodyTooLongTest extends BaseUpdateEntryUnitTest
     public function testTooLongBodyFailsValidationAndRepoUntouched(): void
     {
         // Arrange
+        $dataset   = UpdateEntryDataset::ac06InvalidId();
+        $request   = $dataset['request'];
+
         $errorCode = 'BODY_TOO_LONG';
         $validator = $this->makeValidatorThrows($errorCode);
-        $request   = UpdateEntryTestRequestFactory::tooLongBody();
         $repo      = $this->makeRepo();
 
         // Expect

@@ -7,27 +7,30 @@ use DateTimeImmutable;
 use Daylog\Domain\Services\Clock;
 use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Domain\Models\Entries\EntryConstraints;
-
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequest;
 use Daylog\Application\DTO\Entries\UpdateEntry\UpdateEntryRequestInterface;
-
 use Daylog\Tests\Support\Helper\EntryTestData;
 
 /**
- * Centralized scenarios for UC-5 UpdateEntry.
+ * Centralized datasets for UC-5 UpdateEntry (AC-01…AC-14).
  *
  * Purpose:
- * Provide deterministic datasets reused in Unit and Integration tests.
- * Each AC method specifies which fields change; time shifting and baseline
- * row generation are encapsulated in a common helper.
+ * Provide deterministic, uniform datasets for Unit / Integration / Functional tests.
+ * Each AC method differs only by the request payload; common scaffolding is DRY’ed
+ * via two helpers: buildBaselineRowWithPastTimestamps() and getDataset().
  *
  * Mechanics:
- * - Shift createdAt/updatedAt into the past to guarantee BR-2 monotonicity;
- * - Build a canonical Entry payload via EntryTestData::getOne();
- * - Each dataset returns:
- *     - `rows`: array with one baseline row,
- *     - `targetId`: id of that row,
- *     - plus new field values (title/body/date) depending on the case.
+ * - Baseline row has createdAt/updatedAt shifted to the past (BR-2 monotonicity guard);
+ * - Each AC builds a small payload array (id/title/body/date as needed);
+ * - getDataset() wraps {rows, payload} and constructs UpdateEntryRequest DTO;
+ * - All ACs return the same shape: { rows, payload, request }.
+ * 
+ * @phpstan-type Row array{
+ *   id:string, title:string, body:string, date:string, createdAt:string, updatedAt:string
+ * }
+ * @phpstan-type Rows array<int, Row>
+ * @phpstan-type PayloadBase array{id:string, title?:string, body?:string, date?:string}
+ 
  */
 final class UpdateEntryDataset
 {
@@ -35,35 +38,23 @@ final class UpdateEntryDataset
      * AC-01 (title-only) happy path dataset.
      *
      * @return array{
-     *   rows: array<int,array{
-     *     id: string,
-     *     title: string,
-     *     body: string,
-     *     date: string,
-     *     createdAt: string,
-     *     updatedAt: string
-     *   }>,
-     *   payload: array{id: string, title: string},
+     *   rows: Rows,
+     *   payload: array{id:string, title:string},
      *   request: UpdateEntryRequestInterface
      * }
      */
     public static function ac01TitleOnly(): array
     {
-        $row  = self::buildBaselineRowWithPastTimestamps();
-        $rows = [$row];
+        $row   = self::buildBaselineRowWithPastTimestamps();
+        $rows  = [$row];
 
+        /** @var array{id: string, title: string} $payload */
         $payload = [
             'id'    => $row['id'],
-            'title' => 'Updated title'
+            'title' => 'Updated title',
         ];
 
-        $request = UpdateEntryRequest::fromArray($payload);
-
-        $dataset = [
-            'rows'    => $rows,
-            'payload' => $payload,
-            'request' => $request,
-        ];
+        $dataset = self::getDataset($rows, $payload);
 
         return $dataset;
     }
@@ -72,35 +63,23 @@ final class UpdateEntryDataset
      * AC-02 (body-only) happy path dataset.
      *
      * @return array{
-     *   rows: array<int,array{
-     *     id: string,
-     *     title: string,
-     *     body: string,
-     *     date: string,
-     *     createdAt: string,
-     *     updatedAt: string
-     *   }>,
-     *   payload: array{id: string, body: string},
+     *   rows: Rows,
+     *   payload: array{id:string,body:string},
      *   request: UpdateEntryRequestInterface
      * }
      */
     public static function ac02BodyOnly(): array
     {
-        $row  = self::buildBaselineRowWithPastTimestamps();
-        $rows = [$row];
+        $row   = self::buildBaselineRowWithPastTimestamps();
+        $rows  = [$row];
 
+        /** @var array{id: string, body: string} $payload */
         $payload = [
             'id'   => $row['id'],
-            'body' => 'Updated body'
+            'body' => 'Updated body',
         ];
 
-        $request = UpdateEntryRequest::fromArray($payload);
-
-        $dataset = [
-            'rows'    => $rows,
-            'payload' => $payload,
-            'request' => $request,
-        ];
+        $dataset = self::getDataset($rows, $payload);
 
         return $dataset;
     }
@@ -109,35 +88,23 @@ final class UpdateEntryDataset
      * AC-03 (date-only) happy path dataset.
      *
      * @return array{
-     *   rows: array<int,array{
-     *     id: string,
-     *     title: string,
-     *     body: string,
-     *     date: string,
-     *     createdAt: string,
-     *     updatedAt: string
-     *   }>,
-     *   payload: array{id: string, date: string},
+     *   rows: Rows,
+     *   payload: array{id:string,date:string},
      *   request: UpdateEntryRequestInterface
      * }
      */
     public static function ac03DateOnly(): array
     {
-        $row  = self::buildBaselineRowWithPastTimestamps();
-        $rows = [$row];
+        $row   = self::buildBaselineRowWithPastTimestamps();
+        $rows  = [$row];
 
+        /** @var array{id: string, date: string} $payload */
         $payload = [
             'id'   => $row['id'],
-            'date' => '1999-12-01'
+            'date' => '1999-12-01',
         ];
 
-        $request = UpdateEntryRequest::fromArray($payload);
-
-        $dataset = [
-            'rows'    => $rows,
-            'payload' => $payload,
-            'request' => $request,
-        ];
+        $dataset = self::getDataset($rows, $payload);
 
         return $dataset;
     }
@@ -146,36 +113,24 @@ final class UpdateEntryDataset
      * AC-04 (partial update: title+body) happy path dataset.
      *
      * @return array{
-     *   rows: array<int,array{
-     *     id: string,
-     *     title: string,
-     *     body: string,
-     *     date: string,
-     *     createdAt: string,
-     *     updatedAt: string
-     *   }>,
-     *   payload: array{id: string, title: string, body: string},
+     *   rows: Rows,
+     *   payload: array{id:string,title:string,body:string},
      *   request: UpdateEntryRequestInterface
      * }
      */
     public static function ac04TitleAndBody(): array
     {
-        $row  = self::buildBaselineRowWithPastTimestamps();
-        $rows = [$row];
+        $row   = self::buildBaselineRowWithPastTimestamps();
+        $rows  = [$row];
 
+        /** @var array{id: string, title: string, body: string} $payload */
         $payload = [
             'id'    => $row['id'],
             'title' => 'Updated title',
-            'body'  => 'Updated body'
+            'body'  => 'Updated body',
         ];
 
-        $request = UpdateEntryRequest::fromArray($payload);
-
-        $dataset = [
-            'rows'    => $rows,
-            'payload' => $payload,
-            'request' => $request,
-        ];
+        $dataset = self::getDataset($rows, $payload);
 
         return $dataset;
     }
@@ -183,42 +138,24 @@ final class UpdateEntryDataset
     /**
      * AC-05 (missing id) dataset.
      *
-     * Purpose:
-     * Validate transport-level failure when "id" is missing/empty.
-     * Used by functional/integration tests to ensure the contract returns
-     * the correct HTTP status and semantic code (expected 422 ID_REQUIRED).
-     *
      * @return array{
-     *   rows: array<int,array{
-     *     id: string,
-     *     title: string,
-     *     body: string,
-     *     date: string,
-     *     createdAt: string,
-     *     updatedAt: string
-     *   }>,
-     *   payload: array{id: string, title: string},
+     *   rows: Rows,
+     *   payload: array{id:string,title:string},
      *   request: UpdateEntryRequestInterface
      * }
      */
     public static function ac05MissingId(): array
     {
-        $row  = self::buildBaselineRowWithPastTimestamps();
-        $rows = [$row];
+        $row   = self::buildBaselineRowWithPastTimestamps();
+        $rows  = [$row];
 
-        // Build invalid payload with missing/empty id
+        /** @var array{id: string, title: string} $payload */
         $payload = [
             'id'    => '',
             'title' => 'Updated title',
         ];
 
-        $request = UpdateEntryRequest::fromArray($payload);
-
-        $dataset = [
-            'rows'    => $rows,
-            'payload' => $payload,
-            'request' => $request,
-        ];
+        $dataset = self::getDataset($rows, $payload);
 
         return $dataset;
     }
@@ -226,87 +163,49 @@ final class UpdateEntryDataset
     /**
      * AC-06 (invalid id) dataset.
      *
-     * Purpose:
-     * Validate transport-level failure when "id" is not a valid UUID v4.
-     * Used by functional/integration tests to ensure the contract returns
-     * the correct HTTP status and semantic code (expected 422 ID_INVALID).
-     *
      * @return array{
-     *   rows: array<int,array{
-     *     id: string,
-     *     title: string,
-     *     body: string,
-     *     date: string,
-     *     createdAt: string,
-     *     updatedAt: string
-     *   }>,
-     *   payload: array{id: string, title: string},
+     *   rows: Rows,
+     *   payload: array{id:string,title:string},
      *   request: UpdateEntryRequestInterface
      * }
      */
     public static function ac06InvalidId(): array
     {
-        $row  = self::buildBaselineRowWithPastTimestamps();
-        $rows = [$row];
+        $row   = self::buildBaselineRowWithPastTimestamps();
+        $rows  = [$row];
 
-        // Build invalid payload with non-UUID id
+        /** @var array{id: string, title: string} $payload */
         $payload = [
             'id'    => 'not-a-uuid',
             'title' => 'Updated title',
         ];
 
-        $request = UpdateEntryRequest::fromArray($payload);
-
-        $dataset = [
-            'rows'    => $rows,
-            'payload' => $payload,
-            'request' => $request,
-        ];
+        $dataset = self::getDataset($rows, $payload);
 
         return $dataset;
     }
 
     /**
-     * AC-07 (not found) dataset.
-     *
-     * Purpose:
-     * Validate behavior when a valid UUID is provided,
-     * but no matching entry exists in storage.
-     * Expected contract: 404 NOT_FOUND with ENTRY_NOT_FOUND code.
+     * AC-07 (not found) dataset — valid UUID that is absent in storage.
      *
      * @return array{
-     *   rows: array<int,array{
-     *     id: string,
-     *     title: string,
-     *     body: string,
-     *     date: string,
-     *     createdAt: string,
-     *     updatedAt: string
-     *   }>,
-     *   payload: array{id: string, title: string},
+     *   rows: Rows,
+     *   payload: array{id:string,title:string},
      *   request: UpdateEntryRequestInterface
      * }
      */
     public static function ac07NotFound(): array
     {
-        // Build dataset with a baseline row but target id that doesn't exist
-        $row  = self::buildBaselineRowWithPastTimestamps();
-        $rows = [$row];
+        $row   = self::buildBaselineRowWithPastTimestamps();
+        $rows  = [$row];
 
-        $missingId = UuidGenerator::generate();
-
+        /** @var array{id: string, title: string} $payload */
         $payload = [
-            'id'    => $missingId,
+            'id'    => UuidGenerator::generate(),
             'title' => 'Updated title',
         ];
 
-        $request = UpdateEntryRequest::fromArray($payload);
-
-        $dataset = [
-            'rows'    => $rows,
-            'payload' => $payload,
-            'request' => $request,
-        ];
+        $dataset = self::getDataset($rows, $payload);
 
         return $dataset;
     }
@@ -314,43 +213,23 @@ final class UpdateEntryDataset
     /**
      * AC-08 (id only, no updatable fields) dataset.
      *
-     * Purpose:
-     * Validate transport-level failure when request contains only an "id"
-     * without any mutable fields (title/body/date).
-     * Expected contract: 422 UNPROCESSABLE_ENTITY with a specific error code
-     * (e.g., NO_FIELDS_TO_UPDATE).
-     *
      * @return array{
-     *   rows: array<int,array{
-     *     id: string,
-     *     title: string,
-     *     body: string,
-     *     date: string,
-     *     createdAt: string,
-     *     updatedAt: string
-     *   }>,
-     *   payload: array{id: string},
+     *   rows: Rows,
+     *   payload: array{id:string},
      *   request: UpdateEntryRequestInterface
      * }
      */
     public static function ac08IdOnly(): array
     {
-        $row  = self::buildBaselineRowWithPastTimestamps();
-        $rows = [$row];
+        $row   = self::buildBaselineRowWithPastTimestamps();
+        $rows  = [$row];
 
-        $entryId = UuidGenerator::generate();
-
+        /** @var array{id: string} $payload */
         $payload = [
-            'id' => $entryId,
+            'id' => UuidGenerator::generate(),
         ];
 
-        $request = UpdateEntryRequest::fromArray($payload);
-
-        $dataset = [
-            'rows'    => $rows,
-            'payload' => $payload,
-            'request' => $request,
-        ];
+        $dataset = self::getDataset($rows, $payload);
 
         return $dataset;
     }
@@ -358,43 +237,24 @@ final class UpdateEntryDataset
     /**
      * AC-09 (empty title after trimming) dataset.
      *
-     * Purpose:
-     * Validate domain-level failure when the provided "title"
-     * becomes empty after trimming whitespace.
-     * Expected contract: 422 UNPROCESSABLE_ENTITY with TITLE_REQUIRED code.
-     *
      * @return array{
-     *   rows: array<int,array{
-     *     id: string,
-     *     title: string,
-     *     body: string,
-     *     date: string,
-     *     createdAt: string,
-     *     updatedAt: string
-     *   }>,
-     *   payload: array{id: string, title: string},
+     *   rows: Rows,
+     *   payload: array{id:string,title:string},
      *   request: UpdateEntryRequestInterface
      * }
      */
     public static function ac09EmptyTitle(): array
     {
-        $row  = self::buildBaselineRowWithPastTimestamps();
-        $rows = [$row];
+        $row   = self::buildBaselineRowWithPastTimestamps();
+        $rows  = [$row];
 
-        $entryId = UuidGenerator::generate();
-
+        /** @var array{id: string, title: string} $payload */
         $payload = [
-            'id'    => $entryId,
-            'title' => '   ', // becomes empty after trim
+            'id'    => UuidGenerator::generate(),
+            'title' => '   ',
         ];
 
-        $request = UpdateEntryRequest::fromArray($payload);
-
-        $dataset = [
-            'rows'    => $rows,
-            'payload' => $payload,
-            'request' => $request,
-        ];
+        $dataset = self::getDataset($rows, $payload);
 
         return $dataset;
     }
@@ -402,45 +262,28 @@ final class UpdateEntryDataset
     /**
      * AC-10 (too long title) dataset.
      *
-     * Purpose:
-     * Validate domain-level failure when the provided "title"
-     * exceeds EntryConstraints::TITLE_MAX length.
-     * Expected contract: 422 UNPROCESSABLE_ENTITY with TITLE_TOO_LONG code.
-     *
      * @return array{
-     *   rows: array<int,array{
-     *     id: string,
-     *     title: string,
-     *     body: string,
-     *     date: string,
-     *     createdAt: string,
-     *     updatedAt: string
-     *   }>,
-     *   payload: array{id: string, title: string},
+     *   rows: Rows,
+     *   payload: array{id:string,title:string},
      *   request: UpdateEntryRequestInterface
      * }
      */
     public static function ac10TooLongTitle(): array
     {
-        $row  = self::buildBaselineRowWithPastTimestamps();
-        $rows = [$row];
+        $row   = self::buildBaselineRowWithPastTimestamps();
+        $rows  = [$row];
 
-        $entryId   = UuidGenerator::generate();
-        $length    = EntryConstraints::TITLE_MAX + 1;
-        $longTitle = str_repeat('A', $length);
+        $id      = UuidGenerator::generate();
+        $length  = EntryConstraints::TITLE_MAX + 1;
+        $title   = str_repeat('A', $length);
 
+        /** @var array{id: string, title: string} $payload */
         $payload = [
-            'id'    => $entryId,
-            'title' => $longTitle,
+            'id'    => $id,
+            'title' => $title,
         ];
 
-        $request = UpdateEntryRequest::fromArray($payload);
-
-        $dataset = [
-            'rows'    => $rows,
-            'payload' => $payload,
-            'request' => $request,
-        ];
+        $dataset = self::getDataset($rows, $payload);
 
         return $dataset;
     }
@@ -448,43 +291,24 @@ final class UpdateEntryDataset
     /**
      * AC-11 (empty body after trimming) dataset.
      *
-     * Purpose:
-     * Validate domain-level failure when the provided "body"
-     * becomes empty after trimming whitespace.
-     * Expected contract: 422 UNPROCESSABLE_ENTITY with BODY_REQUIRED code.
-     *
      * @return array{
-     *   rows: array<int,array{
-     *     id: string,
-     *     title: string,
-     *     body: string,
-     *     date: string,
-     *     createdAt: string,
-     *     updatedAt: string
-     *   }>,
-     *   payload: array{id: string, body: string},
+     *   rows: Rows,
+     *   payload: array{id:string,body:string},
      *   request: UpdateEntryRequestInterface
      * }
      */
     public static function ac11EmptyBody(): array
     {
-        $row  = self::buildBaselineRowWithPastTimestamps();
-        $rows = [$row];
+        $row   = self::buildBaselineRowWithPastTimestamps();
+        $rows  = [$row];
 
-        $entryId = UuidGenerator::generate();
-
+        /** @var array{id: string, body: string} $payload */
         $payload = [
-            'id'   => $entryId,
-            'body' => '   ', // becomes empty after trim
+            'id'   => UuidGenerator::generate(),
+            'body' => '   ',
         ];
 
-        $request = UpdateEntryRequest::fromArray($payload);
-
-        $dataset = [
-            'rows'    => $rows,
-            'payload' => $payload,
-            'request' => $request,
-        ];
+        $dataset = self::getDataset($rows, $payload);
 
         return $dataset;
     }
@@ -492,90 +316,53 @@ final class UpdateEntryDataset
     /**
      * AC-12 (too long body) dataset.
      *
-     * Purpose:
-     * Validate domain-level failure when the provided "body"
-     * exceeds EntryConstraints::BODY_MAX length.
-     * Expected contract: 422 UNPROCESSABLE_ENTITY with BODY_TOO_LONG code.
-     *
      * @return array{
-     *   rows: array<int,array{
-     *     id: string,
-     *     title: string,
-     *     body: string,
-     *     date: string,
-     *     createdAt: string,
-     *     updatedAt: string
-     *   }>,
-     *   payload: array{id: string, body: string},
+     *   rows: Rows,
+     *   payload: array{id:string,body:string},
      *   request: UpdateEntryRequestInterface
      * }
      */
     public static function ac12TooLongBody(): array
     {
-        $row  = self::buildBaselineRowWithPastTimestamps();
-        $rows = [$row];
+        $row   = self::buildBaselineRowWithPastTimestamps();
+        $rows  = [$row];
 
-        $entryId  = UuidGenerator::generate();
-        $length   = EntryConstraints::BODY_MAX + 1;
-        $longBody = str_repeat('A', $length);
+        $id      = UuidGenerator::generate();
+        $length  = EntryConstraints::BODY_MAX + 1;
+        $body    = str_repeat('A', $length);
 
+        /** @var array{id: string, body: string} $payload */
         $payload = [
-            'id'   => $entryId,
-            'body' => $longBody,
+            'id'   => $id,
+            'body' => $body,
         ];
 
-        $request = UpdateEntryRequest::fromArray($payload);
-
-        $dataset = [
-            'rows'    => $rows,
-            'payload' => $payload,
-            'request' => $request,
-        ];
+        $dataset = self::getDataset($rows, $payload);
 
         return $dataset;
     }
 
     /**
-     * AC-13 (invalid date) dataset.
-     *
-     * Purpose:
-     * Validate domain-level failure when the provided "date"
-     * is syntactically correct but semantically invalid
-     * (e.g., impossible calendar date like 2025-02-30).
-     * Expected contract: 422 UNPROCESSABLE_ENTITY with DATE_INVALID code.
+     * AC-13 (invalid date) dataset (e.g., impossible calendar date).
      *
      * @return array{
-     *   rows: array<int,array{
-     *     id: string,
-     *     title: string,
-     *     body: string,
-     *     date: string,
-     *     createdAt: string,
-     *     updatedAt: string
-     *   }>,
-     *   payload: array{id: string, date: string},
+     *   rows: Rows,
+     *   payload: array{id:string,date:string},
      *   request: UpdateEntryRequestInterface
      * }
      */
     public static function ac13InvalidDate(): array
     {
-        $row  = self::buildBaselineRowWithPastTimestamps();
-        $rows = [$row];
+        $row   = self::buildBaselineRowWithPastTimestamps();
+        $rows  = [$row];
 
-        $entryId = UuidGenerator::generate();
-
+        /** @var array{id: string, date: string} $payload */
         $payload = [
-            'id'   => $entryId,
-            'date' => '2025-02-30', // invalid date
+            'id'   => UuidGenerator::generate(),
+            'date' => '2025-02-30',
         ];
 
-        $request = UpdateEntryRequest::fromArray($payload);
-
-        $dataset = [
-            'rows'    => $rows,
-            'payload' => $payload,
-            'request' => $request,
-        ];
+        $dataset = self::getDataset($rows, $payload);
 
         return $dataset;
     }
@@ -583,48 +370,30 @@ final class UpdateEntryDataset
     /**
      * AC-14 (no-op) dataset: request equals stored values.
      *
-     * Purpose:
-     * Provide a single-row dataset where the incoming request repeats the stored
-     * values (id/title/body/date). The use case must detect no effective changes
-     * and raise NO_CHANGES_APPLIED without touching updatedAt.
-     *
-     * Mechanics:
-     * - Build a baseline row with past timestamps to make any accidental update
-     *   detectable by monotonicity checks (should not change in this case).
-     * - Use the same values from the row as payload/request.
-     *
      * @return array{
-     *   rows: array<int,array{
-     *     id: string,
-     *     title: string,
-     *     body: string,
-     *     date: string,
-     *     createdAt: string,
-     *     updatedAt: string
-     *   }>,
-     *   payload: array{id: string, title: string, body: string, date: string},
+     *   rows: Rows,
+     *   payload: array{id: string, title?: string, body?: string, date?: string},
      *   request: UpdateEntryRequestInterface
      * }
      */
     public static function ac14NoOp(): array
     {
-        $row  = self::buildBaselineRowWithPastTimestamps();
-        $rows = [$row];
+        $row   = self::buildBaselineRowWithPastTimestamps();
+        $rows  = [$row];
+
+        $id      = $row['id'];
+        $title   = $row['title'];
+        $body    = $row['body'];
+        $date    = $row['date'];
 
         $payload = [
-            'id'    => $row['id'],
-            'title' => $row['title'],
-            'body'  => $row['body'],
-            'date'  => $row['date'],
+            'id'    => $id,
+            'title' => $title,
+            'body'  => $body,
+            'date'  => $date,
         ];
 
-        $request = UpdateEntryRequest::fromArray($payload);
-
-        $dataset = [
-            'rows'    => $rows,
-            'payload' => $payload,
-            'request' => $request,
-        ];
+        $dataset = self::getDataset($rows, $payload);
 
         return $dataset;
     }
@@ -633,27 +402,11 @@ final class UpdateEntryDataset
      * Build a canonical Entry row with past timestamps.
      *
      * Purpose:
-     * Create a deterministic Entry payload where both `createdAt` and `updatedAt`
-     * are shifted into the past. This guarantees that any subsequent use case
-     * execution at Clock::now() produces a strictly newer `updatedAt`,
-     * thus maintaining BR-2 monotonicity.
+     * Create a deterministic baseline where both createdAt and updatedAt are in the past,
+     * ensuring any successful update performed “now” strictly increases updatedAt (BR-2).
      *
-     * Mechanics:
-     * - Take the current UTC timestamp via Clock::now();
-     * - Convert to DateTimeImmutable and shift by $shiftSpec (default "-1 hour");
-     * - Format as ISO-8601 and assign to both `createdAt` and `updatedAt`;
-     * - Call EntryTestData::getOne() with named parameters for these timestamps.
-     *
-     * @param string $shiftSpec Relative modification spec for DateTimeImmutable::modify(),
-     *                          e.g. "-1 hour", "-2 days".
-     * @return array{
-     *   id: string,
-     *   title: string,
-     *   body: string,
-     *   date: string,
-     *   createdAt: string,
-     *   updatedAt: string
-     * }
+     * @param string $shiftSpec Relative modification spec for DateTimeImmutable::modify(), e.g., "-1 hour".
+     * @return array{id:string,title:string,body:string,date:string,createdAt:string,updatedAt:string}
      */
     private static function buildBaselineRowWithPastTimestamps(string $shiftSpec = '-1 hour'): array
     {
@@ -669,5 +422,34 @@ final class UpdateEntryDataset
         $row = EntryTestData::getOne(createdAt: $createdAt, updatedAt: $updatedAt);
 
         return $row;
+    }
+
+    /**
+     * Construct a unified dataset shape and the corresponding UpdateEntryRequest DTO.
+     *
+     * Purpose:
+     * DRY helper to pack prepared DB rows and request payload into a single
+     * dataset used by tests, while also instantiating the request DTO.
+     *
+     * @template TPayload of PayloadBase
+     * @param Rows $rows
+     * @param TPayload $payload
+     * @return array{
+     *   rows: Rows,
+     *   payload: TPayload,
+     *   request: UpdateEntryRequestInterface
+     * }
+     */
+    private static function getDataset(array $rows, array $payload): array
+    {
+        $request = UpdateEntryRequest::fromArray($payload);
+
+        $dataset = [
+            'rows'    => $rows,
+            'payload' => $payload,
+            'request' => $request,
+        ];
+
+        return $dataset;
     }
 }
