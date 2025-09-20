@@ -3,19 +3,12 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
-use Codeception\Test\Unit;
 use Daylog\Configuration\Bootstrap\SqlFactory;
 use Daylog\Configuration\Providers\Entries\UpdateEntryProvider;
 use Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntryInterface;
 use Daylog\Tests\Support\Fixture\EntryFixture;
+use Daylog\Tests\Integration\Application\UseCases\Entries\BaseEntryUseCaseIntegrationTest;
 use DB\SQL;
-
-use Daylog\Tests\Support\Helper\EntryTestData;
-use Daylog\Infrastructure\Storage\Entries\EntryModel;
-use Daylog\Infrastructure\Storage\Entries\EntryFieldMapper;
-use Daylog\Domain\Services\Clock;
-use Daylog\Domain\Models\Entries\Entry;
-use DateTimeImmutable;
 
 /**
  * Base class for UC-5 UpdateEntry integration tests.
@@ -32,7 +25,7 @@ use DateTimeImmutable;
  *
  * @internal Extend this class in AC/AF test files (AC1_..., AF1_..., etc.).
  */
-abstract class BaseUpdateEntryIntegrationTest extends Unit
+abstract class BaseUpdateEntryIntegrationTest extends BaseEntryUseCaseIntegrationTest
 {
     /** @var SQL */
     protected SQL $db;

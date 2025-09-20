@@ -4,10 +4,8 @@ declare(strict_types=1);
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
 use Daylog\Domain\Models\Entries\Entry;
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
-use Daylog\Tests\Support\Scenarios\Entries\UpdateEntryScenario;
 use Daylog\Tests\Support\Assertion\UpdateEntryTitleOnlyAssertions;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 
 /**
  * AC-01 (happy path — title): Given a valid id and a non-empty title within limits,
@@ -39,20 +37,20 @@ final class AC01_HappyPath_TitleOnlyTest extends BaseUpdateEntryIntegrationTest
     public function testHappyPathUpdatesTitleAndRefreshesUpdatedAt(): void
     {
         // Arrange
-        $dataset  = UpdateEntryScenario::ac01TitleOnly();
-        $rows     = $dataset['rows'];
-        $targetId = $dataset['targetId'];
-        $newTitle = $dataset['newTitle'];
-
-        $request = UpdateEntryTestRequestFactory::titleOnly($targetId, $newTitle);
-        EntriesSeeding::intoDb($rows);
+        $dataset = UpdateEntryDataset::ac01TitleOnly();
+        $this->seedFromDataset($dataset);
 
         // Act
+        $request  = $dataset['request'];
         $response = $this->useCase->execute($request);
-        $actual   = $response->getEntry();
 
         // Assert
-        $expected = Entry::fromArray($rows[0]);
-        $this->assertTitleOnlyUpdated($expected, $actual, $newTitle);
+        $newTitle = $dataset['payload']['title'];
+
+        $expectedEntry = $dataset['rows'][0];
+        $expectedEntry = Entry::fromArray($expectedEntry);
+        $actualEntry   = $response->getEntry();
+
+        $this->assertTitleOnlyUpdated($expectedEntry, $actualEntry, $newTitle);
     }
 }
