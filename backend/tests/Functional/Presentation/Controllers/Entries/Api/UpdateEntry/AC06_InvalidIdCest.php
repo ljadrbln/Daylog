@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\UpdateEntry;
 
 use Daylog\Tests\FunctionalTester;
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 
 /**
  * AC-06 (invalid id): 422 with ID_INVALID.
@@ -31,14 +31,14 @@ final class AC06_InvalidIdCest extends BaseUpdateEntryFunctionalCest
      */
     public function testInvalidIdFailsValidationWithIdInvalid(FunctionalTester $I): void
     {
-        // Arrange
-        $this->withJsonHeaders($I);
-        $payload = UpdateEntryTestRequestFactory::invalidIdPayload();
+        // Arrange        
+        $dataset = UpdateEntryDataset::ac06InvalidId();
 
         // Act
-        $this->updateEntry($I, $payload);
+        $this->withJsonHeaders($I);
+        $this->updateEntryFromDataset($I, $dataset);
 
-        // Assert — 422 + ID_INVALID per contract
+        // Assert
         $this->assertUnprocessableContract($I);
 
         $code = 'ID_INVALID';

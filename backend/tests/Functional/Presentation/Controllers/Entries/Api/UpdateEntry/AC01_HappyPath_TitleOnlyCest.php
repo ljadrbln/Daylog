@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\UpdateEntry;
 
-use Daylog\Tests\FunctionalTester;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
-use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
 use Daylog\Domain\Services\UuidGenerator;
+
+use Daylog\Tests\FunctionalTester;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
+
 /**
  * AC-01 (happy path — title): Update only the title and refresh updatedAt.
  *
@@ -47,7 +47,7 @@ final class AC01_HappyPath_TitleOnlyCest extends BaseUpdateEntryFunctionalCest
      */
     public function testHappyPathUpdatesTitleAndRefreshesUpdatedAt(FunctionalTester $I): void
     {
-        // Arrange — seed DB and prepare request
+        // Arrange
         $dataset = UpdateEntryDataset::ac01TitleOnly();
         $this->seedFromDataset($I, $dataset);
 
@@ -59,13 +59,9 @@ final class AC01_HappyPath_TitleOnlyCest extends BaseUpdateEntryFunctionalCest
         $this->assertOkContract($I);
 
         // Assert (response contains a valid UUID id and expected fields)
-        $raw     = $I->grabResponse();
-        $decoded = json_decode($raw, true);
+        $after   = $this->grabTypedDataEnvelope($I);
+        $before  = $dataset['rows'][0];
         $payload = $dataset['payload'];
-
-        /** @var array{id: string, title: string, body: string, date: string, createdAt: string, updatedAt: string} $after */
-        $after  = $decoded['data'];
-        $before = $dataset['rows'][0];
 
         $targetId    = $payload['id'];
         $returnedId  = $after['id'];

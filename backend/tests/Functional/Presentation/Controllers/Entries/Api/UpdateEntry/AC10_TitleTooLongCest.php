@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\UpdateEntry;
 
 use Daylog\Tests\FunctionalTester;
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 
 /**
  * AC-10 (title too long): 422 with TITLE_TOO_LONG.
@@ -37,12 +37,11 @@ final class AC10_TitleTooLongCest extends BaseUpdateEntryFunctionalCest
     public function testTitleTooLongFailsValidationWithTitleTooLong(FunctionalTester $I): void
     {
         // Arrange
-        $this->withJsonHeaders($I);
-
-        $payload = UpdateEntryTestRequestFactory::tooLongTitlePayload();
+        $dataset = UpdateEntryDataset::ac10TooLongTitle();
 
         // Act
-        $this->updateEntry($I, $payload);
+        $this->withJsonHeaders($I);
+        $this->updateEntryFromDataset($I, $dataset);
 
         // Assert (HTTP + contract)
         $this->assertUnprocessableContract($I);

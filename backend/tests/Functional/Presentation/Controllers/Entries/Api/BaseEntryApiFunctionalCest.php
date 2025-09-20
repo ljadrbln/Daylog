@@ -220,7 +220,7 @@ abstract class BaseEntryApiFunctionalCest
     {
         $rows = $dataset['rows'];
         EntriesSeeding::intoDb($rows);
-    }   
+    }
     
     /**
      * Grab "data" from the standard JSON envelope and narrow static types.

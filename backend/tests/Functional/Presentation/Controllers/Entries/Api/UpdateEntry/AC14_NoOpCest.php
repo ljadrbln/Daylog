@@ -5,7 +5,7 @@ namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\UpdateEnt
 
 use Daylog\Tests\FunctionalTester;
 use Daylog\Tests\Support\Helper\EntriesSeeding;
-use Daylog\Tests\Support\Scenarios\Entries\UpdateEntryScenario;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
 
 /**
@@ -40,20 +40,12 @@ final class AC14_NoOpCest extends BaseUpdateEntryFunctionalCest
     public function testNoOpUpdateReportsNoChangesApplied(FunctionalTester $I): void
     {
         // Arrange
-        $this->withJsonHeaders($I);
-
-        $dataset = UpdateEntryScenario::ac14NoOp();
-        $rows    = $dataset['rows'];
-        $row     = $rows[0];
-
-        // Seed DB with the baseline entry
-        EntriesSeeding::intoDb($rows);
-
-        // Build a no-op payload (same id/title/body/date)
-        $payload = UpdateEntryTestRequestFactory::noOpPayload($row);
+        $dataset = UpdateEntryDataset::ac14NoOp();
+        $this->seedFromDataset($I, $dataset);
 
         // Act
-        $this->updateEntry($I, $payload);
+        $this->withJsonHeaders($I);
+        $this->updateEntryFromDataset($I, $dataset);
 
         // Assert (HTTP + contract)
         $this->assertUnprocessableContract($I);

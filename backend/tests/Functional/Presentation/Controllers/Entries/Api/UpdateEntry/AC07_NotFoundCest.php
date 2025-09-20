@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\UpdateEntry;
 
 use Daylog\Tests\FunctionalTester;
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 
 /**
  * AC-07 (not found): Valid but absent UUID returns ENTRY_NOT_FOUND.
@@ -37,14 +37,13 @@ final class AC07_NotFoundCest extends BaseUpdateEntryFunctionalCest
     public function testNotFoundFailsWithEntryNotFound(FunctionalTester $I): void
     {
         // Arrange
-        $this->withJsonHeaders($I);
-
-        $payload = UpdateEntryTestRequestFactory::notFoundPayload();
+        $dataset = UpdateEntryDataset::ac07NotFound();
 
         // Act
-        $this->updateEntry($I, $payload);
+        $this->withJsonHeaders($I);
+        $this->updateEntryFromDataset($I, $dataset);
 
-        // Assert — 404 + ENTRY_NOT_FOUND per contract
+        // Assert
         $this->assertNotFoundContract($I);
 
         $code = 'ENTRY_NOT_FOUND';

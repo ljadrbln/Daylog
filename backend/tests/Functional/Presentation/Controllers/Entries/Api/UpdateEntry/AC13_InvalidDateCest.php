@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\UpdateEntry;
 
 use Daylog\Tests\FunctionalTester;
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 
 /**
  * AC-13 (invalid date): 422 with DATE_INVALID.
@@ -36,12 +36,11 @@ final class AC13_InvalidDateCest extends BaseUpdateEntryFunctionalCest
     public function testInvalidDateFailsValidationAndReturnsDateInvalid(FunctionalTester $I): void
     {
         // Arrange
-        $this->withJsonHeaders($I);
-
-        $payload = UpdateEntryTestRequestFactory::invalidDatePayload();
+        $dataset = UpdateEntryDataset::ac13InvalidDate();
 
         // Act
-        $this->updateEntry($I, $payload);
+        $this->withJsonHeaders($I);
+        $this->updateEntryFromDataset($I, $dataset);
 
         // Assert (HTTP + contract)
         $this->assertUnprocessableContract($I);

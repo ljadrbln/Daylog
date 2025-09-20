@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\UpdateEntry;
 
 use Daylog\Tests\FunctionalTester;
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 
 /**
  * AC-11 (empty body): 422 with BODY_REQUIRED.
@@ -33,12 +33,11 @@ final class AC11_EmptyBodyCest extends BaseUpdateEntryFunctionalCest
     public function testEmptyBodyFailsValidationWithBodyRequired(FunctionalTester $I): void
     {
         // Arrange
-        $this->withJsonHeaders($I);
-
-        $payload = UpdateEntryTestRequestFactory::emptyBodyPayload();
+        $dataset = UpdateEntryDataset::ac11EmptyBody();
 
         // Act
-        $this->updateEntry($I, $payload);
+        $this->withJsonHeaders($I);
+        $this->updateEntryFromDataset($I, $dataset);
 
         // Assert (HTTP + contract)
         $this->assertUnprocessableContract($I);

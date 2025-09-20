@@ -4,10 +4,8 @@ declare(strict_types=1);
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\UpdateEntry;
 
 use Daylog\Tests\FunctionalTester;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
-use Daylog\Tests\Support\Scenarios\Entries\UpdateEntryScenario;
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
 use Daylog\Domain\Services\UuidGenerator;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 
 /**
  * AC-04 (partial update): Update only provided fields (title + body), keep others intact.
@@ -50,33 +48,23 @@ final class AC04_PartialUpdateCest extends BaseUpdateEntryFunctionalCest
      */
     public function testPartialUpdateChangesOnlyProvidedFields(FunctionalTester $I): void
     {
-        // Arrange — seed DB and prepare request
-        $this->withJsonHeaders($I);
-
-        $dataset  = UpdateEntryScenario::ac04TitleAndBody();
-        $rows     = $dataset['rows'];
-        $targetId = $dataset['targetId'];
-        $newTitle = $dataset['newTitle'];
-        $newBody  = $dataset['newBody'];
-
-        $payload = UpdateEntryTestRequestFactory::titleAndBodyPayload($targetId, $newTitle, $newBody);
-
-        EntriesSeeding::intoDb($rows);
+        // Arrange
+        $dataset = UpdateEntryDataset::ac04TitleAndBody();
+        $this->seedFromDataset($I, $dataset);        
 
         // Act
-        $this->updateEntry($I, $payload);
+        $this->withJsonHeaders($I);
+        $this->updateEntryFromDataset($I, $dataset);
 
         // Assert (HTTP + contract)
         $this->assertOkContract($I);
 
         // Assert (response contains a valid UUID id and expected fields)
-        $raw     = $I->grabResponse();
-        $decoded = json_decode($raw, true);
+        $after   = $this->grabTypedDataEnvelope($I);
+        $before  = $dataset['rows'][0];
+        $payload = $dataset['payload'];
 
-        /** @var array{id: string, title: string, body: string, date: string, createdAt: string, updatedAt: string} $after */
-        $after  = $decoded['data'];
-        $before = $rows[0];
-
+        $targetId    = $payload['id'];
         $returnedId  = $after['id'];
         $isValidUuid = UuidGenerator::isValid($returnedId);
 
@@ -85,8 +73,8 @@ final class AC04_PartialUpdateCest extends BaseUpdateEntryFunctionalCest
 
         // Field equality / inequality checks
         $I->assertSame($before['id'],        $after['id']);
-        $I->assertSame($newTitle,            $after['title']);
-        $I->assertSame($newBody,             $after['body']);
+        $I->assertSame($payload['title'],    $after['title']);
+        $I->assertSame($payload['body'],     $after['body']);
         $I->assertSame($before['date'],      $after['date']);
         $I->assertSame($before['createdAt'], $after['createdAt']);
 

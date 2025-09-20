@@ -4,10 +4,8 @@ declare(strict_types=1);
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\UpdateEntry;
 
 use Daylog\Tests\FunctionalTester;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
-use Daylog\Tests\Support\Scenarios\Entries\UpdateEntryScenario;
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
 use Daylog\Domain\Services\UuidGenerator;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 
 /**
  * AC-03 (happy path — date): Update only the date and refresh updatedAt.
@@ -49,32 +47,23 @@ final class AC03_HappyPath_DateOnlyCest extends BaseUpdateEntryFunctionalCest
      */
     public function testHappyPathUpdatesDateAndRefreshesUpdatedAt(FunctionalTester $I): void
     {
-        // Arrange — seed DB and prepare request
-        $this->withJsonHeaders($I);
-
-        $dataset  = UpdateEntryScenario::ac03DateOnly();
-        $rows     = $dataset['rows'];
-        $targetId = $dataset['targetId'];
-        $newDate  = $dataset['newDate'];
-
-        $payload = UpdateEntryTestRequestFactory::dateOnlyPayload($targetId, $newDate);
-
-        EntriesSeeding::intoDb($rows);
+        // Arrange
+        $dataset = UpdateEntryDataset::ac03DateOnly();
+        $this->seedFromDataset($I, $dataset);        
 
         // Act
-        $this->updateEntry($I, $payload);
+        $this->withJsonHeaders($I);
+        $this->updateEntryFromDataset($I, $dataset);
 
         // Assert (HTTP + contract)
         $this->assertOkContract($I);
 
         // Assert (response contains a valid UUID id and expected fields)
-        $raw     = $I->grabResponse();
-        $decoded = json_decode($raw, true);
+        $after   = $this->grabTypedDataEnvelope($I);
+        $before  = $dataset['rows'][0];
+        $payload = $dataset['payload'];
 
-        /** @var array{id: string, title: string, body: string, date: string, createdAt: string, updatedAt: string} $after */
-        $after  = $decoded['data'];
-        $before = $rows[0];
-
+        $targetId    = $payload['id'];
         $returnedId  = $after['id'];
         $isValidUuid = UuidGenerator::isValid($returnedId);
 

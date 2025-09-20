@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\UpdateEntry;
 
 use Daylog\Tests\FunctionalTester;
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 
 /**
  * AC-08 (no fields to update): 422 with NO_FIELDS_TO_UPDATE.
@@ -34,15 +34,14 @@ final class AC08_NoFieldsCest extends BaseUpdateEntryFunctionalCest
      */
     public function testNoFieldsToUpdateFailsValidationWithNoFieldsToUpdate(FunctionalTester $I): void
     {
-        // Arrange — JSON headers and payload with only id
+        // Arrange
+        $dataset = UpdateEntryDataset::ac08IdOnly();
+
+        // Act
         $this->withJsonHeaders($I);
+        $this->updateEntryFromDataset($I, $dataset);
 
-        $payload = UpdateEntryTestRequestFactory::idOnlyPayload();
-
-        // Act — PUT /api/entries/{id} where body has no updatable fields
-        $this->updateEntry($I, $payload);
-
-        // Assert — 422 + NO_FIELDS_TO_UPDATE per contract
+        // Assert
         $this->assertUnprocessableContract($I);
 
         $code = 'NO_FIELDS_TO_UPDATE';

@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\UpdateEntry;
 
 use Daylog\Tests\FunctionalTester;
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 
 /**
  * AC-05 (missing id): expected 422 with ID_REQUIRED, but current router yields 405.
@@ -34,12 +34,12 @@ final class AC05_MissingIdCest extends BaseUpdateEntryFunctionalCest
      */
     public function testMissingIdFailsValidationWithIdRequired(FunctionalTester $I): void
     {
-        // Arrange — JSON headers and minimal payload without 'id'
-        $this->withJsonHeaders($I);
-        $payload = UpdateEntryTestRequestFactory::missingIdPayload();
+        // Arrange
+        $dataset = UpdateEntryDataset::ac05MissingId();
 
-        // Act — send to /api/entries (no {id} in path)
-        $this->updateEntry($I, $payload);
+        // Act
+        $this->withJsonHeaders($I);
+        $this->updateEntryFromDataset($I, $dataset);
 
         // Assert — router currently returns 405 Method Not Allowed
         $I->seeResponseCodeIs(405);
