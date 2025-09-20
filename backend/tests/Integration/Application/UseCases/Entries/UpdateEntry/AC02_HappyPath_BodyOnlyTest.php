@@ -8,6 +8,8 @@ use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
 use Daylog\Tests\Support\Helper\EntriesSeeding;
 use Daylog\Tests\Support\Scenarios\Entries\UpdateEntryScenario;
 use Daylog\Tests\Support\Assertion\UpdateEntryBodyOnlyAssertions;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
+
 
 /**
  * AC-2 (happy path — body): Given a valid id and a non-empty body within limits,
@@ -39,21 +41,20 @@ final class AC02_HappyPath_BodyOnlyTest extends BaseUpdateEntryIntegrationTest
     public function testHappyPathUpdatesBodyAndRefreshesUpdatedAt(): void
     {
         // Arrange
-        $dataset = UpdateEntryScenario::ac02BodyOnly();
-
-        $rows    = $dataset['rows'];
-        $id      = $dataset['targetId'];
-        $newBody = $dataset['newBody'];
-
-        $request = UpdateEntryTestRequestFactory::bodyOnly($id, $newBody);
-        EntriesSeeding::intoDb($rows);
+        $dataset = UpdateEntryDataset::ac02BodyOnly();
+        $this->seedFromDataset($dataset);
 
         // Act
+        $request  = $dataset['request'];
         $response = $this->useCase->execute($request);
-        $actual   = $response->getEntry();
 
         // Assert
-        $expected = Entry::fromArray($rows[0]);
-        $this->assertBodyOnlyUpdated($expected, $actual, $newBody);
+        $newBody = $dataset['payload']['body'];
+
+        $expectedEntry = $dataset['rows'][0];
+        $expectedEntry = Entry::fromArray($expectedEntry);
+        $actualEntry   = $response->getEntry();
+
+        $this->assertBodyOnlyUpdated($expectedEntry, $actualEntry, $newBody);
     }
 }

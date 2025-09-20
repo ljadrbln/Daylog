@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
@@ -34,7 +34,8 @@ final class AC11_EmptyBodyTest extends BaseUpdateEntryIntegrationTest
     public function testEmptyBodyFailsValidationWithBodyRequired(): void
     {
         // Arrange
-        $request = UpdateEntryTestRequestFactory::emptyBody();
+        $dataset = UpdateEntryDataset::ac11EmptyBody();
+        $request = $dataset['request'];
 
         // Expect: sanitizer on a presentation level makes a trim and passes an empty string to the validator.
         $this->expectEntryNotFound();

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
@@ -34,8 +34,9 @@ final class AC08_NoFieldsTest extends BaseUpdateEntryIntegrationTest
     public function testNoFieldsToUpdateFailsValidationWithNoFieldsToUpdate(): void
     {
         // Arrange
-        $request = UpdateEntryTestRequestFactory::idOnly();
-
+        $dataset = UpdateEntryDataset::ac08IdOnly();
+        $request = $dataset['request'];
+        
         // Expect
         $this->expectNoFieldsToUpdate();
 

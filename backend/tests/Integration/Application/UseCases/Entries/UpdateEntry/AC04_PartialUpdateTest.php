@@ -4,10 +4,8 @@ declare(strict_types=1);
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
 use Daylog\Domain\Models\Entries\Entry;
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
-use Daylog\Tests\Support\Scenarios\Entries\UpdateEntryScenario;
 use Daylog\Tests\Support\Assertion\UpdateEntryTitleAndBodyAssertions;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 
 /**
  * AC-4 (partial update): Given a valid id and any subset of title, body, date,
@@ -40,22 +38,21 @@ final class AC04_PartialUpdateTest extends BaseUpdateEntryIntegrationTest
     public function testPartialUpdateChangesOnlyProvidedFields(): void
     {
         // Arrange
-        $dataset  = UpdateEntryScenario::ac04TitleAndBody();
-
-        $rows     = $dataset['rows'];
-        $targetId = $dataset['targetId'];
-        $newTitle = $dataset['newTitle'];
-        $newBody  = $dataset['newBody'];
-        
-        $request = UpdateEntryTestRequestFactory::titleAndBody($targetId, $newTitle, $newBody);
-        EntriesSeeding::intoDb($rows);
+        $dataset = UpdateEntryDataset::ac04TitleAndBody();
+        $this->seedFromDataset($dataset);
 
         // Act
+        $request  = $dataset['request'];
         $response = $this->useCase->execute($request);
-        $actual   = $response->getEntry();
 
         // Assert
-        $expected = Entry::fromArray($rows[0]);
-        $this->assertTitleAndBodyUpdated($expected, $actual, $newTitle, $newBody);
+        $newTitle = $dataset['payload']['title'];
+        $newBody  = $dataset['payload']['body'];
+
+        $expectedEntry = $dataset['rows'][0];
+        $expectedEntry = Entry::fromArray($expectedEntry);
+        $actualEntry   = $response->getEntry();
+
+        $this->assertTitleAndBodyUpdated($expectedEntry, $actualEntry, $newTitle, $newBody);
     }
 }

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
@@ -33,7 +33,8 @@ final class AC13_InvalidDateTest extends BaseUpdateEntryIntegrationTest
     public function testInvalidDateFailsValidationAndRepoUntouched(): void
     {
         // Arrange
-        $request = UpdateEntryTestRequestFactory::invalidDate();
+        $dataset = UpdateEntryDataset::ac13InvalidDate();
+        $request = $dataset['request'];
 
         // Expect
         $this->expectDateInvalid();

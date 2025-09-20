@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
@@ -34,8 +34,9 @@ final class AC09_EmptyTitleTest extends BaseUpdateEntryIntegrationTest
     public function testEmptyTitleFailsValidationWithTitleRequired(): void
     {
         // Arrange
-        $request = UpdateEntryTestRequestFactory::emptyTitle();
-
+        $dataset = UpdateEntryDataset::ac09EmptyTitle();
+        $request = $dataset['request'];
+        
         // Expect: sanitizer on a presentation level makes a trim and passes an empty string to the validator.
         $this->expectEntryNotFound();
 

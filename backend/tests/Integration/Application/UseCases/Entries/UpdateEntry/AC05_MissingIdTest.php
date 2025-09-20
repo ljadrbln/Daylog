@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 
 /**
  * AC-5 (missing id): Given no id, when updating, then validation fails with ID_REQUIRED.
@@ -35,7 +35,8 @@ final class AC05_MissingIdTest extends BaseUpdateEntryIntegrationTest
     public function testMissingIdFailsValidationWithIdRequired(): void
     {
         // Arrange
-        $request = UpdateEntryTestRequestFactory::missingId();
+        $dataset = UpdateEntryDataset::ac05MissingId();
+        $request = $dataset['request'];
 
         // Expect
         $this->expectIdRequired();

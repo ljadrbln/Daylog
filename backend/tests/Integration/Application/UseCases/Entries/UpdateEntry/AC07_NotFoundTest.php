@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
 /**
@@ -38,7 +38,8 @@ final class AC07_NotFoundTest extends BaseUpdateEntryIntegrationTest
     public function testNotFoundFailsWithEntryNotFound(): void
     {
         // Arrange
-        $request = UpdateEntryTestRequestFactory::notFound();
+        $dataset = UpdateEntryDataset::ac07NotFound();
+        $request = $dataset['request'];
 
         // Expect
         $this->expectEntryNotFound();

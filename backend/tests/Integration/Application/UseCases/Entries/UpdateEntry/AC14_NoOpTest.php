@@ -3,10 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\UpdateEntry;
 
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
-use Daylog\Tests\Support\Scenarios\Entries\UpdateEntryScenario;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
+use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
 
 /**
  * UC-5 / AC-14 — No-op update.
@@ -38,13 +36,11 @@ final class AC14_NoOpTest extends BaseUpdateEntryIntegrationTest
     public function testNoOpUpdateReportsNoChangesApplied(): void
     {
         // Arrange
-        $dataset = UpdateEntryScenario::ac14NoOp();
-        $rows    = $dataset['rows'];
-        $row     = $rows[0];
+        $dataset = UpdateEntryDataset::ac14NoOp();
+        $this->seedFromDataset($dataset);
         
-        $request = UpdateEntryTestRequestFactory::noOp($row);
-        EntriesSeeding::intoDb($rows);
-
+        $request = $dataset['request'];
+        
         // Expect
         $this->expectNoChangesApplied();
 
