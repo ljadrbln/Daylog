@@ -15,7 +15,7 @@ use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
  *   Uses real wiring (Provider + SqlFactory) and a clean DB prepared by the base class.
  *
  * Mechanics:
- *   - Build a request via UpdateEntryTestRequestFactory::titleOnly() with a non-UUID id.
+ *   - Build a request via UpdateEntryDataset::ac06InvalidId() with a non-UUID id.
  *   - Execute real use case from BaseUpdateEntryIntegrationTest.
  *   - Expect DomainValidationException with message 'ID_INVALID'.
  *
@@ -36,7 +36,7 @@ final class AC06_InvalidIdTest extends BaseUpdateEntryIntegrationTest
         // Arrange
         $dataset = UpdateEntryDataset::ac06InvalidId();
         $request = $dataset['request'];
-        
+
         // Expect
         $this->expectIdInvalid();
 

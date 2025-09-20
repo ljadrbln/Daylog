@@ -15,10 +15,9 @@ use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
  * and timestamps remain valid/monotonic in the response DTO.
  *
  * Mechanics:
- * - Build deterministic rows via UpdateEntryScenario::ac01TitleOnly();
- * - Seed a Fake repository through EntriesSeeding::intoFakeRepo();
- * - Build a title-only request via UpdateEntryTestRequestFactory;
- * - Execute the use case and assert with shared trait.
+ * - Build deterministic dataset via UpdateEntryDataset::ac01TitleOnly();
+ * - Seed repository with dataset rows;
+ * - Use request object directly from the dataset;
  *
  * @covers \Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry::execute
  * @group UC-UpdateEntry

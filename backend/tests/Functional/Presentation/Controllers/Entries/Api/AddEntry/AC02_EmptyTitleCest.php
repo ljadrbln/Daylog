@@ -34,6 +34,7 @@ final class AC02_EmptyTitleCest extends BaseAddEntryFunctionalCest
     public function testEmptyTitleIsRejectedWithTitleRequired(FunctionalTester $I): void
     {
         // Arrange
+        $this->withJsonHeaders($I);
         $payload = AddEntryTestRequestFactory::emptyTitlePayload();
 
         // Act

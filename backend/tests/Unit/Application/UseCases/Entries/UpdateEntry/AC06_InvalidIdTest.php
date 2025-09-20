@@ -14,9 +14,10 @@ use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
  *   must remain untouched (no save attempts).
  *
  * Mechanics:
- *   - Build UpdateEntryRequest via UpdateEntryTestRequestFactory::titleOnly() with malformed id.
+ *   - Build deterministic dataset via UpdateEntryDataset::ac06InvalidId() with malformed id.
  *   - Configure validator mock to throw DomainValidationException('ID_INVALID').
  *   - Execute the use case and verify no persistence by asserting saveCalls() is zero.
+ *   - Use request object directly from the dataset
  *
  * @covers \Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry::execute
  * @group UC-UpdateEntry

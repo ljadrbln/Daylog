@@ -16,10 +16,9 @@ use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
  * and returns a response DTO holding a valid domain Entry snapshot.
  *
  * Mechanics:
- * - Build deterministic rows via UpdateEntryScenario::ac02BodyOnly();
- * - Seed a Fake repository through EntriesSeeding::intoFakeRepo();
- * - Build a body-only request via UpdateEntryTestRequestFactory;
- * - Validator is expected to run exactly once (domain rules tested elsewhere).
+ * - Build deterministic dataset via UpdateEntryDataset::ac02BodyOnly();
+ * - Seed repository with dataset rows;
+ * - Use request object directly from the dataset;
  *
  * @covers \Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry::execute
  * @group UC-UpdateEntry

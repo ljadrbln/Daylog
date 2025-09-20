@@ -4,9 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\UpdateEntry;
 
 use Daylog\Tests\FunctionalTester;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
 use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
-use Daylog\Tests\Support\Factory\UpdateEntryTestRequestFactory;
 
 /**
  * AC-14 (no-op): 200 with NO_CHANGES_APPLIED.

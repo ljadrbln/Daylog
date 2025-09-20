@@ -15,7 +15,7 @@ use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
  *   transport-level validation error code NO_FIELDS_TO_UPDATE.
  *
  * Mechanics:
- *   - Build a payload with only the id via UpdateEntryTestRequestFactory::idOnlyPayload();
+ *   - Build a payload with only the id via UpdateEntryDataset::ac08IdOnly();
  *   - Issue PUT /api/entries/{id} with an empty body of updates;
  *   - Assert HTTP 422 contract and NO_FIELDS_TO_UPDATE in the errors array.
  *

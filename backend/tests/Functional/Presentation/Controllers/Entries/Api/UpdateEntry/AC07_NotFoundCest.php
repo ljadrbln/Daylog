@@ -17,7 +17,7 @@ use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
  *
  * Mechanics:
  *   - Keep DB clean (no row with the tested id);
- *   - Use UpdateEntryTestRequestFactory::notFoundPayload() to produce a valid UUID + update field(s);
+ *   - Use UpdateEntryDataset::ac07NotFound() to produce a valid UUID + update field(s);
  *   - PUT /api/entries/{id} with JSON body;
  *   - Assert HTTP 404 contract and ENTRY_NOT_FOUND code in the error payload.
  *

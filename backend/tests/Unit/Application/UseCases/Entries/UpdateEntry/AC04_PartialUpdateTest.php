@@ -15,10 +15,9 @@ use Daylog\Tests\Support\Datasets\Entries\UpdateEntryDataset;
  * while others remain intact. The updatedAt timestamp is refreshed per BR-2.
  *
  * Mechanics:
- * - Build deterministic rows via UpdateEntryScenario::ac04TitleAndBody();
- * - Seed a Fake repository through EntriesSeeding::intoFakeRepo();
- * - Build a request via UpdateEntryTestRequestFactory::titleAndBody();
- * - Execute the use case and assert via shared trait.
+ * - Build deterministic dataset via UpdateEntryDataset::ac04TitleAndBody();
+ * - Seed repository with dataset rows;
+ * - Use request object directly from the dataset;
  *
  * @covers \Daylog\Application\UseCases\Entries\UpdateEntry\UpdateEntry::execute
  * @group UC-UpdateEntry
