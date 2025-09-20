@@ -72,6 +72,46 @@ abstract class BaseEntryApiFunctionalCest
     }
 
     /**
+     * Assert common HTTP/JSON response contract.
+     *
+     * Purpose:
+     *   Provide a single assertion path for success/error responses to remove duplication.
+     *   Verifies: HTTP status, JSON content type, `success` flag, and presence/absence of "data".
+     *
+     * Mechanics:
+     *   - Checks exact HTTP status;
+     *   - Requires JSON response;
+     *   - Asserts `success` equals expected;
+     *   - Asserts `"data"` key presence according to scenario.
+     *
+     * @param FunctionalTester $I   Codeception actor for HTTP assertions.
+     * @param int $expectedStatus   Expected HTTP status code (e.g., 200, 400, 404, 422).
+     * @param bool $expectedSuccess Expected boolean value for the `success` field.
+     * @param bool $expectData      Whether `"data"` must be present in the response body.
+     * @return void
+     */
+    private function assertResponseContract(
+        FunctionalTester $I,
+        int $expectedStatus,
+        bool $expectedSuccess,
+        bool $expectData
+    ): void {
+        $I->seeResponseCodeIs($expectedStatus);
+        $I->seeResponseIsJson();
+
+        $successFlag = ['success' => $expectedSuccess];
+        $I
+            ->seeResponseContainsJson($successFlag);
+
+        $needle = '"data"';
+        if ($expectData === true) {
+            $I->seeResponseContains($needle);
+        } else {
+            $I->dontSeeResponseContains($needle);
+        }
+    }
+
+    /**
      * Assert 200 OK + success=true + data present.
      *
      * @param FunctionalTester $I
@@ -79,15 +119,26 @@ abstract class BaseEntryApiFunctionalCest
      */
     protected function assertOkContract(FunctionalTester $I): void
     {
-        $expected = HttpCode::OK;
-        $I->seeResponseCodeIs($expected);
-        $I->seeResponseIsJson();
+        $status         = HttpCode::OK;
+        $success        = true;
+        $dataIsPresent  = true;
 
-        $success = ['success' => true];
-        $I->seeResponseContainsJson($success);
+        $this->assertResponseContract($I, $status, $success, $dataIsPresent);
+    }
 
-        $needle = '"data"';
-        $I->seeResponseContains($needle);
+    /**
+     * Assert 400 Bad Request + standard error contract (no data).
+     *
+     * @param FunctionalTester $I
+     * @return void
+     */
+    protected function assertBadRequestContract(FunctionalTester $I): void
+    {
+        $status         = HttpCode::BAD_REQUEST;
+        $success        = false;
+        $dataIsPresent  = false;
+
+        $this->assertResponseContract($I, $status, $success, $dataIsPresent);
     }
 
     /**
@@ -98,15 +149,11 @@ abstract class BaseEntryApiFunctionalCest
      */
     protected function assertNotFoundContract(FunctionalTester $I): void
     {
-        $expected = HttpCode::NOT_FOUND;
-        $I->seeResponseCodeIs($expected);
-        $I->seeResponseIsJson();
+        $status         = HttpCode::NOT_FOUND;
+        $success        = false;
+        $dataIsPresent  = false;
 
-        $contract = ['success' => false];
-        $I->seeResponseContainsJson($contract);
-
-        $needle = '"data"';
-        $I->dontSeeResponseContains($needle);
+        $this->assertResponseContract($I, $status, $success, $dataIsPresent);
     }
 
     /**
@@ -117,15 +164,11 @@ abstract class BaseEntryApiFunctionalCest
      */
     protected function assertUnprocessableContract(FunctionalTester $I): void
     {
-        $expected = HttpCode::UNPROCESSABLE_ENTITY;
-        $I->seeResponseCodeIs($expected);
-        $I->seeResponseIsJson();
+        $status         = HttpCode::UNPROCESSABLE_ENTITY;
+        $success        = false;
+        $dataIsPresent  = false;
 
-        $contract = ['success' => false];
-        $I->seeResponseContainsJson($contract);
-
-        $needle = '"data"';
-        $I->dontSeeResponseContains($needle);
+        $this->assertResponseContract($I, $status, $success, $dataIsPresent);
     }
 
     /**
