@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\AddEntry;
 
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
-use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\AddEntryDataset;
 
 /**
  * AC-05: Body too long → BODY_TOO_LONG.
@@ -34,12 +34,13 @@ final class AC05_BodyTooLongTest extends BaseAddEntryIntegrationTest
     public function testBodyTooLongFailsWithBodyTooLong(): void
     {
         // Arrange
-        $request = AddEntryTestRequestFactory::bodyTooLong();
+        $dataset = AddEntryDataset::ac05TooLongBody();
 
         // Expect
         $this->expectBodyTooLong();
 
         // Act
+        $request = $dataset['request'];
         $this->useCase->execute($request);
 
         // Safety

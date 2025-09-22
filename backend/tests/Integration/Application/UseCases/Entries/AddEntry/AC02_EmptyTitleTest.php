@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\AddEntry;
 
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
-use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\AddEntryDataset;
 
 /**
  * AC-02: Empty title → TITLE_REQUIRED.
@@ -33,12 +33,13 @@ final class AC02_EmptyTitleTest extends BaseAddEntryIntegrationTest
     public function testEmptyTitleFailsWithTitleRequired(): void
     {
         // Arrange
-        $request = AddEntryTestRequestFactory::emptyTitle();
+        $dataset = AddEntryDataset::ac02EmptyTitleSanitized();
 
         // Expect
         $this->expectTitleRequired();
 
         // Act
+        $request = $dataset['request'];
         $this->useCase->execute($request);
 
         // Safety

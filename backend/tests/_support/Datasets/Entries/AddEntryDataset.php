@@ -66,6 +66,21 @@ final class AddEntryDataset
     }
 
     /**
+     * AC-02 (empty title after sanitization) dataset.
+     *
+     * @return array{
+     *   payload: array{title:string,body:string,date:string},
+     *   request: AddEntryRequestInterface
+     * }
+     */    
+    public static function ac02EmptyTitleSanitized(): array {
+        $payload = EntryTestData::getOne(title: '');
+        $dataset = self::getDataset($payload);
+
+        return $dataset;        
+    }
+
+    /**
      * AC-02 — Missing title (delegates to Empty → unset).
      *
      * @return array{
@@ -121,6 +136,22 @@ final class AddEntryDataset
     }
 
     /**
+     * AC-04 (empty body after sanitization) dataset.
+     *
+     * @return array{
+     *   payload: array{title:string,body:string,date:string},
+     *   request: AddEntryRequestInterface
+     * }
+     */
+    public static function ac04EmptyBodySanitized(): array
+    {
+        $payloadRaw = EntryTestData::getOne(body: '');
+        $dataset    = self::getDataset($payloadRaw);
+
+        return $dataset;
+    }
+
+    /**
      * AC-04 — Missing body (delegates to Empty → unset).
      *
      * @return array{
@@ -171,6 +202,22 @@ final class AddEntryDataset
     {
         $payload = EntryTestData::getOne(date: '   ');
         $dataset = self::getDataset($payload);
+
+        return $dataset;
+    }
+
+    /**
+     * AC-06 (empty date after sanitization) dataset.
+     *
+     * @return array{
+     *   payload: array{title:string,body:string,date:string},
+     *   request: AddEntryRequestInterface
+     * }
+     */
+    public static function ac06EmptyDateSanitized(): array
+    {
+        $payloadRaw = EntryTestData::getOne(date: '');
+        $dataset    = self::getDataset($payloadRaw);
 
         return $dataset;
     }

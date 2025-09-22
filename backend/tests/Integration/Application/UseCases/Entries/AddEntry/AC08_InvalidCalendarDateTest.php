@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\AddEntry;
 
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
-use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\AddEntryDataset;
 
 /**
  * AC-08: Invalid calendar date → DATE_INVALID.
@@ -35,12 +35,13 @@ final class AC08_InvalidCalendarDateTest extends BaseAddEntryIntegrationTest
     public function testInvalidCalendarDateFailsWithDateInvalid(): void
     {
         // Arrange
-        $request = AddEntryTestRequestFactory::invalidCalendarDate();
+        $dataset = AddEntryDataset::ac08InvalidCalendarDate();
 
         // Expectation
         $this->expectDateInvalid();
 
         // Act
+        $request = $dataset['request'];
         $this->useCase->execute($request);
 
         // Safety

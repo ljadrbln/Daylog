@@ -5,7 +5,7 @@ namespace Daylog\Tests\Integration\Application\UseCases\Entries\AddEntry;
 
 use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Tests\Support\Fixture\EntryFixture;
-use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\AddEntryDataset;
 
 /**
  * AC-01: Given valid title/body/date, the system returns a new id and persists the entry.
@@ -34,9 +34,10 @@ final class AC01_HappyPathTest extends BaseAddEntryIntegrationTest
     public function testHappyPathPersistsAndReturnsUuid(): void
     {
         // Arrange
-        $request = AddEntryTestRequestFactory::happy();
+        $dataset = AddEntryDataset::ac01HappyPath();
 
         // Act
+        $request  = $dataset['request'];
         $response = $this->useCase->execute($request);
         $entry    = $response->getEntry();
 

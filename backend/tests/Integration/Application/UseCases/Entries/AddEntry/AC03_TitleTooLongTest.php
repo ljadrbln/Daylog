@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\AddEntry;
 
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
-use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\AddEntryDataset;
 
 /**
  * AC-03: Title too long → TITLE_TOO_LONG.
@@ -34,12 +34,13 @@ final class AC03_TitleTooLongTest extends BaseAddEntryIntegrationTest
     public function testTitleTooLongFailsWithTitleTooLong(): void
     {
         // Arrange
-        $request = AddEntryTestRequestFactory::titleTooLong();
+        $dataset = AddEntryDataset::ac03TooLongTitle();
 
         // Expect
         $this->expectTitleTooLong();
 
         // Act
+        $request = $dataset['request'];
         $this->useCase->execute($request);
 
         // Safety

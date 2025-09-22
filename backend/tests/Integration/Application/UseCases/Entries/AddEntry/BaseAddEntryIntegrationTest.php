@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\AddEntry;
 
-use Codeception\Test\Unit;
+use DB\SQL;
 use Daylog\Configuration\Bootstrap\SqlFactory;
 use Daylog\Configuration\Providers\Entries\AddEntryProvider;
 use Daylog\Application\UseCases\Entries\AddEntry\AddEntryInterface;
 use Daylog\Tests\Support\Fixture\EntryFixture;
-use DB\SQL;
+use Daylog\Tests\Integration\Application\UseCases\Entries\BaseEntryUseCaseIntegrationTest;
 
 /**
  * Base class for UC-1 AddEntry integration tests.
@@ -25,7 +25,7 @@ use DB\SQL;
  *
  * @internal Extend this class in AC/AF test files (AC1_..., AF1_..., etc.).
  */
-abstract class BaseAddEntryIntegrationTest extends Unit
+abstract class BaseAddEntryIntegrationTest extends BaseEntryUseCaseIntegrationTest
 {
     /** @var SQL */
     protected SQL $db;
