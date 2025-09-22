@@ -40,7 +40,6 @@ final class AC01_HappyPathCest extends BaseDeleteEntryFunctionalCest
         $this->seedFromDataset($I, $dataset);
 
         // Act
-        $this->withJsonHeaders($I);
         $this->deleteEntryFromDataset($I, $dataset);
 
         // Assert (HTTP + contract)

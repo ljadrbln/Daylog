@@ -37,8 +37,6 @@ final class AC01_HappyPathCest extends BaseGetEntryFunctionalCest
         $dataset = GetEntryDataset::ac01ExistingId();
         $this->seedFromDataset($I, $dataset);
 
-        $this->withJsonHeaders($I);
-
         // Act
         $this->getEntryFromDataset($I, $dataset);
 
