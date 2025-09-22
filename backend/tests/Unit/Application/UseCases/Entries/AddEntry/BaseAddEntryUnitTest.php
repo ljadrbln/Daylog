@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\AddEntry;
 
-use Codeception\Test\Unit;
 use Daylog\Application\UseCases\Entries\AddEntry\AddEntry;
 use Daylog\Application\Validators\Entries\AddEntry\AddEntryValidatorInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Tests\Support\Fakes\FakeEntryRepository;
+use Daylog\Tests\Unit\Application\UseCases\Entries\BaseEntryUseCaseUnitTest;
 
 /**
  * Base wiring for UC-1 AddEntry unit tests.
@@ -21,7 +21,7 @@ use Daylog\Tests\Support\Fakes\FakeEntryRepository;
  * - Uses FakeEntryRepository (in-memory) for persistence surface.
  * - Exposes helpers for a "success" validator and a "throws" validator.
  */
-abstract class BaseAddEntryUnitTest extends Unit
+abstract class BaseAddEntryUnitTest extends BaseEntryUseCaseUnitTest
 {
     /**
      * Create a fresh fake repository instance.

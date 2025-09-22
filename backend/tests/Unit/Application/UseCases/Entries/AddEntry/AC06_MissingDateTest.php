@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\AddEntry;
 
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
-use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\AddEntryDataset;
 
 /**
  * UC-1 / AC-06 — Missing date — Unit.
@@ -27,15 +27,17 @@ final class AC06_MissingDateTest extends BaseAddEntryUnitTest
     public function testMissingDateFailsWithDateRequired(): void
     {
         // Arrange        
+        $dataset   = AddEntryDataset::ac06EmptyDateSanitized();
+        
         $errorCode = 'DATE_REQUIRED';
         $validator = $this->makeValidatorThrows($errorCode);
-        $request   = AddEntryTestRequestFactory::missingDate();
         $repo      = $this->makeRepo();
 
         // Expect
         $this->expectDateRequired();
 
         // Act
+        $request = $dataset['request'];
         $useCase = $this->makeUseCase($repo, $validator);
         $useCase->execute($request);
 

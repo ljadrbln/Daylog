@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\AddEntry;
 
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
-use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\AddEntryDataset;
 
 /**
  * UC-1 / AC-03 — Title too long — Unit.
@@ -30,15 +30,17 @@ final class AC03_TitleTooLongTest extends BaseAddEntryUnitTest
     public function testTitleTooLongStopsBeforePersistence(): void
     {
         // Arrange
+        $dataset   = AddEntryDataset::ac03TooLongTitle();
+
         $errorCode = 'TITLE_TOO_LONG';
         $validator = $this->makeValidatorThrows($errorCode);
-        $request   = AddEntryTestRequestFactory::titleTooLong();
         $repo      = $this->makeRepo();
 
         // Expect
         $this->expectTitleTooLong();
 
         // Act
+        $request = $dataset['request'];
         $useCase = $this->makeUseCase($repo, $validator);
         $useCase->execute($request);
 

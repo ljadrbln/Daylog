@@ -3,10 +3,9 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\AddEntry;
 
-use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequest;
 use Daylog\Domain\Services\DateService;
 use Daylog\Domain\Services\UuidGenerator;
-use Daylog\Tests\Support\Helper\EntryTestData;
+use Daylog\Tests\Support\Datasets\Entries\AddEntryDataset;
 
 /**
  * UC-1 / AC-01 — Happy path — Unit.
@@ -33,12 +32,13 @@ final class AC01_HappyPathTest extends BaseAddEntryUnitTest
     public function testHappyPathSavesEntryAndReturnsResponseDto(): void
     {
         // Arrange        
+        $dataset = AddEntryDataset::ac01HappyPath();
+                
         $validator = $this->makeValidatorOk();
-        $data      = EntryTestData::getOne();
-        $request   = AddEntryRequest::fromArray($data);
         $repo      = $this->makeRepo();
 
         // Act
+        $request  = $dataset['request'];
         $useCase  = $this->makeUseCase($repo, $validator);
         $response = $useCase->execute($request);
 
@@ -49,9 +49,10 @@ final class AC01_HappyPathTest extends BaseAddEntryUnitTest
         $isValidId = UuidGenerator::isValid($entryId);
         $this->assertTrue($isValidId);
 
-        $this->assertSame($data['title'], $entry->getTitle());
-        $this->assertSame($data['body'],  $entry->getBody());
-        $this->assertSame($data['date'],  $entry->getDate());
+        $payload = $dataset['payload'];
+        $this->assertSame($payload['title'], $entry->getTitle());
+        $this->assertSame($payload['body'],  $entry->getBody());
+        $this->assertSame($payload['date'],  $entry->getDate());
 
         $createdAt = $entry->getCreatedAt();
         $updatedAt = $entry->getUpdatedAt();

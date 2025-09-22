@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\AddEntry;
 
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
-use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\AddEntryDataset;
 
 /**
  * UC-1 / AC-07 — Invalid date format — Unit.
@@ -30,15 +30,17 @@ final class AC07_InvalidDateFormatTest extends BaseAddEntryUnitTest
     public function testInvalidDateFormatStopsBeforePersistence(): void
     {
         // Arrange        
+        $dataset   = AddEntryDataset::ac07InvalidDateFormat();
+
         $errorCode = 'DATE_INVALID';
         $validator = $this->makeValidatorThrows($errorCode);
-        $request   = AddEntryTestRequestFactory::invalidDateFormat();
         $repo      = $this->makeRepo();
 
         // Expect
         $this->expectDateInvalid();
 
         // Act
+        $request = $dataset['request'];
         $useCase = $this->makeUseCase($repo, $validator);
         $useCase->execute($request);
 

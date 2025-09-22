@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\AddEntry;
 
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
-use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\AddEntryDataset;
 
 /**
  * UC-1 / AC-08 — Invalid calendar date — Unit.
@@ -31,15 +31,17 @@ final class AC08_InvalidCalendarDateTest extends BaseAddEntryUnitTest
     public function testInvalidCalendarDateStopsBeforePersistence(): void
     {
         // Arrange        
+        $dataset   = AddEntryDataset::ac08InvalidCalendarDate();
+
         $errorCode = 'DATE_INVALID';
         $validator = $this->makeValidatorThrows($errorCode);
-        $request   = AddEntryTestRequestFactory::invalidCalendarDate();
         $repo      = $this->makeRepo();
 
         // Expect
         $this->expectDateInvalid();
 
         // Act
+        $request = $dataset['request'];
         $useCase = $this->makeUseCase($repo, $validator);
         $useCase->execute($request);
 
