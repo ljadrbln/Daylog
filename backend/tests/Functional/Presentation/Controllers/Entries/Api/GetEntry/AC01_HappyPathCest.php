@@ -46,22 +46,22 @@ final class AC01_HappyPathCest extends BaseGetEntryFunctionalCest
         $this->assertOkContract($I);
 
         // Assert (payload equals seeded)
-        $after = $this->grabTypedDataEnvelope($I);
+        $actualEntry = $this->grabTypedDataEnvelope($I);
 
-        /** @var array<string,string> $before */
-        $before = $dataset['rows'][0];
+        /** @var array<string,string> $expectedEntry */
+        $expectedEntry = $dataset['rows'][0];
 
         /** @var string $returnedId */
-        $returnedId = $after['id'];
+        $returnedId = $actualEntry['id'];
 
         $isValid = UuidGenerator::isValid($returnedId);
         $I->assertTrue($isValid);
 
-        $I->assertSame($before['id'],        $after['id']);
-        $I->assertSame($before['title'],     $after['title']);
-        $I->assertSame($before['body'],      $after['body']);
-        $I->assertSame($before['date'],      $after['date']);
-        $I->assertSame($before['createdAt'], $after['createdAt']);
-        $I->assertSame($before['updatedAt'], $after['updatedAt']);
+        $I->assertSame($expectedEntry['id'],        $actualEntry['id']);
+        $I->assertSame($expectedEntry['title'],     $actualEntry['title']);
+        $I->assertSame($expectedEntry['body'],      $actualEntry['body']);
+        $I->assertSame($expectedEntry['date'],      $actualEntry['date']);
+        $I->assertSame($expectedEntry['createdAt'], $actualEntry['createdAt']);
+        $I->assertSame($expectedEntry['updatedAt'], $actualEntry['updatedAt']);
     }
 }

@@ -59,32 +59,32 @@ final class AC01_HappyPath_TitleOnlyCest extends BaseUpdateEntryFunctionalCest
         $this->assertOkContract($I);
 
         // Assert (response contains a valid UUID id and expected fields)
-        $after   = $this->grabTypedDataEnvelope($I);
-        $before  = $dataset['rows'][0];
+        $beforeEntry = $dataset['rows'][0];
+        $actualEntry = $this->grabTypedDataEnvelope($I);
         $payload = $dataset['payload'];
 
         $targetId    = $payload['id'];
-        $returnedId  = $after['id'];
+        $returnedId  = $actualEntry['id'];
         $isValidUuid = UuidGenerator::isValid($returnedId);
 
         $I->assertTrue($isValidUuid);
         $I->assertSame($targetId, $returnedId);
 
         // Field equality / inequality checks
-        $I->assertSame($before['id'],        $after['id']);
-        $I->assertSame($payload['title'],    $after['title']);
-        $I->assertSame($before['body'],      $after['body']);
-        $I->assertSame($before['date'],      $after['date']);
-        $I->assertSame($before['createdAt'], $after['createdAt']);
+        $I->assertSame($beforeEntry['id'],        $actualEntry['id']);
+        $I->assertSame($payload['title'],         $actualEntry['title']);
+        $I->assertSame($beforeEntry['body'],      $actualEntry['body']);
+        $I->assertSame($beforeEntry['date'],      $actualEntry['date']);
+        $I->assertSame($beforeEntry['createdAt'], $actualEntry['createdAt']);
 
-        // updatedAt must be strictly greater than before (ISO-8601 string compare is valid)
-        /** @var string $afterUpdatedAt */
-        $afterUpdatedAt  = $after['updatedAt'];
+        // updatedAt must be strictly greater than beforeEntry (ISO-8601 string compare is valid)
+        /** @var string $actualEntryUpdatedAt */
+        $actualEntryUpdatedAt  = $actualEntry['updatedAt'];
 
-        /** @var string $beforeUpdatedAt */
-        $beforeUpdatedAt = $before['updatedAt'];
+        /** @var string $beforeEntryUpdatedAt */
+        $beforeEntryUpdatedAt = $beforeEntry['updatedAt'];
 
-        $isStrictlyGreater = strcmp($afterUpdatedAt, $beforeUpdatedAt) > 0;
+        $isStrictlyGreater = strcmp($actualEntryUpdatedAt, $beforeEntryUpdatedAt) > 0;
         $I->assertTrue($isStrictlyGreater);
     }
 }
