@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\DeleteEntry;
 
+use Daylog\Application\DTO\Entries\DeleteEntry\DeleteEntryRequestInterface;
+
 use Daylog\Tests\FunctionalTester;
 use Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\BaseEntryApiFunctionalCest;
 
@@ -31,12 +33,19 @@ abstract class BaseDeleteEntryFunctionalCest extends BaseEntryApiFunctionalCest
      *   - Delegates HTTP to Codeception's REST module via FunctionalTester.
      *
      * @param FunctionalTester      $I       Codeception functional tester.
-     * @param array{id:string}      $payload Transport payload with the entry UUID (e.g., ['id' => '...']).
+     * @param array{
+     *   rows: array<int,array<string,string>>,
+     *   payload: array{id:string},
+     *   request: DeleteEntryRequestInterface
+     * } $dataset
+     * 
      * @return void
      */
-    protected function deleteEntry(FunctionalTester $I, array $payload): void
+    protected function deleteEntryFromDataset(FunctionalTester $I, array $dataset): void
     {
-        $id  = $payload['id'];
+        $payload = $dataset['payload'];
+        $id      = $payload['id'];
+
         $url = '/api/entries/%s';
         $url = sprintf($url, $id);
 

@@ -9,6 +9,9 @@ use Daylog\Tests\Support\Scenarios\Entries\DeleteEntryScenario;
 use Daylog\Tests\Support\Helper\EntriesSeeding;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 
+use Daylog\Tests\Support\Datasets\Entries\DeleteEntryDataset;
+
+
 /**
  * AC-03 Not found: ensures that a valid UUID v4 which does not exist
  * leads to a domain-level "ENTRY_NOT_FOUND" error.
@@ -41,11 +44,8 @@ final class AC03_NotFoundTest extends BaseDeleteEntryIntegrationTest
     public function testValidAbsentUuidTriggersEntryNotFound(): void
     {
         // Arrange
-        $dataset  = DeleteEntryScenario::ac01HappyPath();
-        $rows     = $dataset['rows'];
-
-        $request = DeleteEntryTestRequestFactory::notFound();
-        EntriesSeeding::intoDb($rows);
+        $dataset  = DeleteEntryDataset::ac03NotFound();
+        $this->seedFromDataset($dataset);
 
         $rowsCountBefore = EntryFixture::countRows();
 
@@ -53,6 +53,7 @@ final class AC03_NotFoundTest extends BaseDeleteEntryIntegrationTest
         $this->expectEntryNotFound();
 
         // Act
+        $request = $dataset['request'];
         $this->useCase->execute($request);
 
         // Assert

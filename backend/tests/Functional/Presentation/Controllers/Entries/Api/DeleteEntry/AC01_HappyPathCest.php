@@ -3,11 +3,10 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\DeleteEntry;
 
-use Daylog\Tests\Support\Factory\DeleteEntryTestRequestFactory;
-use Daylog\Tests\Support\Scenarios\Entries\DeleteEntryScenario;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
 use Daylog\Tests\Support\Fixture\EntryFixture;
 use Daylog\Tests\FunctionalTester;
+use Daylog\Tests\Support\Datasets\Entries\DeleteEntryDataset;
+
 
 /**
  * UC-4 / AC-01 — Happy path — Functional.
@@ -37,22 +36,18 @@ final class AC01_HappyPathCest extends BaseDeleteEntryFunctionalCest
     public function testHappyPathDeletesSeededEntry(FunctionalTester $I): void
     {
         // Arrange
-        $this->withJsonHeaders($I);
-
-        $dataset  = DeleteEntryScenario::ac01HappyPath();
-        $rows     = $dataset['rows'];
-        $targetId = $dataset['targetId'];
-        $payload  = DeleteEntryTestRequestFactory::happyPayload($targetId);
-
-        EntriesSeeding::intoDb($rows);
+        $dataset = DeleteEntryDataset::ac01ExistingId();
+        $this->seedFromDataset($I, $dataset);
 
         // Act
-        $this->deleteEntry($I, $payload);
+        $this->withJsonHeaders($I);
+        $this->deleteEntryFromDataset($I, $dataset);
 
         // Assert (HTTP + contract)
         $this->assertOkContract($I);
 
         // Assert (payload contains id of deleted entry)
+        $targetId   = $dataset['payload']['id'];
         $expectedId = ['data' => ['id' => $targetId]];
         $I->seeResponseContainsJson($expectedId);
 

@@ -4,9 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\DeleteEntry;
 
 use Daylog\Tests\Support\Fixture\EntryFixture;
-use Daylog\Tests\Support\Factory\DeleteEntryTestRequestFactory;
-use Daylog\Tests\Support\Scenarios\Entries\DeleteEntryScenario;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
+use Daylog\Tests\Support\Datasets\Entries\DeleteEntryDataset;
 
 /**
  * AC-01: Deleting an existing entry succeeds (happy path).
@@ -41,16 +39,13 @@ final class AC01_HappyPathTest extends BaseDeleteEntryIntegrationTest
     public function testHappyPathDeletesSeededEntry(): void
     {
         // Arrange
-        $dataset  = DeleteEntryScenario::ac01HappyPath();
-        $rows     = $dataset['rows'];
-        $targetId = $dataset['targetId'];
-
-        $request = DeleteEntryTestRequestFactory::happy($targetId);
-        EntriesSeeding::intoDb($rows);
+        $dataset = DeleteEntryDataset::ac01ExistingId();
+        $this->seedFromDataset($dataset);
 
         $rowsCountBefore = EntryFixture::countRows();
 
         // Act
+        $request  = $dataset['request'];
         $response = $this->useCase->execute($request);
 
         // Assert
@@ -60,6 +55,7 @@ final class AC01_HappyPathTest extends BaseDeleteEntryIntegrationTest
         $this->assertSame(1, $numberOfDeletedRows);
 
         // Assert: response echoes the same id (DTO → Entry → id)
+        $targetId = $dataset['payload']['id'];
         $entry    = $response->getEntry();
         $actualId = $entry->getId();
 

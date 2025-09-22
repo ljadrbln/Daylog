@@ -4,9 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\DeleteEntry;
 
 use Daylog\Tests\FunctionalTester;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
-use Daylog\Tests\Support\Scenarios\Entries\DeleteEntryScenario;
-use Daylog\Tests\Support\Factory\DeleteEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\DeleteEntryDataset;
 
 /**
  * UC-4 / AC-03 — Not found — Functional.
@@ -33,16 +31,12 @@ final class AC03_NotFoundCest extends BaseDeleteEntryFunctionalCest
     public function testNotFoundFailsWithEntryNotFound(FunctionalTester $I): void
     {
         // Arrange
-        $this->withJsonHeaders($I);
-
-        $dataset  = DeleteEntryScenario::ac01HappyPath();
-        $rows    = $dataset['rows'];
-
-        EntriesSeeding::intoDb($rows);
-        $payload = DeleteEntryTestRequestFactory::notFoundPayload();
+        $dataset = DeleteEntryDataset::ac03NotFound();
+        $this->seedFromDataset($I, $dataset);
 
         // Act
-        $this->deleteEntry($I, $payload);
+        $this->withJsonHeaders($I);
+        $this->deleteEntryFromDataset($I, $dataset);
 
         // Assert
         $this->assertNotFoundContract($I);

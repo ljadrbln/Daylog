@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\DeleteEntry;
 
-use Codeception\Test\Unit;
+use DB\SQL;
 use Daylog\Configuration\Bootstrap\SqlFactory;
 use Daylog\Configuration\Providers\Entries\DeleteEntryProvider;
 use Daylog\Application\UseCases\Entries\DeleteEntry\DeleteEntryInterface;
 use Daylog\Tests\Support\Fixture\EntryFixture;
-use DB\SQL;
+use Daylog\Tests\Integration\Application\UseCases\Entries\BaseEntryUseCaseIntegrationTest;
 
 /**
  * Base class for UC-4 DeleteEntry integration tests.
@@ -25,7 +25,7 @@ use DB\SQL;
  * 
  * @internal Extend this class in AC/AF test files (AC1_..., AF1_..., etc.).
  */
-abstract class BaseDeleteEntryIntegrationTest extends Unit
+abstract class BaseDeleteEntryIntegrationTest extends BaseEntryUseCaseIntegrationTest
 {
     /**
      * Real DB connection used by child tests.

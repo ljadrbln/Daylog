@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\DeleteEntry;
 
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
-use Daylog\Tests\Support\Factory\DeleteEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\DeleteEntryDataset;
 
 /**
  * AC-02 Invalid id: ensures that non-UUID input is rejected.
@@ -34,12 +34,13 @@ final class AC02_InvalidIdTest extends BaseDeleteEntryIntegrationTest
     public function testInvalidIdTriggersValidationError(): void
     {
         // Arrange
-        $request = DeleteEntryTestRequestFactory::invalidId();
+        $dataset = DeleteEntryDataset::ac02InvalidId();
 
         // Assert
         $this->expectIdInvalid();
 
         // Act
+        $request = $dataset['request'];
         $this->useCase->execute($request);
     }
 }
