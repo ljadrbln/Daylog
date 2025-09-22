@@ -3,10 +3,7 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\GetEntry;
 
-use Daylog\Tests\Support\Fixture\EntryFixture;
-use Daylog\Tests\Support\Factory\GetEntryTestRequestFactory;
-use Daylog\Tests\Support\Scenarios\Entries\GetEntryScenario;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
+use Daylog\Tests\Support\Datasets\Entries\GetEntryDataset;
 
 /**
  * AC-01: Retrieving an existing entry succeeds (happy path).
@@ -41,19 +38,16 @@ final class AC01_HappyPathTest extends BaseGetEntryIntegrationTest
     public function testHappyPathReturnsSeededEntry(): void
     {
         // Arrange
-        $dataset  = GetEntryScenario::ac01HappyPath();
-        $rows     = $dataset['rows'];
-        $targetId = $dataset['targetId'];
-
-        $request = GetEntryTestRequestFactory::happy($targetId);
-        EntriesSeeding::intoDb($rows);
+        $dataset  = GetEntryDataset::ac01ExistingId();
+        $this->seedFromDataset($dataset);
 
         // Act
+        $request  = $dataset['request'];
         $response = $this->useCase->execute($request);
         $entry    = $response->getEntry();
 
-        // Assert: response Entry matches seeded row
-        $seeded      = $rows[0];
+        // Assert
+        $seeded      = $dataset['rows'][0];
         $actualId    = $entry->getId();
         $actualTitle = $entry->getTitle();
         $actualBody  = $entry->getBody();

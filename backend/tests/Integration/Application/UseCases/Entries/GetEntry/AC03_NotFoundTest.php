@@ -3,11 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\GetEntry;
 
-use Daylog\Tests\Support\Fixture\EntryFixture;
-use Daylog\Tests\Support\Factory\GetEntryTestRequestFactory;
-use Daylog\Tests\Support\Scenarios\Entries\GetEntryScenario;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
+use Daylog\Tests\Support\Datasets\Entries\GetEntryDataset;
 
 /**
  * AC-03 Not found: ensures that a valid UUID v4 which does not exist
@@ -41,16 +38,14 @@ final class AC03_NotFoundTest extends BaseGetEntryIntegrationTest
     public function testValidAbsentUuidTriggersEntryNotFound(): void
     {
         // Arrange
-        $dataset = GetEntryScenario::ac01HappyPath();
-        $rows    = $dataset['rows'];
-
-        $request = GetEntryTestRequestFactory::notFound();
-        EntriesSeeding::intoDb($rows);
+        $dataset = GetEntryDataset::ac03NotFound();
+        $this->seedFromDataset($dataset);
 
         // Expect
         $this->expectEntryNotFound();
 
         // Act
+        $request = $dataset['request'];
         $this->useCase->execute($request);
     }
 }

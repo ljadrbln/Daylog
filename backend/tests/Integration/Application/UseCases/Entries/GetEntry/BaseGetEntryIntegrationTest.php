@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\GetEntry;
 
-use Codeception\Test\Unit;
+use DB\SQL;
 use Daylog\Configuration\Bootstrap\SqlFactory;
 use Daylog\Configuration\Providers\Entries\GetEntryProvider;
 use Daylog\Application\UseCases\Entries\GetEntry\GetEntryInterface;
 use Daylog\Tests\Support\Fixture\EntryFixture;
-use DB\SQL;
 
+use Daylog\Tests\Integration\Application\UseCases\Entries\BaseEntryUseCaseIntegrationTest;
 /**
  * Base class for UC-3 GetEntry integration tests.
  *
@@ -25,7 +25,7 @@ use DB\SQL;
  * 
  * @internal Extend this class in AC/AF test files (AC1_..., AF1_..., etc.).
  */
-abstract class BaseGetEntryIntegrationTest extends Unit
+abstract class BaseGetEntryIntegrationTest extends BaseEntryUseCaseIntegrationTest
 {
     /**
      * Real DB connection used by child tests.

@@ -7,6 +7,7 @@ use Daylog\Tests\Support\Scenarios\Entries\GetEntryScenario;
 use Daylog\Tests\Support\Factory\GetEntryTestRequestFactory;
 use Daylog\Tests\Support\Helper\EntriesSeeding;
 use Daylog\Tests\FunctionalTester;
+use Daylog\Tests\Support\Datasets\Entries\GetEntryDataset;
 
 /**
  * UC-3 / AC-03 — Not found — Functional.
@@ -33,16 +34,12 @@ final class AC03_NotFoundCest extends BaseGetEntryFunctionalCest
     public function testNotFoundFailsWithEntryNotFound(FunctionalTester $I): void
     {
         // Arrange
-        $this->withJsonHeaders($I);
-
-        $dataset = GetEntryScenario::ac01HappyPath();
-        $rows    = $dataset['rows'];
-
-        EntriesSeeding::intoDb($rows);
-        $payload = GetEntryTestRequestFactory::notFoundPayload();
-
+        $dataset = GetEntryDataset::ac03NotFound();
+        $this->seedFromDataset($I, $dataset);
+        
         // Act
-        $this->getEntry($I, $payload);
+        $this->withJsonHeaders($I);
+        $this->getEntryFromDataset($I, $dataset);
 
         // Assert
         $this->assertNotFoundContract($I);

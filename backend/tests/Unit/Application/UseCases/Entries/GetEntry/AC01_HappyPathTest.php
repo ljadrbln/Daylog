@@ -3,9 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\GetEntry;
 
-use Daylog\Tests\Support\Factory\GetEntryTestRequestFactory;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
-use Daylog\Tests\Support\Scenarios\Entries\GetEntryScenario;
+use Daylog\Domain\Models\Entries\Entry;
+use Daylog\Tests\Support\Datasets\Entries\GetEntryDataset;
 
 /**
  * UC-3 / AC-01 — Happy path — Unit.
@@ -34,23 +33,22 @@ final class AC01_HappyPathTest extends BaseGetEntryUnitTest
     public function testHappyPathReturnsEntryById(): void
     {
         // Arrange
-        $dataset  = GetEntryScenario::ac01HappyPath();
-        $rows     = $dataset['rows'];
-        $targetId = $dataset['targetId'];
-        $expected = $dataset['expected'];
+        $repo    = $this->makeRepo();
+        $dataset = GetEntryDataset::ac01ExistingId();
+        $this->seedFromDataset($repo, $dataset);
 
-        $repo = $this->makeRepo();
-        EntriesSeeding::intoFakeRepo($repo, $rows);
-
-        $request   = GetEntryTestRequestFactory::happy($targetId);
         $validator = $this->makeValidatorOk();
         $useCase   = $this->makeUseCase($repo, $validator);
-
+        
         // Act
-        $response = $useCase->execute($request);
-        $actual   = $response->getEntry();
+        $request  = $dataset['request'];
+        $response = $useCase->execute($request);        
 
         // Assert
+        $expected = $dataset['rows'][0];
+        $expected = Entry::fromArray($expected);
+
+        $actual   = $response->getEntry();
         $areEqual = $expected->equals($actual);
         $this->assertTrue($areEqual);
     }

@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\DeleteEntry;
 
-use Daylog\Domain\Models\Entries\Entry;
-use Daylog\Tests\Support\Assertion\UpdateEntryTitleOnlyAssertions;
 use Daylog\Tests\Support\Datasets\Entries\DeleteEntryDataset;
 
 /**

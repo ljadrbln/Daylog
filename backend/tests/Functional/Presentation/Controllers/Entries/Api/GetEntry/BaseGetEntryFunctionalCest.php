@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\GetEntry;
 
+use Daylog\Application\DTO\Entries\GetEntry\GetEntryRequestInterface;
 use Daylog\Tests\FunctionalTester;
 use Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\BaseEntryApiFunctionalCest;
 
@@ -10,35 +11,43 @@ use Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\BaseEntryApiFun
  * BaseGetEntryFunctionalCest
  *
  * Purpose:
- * Thin layer over the shared base to expose a single, intention-revealing helper
- * for issuing GET requests against the Entries API.
+ * Provide a thin, intention-revealing helper for issuing canonical
+ * GET /api/entries/{id} requests in UC-3 functional scenarios.
  *
  * Mechanics:
- * - Builds the canonical GET URL without hardcoded duplication;
+ * - Accepts a unified dataset shape { rows, payload, request } to keep tests DRY;
+ * - Extracts 'id' from payload and builds the URL via a formatted pattern;
  * - Delegates the HTTP call to Codeception's REST module through FunctionalTester.
  */
 abstract class BaseGetEntryFunctionalCest extends BaseEntryApiFunctionalCest
 {
     /**
-     * Issue a GET request to the Entries API.
+     * Issue a GET request to the Entries API using a prepared dataset.
      *
      * Purpose:
      *   Send a canonical GET /api/entries/{id} call for UC-3 scenarios from functional tests.
      *
      * Mechanics:
-     *   - Accepts a typed array-shape payload with a single 'id' (UUID).
-     *   - Builds the route using a formatted pattern to avoid hardcoded concatenation.
-     *   - Delegates HTTP to Codeception's REST module via FunctionalTester.
+     *   - Accepts a typed dataset with 'payload' holding a single 'id' (UUID v4);
+     *   - Uses a dedicated pattern variable to avoid hardcoded concatenation;
+     *   - Invokes FunctionalTester->sendGet() with the fully formatted URL.
      *
      * @param FunctionalTester      $I       Codeception functional tester.
-     * @param array{id:string}      $payload Transport payload with the entry UUID (e.g., ['id' => '...']).
+     * @param array{
+     *   rows: array<int,array<string,string>>,
+     *   payload: array{id:string},
+     *   request: GetEntryRequestInterface
+     * } $dataset
+     *
      * @return void
      */
-    protected function getEntry(FunctionalTester $I, array $payload): void
+    protected function getEntryFromDataset(FunctionalTester $I, array $dataset): void
     {
-        $id  = $payload['id'];
-        $url = '/api/entries/%s';
-        $url = sprintf($url, $id);
+        $payload = $dataset['payload'];
+        $id      = $payload['id'];
+
+        $pattern = '/api/entries/%s';
+        $url     = sprintf($pattern, $id);
 
         $I->sendGet($url);
     }

@@ -4,7 +4,8 @@ declare(strict_types=1);
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\GetEntry;
 
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
-use Daylog\Tests\Support\Factory\GetEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\GetEntryDataset;
+
 
 /**
  * UC-3 / AC-02 — Invalid id — Unit.
@@ -31,10 +32,12 @@ final class AC02_InvalidIdTest extends BaseGetEntryUnitTest
      */
     public function testInvalidIdTriggersValidationError(): void
     {
-        // Arrange        
+        // Arrange
+        $dataset   = GetEntryDataset::ac02InvalidId();
+        $request   = $dataset['request'];
+        
         $errorCode = 'ID_INVALID';
         $validator = $this->makeValidatorThrows($errorCode);
-        $request   = GetEntryTestRequestFactory::invalidId();
         $repo      = $this->makeRepo();
 
         // Expect

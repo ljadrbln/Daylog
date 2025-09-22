@@ -7,6 +7,8 @@ use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 use Daylog\Tests\Support\Factory\GetEntryTestRequestFactory;
 use Daylog\Tests\Support\Helper\EntriesSeeding;
 use Daylog\Tests\Support\Scenarios\Entries\GetEntryScenario;
+use Daylog\Tests\Support\Datasets\Entries\GetEntryDataset;
+
 
 /**
  * UC-3 / AC-03 — Not found — Unit.
@@ -36,14 +38,11 @@ final class AC03_NotFoundTest extends BaseGetEntryUnitTest
     public function testAbsentIdYieldsEntryNotFound(): void
     {
         // Arrange
-        $dataset = GetEntryScenario::ac01HappyPath();
-        $rows    = $dataset['rows'];
+        $dataset   = GetEntryDataset::ac03NotFound();
+        $request   = $dataset['request'];
 
-        $repo = $this->makeRepo();
-        EntriesSeeding::intoFakeRepo($repo, $rows);
-
-        $request   = GetEntryTestRequestFactory::notFound();
         $validator = $this->makeValidatorOk();
+        $repo      = $this->makeRepo();
 
         // Expect
         $this->expectEntryNotFound();
@@ -54,5 +53,5 @@ final class AC03_NotFoundTest extends BaseGetEntryUnitTest
 
         // Assert
         $this->assertRepoUntouched($repo);
-    }
+    }    
 }

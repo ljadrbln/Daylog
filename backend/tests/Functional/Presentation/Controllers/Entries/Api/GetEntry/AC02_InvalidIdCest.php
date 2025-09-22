@@ -2,8 +2,8 @@
 declare(strict_types=1);
 
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\GetEntry;
-use Daylog\Tests\Support\Factory\GetEntryTestRequestFactory;
 use Daylog\Tests\FunctionalTester;
+use Daylog\Tests\Support\Datasets\Entries\GetEntryDataset;
 
 /**
  * UC-3 / AC-02 — Invalid id — Functional.
@@ -29,12 +29,12 @@ final class AC02_InvalidIdCest extends BaseGetEntryFunctionalCest
      */
     public function testInvalidIdFailsWithIdInvalid(FunctionalTester $I): void
     {
-        // Arrange
-        $this->withJsonHeaders($I);
-        $payload = GetEntryTestRequestFactory::invalidIdPayload();
+        // Arrange        
+        $dataset = GetEntryDataset::ac02InvalidId();
 
         // Act
-        $this->getEntry($I, $payload);
+        $this->withJsonHeaders($I);
+        $this->getEntryFromDataset($I, $dataset);
 
         // Assert
         $this->assertUnprocessableContract($I);
