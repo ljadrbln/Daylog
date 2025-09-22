@@ -7,6 +7,7 @@ use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Tests\Support\Fixture\EntryFixture;
 use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
 use Daylog\Tests\FunctionalTester;
+use Daylog\Tests\Support\Datasets\Entries\AddEntryDataset;
 
 /**
  * UC-1 / AC-01 — Happy path — Functional.
@@ -36,25 +37,24 @@ final class AC01_HappyPathCest extends BaseAddEntryFunctionalCest
     public function testHappyPathCreatesEntryAndReturnsId(FunctionalTester $I): void
     {
         // Arrange
-        $this->withJsonHeaders($I);
-        $payload = AddEntryTestRequestFactory::happyPayload();
+        $dataset = AddEntryDataset::ac01HappyPath();
 
         // Act
-        $this->addEntry($I, $payload);
+        $this->withJsonHeaders($I);
+        $this->addEntryFromDataset($I, $dataset);
 
         // Assert (HTTP + contract)
         $this->assertOkContract($I);
 
         // Assert (response contains a valid UUID id)
-        $raw     = $I->grabResponse();
-        $decoded = json_decode($raw, true);
-        $entryId = $decoded['data']['id'] ?? null;
+        $responseData = $this->grabTypedDataEnvelope($I);
+        $entryId      = $responseData['id'];
 
         $isValid = UuidGenerator::isValid($entryId);
-        $I->assertTrue($isValid, 'Returned id must be a valid UUID v4.');
+        $I->assertTrue($isValid);
 
         // Assert (DB contains the created entry)
         $exists = EntryFixture::existsById($entryId);
-        $I->assertTrue($exists, 'Entry must be persisted in the database.');
+        $I->assertTrue($exists);
     }
 }

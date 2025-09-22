@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\AddEntry;
 
+use Daylog\Application\DTO\Entries\AddEntry\AddEntryRequestInterface;
+
 use Daylog\Tests\FunctionalTester;
 use Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\BaseEntryApiFunctionalCest;
 
@@ -31,14 +33,18 @@ abstract class BaseAddEntryFunctionalCest extends BaseEntryApiFunctionalCest
      *   - Sends JSON payload directly to the API endpoint.
      *   - Delegates HTTP to Codeception's REST module via FunctionalTester.
      *
-     * @param FunctionalTester                   $I       Codeception functional tester.
-     * @param array{title:string,body:string,date:string} $payload Transport payload with entry data.
+     * @param FunctionalTester $I
+     * @param array{
+     *   payload: array{title?:string,body?:string,date?:string},
+     *   request: AddEntryRequestInterface
+     * } $dataset
      * @return void
      */
-    protected function addEntry(FunctionalTester $I, array $payload): void
+    protected function addEntryFromDataset(FunctionalTester $I, array $dataset): void
     {
         $url = '/api/entries';
-
+        
+        $payload = $dataset['payload'];
         $I->sendPost($url, $payload);
     }
 }
