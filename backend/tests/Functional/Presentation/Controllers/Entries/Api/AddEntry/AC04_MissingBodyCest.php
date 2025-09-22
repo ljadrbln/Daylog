@@ -7,34 +7,34 @@ use Daylog\Tests\FunctionalTester;
 use Daylog\Tests\Support\Datasets\Entries\AddEntryDataset;
 
 /**
- * AC-06: Missing date → DATE_REQUIRED (API boundary).
+ * AC-04: Missing body → BODY_REQUIRED (API boundary).
  *
  * Purpose:
- *   Verify that the API rejects a request without the date field and responds with the
+ *   Verify that the API rejects a request without the body field and responds with the
  *   standardized 422 validation envelope consistent with UC-1 and ENTRY-BR rules.
  *
  * Mechanics:
- *   - Build a canonical invalid JSON payload via AddEntryDataset::ac06MissingDate();
+ *   - Build a canonical invalid JSON payload via AddEntryDataset::ac04MissingBody();
  *   - POST payload to /api/entries using the shared base helper;
- *   - Assert 422 contract (success=false) and presence of DATE_REQUIRED in the flat errors list.
+ *   - Assert 422 contract (success=false) and presence of BODY_REQUIRED in the flat errors list.
  *
  * @covers \Daylog\Configuration\Providers\Entries\AddEntryProvider
  * @covers \Daylog\Application\UseCases\Entries\AddEntry
  *
  * @group UC-AddEntry
  */
-final class AC06_MissingDateCest extends BaseAddEntryFunctionalCest
+final class AC04_MissingBodyCest extends BaseAddEntryFunctionalCest
 {
     /**
-     * API rejects missing date and reports DATE_REQUIRED.
+     * API rejects missing body and reports BODY_REQUIRED.
      *
      * @param FunctionalTester $I Codeception functional tester.
      * @return void
      */
-    public function testMissingDateIsRejectedWithDateRequired(FunctionalTester $I): void
+    public function testMissingBodyIsRejectedWithBodyRequired(FunctionalTester $I): void
     {
         // Arrange
-        $dataset = AddEntryDataset::ac06MissingDate();
+        $dataset = AddEntryDataset::ac04MissingBody();
 
         // Act
         $this->addEntryFromDataset($I, $dataset);
@@ -42,7 +42,7 @@ final class AC06_MissingDateCest extends BaseAddEntryFunctionalCest
         // Assert
         $this->assertBadRequestContract($I);
 
-        $code = 'DATE_REQUIRED';
+        $code = 'BODY_REQUIRED';
         $this->assertErrorCode($I, $code);
     }
 }

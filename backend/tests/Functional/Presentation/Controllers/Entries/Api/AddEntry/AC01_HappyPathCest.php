@@ -39,7 +39,6 @@ final class AC01_HappyPathCest extends BaseAddEntryFunctionalCest
         $dataset = AddEntryDataset::ac01HappyPath();
 
         // Act
-        $this->withJsonHeaders($I);
         $this->addEntryFromDataset($I, $dataset);
 
         // Assert (HTTP + contract)

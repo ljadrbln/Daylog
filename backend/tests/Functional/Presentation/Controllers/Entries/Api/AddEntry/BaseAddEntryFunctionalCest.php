@@ -45,6 +45,8 @@ abstract class BaseAddEntryFunctionalCest extends BaseEntryApiFunctionalCest
         $url = '/api/entries';
         
         $payload = $dataset['payload'];
+
+        $this->withJsonHeaders($I);
         $I->sendPost($url, $payload);
     }
 }

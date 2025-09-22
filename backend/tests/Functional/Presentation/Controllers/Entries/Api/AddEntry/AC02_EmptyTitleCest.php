@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\AddEntry;
 
 use Daylog\Tests\FunctionalTester;
-use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\AddEntryDataset;
 
 /**
  * AC-02: Empty title → TITLE_REQUIRED.
@@ -34,11 +34,10 @@ final class AC02_EmptyTitleCest extends BaseAddEntryFunctionalCest
     public function testEmptyTitleIsRejectedWithTitleRequired(FunctionalTester $I): void
     {
         // Arrange
-        $this->withJsonHeaders($I);
-        $payload = AddEntryTestRequestFactory::emptyTitlePayload();
+        $dataset = AddEntryDataset::ac02EmptyTitle();
 
         // Act
-        $this->addEntry($I, $payload);
+        $this->addEntryFromDataset($I, $dataset);
 
         // Assert
         $this->assertUnprocessableContract($I);

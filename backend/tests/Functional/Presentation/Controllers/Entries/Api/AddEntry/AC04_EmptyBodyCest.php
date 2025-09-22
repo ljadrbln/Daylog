@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\AddEntry;
 
 use Daylog\Tests\FunctionalTester;
-use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\AddEntryDataset;
 
 /**
  * AC-04: Empty body → BODY_REQUIRED (API boundary).
@@ -34,13 +34,12 @@ final class AC04_EmptyBodyCest extends BaseAddEntryFunctionalCest
     public function testEmptyBodyIsRejectedWithBodyRequired(FunctionalTester $I): void
     {
         // Arrange
-        $this->withJsonHeaders($I);
-        $payload = AddEntryTestRequestFactory::emptyBodyPayload();
+        $dataset = AddEntryDataset::ac04EmptyBody();
 
         // Act
-        $this->addEntry($I, $payload);
+        $this->addEntryFromDataset($I, $dataset);
 
-        // Assert — contract and specific error code
+        // Assert
         $this->assertUnprocessableContract($I);
 
         $code = 'BODY_REQUIRED';

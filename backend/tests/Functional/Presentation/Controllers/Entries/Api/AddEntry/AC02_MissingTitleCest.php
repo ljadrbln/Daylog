@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\AddEntry;
 
 use Daylog\Tests\FunctionalTester;
-use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\AddEntryDataset;
 
 /**
  * AC-02: Empty title → TITLE_REQUIRED.
@@ -31,19 +31,18 @@ final class AC02_MissingTitleCest extends BaseAddEntryFunctionalCest
      * @param FunctionalTester $I Codeception functional tester.
      * @return void
      */
-    public function testEmptyTitleIsRejectedWithTitleRequired(FunctionalTester $I): void
+    public function testMissingTitleIsRejectedWithTitleRequired(FunctionalTester $I): void
     {
         // Arrange
-        $this->withJsonHeaders($I);
-        $payload = AddEntryTestRequestFactory::missingTitlePayload();
+        $dataset = AddEntryDataset::ac02MissingTitle();
 
         // Act
-        $this->addEntry($I, $payload);
+        $this->addEntryFromDataset($I, $dataset);
 
         // Assert
         $this->assertBadRequestContract($I);
 
         $code = 'TITLE_REQUIRED';
         $this->assertErrorCode($I, $code);
-    }
+    }    
 }
