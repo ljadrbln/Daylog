@@ -5,7 +5,6 @@ namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\AddEntry;
 
 use Daylog\Domain\Services\UuidGenerator;
 use Daylog\Tests\Support\Fixture\EntryFixture;
-use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
 use Daylog\Tests\FunctionalTester;
 use Daylog\Tests\Support\Datasets\Entries\AddEntryDataset;
 

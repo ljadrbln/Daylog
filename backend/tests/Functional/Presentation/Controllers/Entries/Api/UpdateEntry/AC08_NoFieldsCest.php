@@ -38,7 +38,6 @@ final class AC08_NoFieldsCest extends BaseUpdateEntryFunctionalCest
         $dataset = UpdateEntryDataset::ac08IdOnly();
 
         // Act
-        $this->withJsonHeaders($I);
         $this->updateEntryFromDataset($I, $dataset);
 
         // Assert

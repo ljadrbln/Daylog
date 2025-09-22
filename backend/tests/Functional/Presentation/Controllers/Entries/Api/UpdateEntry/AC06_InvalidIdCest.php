@@ -35,7 +35,6 @@ final class AC06_InvalidIdCest extends BaseUpdateEntryFunctionalCest
         $dataset = UpdateEntryDataset::ac06InvalidId();
 
         // Act
-        $this->withJsonHeaders($I);
         $this->updateEntryFromDataset($I, $dataset);
 
         // Assert

@@ -50,6 +50,7 @@ abstract class BaseUpdateEntryFunctionalCest extends BaseEntryApiFunctionalCest
         $url = '/api/entries/%s';
         $url = sprintf($url, $id);
 
+        $this->withJsonHeaders($I);
         $I->sendPut($url, $payload);
     }
 }

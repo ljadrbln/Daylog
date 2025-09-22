@@ -40,7 +40,6 @@ final class AC10_TitleTooLongCest extends BaseUpdateEntryFunctionalCest
         $dataset = UpdateEntryDataset::ac10TooLongTitle();
 
         // Act
-        $this->withJsonHeaders($I);
         $this->updateEntryFromDataset($I, $dataset);
 
         // Assert (HTTP + contract)

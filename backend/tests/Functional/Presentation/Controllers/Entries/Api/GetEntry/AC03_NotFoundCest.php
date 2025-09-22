@@ -38,7 +38,6 @@ final class AC03_NotFoundCest extends BaseGetEntryFunctionalCest
         $this->seedFromDataset($I, $dataset);
         
         // Act
-        $this->withJsonHeaders($I);
         $this->getEntryFromDataset($I, $dataset);
 
         // Assert

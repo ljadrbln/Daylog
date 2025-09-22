@@ -49,6 +49,7 @@ abstract class BaseGetEntryFunctionalCest extends BaseEntryApiFunctionalCest
         $pattern = '/api/entries/%s';
         $url     = sprintf($pattern, $id);
 
+        $this->withJsonHeaders($I);
         $I->sendGet($url);
     }
 }

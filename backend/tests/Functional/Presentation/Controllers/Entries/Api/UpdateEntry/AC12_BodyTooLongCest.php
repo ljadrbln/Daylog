@@ -40,7 +40,6 @@ final class AC12_BodyTooLongCest extends BaseUpdateEntryFunctionalCest
         $dataset = UpdateEntryDataset::ac12TooLongBody();
 
         // Act
-        $this->withJsonHeaders($I);
         $this->updateEntryFromDataset($I, $dataset);
 
         // Assert (HTTP + contract)

@@ -42,7 +42,6 @@ final class AC14_NoOpCest extends BaseUpdateEntryFunctionalCest
         $this->seedFromDataset($I, $dataset);
 
         // Act
-        $this->withJsonHeaders($I);
         $this->updateEntryFromDataset($I, $dataset);
 
         // Assert (HTTP + contract)

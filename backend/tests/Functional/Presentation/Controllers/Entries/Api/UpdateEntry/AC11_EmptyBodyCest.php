@@ -36,7 +36,6 @@ final class AC11_EmptyBodyCest extends BaseUpdateEntryFunctionalCest
         $dataset = UpdateEntryDataset::ac11EmptyBody();
 
         // Act
-        $this->withJsonHeaders($I);
         $this->updateEntryFromDataset($I, $dataset);
 
         // Assert (HTTP + contract)

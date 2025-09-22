@@ -52,7 +52,6 @@ final class AC03_HappyPath_DateOnlyCest extends BaseUpdateEntryFunctionalCest
         $this->seedFromDataset($I, $dataset);        
 
         // Act
-        $this->withJsonHeaders($I);
         $this->updateEntryFromDataset($I, $dataset);
 
         // Assert (HTTP + contract)

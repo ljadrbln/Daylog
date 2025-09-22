@@ -38,7 +38,6 @@ final class AC05_MissingIdCest extends BaseUpdateEntryFunctionalCest
         $dataset = UpdateEntryDataset::ac05MissingId();
 
         // Act
-        $this->withJsonHeaders($I);
         $this->updateEntryFromDataset($I, $dataset);
 
         // Assert — router currently returns 405 Method Not Allowed

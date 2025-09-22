@@ -53,7 +53,6 @@ final class AC04_PartialUpdateCest extends BaseUpdateEntryFunctionalCest
         $this->seedFromDataset($I, $dataset);        
 
         // Act
-        $this->withJsonHeaders($I);
         $this->updateEntryFromDataset($I, $dataset);
 
         // Assert (HTTP + contract)

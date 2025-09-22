@@ -33,7 +33,6 @@ final class AC02_InvalidIdCest extends BaseGetEntryFunctionalCest
         $dataset = GetEntryDataset::ac02InvalidId();
 
         // Act
-        $this->withJsonHeaders($I);
         $this->getEntryFromDataset($I, $dataset);
 
         // Assert

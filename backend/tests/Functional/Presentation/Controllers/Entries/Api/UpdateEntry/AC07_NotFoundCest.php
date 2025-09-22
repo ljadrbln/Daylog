@@ -40,7 +40,6 @@ final class AC07_NotFoundCest extends BaseUpdateEntryFunctionalCest
         $dataset = UpdateEntryDataset::ac07NotFound();
 
         // Act
-        $this->withJsonHeaders($I);
         $this->updateEntryFromDataset($I, $dataset);
 
         // Assert

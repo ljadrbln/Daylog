@@ -35,7 +35,6 @@ final class AC03_NotFoundCest extends BaseDeleteEntryFunctionalCest
         $this->seedFromDataset($I, $dataset);
 
         // Act
-        $this->withJsonHeaders($I);
         $this->deleteEntryFromDataset($I, $dataset);
 
         // Assert

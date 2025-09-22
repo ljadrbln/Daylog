@@ -39,7 +39,6 @@ final class AC13_InvalidDateCest extends BaseUpdateEntryFunctionalCest
         $dataset = UpdateEntryDataset::ac13InvalidDate();
 
         // Act
-        $this->withJsonHeaders($I);
         $this->updateEntryFromDataset($I, $dataset);
 
         // Assert (HTTP + contract)

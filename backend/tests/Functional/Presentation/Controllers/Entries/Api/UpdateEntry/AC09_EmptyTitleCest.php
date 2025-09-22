@@ -36,7 +36,6 @@ final class AC09_EmptyTitleCest extends BaseUpdateEntryFunctionalCest
         $dataset = UpdateEntryDataset::ac09EmptyTitle();
 
         // Act
-        $this->withJsonHeaders($I);
         $this->updateEntryFromDataset($I, $dataset);
 
         // Assert
