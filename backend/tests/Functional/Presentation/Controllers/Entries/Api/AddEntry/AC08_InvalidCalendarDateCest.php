@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Functional\Presentation\Controllers\Entries\Api\AddEntry;
 
 use Daylog\Tests\FunctionalTester;
-use Daylog\Tests\Support\Factory\AddEntryTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\AddEntryDataset;
 
 /**
  * AC-08: Invalid calendar date → DATE_INVALID (API boundary).
@@ -34,13 +34,12 @@ final class AC08_InvalidCalendarDateCest extends BaseAddEntryFunctionalCest
     public function testInvalidCalendarDateIsRejectedWithDateInvalid(FunctionalTester $I): void
     {
         // Arrange
-        $this->withJsonHeaders($I);
-        $payload = AddEntryTestRequestFactory::invalidCalendarDatePayload();
+        $dataset = AddEntryDataset::ac08InvalidCalendarDate();
 
         // Act
-        $this->addEntry($I, $payload);
+        $this->addEntryFromDataset($I, $dataset);
 
-        // Assert — contract and specific error code
+        // Assert
         $this->assertUnprocessableContract($I);
 
         $code = 'DATE_INVALID';
