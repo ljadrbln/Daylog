@@ -37,7 +37,7 @@ final class ListEntriesController extends BaseController
      *
      * @return void
      */
-    public function show(): void
+    public function list(): void
     {
         try {
             $params  = HttpRequest::get();

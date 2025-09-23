@@ -5,7 +5,6 @@ namespace Daylog\Application\DTO\Entries\ListEntries;
 
 use Daylog\Application\Transformers\Entries\EntryTransformer;
 
-
 /**
  * Response DTO for UC-2 List Entries.
  *
@@ -76,20 +75,14 @@ final class ListEntriesResponse implements ListEntriesResponseInterface
      */
     public function toArray(): array
     {
-        /** @var list<array{id:string,title:string,body:string,date:string,createdAt:string,updatedAt:string}> $items */
-        $items = [];
-        foreach ($this->items as $item) {
-            $row   = $item->toArray();
-            $items[] = $row;
-        }
-
         $payload = [
-            'items'      => $items,
+            'items'      => $this->items,
             'page'       => $this->page,
             'perPage'    => $this->perPage,
             'total'      => $this->total,
             'pagesCount' => $this->pagesCount,
         ];
+
         return $payload;
     }
 

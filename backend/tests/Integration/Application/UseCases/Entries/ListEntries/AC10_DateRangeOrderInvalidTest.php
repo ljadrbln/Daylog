@@ -45,7 +45,6 @@ final class AC10_DateRangeOrderInvalidTest extends BaseListEntriesIntegrationTes
         // Arrange
         $dataset = ListEntriesDataset::ac10DateRangeOrderInvalid($from, $to);
 
-
         // Expect
         $this->expectDateRangeInvalid();
 

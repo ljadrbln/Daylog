@@ -24,7 +24,7 @@ trait ListEntriesPaginationDataProvider
      *
      * @return array<string, array{int,int,int,int,int}>
      */
-    public function providePaginationBoundsCases(): array
+    protected function providePaginationBoundsCases(): array
     {
         $minPerPage = ListEntriesConstraints::PER_PAGE_MIN;
         $maxPerPage = ListEntriesConstraints::PER_PAGE_MAX;
