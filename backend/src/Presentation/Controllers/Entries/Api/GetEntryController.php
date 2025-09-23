@@ -37,7 +37,7 @@ final class GetEntryController extends BaseController
      *
      * @return void
      */
-    public function show(): void
+    public function get(): void
     {
         try {
             $params  = HttpRequest::params();
