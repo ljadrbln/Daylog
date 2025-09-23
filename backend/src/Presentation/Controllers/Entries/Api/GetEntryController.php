@@ -40,8 +40,8 @@ final class GetEntryController extends BaseController
     public function show(): void
     {
         try {
-            $request = HttpRequest::params();
-            $request = GetEntryRequestFactory::fromArray($request);
+            $params  = HttpRequest::params();
+            $request = GetEntryRequestFactory::fromArray($params);
             $useCase = GetEntryProvider::useCase();
             
             $response = $useCase->execute($request);

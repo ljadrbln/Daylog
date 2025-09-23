@@ -40,8 +40,8 @@ final class DeleteEntryController extends BaseController
     public function remove(): void
     {
         try {
-            $request = HttpRequest::params();
-            $request = DeleteEntryRequestFactory::fromArray($request);
+            $params  = HttpRequest::params();
+            $request = DeleteEntryRequestFactory::fromArray($params);
             $useCase = DeleteEntryProvider::useCase();
 
             $response = $useCase->execute($request);

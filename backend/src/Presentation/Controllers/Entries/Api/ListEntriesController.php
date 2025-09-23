@@ -72,7 +72,7 @@ final class ListEntriesController extends BaseController
         } catch (Throwable $e) {
             $code    = 500;
             $error   = ResponseCode::UNEXPECTED_ERROR;
-var_dump($e);exit;
+
             $payload = ResponsePayload::failure()
                 ->withStatus($code)
                 ->withCode($error);

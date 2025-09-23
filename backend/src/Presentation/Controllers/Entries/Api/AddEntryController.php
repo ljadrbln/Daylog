@@ -41,9 +41,9 @@ final class AddEntryController extends BaseController
     public function create(): void
     {
         try {
-            $requestBody = HttpRequest::body();
-            $request     = AddEntryRequestFactory::fromArray($requestBody);
-            $useCase     = AddEntryProvider::useCase();
+            $params  = HttpRequest::body();
+            $request = AddEntryRequestFactory::fromArray($params);
+            $useCase = AddEntryProvider::useCase();
 
             $response = $useCase->execute($request);
 
