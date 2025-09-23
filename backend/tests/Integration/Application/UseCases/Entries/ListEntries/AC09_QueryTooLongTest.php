@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries;
 
-use Daylog\Tests\Support\Factory\ListEntriesTestRequestFactory;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 use Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries\BaseListEntriesIntegrationTest;
+use Daylog\Tests\Support\Datasets\Entries\ListEntriesDataset;
 
 /**
  * AC-09: query longer than 30 chars (after trimming) fails with QUERY_TOO_LONG.
@@ -39,12 +39,13 @@ final class AC09_QueryTooLongTest extends BaseListEntriesIntegrationTest
     public function testOverlongQueryFailsWithQueryTooLong(string $rawQuery): void
     {
         // Arrange
-        $request = ListEntriesTestRequestFactory::query($rawQuery);
+        $dataset = ListEntriesDataset::ac09QueryTooLong($rawQuery);
 
         // Expect
         $this->expectQueryTooLong();
 
         // Act
+        $request = $dataset['request'];
         $this->useCase->execute($request);
 
         // Safety

@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries;
 
-use Daylog\Tests\Support\Factory\ListEntriesTestRequestFactory;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 use Daylog\Tests\Support\DataProviders\ListEntriesDateRangeDataProvider;
 use Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries\BaseListEntriesIntegrationTest;
+use Daylog\Tests\Support\Datasets\Entries\ListEntriesDataset;
 
 /**
  * AC-10: dateFrom greater than dateTo must fail with DATE_RANGE_INVALID.
@@ -43,12 +43,14 @@ final class AC10_DateRangeOrderInvalidTest extends BaseListEntriesIntegrationTes
     public function testReversedRangeFailsWithDateRangeInvalid(string $from, string $to): void
     {
         // Arrange
-        $request = ListEntriesTestRequestFactory::rangeInclusive($from, $to);
+        $dataset = ListEntriesDataset::ac10DateRangeOrderInvalid($from, $to);
+
 
         // Expect
         $this->expectDateRangeInvalid();
 
         // Act
+        $request = $dataset['request'];
         $this->useCase->execute($request);
 
         // Safety
