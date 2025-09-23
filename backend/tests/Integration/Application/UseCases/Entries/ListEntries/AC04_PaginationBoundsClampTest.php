@@ -7,6 +7,7 @@ use Daylog\Tests\Support\Factory\ListEntriesTestRequestFactory;
 use Daylog\Tests\Support\Scenarios\Entries\ListEntriesScenario;
 use Daylog\Tests\Support\Helper\EntriesSeeding;
 use Daylog\Tests\Support\DataProviders\ListEntriesPaginationDataProvider;
+use Daylog\Tests\Support\Datasets\Entries\ListEntriesDataset;
 
 /**
  * AC-04: perPage is clamped to allowed bounds; empty pages are valid.
@@ -49,18 +50,11 @@ final class AC04_PaginationBoundsClampTest extends BaseListEntriesIntegrationTes
         int $expectedPagesCount
     ): void {
         // Arrange
-        $dataset = ListEntriesScenario::ac04PaginationBoundsClamp();
-        $rows    = $dataset['rows'];
-
-        $overrides = [
-            'perPage' => $perPageInput,
-            'page'    => $page,
-        ];
-
-        $request = ListEntriesTestRequestFactory::fromOverrides($overrides);
-        EntriesSeeding::intoDb($rows);
-
+        $dataset = ListEntriesDataset::ac04PaginationBoundsClamp($perPageInput, $page);
+        $this->seedFromDataset($dataset);
+        
         // Act
+        $request  = $dataset['request'];
         $response = $this->useCase->execute($request);
 
         $items          = $response->getItems();
@@ -76,7 +70,7 @@ final class AC04_PaginationBoundsClampTest extends BaseListEntriesIntegrationTes
         $this->assertSame($expectedPagesCount, $actualPages);
         $this->assertSame($page, $actualPage);
 
-        $expectedTotal = count($rows);
+        $expectedTotal = count($dataset['rows']);
         $this->assertSame($expectedTotal, $total);
     }
 }

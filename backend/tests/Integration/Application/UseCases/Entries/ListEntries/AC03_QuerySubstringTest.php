@@ -3,9 +3,7 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries;
 
-use Daylog\Tests\Support\Factory\ListEntriesTestRequestFactory;
-use Daylog\Tests\Support\Scenarios\Entries\ListEntriesScenario;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
+use Daylog\Tests\Support\Datasets\Entries\ListEntriesDataset;
 
 /**
  * UC-2 / AC-03 — Query substring (case-insensitive) — Integration.
@@ -34,23 +32,19 @@ final class AC03_QuerySubstringTest extends BaseListEntriesIntegrationTest
     public function testQueryFiltersTitleOrBodyCaseInsensitive(): void
     {
         // Arrange
-        $dataset = ListEntriesScenario::ac03QueryTitleOrBodyCaseInsensitive();
-
-        $rows        = $dataset['rows'];
-        $query       = $dataset['query'];        
-        $expectedIds = $dataset['expectedIds'];
-        
-        $request = ListEntriesTestRequestFactory::query($query);
-        EntriesSeeding::intoDb($rows);
+        $dataset = ListEntriesDataset::ac03QueryTitleOrBodyCaseInsensitive();
+        $this->seedFromDataset($dataset);
 
         // Act
-        $response  = $this->useCase->execute($request);
-        $items     = $response->getItems();
+        $request  = $dataset['request'];
+        $response = $this->useCase->execute($request);
+        $items    = $response->getItems();
         
         // Assert
         $this->assertSame(2, count($items));
         
-        $actualIds = array_column($items, 'id');
+        $expectedIds = $dataset['expectedIds'];
+        $actualIds   = array_column($items, 'id');
         $this->assertSame($expectedIds, $actualIds);
     }
 }

@@ -52,6 +52,6 @@ final class AC01_HappyPathTest extends BaseListEntriesUnitTest
         $expectedIds = $dataset['expectedIds'];
         $actualIds   = array_column($items, 'id');
         
-        $this->assertSame($expectedIds, $actualIds);
+        $this->assertSame($expectedIds, $actualIds);\
     }    
 }

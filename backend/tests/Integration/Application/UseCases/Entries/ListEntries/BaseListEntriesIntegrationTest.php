@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries;
 
-use Codeception\Test\Unit;
+use DB\SQL;
 
 use Daylog\Configuration\Providers\Entries\ListEntriesProvider;
 use Daylog\Application\UseCases\Entries\ListEntries\ListEntriesInterface;
 use Daylog\Configuration\Bootstrap\SqlFactory;
 use Daylog\Tests\Support\Fixture\EntryFixture;
-use DB\SQL;
+use Daylog\Tests\Integration\Application\UseCases\Entries\BaseEntryUseCaseIntegrationTest;
 
 /**
  * Base class for UC-2 ListEntries integration tests.
@@ -26,7 +26,7 @@ use DB\SQL;
  *
  * @internal Extend this class in AC/AF test files (AC1_..., AC2_..., etc.).
  */
-abstract class BaseListEntriesIntegrationTest extends Unit
+abstract class BaseListEntriesIntegrationTest extends BaseEntryUseCaseIntegrationTest
 {
     /**
      * Real DB connection used by child tests.

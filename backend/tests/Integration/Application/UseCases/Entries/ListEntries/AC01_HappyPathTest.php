@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries;
 
 use Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries\BaseListEntriesIntegrationTest;
-use Daylog\Tests\Support\Factory\ListEntriesTestRequestFactory;
-use Daylog\Tests\Support\Scenarios\Entries\ListEntriesScenario;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
+use Daylog\Tests\Support\Datasets\Entries\ListEntriesDataset;
 
 /**
  * AC-1: With no filters, the first page is returned, sorted by date DESC by default.
@@ -36,22 +34,20 @@ final class AC01_HappyPathTest extends BaseListEntriesIntegrationTest
     public function testHappyPathReturnsFirstPageSortedByDateDesc(): void
     {
         // Arrange
-        $dataset = ListEntriesScenario::ac01HappyPath();
-
-        $rows        = $dataset['rows'];
-        $expectedIds = $dataset['expectedIds'];
-        
-        $request = ListEntriesTestRequestFactory::happy();
-        EntriesSeeding::intoDb($rows);
+        $dataset = ListEntriesDataset::ac01HappyPath();
+        $this->seedFromDataset($dataset);
 
         // Act
-        $response  = $this->useCase->execute($request);
-        $items     = $response->getItems();
+        $request  = $dataset['request'];
+        $response = $this->useCase->execute($request);
+        $items    = $response->getItems();
         
         // Assert
         $this->assertSame(3, count($items));
 
-        $actualIds = array_column($items, 'id');
+        $actualIds   = array_column($items, 'id');
+        $expectedIds = $dataset['expectedIds'];
+
         $this->assertSame($expectedIds, $actualIds);
     }
 }
