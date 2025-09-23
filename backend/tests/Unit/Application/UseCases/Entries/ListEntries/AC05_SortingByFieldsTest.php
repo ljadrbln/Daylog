@@ -3,28 +3,26 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\ListEntries;
 
-use Daylog\Tests\Support\Factory\ListEntriesTestRequestFactory;
-
-use Daylog\Tests\Support\Scenarios\Entries\ListEntriesScenario;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
 use Daylog\Tests\Support\DataProviders\ListEntriesSortingDataProvider;
+use Daylog\Tests\Support\Datasets\Entries\ListEntriesDataset;
 use Daylog\Tests\Support\Helper\ListEntriesExpectationHelper;
 
 /**
- * AC-05: Sorting by createdAt/updatedAt supports ASC/DESC.
+ * UC-2 / AC-05 — Sorting by createdAt/updatedAt supports ASC/DESC (Unit).
  *
  * Purpose:
- * Verify that 'sortField' and 'sortDir' change ordering by timestamps using real DB wiring.
- * Expected order is derived at runtime from seeded rows, removing coupling to hardcoded markers.
+ * Validate that sorting by timestamp fields changes the order of results according
+ * to the requested field ('createdAt' or 'updatedAt') and direction ('ASC' or 'DESC').
+ * The expected order is derived dynamically from the seeded rows to avoid coupling
+ * to hardcoded IDs or positions.
  *
  * Mechanics:
- * - Seed 3 deterministic rows with identical logical 'date' and distinct timestamps.
- * - Drive four cases via a data provider (createdAt ASC/DESC, updatedAt ASC/DESC).
- * - Compute expected id sequence by sorting the seeded rows in-memory by the requested key/direction.
+ * - Build rows with the same logical date and distinct timestamps via ListEntriesDataset;
+ * - Pass {sortField, sortDir} into the dataset so the request DTO is constructed inside it;
+ * - Seed rows into a fake repository, execute the use case, compare the order of returned IDs
+ *   with the runtime-computed expected order (helper).
  *
- * @covers \Daylog\Configuration\Providers\Entries\ListEntriesProvider
- * @covers \Daylog\Application\UseCases\Entries\ListEntries
- *
+ * @covers \Daylog\Application\UseCases\Entries\ListEntries\ListEntries::execute
  * @group UC-ListEntries
  */
 final class AC05_SortingByFieldsTest extends BaseListEntriesUnitTest
@@ -45,28 +43,25 @@ final class AC05_SortingByFieldsTest extends BaseListEntriesUnitTest
     public function testSortingByTimestampsIsApplied(string $sortField, string $sortDir): void
     {
         // Arrange
-        $dataset = ListEntriesScenario::ac05SortingByTimestamps();
-        $rows    = $dataset['rows'];
-        
-        $overrides = [
-            'sortField' => $sortField,
-            'sortDir'   => $sortDir,
-        ];
+        $repo = $this->makeRepo();
 
-        $repo      = $this->makeRepo();
-        $request   = ListEntriesTestRequestFactory::fromOverrides($overrides);
+        $dataset = ListEntriesDataset::ac05SortingByTimestamps($sortField, $sortDir);
+        $this->seedFromDataset($repo, $dataset);
+
         $validator = $this->makeValidatorOk();
         $useCase   = $this->makeUseCase($repo, $validator);
 
-        EntriesSeeding::intoFakeRepo($repo, $rows);
+        $request = $dataset['request'];
 
         // Act
         $response = $useCase->execute($request);
         $items    = $response->getItems();
 
         // Assert
+        $rows        = $dataset['rows'];
         $actualIds   = array_column($items, 'id');
         $expectedIds = $this->buildExpectedIds($rows, $sortField, $sortDir);
+
         $this->assertSame($expectedIds, $actualIds);
     }
 }

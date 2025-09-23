@@ -170,15 +170,37 @@ final class ListEntriesDataset
     }
 
     /**
-     * AC-05 — Three rows share the same logical date; createdAt/updatedAt differ to exercise timestamp-based tie-breaks.
-     * Expected order may depend on secondary rule (createdAt or updatedAt DESC). If a test asserts a specific rule,
-     * it should compute the order from the returned rows. We therefore return expectedIds as an empty list.
+     * AC-05 — Three rows share the same logical date; createdAt/updatedAt differ to exercise timestamp-based sorting.
+     * sortField/sortDir are injected into payload so the ListEntriesRequest is fully prepared by the dataset.
      *
-     * @return TDataset
+     * @param string       $sortField One of: 'createdAt'|'updatedAt'
+     * @param 'ASC'|'DESC' $sortDir   Sorting direction
+     * @return array{
+     *   rows: array<int, array{
+     *     id: string,
+     *     title: string,
+     *     body: string,
+     *     date: string,
+     *     createdAt?: string|null,
+     *     updatedAt?: string|null
+     *   }>,
+     *   payload: array{
+     *     page?: int,
+     *     perPage?: int,
+     *     date?: string,
+     *     dateFrom?: string,
+     *     dateTo?: string,
+     *     query?: string,
+     *     sortField?: string,
+     *     sortDir?: 'ASC'|'DESC'
+     *   },
+     *   request: ListEntriesRequestInterface,
+     *   expectedIds: array<int,string>
+     * }
      */
-    public static function ac05SortingByTimestamps(): array
+    public static function ac05SortingByTimestamps(string $sortField, string $sortDir): array
     {
-        $rows = EntryTestData::getMany(3, 0);
+        $rows = \Daylog\Tests\Support\Helper\EntryTestData::getMany(3, 0);
 
         $startDate = $rows[0]['date'];
         $base      = new DateTimeImmutable($startDate);
@@ -189,18 +211,51 @@ final class ListEntriesDataset
         $stepHours = 1;
 
         for ($i = 0; $i < count($rows); $i++) {
-            $shiftSpec           = sprintf('+%d hours', $i * $stepHours);
-            $createdAtObj        = $baseCreated->modify($shiftSpec);
-            $updatedAtObj        = $baseUpdated->modify($shiftSpec);
+            $shiftSpec             = sprintf('+%d hours', $i * $stepHours);
+            $createdAtObj          = $baseCreated->modify($shiftSpec);
+            $updatedAtObj          = $baseUpdated->modify($shiftSpec);
             $rows[$i]['createdAt'] = $createdAtObj->format('Y-m-d\TH:i:s+00:00');
             $rows[$i]['updatedAt'] = $updatedAtObj->format('Y-m-d\TH:i:s+00:00');
         }
 
+        // We compute expectations in the test at runtime, so keep this empty by design.
         $expectedIds = [];
-        $overrides   = [];
+
+        $overrides = [
+            'sortField' => $sortField,
+            'sortDir'   => $sortDir,
+        ];
 
         $dataset = self::getDataset($rows, $overrides, $expectedIds);
 
+        return $dataset;
+    }
+
+    /**
+     * AC-06 — Build a request with an invalid date-like field.
+     *
+     * Purpose:
+     * Provide a minimal dataset focused on validation: no rows are required,
+     * only a payload where exactly one of {date, dateFrom, dateTo} is invalid.
+     *
+     * Mechanics:
+     * - Start from ListEntriesHelper::getData() baseline;
+     * - Override $field with $value; keep others valid/empty;
+     * - Build ListEntriesRequest inside the dataset to keep shape uniform.
+     *
+     * @param string $field One of: date|dateFrom|dateTo.
+     * @param string $value Invalid raw string.
+     * @phpstan-return TDataset
+     */
+    public static function ac06InvalidDateInput(string $field, string $value): array
+    {
+        $rows = []; // Not needed: validation must fail before repo access.
+
+        $overrides = [
+            $field => $value,
+        ];
+
+        $dataset = self::getDataset($rows, $overrides, []);
         return $dataset;
     }
 

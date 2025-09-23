@@ -5,7 +5,6 @@ namespace Daylog\Tests\Unit\Application\UseCases\Entries\ListEntries;
 
 use Daylog\Tests\Support\DataProviders\ListEntriesPaginationDataProvider;
 use Daylog\Tests\Support\Datasets\Entries\ListEntriesDataset;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
 
 /**
  * AC-04: perPage is clamped to allowed bounds; empty pages are valid (Unit).
