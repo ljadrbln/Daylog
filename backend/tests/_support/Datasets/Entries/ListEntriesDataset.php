@@ -133,12 +133,22 @@ final class ListEntriesDataset
     }
 
     /**
-     * AC-04 — Pagination bounds clamp: dataset with 5 rows; defaults may be clamped in Application layer.
-     * Tests can override page/perPage if needed; expectedIds reflect total order by date DESC.
+     * AC-04 — Pagination bounds clamp.
      *
-     * @return TDataset
+     * Purpose:
+     * Build a 5-row dataset with deterministic dates, then inject pagination parameters
+     * directly into the payload so tests don’t mutate payloads manually.
+     *
+     * Mechanics:
+     * - Rows: 5 items with a 1-day step (D1..D5).
+     * - Expected total order by date DESC (for convenience/consistency).
+     * - perPage/page are passed in and included in the request DTO.
+     *
+     * @param int $perPage Raw perPage from client (may be out of bounds).
+     * @param int $page    Requested page number.
+     * @phpstan-return TDataset
      */
-    public static function ac04PaginationBoundsClamp(): array
+    public static function ac04PaginationBoundsClamp(int $perPage, int $page): array
     {
         $rows = EntryTestData::getMany(5, 1);
 
@@ -150,9 +160,12 @@ final class ListEntriesDataset
 
         $expectedIds = [$id4, $id3, $id2, $id1, $id0];
 
-        $overrides = [];
-        $dataset   = self::getDataset($rows, $overrides, $expectedIds);
+        $overrides = [
+            'perPage' => $perPage,
+            'page'    => $page,
+        ];
 
+        $dataset = self::getDataset($rows, $overrides, $expectedIds);
         return $dataset;
     }
 

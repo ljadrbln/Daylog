@@ -3,10 +3,9 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\ListEntries;
 
-use Daylog\Tests\Support\Scenarios\Entries\ListEntriesScenario;
-use Daylog\Tests\Support\Factory\ListEntriesTestRequestFactory;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
 use Daylog\Tests\Support\DataProviders\ListEntriesPaginationDataProvider;
+use Daylog\Tests\Support\Datasets\Entries\ListEntriesDataset;
+use Daylog\Tests\Support\Helper\EntriesSeeding;
 
 /**
  * AC-04: perPage is clamped to allowed bounds; empty pages are valid (Unit).
@@ -17,15 +16,15 @@ use Daylog\Tests\Support\DataProviders\ListEntriesPaginationDataProvider;
  *
  * Mechanics:
  * - Seed 5 entries into a fake repo;
- * - run three scenarios via data provider (below min → 1, above max → 100, page beyond range → empty list).
+ * - Run three scenarios via data provider (below min → 1, above max → 100, page beyond range → empty list).
  *
- * @covers \Daylog\Application\UseCases\Entries\ListEntries
+ * @covers \Daylog\Application\UseCases\Entries\ListEntries\ListEntries::execute
  * @group UC-ListEntries
  */
 final class AC04_PaginationBoundsClampUnitTest extends BaseListEntriesUnitTest
 {
     use ListEntriesPaginationDataProvider;
-    
+
     /**
      * AC-04: perPage clamping and valid empty pages via data provider (Unit).
      *
@@ -46,31 +45,25 @@ final class AC04_PaginationBoundsClampUnitTest extends BaseListEntriesUnitTest
         int $expectedItemsCount,
         int $expectedPagesCount
     ): void {
-        // Arrange        
-        $dataset = ListEntriesScenario::ac04PaginationBoundsClamp();
-        $rows    = $dataset['rows'];
-        
-        $overrides = [
-            'perPage' => $perPageInput,
-            'page'    => $page,
-        ];
-        $request   = ListEntriesTestRequestFactory::fromOverrides($overrides);
+        // Arrange
+        $repo    = $this->makeRepo();
 
-        $repo      = $this->makeRepo();
+        $dataset = ListEntriesDataset::ac04PaginationBoundsClamp($perPageInput, $page);
+        $this->seedFromDataset($repo, $dataset);
+
         $validator = $this->makeValidatorOk();
         $useCase   = $this->makeUseCase($repo, $validator);
 
-        EntriesSeeding::intoFakeRepo($repo, $rows);
-
         // Act
+        $request  = $dataset['request'];
         $response = $useCase->execute($request);
 
-        $items          = $response->getItems();
-        $itemsCount     = count($items);
-        $actualPerPage  = $response->getPerPage();
-        $actualPages    = $response->getPagesCount();
-        $actualPage     = $response->getPage();
-        $actualTotal    = $response->getTotal();
+        $items         = $response->getItems();
+        $itemsCount    = count($items);
+        $actualPerPage = $response->getPerPage();
+        $actualPages   = $response->getPagesCount();
+        $actualPage    = $response->getPage();
+        $actualTotal   = $response->getTotal();
 
         // Assert
         $this->assertSame($expectedPerPage, $actualPerPage);
@@ -78,6 +71,7 @@ final class AC04_PaginationBoundsClampUnitTest extends BaseListEntriesUnitTest
         $this->assertSame($expectedPagesCount, $actualPages);
         $this->assertSame($page, $actualPage);
 
+        $rows          = $dataset['rows'];
         $expectedTotal = count($rows);
         $this->assertSame($expectedTotal, $actualTotal);
     }
