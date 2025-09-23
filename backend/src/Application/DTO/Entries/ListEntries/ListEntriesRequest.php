@@ -68,8 +68,8 @@ final class ListEntriesRequest implements ListEntriesRequestInterface
      */
     public static function fromArray(array $data): ListEntriesRequestInterface
     {
-        $page      = $data['page'];
-        $perPage   = $data['perPage'];
+        $page      = (int) $data['page'];
+        $perPage   = (int) $data['perPage'];
         $sortField = $data['sortField'];
         $sortDir   = $data['sortDir'];
 
