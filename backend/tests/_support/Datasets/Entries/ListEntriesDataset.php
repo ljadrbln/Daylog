@@ -325,6 +325,61 @@ final class ListEntriesDataset
     }
 
     /**
+     * AC-9 — Build a request with an overlong query (>30 after trim).
+     *
+     * Purpose:
+     * Provide a minimal dataset focused on validation: rows are not required.
+     * The payload contains only the 'query' field with an overlong value.
+     *
+     * Mechanics:
+     * - Start from ListEntriesHelper::getData() baseline;
+     * - Override 'query' with the provided raw value (may include whitespace);
+     * - Build ListEntriesRequest so tests can use $dataset['request'] directly.
+     *
+     * @param string $rawQuery Overlong query string (raw, possibly with spaces).
+     * @phpstan-return TDataset
+     */
+    public static function ac09QueryTooLong(string $rawQuery): array
+    {
+        $rows = [];
+
+        $overrides = [
+            'query' => $rawQuery,
+        ];
+
+        $dataset = self::getDataset($rows, $overrides, []);
+        return $dataset;
+    }    
+
+    /**
+     * Build dataset with reversed inclusive range (dateFrom > dateTo).
+     *
+     * @param string $from Later date to place into 'dateFrom'.
+     * @param string $to   Earlier date to place into 'dateTo'.
+     * @return array{
+     *   rows: array<int, array<string,mixed>>,
+     *   payload: array<string,mixed>,
+     *   request: ListEntriesRequestInterface,
+     *   expectedIds: array<int,string>
+     * }
+     */
+    public static function ac10DateRangeOrderInvalid(string $from, string $to): array
+    {
+        $rows = [];
+
+        $overrides = [
+            'dateFrom' => $from,
+            'dateTo'   => $to,
+        ];
+
+        $expectedIds = [];
+
+        $dataset = self::getDataset($rows, $overrides, $expectedIds);
+
+        return $dataset;
+    }    
+
+    /**
      * Helper to build the final dataset shape.
      *
      * Starts from ListEntriesHelper::getData() baseline, applies payload overrides,

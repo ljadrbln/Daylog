@@ -1,30 +1,26 @@
 <?php
-
 declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\ListEntries;
 
-use Daylog\Tests\Support\Factory\ListEntriesTestRequestFactory;
-use Daylog\Tests\Support\Scenarios\Entries\ListEntriesScenario;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
+use Daylog\Tests\Support\Datasets\Entries\ListEntriesDataset;
 
 /**
- * AC-08: When primary sort keys are equal, a stable secondary order by createdAt DESC is applied.
+ * UC-2 / AC-08 — Stable secondary order (Unit).
  *
  * Purpose:
- *   Ensure deterministic ordering when the primary sort key yields equal values:
- *   when sorting by 'date' and all items share the same date, results must be ordered
- *   by 'createdAt' in DESC order (stable tie-breaker).
+ * Ensure deterministic ordering when the primary sort key yields equal values.
+ * When sorting by 'date' and all items share the same logical date, results must
+ * fall back to a stable tie-breaker: 'createdAt' DESC.
  *
  * Mechanics:
- *   - Seed 3 entries that share the same logical 'date';
- *   - set strictly increasing createdAt values to make DESC unambiguous;
- *   - request sorting by 'date' (primary keys equal);
- *   - expect order by createdAt DESC (id3, id2, id1).
+ * - Build dataset via ListEntriesDataset::ac08StableSecondaryOrder()
+ *   (3 rows with same date, strictly increasing createdAt);
+ * - Seed rows into fake repository;
+ * - Use the request prepared by the dataset;
+ * - Execute the use case and assert the returned ids match expectedIds.
  *
- * @covers \Daylog\Configuration\Providers\Entries\ListEntriesProvider
- * @covers \Daylog\Application\UseCases\Entries\ListEntries
- *
+ * @covers \Daylog\Application\UseCases\Entries\ListEntries\ListEntries::execute
  * @group UC-ListEntries
  */
 final class AC08_StableSecondaryOrderTest extends BaseListEntriesUnitTest
@@ -37,29 +33,23 @@ final class AC08_StableSecondaryOrderTest extends BaseListEntriesUnitTest
     public function testStableSecondaryOrderWhenPrimarySortKeysAreEqual(): void
     {
         // Arrange
-        $dataset = ListEntriesScenario::ac08StableSecondaryOrder();
+        $repo    = $this->makeRepo();
+        $dataset = ListEntriesDataset::ac08StableSecondaryOrder();
+        $this->seedFromDataset($repo, $dataset);
 
-        $rows        = $dataset['rows'];
-        $expectedIds = $dataset['expectedIds'];
-
-        $overrides = [
-            'sortField' => 'date',
-            'sortDir'   => 'ASC',
-        ];
-        $request   = ListEntriesTestRequestFactory::fromOverrides($overrides);
-        $repo      = $this->makeRepo();
         $validator = $this->makeValidatorOk();
         $useCase   = $this->makeUseCase($repo, $validator);
 
-        EntriesSeeding::intoFakeRepo($repo, $rows);
-
         // Act
+        $request   = $dataset['request'];
         $response  = $useCase->execute($request);
         $items     = $response->getItems();
-        $actualIds = array_column($items, 'id');
+
+        $actualIds   = array_column($items, 'id');
+        $expectedIds = $dataset['expectedIds'];
 
         // Assert
-        $this->assertSame(3, count($items));
+        $this->assertCount(3, $items);
         $this->assertSame($expectedIds, $actualIds);
     }
 }

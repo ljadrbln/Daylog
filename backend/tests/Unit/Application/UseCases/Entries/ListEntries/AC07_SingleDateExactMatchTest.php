@@ -3,26 +3,21 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\ListEntries;
 
-use Daylog\Domain\Models\Entries\Entry;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
-use Daylog\Tests\Support\Scenarios\Entries\ListEntriesScenario;
-use Daylog\Tests\Support\Factory\ListEntriesTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\ListEntriesDataset;
 
 /**
  * UC-2 / AC-07 — Single-date exact match — Unit.
  *
  * Purpose:
- * Verify that the single-date filter (date=YYYY-MM-DD) returns exclusively entries
- * matching the exact logical date, and does not leak other dates.
+ * Verify that the single-date filter (`date=YYYY-MM-DD`) returns exclusively entries
+ * whose logical `date` equals the target date; entries with other dates must be excluded.
  *
  * Mechanics:
- * - Seed FakeEntryRepository with 5 entries.
- * - Keep exactly two entries with the target date; set three to other dates.
- * - Build request via ListEntriesTestRequestFactory::singleDate($targetDate).
- * - Execute the use case and assert that only the two matching entries are returned.
- *
- * Assertions:
- * - Exactly 2 items returned and they match the expected ids (order-agnostic).
+ * - Build a deterministic dataset via ListEntriesDataset::ac07SingleDateExact();
+ * - Seed the fake repository with provided rows;
+ * - Use the request DTO prepared by the dataset (payload already contains `date`);
+ * - Execute the use case and assert that only the exact-date matches are returned
+ *   in the expected order (date DESC within the day).
  *
  * @covers \Daylog\Application\UseCases\Entries\ListEntries\ListEntries::execute
  * @group UC-ListEntries
@@ -37,27 +32,24 @@ final class AC07_SingleDateExactMatchTest extends BaseListEntriesUnitTest
     public function testSingleDateFilterReturnsOnlyExactMatches(): void
     {
         // Arrange
-        $dataset = ListEntriesScenario::ac07SingleDateExact();
+        $repo    = $this->makeRepo();
+        $dataset = ListEntriesDataset::ac07SingleDateExact();
+        $this->seedFromDataset($repo, $dataset);
         
-        $rows        = $dataset['rows'];
-        $targetDate  = $dataset['targetDate'];
-        $expectedIds = $dataset['expectedIds'];
-        
-        $repo      = $this->makeRepo();
-        $request   = ListEntriesTestRequestFactory::withDate('date', $targetDate);
         $validator = $this->makeValidatorOk();
         $useCase   = $this->makeUseCase($repo, $validator);
 
-        EntriesSeeding::intoFakeRepo($repo, $rows);
-
         // Act
+        $request  = $dataset['request'];
         $response = $useCase->execute($request);
         $items    = $response->getItems();
 
         // Assert
         $this->assertCount(2, $items);
 
-        $actualIds = array_column($items, 'id');
+        $expectedIds = $dataset['expectedIds'];
+        $actualIds   = array_column($items, 'id');
+
         $this->assertSame($expectedIds, $actualIds);
     }
 }

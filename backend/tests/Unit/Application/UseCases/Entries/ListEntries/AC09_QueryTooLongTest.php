@@ -3,18 +3,19 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\ListEntries;
 
-use Daylog\Tests\Support\DataProviders\ListEntriesQueryTooLongDataProvider;
-use Daylog\Tests\Support\Factory\ListEntriesTestRequestFactory;
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
+use Daylog\Tests\Support\DataProviders\ListEntriesQueryTooLongDataProvider;
+use Daylog\Tests\Support\Datasets\Entries\ListEntriesDataset;
 
 /**
  * UC-2 / AC-9 — Overlong query (>30 after trim) — Unit.
  *
  * Purpose:
- * Ensure that queries longer than 30 characters (after trimming) are rejected by validation and the repository is never accessed.
+ * Ensure that queries longer than 30 characters (after trimming) are rejected by
+ * validation and execution stops before any repository access.
  *
  * Mechanics:
- * - Build a request with an overlong 'query';
+ * - Build a request via dataset with an overlong 'query';
  * - Configure validator mock to throw DomainValidationException('QUERY_TOO_LONG');
  * - Execute and assert the exception via shared validation assertions.
  *
@@ -27,7 +28,7 @@ final class AC09_QueryTooLongTest extends BaseListEntriesUnitTest
     use ListEntriesQueryTooLongDataProvider;
 
     /**
-     * Overlong query must trigger QUERY_TOO_LONG and avoid repository access.
+     * Overlong query must trigger QUERY_TOO_LONG.
      *
      * @dataProvider provideTooLongQueries
      *
@@ -37,15 +38,17 @@ final class AC09_QueryTooLongTest extends BaseListEntriesUnitTest
     public function testOverlongQueryTriggersValidationError(string $rawQuery): void
     {
         // Arrange
-        $request   = ListEntriesTestRequestFactory::query($rawQuery);
-        $validator = $this->makeValidatorThrows('QUERY_TOO_LONG');
+        $dataset = ListEntriesDataset::ac09QueryTooLong($rawQuery);
+
         $repo      = $this->makeRepo();
+        $validator = $this->makeValidatorThrows('QUERY_TOO_LONG');
+        $useCase   = $this->makeUseCase($repo, $validator);
 
         // Expect
         $this->expectQueryTooLong();
 
         // Act
-        $useCase = $this->makeUseCase($repo, $validator);
+        $request = $dataset['request'];
         $useCase->execute($request);
     }
 }
