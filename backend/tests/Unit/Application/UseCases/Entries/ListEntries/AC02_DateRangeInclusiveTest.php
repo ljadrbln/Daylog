@@ -8,6 +8,8 @@ use Daylog\Tests\Support\Factory\ListEntriesTestRequestFactory;
 use Daylog\Tests\Support\Scenarios\Entries\ListEntriesScenario;
 use Daylog\Tests\Support\Helper\EntriesSeeding;
 
+use Daylog\Tests\Support\Datasets\Entries\ListEntriesDataset;
+
 /**
  * UC-2 / AC-2 — Date range inclusive — Unit.
  *
@@ -32,30 +34,24 @@ final class AC02_DateRangeInclusiveTest extends BaseListEntriesUnitTest
     public function testDateRangeInclusiveReturnsMatchingItems(): void
     {
         // Arrange
-        $dataset = ListEntriesScenario::ac02DateRangeInclusive();
+        $repo    = $this->makeRepo();
+        $dataset = ListEntriesDataset::ac02DateRangeInclusive();
+        $this->seedFromDataset($repo, $dataset);
         
-        $rows        = $dataset['rows'];
-        $to          = $dataset['to'];
-        $from        = $dataset['from'];
-        $expectedIds = $dataset['expectedIds'];
-
-        $repo = $this->makeRepo();
-
-        $repo      = $this->makeRepo();
-        $request   = ListEntriesTestRequestFactory::rangeInclusive($from, $to);
         $validator = $this->makeValidatorOk();
         $useCase   = $this->makeUseCase($repo, $validator);
 
-        EntriesSeeding::intoFakeRepo($repo, $rows);
-
         // Act
+        $request  = $dataset['request'];
         $response = $useCase->execute($request);
         $items    = $response->getItems();
 
         // Assert
         $this->assertCount(2, $items);
 
-        $actualIds = array_column($items, 'id');
+        $expectedIds = $dataset['expectedIds'];
+        $actualIds   = array_column($items, 'id');
+
         $this->assertSame($expectedIds, $actualIds);
     }
 }

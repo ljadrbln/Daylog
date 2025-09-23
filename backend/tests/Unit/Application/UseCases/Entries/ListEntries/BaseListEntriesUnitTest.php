@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Unit\Application\UseCases\Entries\ListEntries;
 
-use Codeception\Test\Unit;
 use Daylog\Application\UseCases\Entries\ListEntries\ListEntries;
 use Daylog\Application\Validators\Entries\ListEntries\ListEntriesValidatorInterface;
 use Daylog\Application\Exceptions\DomainValidationException;
 use Daylog\Domain\Interfaces\Entries\EntryRepositoryInterface;
 use Daylog\Tests\Support\Fakes\FakeEntryRepository;
+use Daylog\Tests\Unit\Application\UseCases\Entries\BaseEntryUseCaseUnitTest;
 
 /**
  * Base wiring for UC-2 ListEntries unit tests.
@@ -21,7 +21,7 @@ use Daylog\Tests\Support\Fakes\FakeEntryRepository;
  * - Uses FakeEntryRepository (in-memory) as the persistence surface.
  * - Provides helpers for validator mocks: success or throwing with given error code.
  */
-abstract class BaseListEntriesUnitTest extends Unit
+abstract class BaseListEntriesUnitTest extends BaseEntryUseCaseUnitTest
 {
     /**
      * Create a fresh fake repository instance.
