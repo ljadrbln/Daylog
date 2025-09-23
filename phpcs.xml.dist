@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<ruleset name="Daylog PHPCS">
+    <!--
+      Purpose:
+        Enforce a consistent coding style across all layers of the project
+        (Domain, Application, Infrastructure, Presentation, and Tests).
+
+      Scope:
+        - backend/src
+        - backend/tests
+
+      Notes:
+        - Base ruleset is PSR-12.
+        - Specific exclusions can be added if the project intentionally diverges.
+        - Example: if the project requires opening braces on the same line,
+          disable or override the PSR-12 sniff that enforces new-line braces.
+    -->
+
+    <file>backend/src</file>
+    <file>backend/tests</file>
+
+    <!-- Exclude irrelevant folders -->
+    <exclude-pattern>vendor/*</exclude-pattern>
+    <exclude-pattern>backend/public/*</exclude-pattern>
+    <exclude-pattern>backend/tmp/*</exclude-pattern>
+    <exclude-pattern>backend/logs/*</exclude-pattern>
+
+    <!-- Base coding standard -->
+    <rule ref="PSR12"/>
+
+    <!-- General settings -->
+    <config name="ignore_warnings_on_exit" value="0"/>
+    <config name="ignore_errors_on_exit" value="0"/>
+
+    <!-- Adjustments for tests:
+         - Allow longer lines in test data (JSON, data providers, etc.) -->
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="140"/>
+            <property name="absoluteLineLimit" value="0"/>
+        </properties>
+    </rule>
+</ruleset>

@@ -20,7 +20,9 @@
     "codeception/module-db": "*",
     "phpstan/phpstan": "^2.1",
     "phpstan/phpstan-strict-rules": "^2.0",
-    "phpstan/phpstan-phpunit": "^2.0"
+    "phpstan/phpstan-phpunit": "^2.0",
+    "squizlabs/php_codesniffer": "^3.10",
+    "phpmd/phpmd": "^2.15"
   },
   "autoload": {
     "psr-4": {
@@ -53,7 +55,16 @@
       "@db-setup"
     ],
     
-    "stan": "phpstan analyse -c phpstan.neon.dist"
+    "stan": "phpstan analyse -c phpstan.neon.dist",
+
+    "cs": "phpcs -q",
+    "cs:fix": "phpcbf -q",
+    "md": "phpmd backend/src,backend/tests text phpmd.xml.dist",
+    "lint": [
+      "@cs",
+      "@md",
+      "@stan"
+    ]    
   },
   "minimum-stability": "stable",
   "prefer-stable": true

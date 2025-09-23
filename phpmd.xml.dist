@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<ruleset name="Daylog PHPMD"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="
+           http://pmd.sourceforge.net/ruleset/2.0.0
+           http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+
+    <!-- Base rule collections -->
+    <rule ref="rulesets/cleancode.xml"/>
+    <rule ref="rulesets/codesize.xml"/>
+    <rule ref="rulesets/controversial.xml"/>
+    <rule ref="rulesets/design.xml"/>
+    <rule ref="rulesets/naming.xml"/>
+    <rule ref="rulesets/unusedcode.xml"/>
+
+    <!-- Example: adjust CyclomaticComplexity threshold -->
+    <rule ref="rulesets/codesize.xml/CyclomaticComplexity">
+        <properties>
+            <property name="reportLevel" value="12"/>
+        </properties>
+    </rule>
+
+    <!-- Example: adjust ExcessiveMethodLength threshold -->
+    <rule ref="rulesets/codesize.xml/ExcessiveMethodLength">
+        <properties>
+            <property name="minimum" value="60"/>
+        </properties>
+    </rule>
+
+    <!-- Exclude generated/irrelevant paths -->
+    <!-- Exclude irrelevant/generated paths -->
+    <exclude-pattern>vendor/.*</exclude-pattern>
+    <exclude-pattern>backend/public/.*</exclude-pattern>
+    <exclude-pattern>backend/tmp/.*</exclude-pattern>
+    <exclude-pattern>backend/logs/.*</exclude-pattern>
+    <exclude-pattern>backend/tests/_support/_generated/.*</exclude-pattern>
+</ruleset>
