@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries;
 
 use Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries\BaseListEntriesIntegrationTest;
-use Daylog\Tests\Support\Factory\ListEntriesTestRequestFactory;
-use Daylog\Tests\Support\Scenarios\Entries\ListEntriesScenario;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
+use Daylog\Tests\Support\Datasets\Entries\ListEntriesDataset;
 
 /**
  * AC-07: With date=YYYY-MM-DD, only entries with an exact logical date match are returned.
@@ -37,19 +35,16 @@ final class AC07_SingleDateExactMatchTest extends BaseListEntriesIntegrationTest
     public function testSingleDateFilterReturnsOnlyExactMatches(): void
     {
         // Arrange
-        $dataset = ListEntriesScenario::ac07SingleDateExact();
-    
-        $rows        = $dataset['rows'];
-        $targetDate  = $dataset['targetDate'];        
-        $expectedIds = $dataset['expectedIds'];
-        
-        $request = ListEntriesTestRequestFactory::withDate('date', $targetDate);
-        EntriesSeeding::intoDb($rows);
+        $dataset = ListEntriesDataset::ac07SingleDateExact();
+        $this->seedFromDataset($dataset);
 
         // Act
-        $response  = $this->useCase->execute($request);
-        $items     = $response->getItems();
-        $actualIds = array_column($items, 'id');
+        $request  = $dataset['request'];
+        $response = $this->useCase->execute($request);
+        $items    = $response->getItems();
+
+        $expectedIds = $dataset['expectedIds'];
+        $actualIds   = array_column($items, 'id');
 
         // Assert
         $this->assertSame(2, count($items));

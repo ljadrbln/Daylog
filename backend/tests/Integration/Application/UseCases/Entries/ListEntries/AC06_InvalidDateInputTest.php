@@ -5,7 +5,7 @@ namespace Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries;
 
 use Daylog\Tests\Support\Assertion\EntryValidationAssertions;
 use Daylog\Tests\Support\DataProviders\ListEntriesDateDataProvider;
-use Daylog\Tests\Support\Factory\ListEntriesTestRequestFactory;
+use Daylog\Tests\Support\Datasets\Entries\ListEntriesDataset;
 
 /**
  * UC-2 / AC-06 — Invalid date input — Integration.
@@ -40,12 +40,13 @@ final class AC06_InvalidDateInputTest extends BaseListEntriesIntegrationTest
     public function testInvalidDateInputThrowsValidationException(string $field, string $value): void
     {
         // Arrange
-        $request = ListEntriesTestRequestFactory::withDate($field, $value);
+        $dataset = ListEntriesDataset::ac06InvalidDateInput($field, $value);
 
         // Expectation
         $this->expectDateInvalid();
 
         // Act
+        $request = $dataset['request'];
         $this->useCase->execute($request);
     }
 }

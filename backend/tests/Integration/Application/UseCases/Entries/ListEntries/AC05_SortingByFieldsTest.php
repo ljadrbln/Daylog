@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries;
 
-use Daylog\Tests\Support\Helper\EntriesSeeding;
-use Daylog\Tests\Support\Scenarios\Entries\ListEntriesScenario;
-use Daylog\Tests\Support\Factory\ListEntriesTestRequestFactory;
 use Daylog\Tests\Support\DataProviders\ListEntriesSortingDataProvider;
 use Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries\BaseListEntriesIntegrationTest;
 use Daylog\Tests\Support\Helper\ListEntriesExpectationHelper;
+
+use Daylog\Tests\Support\Datasets\Entries\ListEntriesDataset;
+
 
 /**
  * AC-05: Sorting by createdAt/updatedAt supports ASC/DESC.
@@ -46,23 +46,18 @@ final class AC05_SortingByFieldsTest extends BaseListEntriesIntegrationTest
     public function testSortingByTimestampsIsApplied(string $sortField, string $sortDir): void
     {
         // Arrange
-        $dataset = ListEntriesScenario::ac05SortingByTimestamps();
-        $rows    = $dataset['rows'];
-        
-        $overrides = [
-            'sortField' => $sortField,
-            'sortDir'   => $sortDir,
-        ];
-
-        $request = ListEntriesTestRequestFactory::fromOverrides($overrides);
-        EntriesSeeding::intoDb($rows);
+        $dataset = ListEntriesDataset::ac05SortingByTimestamps($sortField, $sortDir);
+        $this->seedFromDataset($dataset);
 
         // Act
+        $request   = $dataset['request'];
         $response  = $this->useCase->execute($request);
+
         $items     = $response->getItems();
         $actualIds = array_column($items, 'id');
 
         // Assert
+        $rows = $dataset['rows'];
         $expectedIds = $this->buildExpectedIds($rows, $sortField, $sortDir);
         $this->assertSame($expectedIds, $actualIds);
     }

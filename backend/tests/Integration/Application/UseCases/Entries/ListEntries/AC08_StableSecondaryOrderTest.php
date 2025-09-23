@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Daylog\Tests\Integration\Application\UseCases\Entries\ListEntries;
 
-use Daylog\Tests\Support\Factory\ListEntriesTestRequestFactory;
-use Daylog\Tests\Support\Scenarios\Entries\ListEntriesScenario;
-use Daylog\Tests\Support\Helper\EntriesSeeding;
+use Daylog\Tests\Support\Datasets\Entries\ListEntriesDataset;
 
 /**
  * AC-08: When primary sort keys are equal, a stable secondary order by createdAt DESC is applied.
@@ -37,24 +35,16 @@ final class AC08_StableSecondaryOrderTest extends BaseListEntriesIntegrationTest
     public function testStableSecondaryOrderWhenPrimarySortKeysAreEqual(): void
     {
         // Arrange
-        $dataset = ListEntriesScenario::ac08StableSecondaryOrder();
-
-        $rows        = $dataset['rows'];
-        $expectedIds = $dataset['expectedIds'];
-
-        $overrides = [
-            'sortField' => 'date',
-            'sortDir'   => 'ASC',
-        ];
-
-        $request = ListEntriesTestRequestFactory::fromOverrides($overrides);
-        
-        EntriesSeeding::intoDb($rows);
+        $dataset = ListEntriesDataset::ac08StableSecondaryOrder();
+        $this->seedFromDataset($dataset);
 
         // Act
-        $response  = $this->useCase->execute($request);
-        $items     = $response->getItems();
-        $actualIds = array_column($items, 'id');
+        $request  = $dataset['request'];
+        $response = $this->useCase->execute($request);
+        $items    = $response->getItems();
+
+        $expectedIds = $dataset['expectedIds'];
+        $actualIds   = array_column($items, 'id');
 
         // Assert
         $this->assertSame(3, count($items));
