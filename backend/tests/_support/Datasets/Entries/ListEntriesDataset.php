@@ -380,6 +380,110 @@ final class ListEntriesDataset
     }    
 
     /**
+     * TR-01: page is non-numeric (array).
+     *
+     * @return array{query: array<string,mixed>}
+     */
+    public static function tr01PageMustBeNumeric(): array
+    {
+        $payload = ['page' => ['not-numeric']];
+        $dataset = ['payload' => $payload];
+
+        return $dataset;
+    }
+
+    /**
+     * TR-02: perPage is non-numeric (array).
+     *
+     * @return array{query: array<string,mixed>}
+     */
+    public static function tr02PerPageMustBeNumeric(): array
+    {
+        $payload = ['perPage' => ['not-numeric']];
+        $dataset = ['payload' => $payload];
+
+        return $dataset;
+    }
+
+    /**
+     * TR-03: sortField is non-string (array).
+     *
+     * @return array{query: array<string,mixed>}
+     */
+    public static function tr03SortFieldMustBeString(): array
+    {
+        $payload = ['sortField' => ['createdAt']];
+        $dataset = ['payload' => $payload];
+
+        return $dataset;
+    }
+
+    /**
+     * TR-04: sortDir is non-string (array).
+     *
+     * @return array{query: array<string,mixed>}
+     */
+    public static function tr04SortDirMustBeString(): array
+    {
+        $payload = ['sortDir' => ['ASC']];
+        $dataset = ['payload' => $payload];
+
+        return $dataset;
+    }
+
+    /**
+     * TR-05: dateFrom is non-string (array).
+     *
+     * @return array{query: array<string,mixed>}
+     */
+    public static function tr05DateFromMustBeString(): array
+    {
+        $payload = ['dateFrom' => ['2025-09-01']];
+        $dataset = ['payload' => $payload];
+
+        return $dataset;
+    }
+
+    /**
+     * TR-06: dateTo is non-string (array).
+     *
+     * @return array{query: array<string,mixed>}
+     */
+    public static function tr06DateToMustBeString(): array
+    {
+        $payload = ['dateTo' => ['2025-09-30']];
+        $dataset = ['payload' => $payload];
+
+        return $dataset;
+    }
+
+    /**
+     * TR-07: date is non-string (array).
+     *
+     * @return array{query: array<string,mixed>}
+     */
+    public static function tr07DateMustBeString(): array
+    {
+        $payload = ['date' => ['2025-09-23']];
+        $dataset = ['payload' => $payload];
+
+        return $dataset;
+    }
+
+    /**
+     * TR-08: query is non-string (array).
+     *
+     * @return array{query: array<string,mixed>}
+     */
+    public static function tr08QueryMustBeString(): array
+    {
+        $payload = ['query' => ['hello']];
+        $dataset = ['payload' => $payload];
+
+        return $dataset;
+    }
+
+    /**
      * Helper to build the final dataset shape.
      *
      * Starts from ListEntriesHelper::getData() baseline, applies payload overrides,
