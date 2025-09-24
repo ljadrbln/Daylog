@@ -5,6 +5,7 @@ Start here to navigate the project documentation.
 ## Overview
 - [Project Charter](PROJECT_CHARTER.md)
 - [Requirements (Overview)](REQUIREMENTS.md)
+- [Architecture: ERD & Glossary](ARCHITECTURE_ERD_AND_GLOSSARY.md)
 - [Global Business Rules](BUSINESS_RULES.md)
 - [Install & Setup](INSTALL.md)
 
