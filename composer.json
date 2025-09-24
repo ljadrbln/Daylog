@@ -57,7 +57,7 @@
     
     "stan": "phpstan analyse -c phpstan.neon.dist",
 
-    "cs": "phpcs -q",
+    "cs": "phpcs -q --report=summary",
     "cs:fix": "phpcbf -q",
     "md": "phpmd backend/src,backend/tests text phpmd.xml.dist --exclude backend/tests/_support",
     "lint": [
