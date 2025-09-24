@@ -4,7 +4,7 @@ A journaling application built with clean architecture principles, following TDD
 
 ## Stack
 - PHP 8.1+
-- Fat-Free Framework (F3) in Infrastructure (DB layer), later in Presentation
+- Fat-Free Framework (F3) in Infrastructure (DB layer), and in Presentation
 - Composer, Codeception (unit/integration/functional)
 - Vite for frontend (later)
 
@@ -21,3 +21,7 @@ A journaling application built with clean architecture principles, following TDD
 - See `/docs/CONFIGURATION.md` for environment and DB setup.  
 - See `/docs/TESTING.md` for testing conventions and running suites.
 
+## License
+
+Daylog is licensed under the GNU General Public License v3.0.  
+See the [LICENSE](LICENSE) file for details.
