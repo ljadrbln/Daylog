@@ -27,12 +27,4 @@
             <property name="minimum" value="60"/>
         </properties>
     </rule>
-
-    <!-- Exclude generated/irrelevant paths -->
-    <!-- Exclude irrelevant/generated paths -->
-    <exclude-pattern>vendor/.*</exclude-pattern>
-    <exclude-pattern>backend/public/.*</exclude-pattern>
-    <exclude-pattern>backend/tmp/.*</exclude-pattern>
-    <exclude-pattern>backend/logs/.*</exclude-pattern>
-    <exclude-pattern>backend/tests/_support/_generated/.*</exclude-pattern>
 </ruleset>

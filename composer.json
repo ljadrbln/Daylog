@@ -59,7 +59,7 @@
 
     "cs": "phpcs -q",
     "cs:fix": "phpcbf -q",
-    "md": "phpmd backend/src,backend/tests text phpmd.xml.dist",
+    "md": "phpmd backend/src,backend/tests text phpmd.xml.dist --exclude backend/tests/_support",
     "lint": [
       "@cs",
       "@md",
