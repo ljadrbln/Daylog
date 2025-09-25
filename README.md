@@ -40,6 +40,7 @@ It was developed collaboratively with the help of ChatGPT (OpenAI).
 - See `/docs/CONFIGURATION.md` for environment and DB setup.  
 - See `/docs/TESTING.md` for testing conventions and running suites.
 - See `/docs/ARCHITECTURE_ERD_AND_GLOSSARY.md` for architecture overview (ERD + glossary).
+- See `/docs/GITFLOW.md` for branching model.
 
 ## License
 
