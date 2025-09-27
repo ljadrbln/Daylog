@@ -7,10 +7,11 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest",
+    "test": "vitest --passWithNoTests",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "format": "prettier -w ."
+    "format": "prettier -w .",
+    "prepare": "cd .. && husky frontend/.husky"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.44.1",
