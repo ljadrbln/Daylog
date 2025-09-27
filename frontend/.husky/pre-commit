@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+set -e
+npm --prefix frontend run format
+npm --prefix frontend run lint:fix
+npm --prefix frontend run test
+
