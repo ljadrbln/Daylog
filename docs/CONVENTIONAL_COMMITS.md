@@ -24,3 +24,8 @@ Format: `<type>(optional-scope): <summary>`
 - `test(unit): red test for AddEntry`
 - `refactor(domain): extract Value Object EntryId`
 
+
+---
+
+See also [GITFLOW.md](GITFLOW.md).
+
