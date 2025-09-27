@@ -185,3 +185,25 @@ Example content:
 127.0.0.1 daylog.localhost www.daylog.localhost
 127.0.0.1 daylog.localhost.test www.daylog.localhost.test
 ```
+
+## Developer Tools
+
+### Clean local git branches
+
+A helper script is available to remove local branches that have already been merged and deleted on remote.
+
+- Location: `tools/git/clean_stale_branches.sh`  
+- Default mode: **dry-run** (only prints which branches would be removed).  
+- Protected branches: `main`, `master`, `develop`, and the current branch are never deleted.  
+
+#### Usage
+
+```bash
+# Preview branches that would be deleted
+./tools/git/clean_stale_branches.sh
+
+# Actually delete stale branches
+./tools/git/clean_stale_branches.sh -f
+```
+
+This script supports the GitFlow workflow: after merging a feature branch via PR and deleting it on GitHub, run the script locally to prune obsolete branches.
