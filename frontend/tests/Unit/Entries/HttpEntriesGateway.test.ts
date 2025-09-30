@@ -27,12 +27,19 @@ describe('HttpEntriesGateway.list — happy path', () => {
     });
 
     it('returns entries when API responds with { items:[...] }', async () => {
-        mockFetchOnce({
-            items: [
-                { id: '1', title: 'First' },
-                { id: '2', title: 'Second' },
-            ],
-        });
+        mockFetchOnce(
+            {
+                success: true,
+                data: {
+                    items: [
+                        { id: '1', title: 'First' },
+                        { id: '2', title: 'Second' },
+                    ],
+                    page: 1, perPage: 10, total: 2, pagesCount: 1,
+                },
+                status: 200
+            }
+        );
 
         const http = new FetchHttpClient(baseUrl);
         const gw = new HttpEntriesGateway(http);

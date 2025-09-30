@@ -13,15 +13,13 @@ export class FetchHttpClient implements HttpClient {
     }
 
     async request<T>(method: HttpMethod, url: string, init: RequestInit = {}): Promise<T> {
-        const fullUrl = url.startsWith('http') 
-            ? url 
-            : `${this.baseUrl}${url}`;
-        
+        const fullUrl = url.startsWith('http') ? url : `${this.baseUrl}${url}`;
+
         const res = await fetch(fullUrl, {
             method,
-            headers: { 
-                Accept: 'application/json', 
-                ...(init.headers ?? {}) 
+            headers: {
+                Accept: 'application/json',
+                ...(init.headers ?? {}),
             },
             body: init.body,
         });

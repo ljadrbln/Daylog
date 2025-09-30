@@ -1,13 +1,7 @@
 import type { HttpClient } from '../Http/FetchHttpClient';
-
-type Entry = {
-    id: string;
-    title: string;
-};
-
-type EntriesListResponse = {
-    items: Entry[];
-};
+import type { Entry } from '../../Domain/Entries/Entry';
+import type { UseCaseResponse } from '../../Application/DTO/Common/UseCaseResponse';
+import type { ListEntriesData } from '../../Application/DTO/Entries/ListEntries/ListEntriesRequest';
 
 export class HttpEntriesGateway {
     private readonly http: HttpClient;
@@ -17,13 +11,17 @@ export class HttpEntriesGateway {
     }
 
     async list(): Promise<Entry[]> {
-        const json = await this.http.request<EntriesListResponse>('GET', '/api/entries');
+        const json = await this.http.request<UseCaseResponse<ListEntriesData>>('GET', '/api/entries');
 
-        if (!json || !Array.isArray(json.items)) {
+        const ok = json?.success === true;
+        const hasItems = Array.isArray(json?.data?.items);
+        
+        if (!ok || !hasItems) {
             const message = 'Malformed response for GET /api/entries';
             throw new Error(message);
         }
 
-        return json.items;
+        const items = json.data!.items;
+        return items;
     }
 }
