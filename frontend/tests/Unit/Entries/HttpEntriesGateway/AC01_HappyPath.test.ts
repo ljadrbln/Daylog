@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { createGateway, mockJsonOnce, type GatewayTestCtx } from './BaseHttpEntriesGatewayTest';
+import { okList } from '../../../helpers/api-responses/UC-2-ListEntries';
 
 describe('AC01 — HttpEntriesGateway returns list on 200 JSON { data.items: [...] }', () => {
     let ctx: GatewayTestCtx;
@@ -13,20 +14,16 @@ describe('AC01 — HttpEntriesGateway returns list on 200 JSON { data.items: [..
     });
 
     it('returns entries when API responds with { success: true, data.items: [...] }', async () => {
-        mockJsonOnce(ctx.fetchMock, 200, {
-            success: true,
-            data: {
-                items: [
-                    { id: '1', title: 'First' },
-                    { id: '2', title: 'Second' },
-                ],
-                page: 1,
-                perPage: 10,
-                total: 2,
-                pagesCount: 1,
-            },
-            status: 200,
-        });
+        const payload = okList(
+            [
+                { id: '1', title: 'First' },
+                { id: '2', title: 'Second' },
+            ],
+            1,
+            10
+        );
+        
+        mockJsonOnce(ctx.fetchMock, 200, payload);
 
         const entries = await ctx.gw.list();
 

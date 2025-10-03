@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { createGateway, mockJsonOnce, type GatewayTestCtx } from './BaseHttpEntriesGatewayTest';
+import { okMalformedListWithoutItems } from '../../../helpers/api-responses/UC-2-ListEntries';
 
 describe('AC03 — HttpEntriesGateway throws on malformed JSON shape (no data.items)', () => {
     let ctx: GatewayTestCtx;
@@ -13,16 +14,7 @@ describe('AC03 — HttpEntriesGateway throws on malformed JSON shape (no data.it
     });
 
     it('throws when API returns JSON without items array', async () => {
-        mockJsonOnce(ctx.fetchMock, 200, {
-            success: true,
-            data: {
-                page: 1,
-                perPage: 10,
-                total: 0,
-                pagesCount: 0,
-            },
-            status: 200,
-        });
+        mockJsonOnce(ctx.fetchMock, 200, okMalformedListWithoutItems);
 
         await expect(ctx.gw.list()).rejects.toThrow(/malformed|items/i);
     });

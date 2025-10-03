@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { createGateway, mockJsonOnce, type GatewayTestCtx } from './BaseHttpEntriesGatewayTest';
+import { successFalse } from '../../../helpers/api-responses/UC-2-ListEntries';
 
 describe('AC04 — HttpEntriesGateway throws when success=false (even with 200)', () => {
     let ctx: GatewayTestCtx;
@@ -13,12 +14,7 @@ describe('AC04 — HttpEntriesGateway throws when success=false (even with 200)'
     });
 
     it('throws on success=false', async () => {
-        mockJsonOnce(ctx.fetchMock, 200, {
-            success: false,
-            data: { items: [], page: 1, perPage: 10, total: 0, pagesCount: 1 },
-            status: 200,
-            message: 'logical failure',
-        });
+        mockJsonOnce(ctx.fetchMock, 200, successFalse);
 
         await expect(ctx.gw.list()).rejects.toThrow(/malformed|success/i);
     });

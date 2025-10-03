@@ -42,5 +42,6 @@ export function mockJsonOnce(
         status,
         headers: { 'content-type': 'application/json' },
     });
+
     fetchMock.mockResolvedValueOnce(res);
 }
