@@ -11,11 +11,14 @@ export class HttpEntriesGateway {
     }
 
     async list(): Promise<Entry[]> {
-        const json = await this.http.request<UseCaseResponse<ListEntriesData>>('GET', '/api/entries');
+        const json = await this.http.request<UseCaseResponse<ListEntriesData>>(
+            'GET',
+            '/api/entries',
+        );
 
         const ok = json?.success === true;
         const hasItems = Array.isArray(json?.data?.items);
-        
+
         if (!ok || !hasItems) {
             const message = 'Malformed response for GET /api/entries';
             throw new Error(message);
