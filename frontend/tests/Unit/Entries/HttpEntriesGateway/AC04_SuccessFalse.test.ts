@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { createGateway, mockJsonOnce, type GatewayTestCtx } from './BaseHttpEntriesGatewayTest';
-import { successFalse } from '../../../helpers/api-responses/UC-2-ListEntries';
+import { successFalse } from '@tests/helpers/api-responses/UC-2-ListEntries';
 
 describe('AC04 — HttpEntriesGateway throws when success=false (even with 200)', () => {
     let ctx: GatewayTestCtx;

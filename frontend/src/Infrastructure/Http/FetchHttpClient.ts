@@ -19,9 +19,9 @@ export class FetchHttpClient implements HttpClient {
             method,
             headers: {
                 Accept: 'application/json',
-                ...(init.headers ?? {}),
+                ...(init.headers ?? {})
             },
-            body: init.body,
+            body: init.body
         });
 
         const text = await res.text();

@@ -1,7 +1,7 @@
-import type { HttpClient } from '../Http/FetchHttpClient';
-import type { Entry } from '../../Domain/Entries/Entry';
-import type { UseCaseResponse } from '../../Application/DTO/Common/UseCaseResponse';
-import type { ListEntriesData } from '../../Application/DTO/Entries/ListEntries/ListEntriesRequest';
+import type { HttpClient } from '@src/Infrastructure/Http/FetchHttpClient';
+import type { Entry } from '@src/Domain/Entries/Entry';
+import type { UseCaseResponse } from '@src/Application/DTO/Common/UseCaseResponse';
+import type { ListEntriesData } from '@src/Application/DTO/Entries/ListEntries/ListEntriesRequest';
 
 export class HttpEntriesGateway {
     private readonly http: HttpClient;
