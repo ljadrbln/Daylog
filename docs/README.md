@@ -20,6 +20,11 @@ Start here to navigate the project documentation.
 - UC-5 details: [UC-5 — Update Entry](use-cases/UC-5-UpdateEntry.md)
 - Template: [UC Template](use-cases/UC_TEMPLATE.md)
 
+## Frontend
+
+The frontend (TypeScript + Vite + Vitest) has its own tooling and workflow.  
+See [`frontend/README.md`](./frontend/README.md) for details.
+
 ## Frontend Acceptance
 
 - UC-2 details: [UC-2 — List Entries (Frontend AC)](frontend/acceptance/UC-2-ListEntries.md)
