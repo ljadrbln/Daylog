@@ -1,17 +1,17 @@
 import {type HttpTestCtxBase, createHttpCtx} from '@tests/Unit/Http/BaseHttpGatewayTest';
-import {HttpEntriesGateway} from '@src/Infrastructure/Entries/HttpEntriesGateway';
+import {GetEntryGateway} from '@src/Infrastructure/Entries/GetEntryGateway';
 
 export type GatewayTestCtx = HttpTestCtxBase & {
-    gw: HttpEntriesGateway;
+    gw: GetEntryGateway;
 };
 
 /**
- * Provides a fresh ListEntriesGateway built over shared HTTP test context.
+ * Provides a fresh GetEntryGateway built over shared HTTP test context.
  * The caller is responsible for calling ctx.cleanup() in afterEach().
  */
 export function createGateway(baseUrl: string = 'http://localhost'): GatewayTestCtx {
     const base = createHttpCtx(baseUrl);
-    const gw = new HttpEntriesGateway(base.http);
+    const gw = new GetEntryGateway(base.http);
 
     const ctx: GatewayTestCtx = {
         ...base,
@@ -21,5 +21,4 @@ export function createGateway(baseUrl: string = 'http://localhost'): GatewayTest
     return ctx;
 }
 
-// Re-export helper for convenience in old tests.
 export {mockJsonOnce} from '@tests/Unit/Http/BaseHttpGatewayTest';
