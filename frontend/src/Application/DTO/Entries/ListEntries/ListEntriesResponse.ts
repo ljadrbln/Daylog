@@ -1,5 +1,5 @@
-import type { Entry } from '../../../../Domain/Entries/Entry';
-import type { UseCaseResponse } from '../../Common/UseCaseResponse';
+import type {Entry} from '../../../../Domain/Entries/Entry';
+import type {UseCaseResponse} from '../../Common/UseCaseResponse';
 
 export interface ListEntriesData {
     items: Entry[];

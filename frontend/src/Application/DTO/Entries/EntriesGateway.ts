@@ -1,4 +1,4 @@
-import type { Entry } from '../../Domain/Entries/Entry';
+import type {Entry} from '../../Domain/Entries/Entry';
 
 /**
  * EntriesGateway defines the application-level contract for loading entries.
