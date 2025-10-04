@@ -1,6 +1,6 @@
-import { vi } from 'vitest';
-import { FetchHttpClient } from '../../../../src/Infrastructure/Http/FetchHttpClient';
-import { HttpEntriesGateway } from '../../../../src/Infrastructure/Entries/HttpEntriesGateway';
+import {vi} from 'vitest';
+import {FetchHttpClient} from '../../../../src/Infrastructure/Http/FetchHttpClient';
+import {HttpEntriesGateway} from '../../../../src/Infrastructure/Entries/HttpEntriesGateway';
 
 export type GatewayTestCtx = {
     fetchMock: ReturnType<typeof vi.fn>;
@@ -25,7 +25,7 @@ export function createGateway(baseUrl: string = 'http://localhost'): GatewayTest
         vi.clearAllMocks();
     };
 
-    const ctx: GatewayTestCtx = { fetchMock, http, gw, cleanup };
+    const ctx: GatewayTestCtx = {fetchMock, http, gw, cleanup};
     return ctx;
 }
 
@@ -36,11 +36,11 @@ export function createGateway(baseUrl: string = 'http://localhost'): GatewayTest
 export function mockJsonOnce(
     fetchMock: GatewayTestCtx['fetchMock'],
     status: number,
-    body: unknown,
+    body: unknown
 ): void {
     const res = new Response(JSON.stringify(body), {
         status,
-        headers: { 'content-type': 'application/json' },
+        headers: {'content-type': 'application/json'}
     });
 
     fetchMock.mockResolvedValueOnce(res);

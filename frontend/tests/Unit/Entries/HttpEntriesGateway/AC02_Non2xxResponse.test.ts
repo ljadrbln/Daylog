@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { createGateway, type GatewayTestCtx } from './BaseHttpEntriesGatewayTest';
+import {describe, it, expect, beforeEach, afterEach} from 'vitest';
+import {createGateway, type GatewayTestCtx} from './BaseHttpEntriesGatewayTest';
 
 describe('AC02 — HttpEntriesGateway throws on non-2xx response', () => {
     let ctx: GatewayTestCtx;
@@ -16,12 +16,15 @@ describe('AC02 — HttpEntriesGateway throws on non-2xx response', () => {
         const res = new Response('{}', {
             status: 500,
             headers: {
-                'content-type': 'application/json',
-            },
+                'content-type': 'application/json'
+            }
         });
 
         ctx.fetchMock.mockResolvedValueOnce(res);
 
-        await expect(ctx.gw.list()).rejects.toThrow(/HTTP 500/);
+        const fn = ctx.gw.list();
+        const message = /HTTP 500/;
+
+        await expect(fn).rejects.toThrow(message);
     });
 });
