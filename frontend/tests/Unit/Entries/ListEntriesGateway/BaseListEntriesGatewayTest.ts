@@ -1,5 +1,5 @@
-import {type HttpTestCtxBase, createHttpCtx} from '@tests/Unit/Http/BaseHttpGatewayTest';
-import {HttpEntriesGateway} from '@src/Infrastructure/Entries/HttpEntriesGateway';
+import {type HttpTestCtxBase, createHttpCtx} from '@tests/Unit/Entries/BaseEntriesGatewayTest';
+import {HttpEntriesGateway} from '@src/Infrastructure/Entries/ListEntriesGateway';
 
 export type GatewayTestCtx = HttpTestCtxBase & {
     gw: HttpEntriesGateway;
@@ -22,4 +22,4 @@ export function createGateway(baseUrl: string = 'http://localhost'): GatewayTest
 }
 
 // Re-export helper for convenience in old tests.
-export {mockJsonOnce} from '@tests/Unit/Http/BaseHttpGatewayTest';
+export {mockJsonOnce} from '@tests/Unit/Entries/BaseEntriesGatewayTest';

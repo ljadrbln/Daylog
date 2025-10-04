@@ -1,5 +1,5 @@
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
-import {createGateway, mockJsonOnce, type GatewayTestCtx} from './BaseHttpEntriesGatewayTest';
+import {createGateway, mockJsonOnce, type GatewayTestCtx} from './BaseListEntriesGatewayTest';
 import {okList} from '@tests/helpers/api-responses/UC-2-ListEntries';
 
 describe('AC01 — HttpEntriesGateway returns list on 200 JSON { data.items: [...] }', () => {

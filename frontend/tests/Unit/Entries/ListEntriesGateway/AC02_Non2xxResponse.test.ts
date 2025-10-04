@@ -1,5 +1,5 @@
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
-import {createGateway, type GatewayTestCtx} from './BaseHttpEntriesGatewayTest';
+import {createGateway, type GatewayTestCtx} from './BaseListEntriesGatewayTest';
 
 describe('AC02 — HttpEntriesGateway throws on non-2xx response', () => {
     let ctx: GatewayTestCtx;

@@ -1,4 +1,4 @@
-import {type HttpTestCtxBase, createHttpCtx} from '@tests/Unit/Http/BaseHttpGatewayTest';
+import {type HttpTestCtxBase, createHttpCtx} from '@tests/Unit/Entries/BaseEntriesGatewayTest';
 import {GetEntryGateway} from '@src/Infrastructure/Entries/GetEntryGateway';
 
 export type GatewayTestCtx = HttpTestCtxBase & {
@@ -21,4 +21,4 @@ export function createGateway(baseUrl: string = 'http://localhost'): GatewayTest
     return ctx;
 }
 
-export {mockJsonOnce} from '@tests/Unit/Http/BaseHttpGatewayTest';
+export {mockJsonOnce} from '@tests/Unit/Entries/BaseEntriesGatewayTest';

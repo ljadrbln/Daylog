@@ -1,5 +1,5 @@
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
-import {createGateway, mockJsonOnce, type GatewayTestCtx} from './BaseHttpEntriesGatewayTest';
+import {createGateway, mockJsonOnce, type GatewayTestCtx} from './BaseListEntriesGatewayTest';
 import {okMalformedListWithoutItems} from '@tests/helpers/api-responses/UC-2-ListEntries';
 
 describe('AC03 — HttpEntriesGateway throws on malformed JSON shape (no data.items)', () => {
