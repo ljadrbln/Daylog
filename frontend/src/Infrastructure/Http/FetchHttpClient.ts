@@ -1,8 +1,4 @@
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
-
-export interface HttpClient {
-    request<T>(method: HttpMethod, url: string, init?: RequestInit): Promise<T>;
-}
+import type {HttpClient, HttpMethod} from './HttpClient';
 
 export class FetchHttpClient implements HttpClient {
     private readonly baseUrl: string;
@@ -13,7 +9,10 @@ export class FetchHttpClient implements HttpClient {
     }
 
     async request<T>(method: HttpMethod, url: string, init: RequestInit = {}): Promise<T> {
-        const fullUrl = url.startsWith('http') ? url : `${this.baseUrl}${url}`;
+        // prettier-ignore
+        const fullUrl = url.startsWith('http') 
+            ? url 
+            : `${this.baseUrl}${url}`;
 
         const res = await fetch(fullUrl, {
             method,
@@ -24,13 +23,17 @@ export class FetchHttpClient implements HttpClient {
             body: init.body
         });
 
-        const text = await res.text();
-        const data = text ? JSON.parse(text) : undefined;
-
         if (!res.ok) {
             const message = `HTTP ${res.status} for ${fullUrl}`;
             throw new Error(message);
         }
+
+        const text = await res.text();
+
+        // prettier-ignore
+        const data = text 
+            ? JSON.parse(text) 
+            : undefined;
 
         return data as T;
     }
