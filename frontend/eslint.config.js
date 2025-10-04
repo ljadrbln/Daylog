@@ -1,4 +1,3 @@
-// frontend/eslint.config.js
 import tsParser from '@typescript-eslint/parser';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import js from '@eslint/js';
@@ -12,16 +11,27 @@ export default [
         ignores: ['dist/**', 'build/**', 'coverage/**'],
         languageOptions: {
             parser: tsParser,
-            parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
-            globals: globals.browser,
+            parserOptions: {
+                ecmaVersion: 'latest',
+                sourceType: 'module'
+            },
+            globals: globals.browser
         },
-        plugins: { '@typescript-eslint': tsPlugin, prettier: prettierPlugin },
+        plugins: {
+            '@typescript-eslint': tsPlugin,
+            prettier: prettierPlugin
+        },
         rules: {
             'no-undef': 'off',
 
-            '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+            '@typescript-eslint/no-unused-vars': [
+                'warn',
+                {
+                    argsIgnorePattern: '^_'
+                }
+            ],
             '@typescript-eslint/consistent-type-imports': 'warn',
-            'prettier/prettier': 'warn',
-        },
-    },
+            'prettier/prettier': 'warn'
+        }
+    }
 ];
