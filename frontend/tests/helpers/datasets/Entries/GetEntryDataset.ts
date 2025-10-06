@@ -1,4 +1,5 @@
 import type {Entry} from '@src/Domain/Entries/Entry';
+import {EntryFactory} from '@tests/helpers/factories/EntryFactory';
 
 /**
  * UC-3 datasets for frontend gateway tests.
@@ -19,14 +20,7 @@ export class GetEntryDataset {
      * @returns {Entry} Valid entry.
      */
     static ac01HappyPath(): Entry {
-        const entry: Entry = {
-            id: '23d90e4f-e736-4260-8c31-ae9124fb9280',
-            title: 'Valid title',
-            body: 'Valid body',
-            date: '2025-02-12',
-            createdAt: '2025-10-04T15:01:18+00:00',
-            updatedAt: '2025-10-04T15:01:18+00:00'
-        };
+        const entry = EntryFactory.make({title: 'Valid title (AC-01)'});
 
         return entry;
     }
@@ -38,7 +32,8 @@ export class GetEntryDataset {
      * @returns {Entry} Valid entry.
      */
     static ac04SuccessFalse(): Entry {
-        const entry = this.ac01HappyPath();
+        const entry = EntryFactory.make({title: 'Valid title (AC-04)'});
+
         return entry;
     }
 }

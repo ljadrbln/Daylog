@@ -1,5 +1,5 @@
-// tests/helpers/datasets/ListEntriesDataset.ts
 import type {Entry} from '@src/Domain/Entries/Entry';
+import {EntryFactory} from '@tests/helpers/factories/EntryFactory';
 
 /**
  * UC-2 datasets for frontend gateway tests.
@@ -20,23 +20,17 @@ export class ListEntriesDataset {
      * @returns {Entry[]} Array of valid entries.
      */
     static ac01HappyPath(): Entry[] {
-        const first: Entry = {
+        const first = EntryFactory.make({
             id: '591aef97-d0ae-4d86-b2cc-2a2ef6a71918',
-            title: 'Valid title',
-            body: 'Valid body',
-            date: '2025-02-14',
-            createdAt: '2025-02-12T10:00:02+00:00',
-            updatedAt: '2025-02-12T10:00:02+00:00'
-        };
+            title: 'Valid title (AC-01 #1)',
+            date: '2025-02-14'
+        });
 
-        const second: Entry = {
+        const second = EntryFactory.make({
             id: 'a68b6643-e713-4266-a7d5-8fad9d6f402a',
-            title: 'Valid title',
-            body: 'Valid body',
-            date: '2025-02-12',
-            createdAt: '2025-02-11T09:00:02+00:00',
-            updatedAt: '2025-02-11T09:00:02+00:00'
-        };
+            title: 'Valid title (AC-01 #2)',
+            date: '2025-02-12'
+        });
 
         const items: Entry[] = [first, second];
         return items;
