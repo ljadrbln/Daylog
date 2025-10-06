@@ -1,5 +1,6 @@
 // tests/helpers/factories/EntryFactory.ts
 import type {Entry} from '@src/Domain/Entries/Entry';
+import {uuidv4} from '@tests/helpers/utils/uuid';
 
 /**
  * Factory for building deterministic Entry objects used in tests.
@@ -21,7 +22,7 @@ export class EntryFactory {
      */
     static make(overrides: Partial<Entry> = {}): Entry {
         const base: Entry = {
-            id: '23d90e4f-e736-4260-8c31-ae9124fb9280',
+            id: uuidv4(),
             title: 'Valid title',
             body: 'Valid body',
             date: '2025-02-12',
