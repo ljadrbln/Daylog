@@ -1,8 +1,9 @@
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {createGateway, mockJsonOnce, type GatewayTestCtx} from './BaseListEntriesGatewayTest';
 import {okList} from '@tests/helpers/api-responses/UC-2-ListEntries';
+import {ListEntriesDataset} from '@tests/helpers/datasets/Entries/ListEntriesDataset';
 
-describe('AC01 — HttpEntriesGateway returns list on 200 JSON { data.items: [...] }', () => {
+describe('AC01 — HttpListEntriesGateway returns items on 200 JSON { data.items: [...] }', () => {
     let ctx: GatewayTestCtx;
 
     beforeEach(() => {
@@ -13,18 +14,17 @@ describe('AC01 — HttpEntriesGateway returns list on 200 JSON { data.items: [..
         ctx.cleanup();
     });
 
-    it('returns entries when API responds with { success: true, data.items: [...] }', async () => {
-        const payload = okList([
-            {id: '1', title: 'First'},
-            {id: '2', title: 'Second'}
-        ]);
+    it('returns items with default sort by date DESC', async () => {
+        const items = ListEntriesDataset.ac01HappyPath();
+        const payload = okList(items);
 
         mockJsonOnce(ctx.fetchMock, 200, payload);
 
-        const entries = await ctx.gw.list();
+        // gw.list returns Entry[]
+        const list = await ctx.gw.list();
 
-        expect(entries.length).toBe(2);
-        expect(entries[0].title).toBe('First');
-        expect(entries[1].id).toBe('2');
+        expect(list.length).toBe(items.length);
+        expect(list[0].id).toBe(items[0].id);
+        expect(list[1].id).toBe(items[1].id);
     });
 });
