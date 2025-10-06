@@ -1,4 +1,3 @@
-// frontend/tests/Unit/Entries/GetEntry/Http/AC03_MalformedJson.test.ts
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {createGateway, mockJsonOnce, type GatewayTestCtx} from './BaseGetEntryGatewayTest';
 import {okMalformedGetWithoutItem} from '@tests/helpers/api-responses/UC-3-GetEntry';
