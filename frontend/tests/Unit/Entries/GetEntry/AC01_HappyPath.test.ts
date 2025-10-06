@@ -1,8 +1,9 @@
+// frontend/tests/Unit/Entries/GetEntry/Http/AC01_HappyPath.test.ts
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {createGateway, mockJsonOnce, type GatewayTestCtx} from './BaseGetEntryGatewayTest';
 import {okGet} from '@tests/helpers/api-responses/UC-3-GetEntry';
 
-describe('UC-3 / AC-02 — HttpGetEntryGateway throws on non-2xx HTTP response', () => {
+describe('AC01 — HttpGetEntryGateway returns entry on 200 JSON { data.item: {...} }', () => {
     let ctx: GatewayTestCtx;
 
     beforeEach(() => {
@@ -13,26 +14,22 @@ describe('UC-3 / AC-02 — HttpGetEntryGateway throws on non-2xx HTTP response',
         ctx.cleanup();
     });
 
-    it('throws "HTTP {status} for {url}" when API responds with 404', async () => {
-        const id = 'missing-id';
-        const url = `http://localhost/api/entries/${id}`;
-        const status = 404;
-
-        // Тело неважно для проверки res.ok=false, кладём валидный JSON для консистентности
+    it('returns entry when API responds with { success: true, data.item: {...} }', async () => {
         const payload = okGet({
-            id: 'stub',
-            title: 'x',
-            body: 'x',
-            date: '2025-01-01',
-            createdAt: '2025-01-01T00:00:00Z',
-            updatedAt: '2025-01-01T00:00:00Z'
+            id: '23d90e4f-e736-4260-8c31-ae9124fb9280',
+            title: 'Valid title',
+            body: 'Valid body',
+            date: '2025-02-12',
+            createdAt: '2025-10-04T15:01:18+00:00',
+            updatedAt: '2025-10-04T15:01:18+00:00'
         });
 
-        mockJsonOnce(ctx.fetchMock, status, payload);
+        mockJsonOnce(ctx.fetchMock, 200, payload);
 
-        const fn = ctx.gw.get(id);
-        const message = `HTTP ${status} for ${url}`;
+        const entry = await ctx.gw.get(payload.data!.item.id);
 
-        await expect(fn).rejects.toThrow(message);
+        expect(entry.id).toBe('23d90e4f-e736-4260-8c31-ae9124fb9280');
+        expect(entry.title).toBe('Valid title');
+        expect(entry.body).toBe('Valid body');
     });
 });
