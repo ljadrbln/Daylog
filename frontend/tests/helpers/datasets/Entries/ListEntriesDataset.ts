@@ -21,14 +21,12 @@ export class ListEntriesDataset {
      */
     static ac01HappyPath(): Entry[] {
         const first = EntryFactory.make({
-            id: '591aef97-d0ae-4d86-b2cc-2a2ef6a71918',
-            title: 'Valid title (AC-01 #1)',
+            title: 'First entry',
             date: '2025-02-14'
         });
 
         const second = EntryFactory.make({
-            id: 'a68b6643-e713-4266-a7d5-8fad9d6f402a',
-            title: 'Valid title (AC-01 #2)',
+            title: 'Second entry',
             date: '2025-02-12'
         });
 

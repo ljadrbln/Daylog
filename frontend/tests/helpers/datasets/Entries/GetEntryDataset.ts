@@ -20,7 +20,7 @@ export class GetEntryDataset {
      * @returns {Entry} Valid entry.
      */
     static ac01HappyPath(): Entry {
-        const entry = EntryFactory.make({title: 'Valid title (AC-01)'});
+        const entry = EntryFactory.make({title: 'Valid title (UC-03, AC-01)'});
 
         return entry;
     }
@@ -32,7 +32,7 @@ export class GetEntryDataset {
      * @returns {Entry} Valid entry.
      */
     static ac04SuccessFalse(): Entry {
-        const entry = EntryFactory.make({title: 'Valid title (AC-04)'});
+        const entry = EntryFactory.make({title: 'Valid title (UC-03, AC-04)'});
 
         return entry;
     }
