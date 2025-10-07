@@ -10,8 +10,8 @@ export class FetchHttpClient implements HttpClient {
 
     async request<T>(method: HttpMethod, url: string, init: RequestInit = {}): Promise<T> {
         // prettier-ignore
-        const fullUrl = url.startsWith('http') 
-            ? url 
+        const fullUrl = url.startsWith('http')
+            ? url
             : `${this.baseUrl}${url}`;
 
         const res = await fetch(fullUrl, {
@@ -22,7 +22,7 @@ export class FetchHttpClient implements HttpClient {
             },
             body: init.body
         });
-
+        console.log(fullUrl);
         if (!res.ok) {
             const message = `HTTP ${res.status} for ${fullUrl}`;
             throw new Error(message);
@@ -31,8 +31,8 @@ export class FetchHttpClient implements HttpClient {
         const text = await res.text();
 
         // prettier-ignore
-        const data = text 
-            ? JSON.parse(text) 
+        const data = text
+            ? JSON.parse(text)
             : undefined;
 
         return data as T;
