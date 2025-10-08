@@ -1,0 +1,8 @@
+import type {Entry} from '@src/Domain/Entries/Entry';
+import type {UseCaseResponse} from '@src/Application/DTO/Common/UseCaseResponse';
+
+/**
+ * UC-1: Add Entry — response DTO.
+ * Mirrors backend: { success:true, status:200, data: Entry }.
+ */
+export type AddEntryResponse = UseCaseResponse<Entry>;

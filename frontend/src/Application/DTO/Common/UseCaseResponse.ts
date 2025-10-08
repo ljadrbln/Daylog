@@ -8,9 +8,6 @@
  *
  * @template T Data payload shape for a specific use-case.
  */
-export interface UseCaseResponse<T> {
-    success: boolean;
-    data?: T;
-    status?: number;
-    code?: string;
-}
+export type UseCaseResponse<T> =
+    | {success: true; status: number; data: T}
+    | {success: false; status: number; code?: string};
