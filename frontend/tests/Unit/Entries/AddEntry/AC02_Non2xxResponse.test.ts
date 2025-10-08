@@ -35,35 +35,33 @@ describe('AC02 — AddEntryGateway throws on non-2xx response (generic)', () => 
 
     it('throws when API responds with 400 Bad Request', async () => {
         // Arrange
-        const request = makeRequest();
+        // prettier-ignore
+        const request  = makeRequest();
         const response = makeBadRequest();
-        const status = 400;
 
-        mockJsonOnce(ctx.fetchMock, status, response);
+        mockJsonOnce(ctx.fetchMock, 400, response);
 
         // Act
-        const call = async () => {
-            await ctx.gw.add(request);
-        };
+        const fn = ctx.gw.add(request);
+        const message = /400|bad request/i;
 
         // Assert
-        await expect(call).rejects.toThrowError(/400|bad request/i);
+        await expect(fn).rejects.toThrowError(message);
     });
 
     it('throws when API responds with 500 Internal Server Error', async () => {
         // Arrange
-        const request = makeRequest();
+        // prettier-ignore
+        const request  = makeRequest();
         const response = makeInternalError();
-        const status = 500;
 
-        mockJsonOnce(ctx.fetchMock, status, response);
+        mockJsonOnce(ctx.fetchMock, 500, response);
 
         // Act
-        const call = async () => {
-            await ctx.gw.add(request);
-        };
+        const fn = ctx.gw.add(request);
+        const message = /500|internal/i;
 
         // Assert
-        await expect(call).rejects.toThrowError(/500|internal/i);
+        await expect(fn).rejects.toThrowError(message);
     });
 });

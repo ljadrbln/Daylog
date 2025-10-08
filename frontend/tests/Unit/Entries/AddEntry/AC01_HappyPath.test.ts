@@ -36,12 +36,19 @@ describe('AC01 — AddEntryGateway returns entry (mocked)', () => {
         const request  = makeRequest();
         const response = makeResponse(request);
 
+        // Ensure test factory returned the success-branch payload.
+        // This guard narrows the union type AddEntryResponse so that
+        // TypeScript recognizes `data` as defined in the success case.
+        if (response.success !== true) {
+            throw new Error('Test setup error: expected success response');
+        }
+
         mockJsonOnce(ctx.fetchMock, 200, response);
         const entry = await ctx.gw.add(request);
 
-        expect(entry.title).toBe(response.data!.title);
-        expect(entry.body).toBe(response.data!.body);
-        expect(entry.date).toBe(response.data!.date);
+        expect(entry.title).toBe(response.data.title);
+        expect(entry.body).toBe(response.data.body);
+        expect(entry.date).toBe(response.data.date);
         expect(entry.createdAt <= entry.updatedAt).toBe(true);
     });
 });

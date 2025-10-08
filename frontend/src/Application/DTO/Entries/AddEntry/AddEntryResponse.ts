@@ -3,12 +3,6 @@ import type {UseCaseResponse} from '@src/Application/DTO/Common/UseCaseResponse'
 
 /**
  * UC-1: Add Entry — response DTO.
- *
- * Mirrors the backend payload:
- * {
- *   success: true,
- *   data: Entry,
- *   status: 200
- * }
+ * Mirrors backend: { success:true, status:200, data: Entry }.
  */
-export interface AddEntryResponse extends UseCaseResponse<Entry> {}
+export type AddEntryResponse = UseCaseResponse<Entry>;

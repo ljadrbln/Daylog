@@ -1,7 +1,7 @@
 // frontend/tests/Unit/Entries/AddEntry/Http/AC03_MalformedJson.test.ts
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {createGateway, mockJsonOnce, type GatewayTestCtx} from './BaseAddEntryGatewayTest';
-import {ac01HappyPath as makeRequest} from '@tests/helpers/http/requests/entries/AddEntryRequestFactory';
+import {ac03MalformedJson as makeRequest} from '@tests/helpers/http/requests/entries/AddEntryRequestFactory';
 import {ac03MalformedJson as makeResponse} from '@tests/helpers/http/responses/entries/AddEntryResponseFactory';
 
 /**
@@ -31,9 +31,10 @@ describe('AC03 — AddEntryGateway throws on malformed JSON', () => {
 
     it('throws when API responds with malformed JSON', async () => {
         // Arrange
-        const request = makeRequest();
+        // prettier-ignore
+        const request  = makeRequest();
         const response = makeResponse(request);
-        console.log(request, response);
+
         mockJsonOnce(ctx.fetchMock, 200, response);
 
         // Act

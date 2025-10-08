@@ -39,15 +39,19 @@ export class AddEntryGateway {
         const url = '/api/entries';
         const json = await this.http.request<UseCaseResponse<Entry>>('POST', url, req);
 
-        const ok = json?.success === true;
-        const hasData = typeof json?.data === 'object' && json.data !== null;
-        console.log('hasData', hasData);
-        if (!ok || !hasData) {
+        if (json.success !== true) {
+            const message = 'Malformed response for POST /api/entries';
+            throw new Error(message);
+        }
+
+        const hasData = typeof json.data === 'object' && json.data !== null;
+        if (!hasData) {
             const message = 'Malformed response for POST /api/entries';
             throw new Error(message);
         }
 
         const entry = json.data as Entry;
+
         return entry;
     }
 }
