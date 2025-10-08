@@ -1,7 +1,5 @@
 // UC-1 AddEntry — Request factory (AC01–AC04).
 // Returns plain request objects without importing types from src.
-
-import type {Entry} from '@src/Domain/Entries/Entry';
 import {EntryFactory} from '@tests/helpers/factories/EntryFactory';
 
 /**
@@ -77,4 +75,3 @@ export function ac04SuccessFalse(): {title: string; body: string; date: string} 
     const payload = {title, body, date};
     return payload;
 }
-

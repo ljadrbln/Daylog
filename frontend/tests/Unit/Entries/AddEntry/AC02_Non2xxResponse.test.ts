@@ -1,7 +1,7 @@
 // frontend/tests/Unit/Entries/AddEntry/Http/AC02_Non2xxResponse.test.ts
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {createGateway, mockJsonOnce, type GatewayTestCtx} from './BaseAddEntryGatewayTest';
-import {ac01HappyPath as makeRequest} from '@tests/helpers/http/requests/entries/AddEntryRequestFactory';
+import {ac02Non2xxResponse as makeRequest} from '@tests/helpers/http/requests/entries/AddEntryRequestFactory';
 import {
     makeBadRequest,
     makeInternalError
@@ -35,9 +35,9 @@ describe('AC02 — AddEntryGateway throws on non-2xx response (generic)', () => 
 
     it('throws when API responds with 400 Bad Request', async () => {
         // Arrange
-        const request  = makeRequest();
+        const request = makeRequest();
         const response = makeBadRequest();
-        const status   = 400;
+        const status = 400;
 
         mockJsonOnce(ctx.fetchMock, status, response);
 
@@ -52,9 +52,9 @@ describe('AC02 — AddEntryGateway throws on non-2xx response (generic)', () => 
 
     it('throws when API responds with 500 Internal Server Error', async () => {
         // Arrange
-        const request  = makeRequest();
+        const request = makeRequest();
         const response = makeInternalError();
-        const status   = 500;
+        const status = 500;
 
         mockJsonOnce(ctx.fetchMock, status, response);
 

@@ -1,6 +1,7 @@
 import type {HttpClient} from '@src/Infrastructure/Http/HttpClient';
 import type {Entry} from '@src/Domain/Entries/Entry';
 import type {UseCaseResponse} from '@src/Application/DTO/Common/UseCaseResponse';
+import type {AddEntryRequest} from '@src/Application/DTO/Entries/AddEntry/AddEntryRequest';
 
 /**
  * UC-1: Add Entry (Frontend)
@@ -22,25 +23,31 @@ export class AddEntryGateway {
     }
 
     /**
-     * Sends entry payload to POST /api/entries and returns created Entry.
+     * UC-1: Add Entry (Frontend, Gateway)
      *
-     * @param {{title:string; body:string; date:string}} req Valid AddEntry request payload.
+     * Sends AddEntry payload to POST /api/entries and returns the created Entry.
+     *
+     * Transport-level validation only:
+     * - success must be true;
+     * - data must be a non-null object (backend returns Entry directly in data).
+     *
+     * @param {AddEntryRequest} req Valid AddEntry request payload.
      * @returns {Promise<Entry>} Created entry returned by the server.
-     * @throws {Error} If transport or response structure is invalid.
+     * @throws {Error} If HTTP status is non-2xx or response structure is invalid.
      */
-    async add(req: {title: string; body: string; date: string}): Promise<Entry> {
+    async add(req: AddEntryRequest): Promise<Entry> {
         const url = '/api/entries';
-        const json = await this.http.request<UseCaseResponse<{item: Entry}>>('POST', url, req);
+        const json = await this.http.request<UseCaseResponse<Entry>>('POST', url, req);
 
         const ok = json?.success === true;
-        const hasItem = typeof json?.data?.item === 'object' && json.data.item !== null;
-
-        if (!ok || !hasItem) {
+        const hasData = typeof json?.data === 'object' && json.data !== null;
+        console.log('hasData', hasData);
+        if (!ok || !hasData) {
             const message = 'Malformed response for POST /api/entries';
             throw new Error(message);
         }
 
-        const entry = json.data!.item;
+        const entry = json.data as Entry;
         return entry;
     }
 }
