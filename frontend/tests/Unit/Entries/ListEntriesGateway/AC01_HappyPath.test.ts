@@ -1,9 +1,25 @@
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {createGateway, mockJsonOnce, type GatewayTestCtx} from './BaseListEntriesGatewayTest';
-import {okList} from '@tests/helpers/api-responses/UC-2-ListEntries';
-import {ListEntriesDataset} from '@tests/helpers/datasets/Entries/ListEntriesDataset';
+import {ac01HappyPath as makeRequest} from '@tests/helpers/http/requests/entries/ListEntriesRequestFactory';
+import {ac01HappyPath as makeResponse} from '@tests/helpers/http/responses/entries/ListEntriesResponseFactory';
 
-describe('AC01 — HttpListEntriesGateway returns items on 200 JSON { data.items: [...] }', () => {
+/**
+ * UC-2: List Entries (Frontend, Gateway)
+ *
+ * Purpose:
+ * Verify that ListEntriesGateway resolves with { items[], page, perPage, total, pagesCount }
+ * when API responds 200 + { success:true, data:{...} }.
+ *
+ * Mechanics:
+ * - Build a valid query request via request factory (no literals at the call site).
+ * - Build a matching success response via response factory from the same request.
+ * - Mock HTTP once with JSON payload and status 200.
+ * - Assert the gateway returns data consistent with the response.
+ *
+ * Cases covered:
+ * - AC-01 — Happy path with well-formed JSON and success=true.
+ */
+describe('AC01 — ListEntriesGateway returns items with pagination (mocked)', () => {
     let ctx: GatewayTestCtx;
 
     beforeEach(() => {
@@ -14,17 +30,34 @@ describe('AC01 — HttpListEntriesGateway returns items on 200 JSON { data.items
         ctx.cleanup();
     });
 
-    it('returns items with default sort by date DESC', async () => {
-        const items = ListEntriesDataset.ac01HappyPath();
-        const payload = okList(items);
+    it('returns items[] and pagination fields on success=true', async () => {
+        // Arrange
+        const request = makeRequest();
+        const response = makeResponse(request); // success:true, data:{items[], page, perPage, total, pagesCount}
+        mockJsonOnce(ctx.fetchMock, 200, response);
 
-        mockJsonOnce(ctx.fetchMock, 200, payload);
+        // Act
+        const data = await ctx.gw.list(request);
 
-        // gw.list returns Entry[]
-        const list = await ctx.gw.list();
+        // Assert — pagination scalars
+        expect(data.page).toBe(response.data.page);
+        expect(data.perPage).toBe(response.data.perPage);
+        expect(data.total).toBe(response.data.total);
+        expect(data.pagesCount).toBe(response.data.pagesCount);
 
-        expect(list.length).toBe(items.length);
-        expect(list[0].id).toBe(items[0].id);
-        expect(list[1].id).toBe(items[1].id);
+        // Assert — items[]
+        expect(Array.isArray(data.items)).toBe(true);
+        expect(data.items.length).toBe(response.data.items.length);
+
+        if (data.items.length > 0) {
+            const first = data.items[0];
+            const firstRef = response.data.items[0];
+
+            expect(first.id).toBe(firstRef.id);
+            expect(first.title).toBe(firstRef.title);
+            expect(first.body).toBe(firstRef.body);
+            expect(first.date).toBe(firstRef.date);
+            expect(first.createdAt <= first.updatedAt).toBe(true);
+        }
     });
 });
