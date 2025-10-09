@@ -26,7 +26,7 @@ Ignored by frontend:
   200 OK but `success=false` ⇒ throws `Error("Malformed response: success")`.
 
 ## Coverage
-- `frontend/tests/Unit/Entries/HttpEntriesGateway/AC01_HappyPath.test.ts`  
-- `frontend/tests/Unit/Entries/HttpEntriesGateway/AC02_Non2xxResponse.test.ts`  
-- `frontend/tests/Unit/Entries/HttpEntriesGateway/AC03_MalformedJson.test.ts`  
-- `frontend/tests/Unit/Entries/HttpEntriesGateway/AC04_SuccessFalse.test.ts`
+- `frontend/tests/Unit/Entries/ListEntries/AC01_HappyPath.test.ts`;
+- `frontend/tests/Unit/Entries/ListEntries/AC02_Non2xxResponse.test.ts`;
+- `frontend/tests/Unit/Entries/ListEntries/AC03_MalformedJson.test.ts`;
+- `frontend/tests/Unit/Entries/ListEntries/AC04_SuccessFalse.test.ts`.

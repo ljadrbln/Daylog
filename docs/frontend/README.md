@@ -46,6 +46,9 @@ Daylog frontend uses a modern TypeScript-based toolchain for consistent code qua
    npm test
    ```
 
+### API Contracts
+- [Entries API Contract](docs/api/entries-api-contract.md) — based on backend functional tests (UC-1…UC-5, 2025-10-09)
+
 ## Notes
 
 - `.editorconfig` ensures uniform indentation (4 spaces) and LF line endings.  
