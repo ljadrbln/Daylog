@@ -1,7 +1,10 @@
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {createGateway, mockJsonOnce, type GatewayTestCtx} from './BaseListEntriesGatewayTest';
 import {ac02Non2xxResponse as makeRequest} from '@tests/helpers/http/requests/entries/ListEntriesRequestFactory';
-import {makeBadRequest, makeInternalError} from '@tests/helpers/http/responses/common/Non2xxResponseFactory';
+import {
+    makeBadRequest,
+    makeInternalError
+} from '@tests/helpers/http/responses/common/Non2xxResponseFactory';
 
 /**
  * UC-2: List Entries (Frontend, Gateway)
@@ -35,7 +38,7 @@ describe('AC02 — ListEntriesGateway throws on non-2xx response (generic)', () 
 
         mockJsonOnce(ctx.fetchMock, 400, response);
 
-        const fn = ctx.gw.list(request);
+        const fn = ctx.gateway.list(request);
         const message = /400|bad request/i;
 
         await expect(fn).rejects.toThrowError(message);
@@ -47,7 +50,7 @@ describe('AC02 — ListEntriesGateway throws on non-2xx response (generic)', () 
 
         mockJsonOnce(ctx.fetchMock, 500, response);
 
-        const fn = ctx.gw.list(request);
+        const fn = ctx.gateway.list(request);
         const message = /500|internal/i;
 
         await expect(fn).rejects.toThrowError(message);

@@ -2,6 +2,7 @@ import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {createGateway, mockJsonOnce, type GatewayTestCtx} from './BaseGetEntryGatewayTest';
 import {ac01HappyPath as makeRequest} from '@tests/helpers/http/requests/entries/GetEntryRequestFactory';
 import {ac01HappyPath as makeResponse} from '@tests/helpers/http/responses/entries/GetEntryResponseFactory';
+import {ensureSuccess} from '@tests/helpers/asserts';
 
 /**
  * UC-3: Get Entry (Frontend, Gateway)
@@ -36,16 +37,21 @@ describe('AC01 — GetEntryGateway returns entry (mocked)', () => {
         const request  = makeRequest();
         const response = makeResponse(request);
 
-        mockJsonOnce(ctx.fetchMock, 200, response);
+        // Ensure test factory returned the success-branch payload.
+        // This guard narrows the union type AddEntryResponse so that
+        // TypeScript recognizes `data` as defined in the success case.
+        const okResponse = ensureSuccess(response);
 
         // Act
-        const entry = await ctx.gw.get(request);
+        mockJsonOnce(ctx.fetchMock, 200, response);
+        const entry = await ctx.gateway.get(request);
 
         // Assert
         expect(entry.id).toBe(request.id);
-        expect(entry.title).toBe(response.data.title);
-        expect(entry.body).toBe(response.data.body);
-        expect(entry.date).toBe(response.data.date);
+        expect(entry.title).toBe(okResponse.data.title);
+        expect(entry.body).toBe(okResponse.data.body);
+        expect(entry.date).toBe(okResponse.data.date);
+
         expect(entry.createdAt <= entry.updatedAt).toBe(true);
     });
 });

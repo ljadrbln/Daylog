@@ -35,13 +35,12 @@ describe('AC04 — AddEntryGateway throws when success=false (even with 200)', (
         const request  = makeRequest();
         const response = makeResponse(request);
 
-        mockJsonOnce(ctx.fetchMock, 200, response);
-
         // Act
-        const fn = ctx.gw.add(request);
-        const message = 'Malformed response for POST /api/entries';
+        mockJsonOnce(ctx.fetchMock, 200, response);
+        const fn = ctx.gateway.add(request);
 
         // Assert
+        const message = 'Malformed response for POST /api/entries';
         await expect(fn).rejects.toThrow(message);
     });
 });

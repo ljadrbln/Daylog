@@ -39,13 +39,12 @@ describe('AC02 — AddEntryGateway throws on non-2xx response (generic)', () => 
         const request  = makeRequest();
         const response = makeBadRequest();
 
-        mockJsonOnce(ctx.fetchMock, 400, response);
-
         // Act
-        const fn = ctx.gw.add(request);
-        const message = /400|bad request/i;
+        mockJsonOnce(ctx.fetchMock, 400, response);
+        const fn = ctx.gateway.add(request);
 
         // Assert
+        const message = /400|bad request/i;
         await expect(fn).rejects.toThrowError(message);
     });
 
@@ -55,13 +54,12 @@ describe('AC02 — AddEntryGateway throws on non-2xx response (generic)', () => 
         const request  = makeRequest();
         const response = makeInternalError();
 
-        mockJsonOnce(ctx.fetchMock, 500, response);
-
         // Act
-        const fn = ctx.gw.add(request);
-        const message = /500|internal/i;
+        mockJsonOnce(ctx.fetchMock, 500, response);
+        const fn = ctx.gateway.add(request);
 
         // Assert
+        const message = /500|internal/i;
         await expect(fn).rejects.toThrowError(message);
     });
 });

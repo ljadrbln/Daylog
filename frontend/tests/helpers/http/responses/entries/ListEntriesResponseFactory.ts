@@ -11,10 +11,7 @@ import type {ListEntriesResponse} from '@src/Application/DTO/Entries/ListEntries
  * @param request Request object with pagination hints (page/perPage optional).
  * @returns {ListEntriesResponse} Mocked API payload.
  */
-export function ac01HappyPath(request: {
-    page?: number;
-    perPage?: number;
-}): ListEntriesResponse {
+export function ac01HappyPath(request: {page?: number; perPage?: number}): ListEntriesResponse {
     // prettier-ignore
     const page    = typeof request.page === 'number' ? request.page : 1;
     const perPage = typeof request.perPage === 'number' ? request.perPage : 10;

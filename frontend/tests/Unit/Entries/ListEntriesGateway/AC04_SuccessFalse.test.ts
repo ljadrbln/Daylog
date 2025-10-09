@@ -37,7 +37,7 @@ describe('AC04 — ListEntriesGateway rejects when success=false with 200 OK', (
 
         mockJsonOnce(ctx.fetchMock, 200, response);
 
-        const fn = ctx.gw.list(request);
+        const fn = ctx.gateway.list(request);
         const message = 'Malformed response for GET /api/entries';
 
         await expect(fn).rejects.toThrowError(message);

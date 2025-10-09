@@ -35,10 +35,9 @@ describe('AC03 — AddEntryGateway throws on malformed JSON', () => {
         const request  = makeRequest();
         const response = makeResponse(request);
 
-        mockJsonOnce(ctx.fetchMock, 200, response);
-
         // Act
-        const fn = ctx.gw.add(request);
+        mockJsonOnce(ctx.fetchMock, 200, response);
+        const fn = ctx.gateway.add(request);
 
         // Assert
         const message = 'Malformed response for POST /api/entries';
