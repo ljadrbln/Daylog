@@ -41,7 +41,7 @@ describe('AC02 — GetEntryGateway throws on non-2xx response (generic)', () => 
         mockJsonOnce(ctx.fetchMock, 400, response);
 
         // Act
-        const fn = ctx.gw.get(request);
+        const fn = ctx.gateway.get(request);
         const message = /400|bad request/i;
 
         // Assert
@@ -57,7 +57,7 @@ describe('AC02 — GetEntryGateway throws on non-2xx response (generic)', () => 
         mockJsonOnce(ctx.fetchMock, 500, response);
 
         // Act
-        const fn = ctx.gw.get(request);
+        const fn = ctx.gateway.get(request);
         const message = /500|internal/i;
 
         // Assert

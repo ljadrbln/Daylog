@@ -37,7 +37,7 @@ describe('AC03 — ListEntriesGateway rejects on malformed JSON (missing items)'
 
         mockJsonOnce(ctx.fetchMock, 200, response);
 
-        const fn = ctx.gw.list(request);
+        const fn = ctx.gateway.list(request);
         const message = 'Malformed response for GET /api/entries';
 
         await expect(fn).rejects.toThrowError(message);

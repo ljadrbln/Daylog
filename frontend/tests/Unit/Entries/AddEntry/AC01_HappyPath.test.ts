@@ -1,8 +1,8 @@
-// frontend/tests/Unit/Entries/AddEntry/Http/AC01_HappyPath.test.ts
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {createGateway, mockJsonOnce, type GatewayTestCtx} from './BaseAddEntryGatewayTest';
 import {ac01HappyPath as makeRequest} from '@tests/helpers/http/requests/entries/AddEntryRequestFactory';
 import {ac01HappyPath as makeResponse} from '@tests/helpers/http/responses/entries/AddEntryResponseFactory';
+import {ensureSuccess} from '@tests/helpers/asserts';
 
 /**
  * UC-1: Add Entry (Frontend, Gateway)
@@ -32,23 +32,25 @@ describe('AC01 — AddEntryGateway returns entry (mocked)', () => {
     });
 
     it('returns entry when called with valid payload', async () => {
-        //prettier-ignore
+        // Arrange
+        // prettier-ignore
         const request  = makeRequest();
         const response = makeResponse(request);
 
         // Ensure test factory returned the success-branch payload.
         // This guard narrows the union type AddEntryResponse so that
         // TypeScript recognizes `data` as defined in the success case.
-        if (response.success !== true) {
-            throw new Error('Test setup error: expected success response');
-        }
+        const okResponse = ensureSuccess(response);
 
-        mockJsonOnce(ctx.fetchMock, 200, response);
-        const entry = await ctx.gw.add(request);
+        // Act
+        mockJsonOnce(ctx.fetchMock, 200, okResponse);
+        const entry = await ctx.gateway.add(request);
 
-        expect(entry.title).toBe(response.data.title);
-        expect(entry.body).toBe(response.data.body);
-        expect(entry.date).toBe(response.data.date);
+        // Assert
+        expect(entry.title).toBe(okResponse.data.title);
+        expect(entry.body).toBe(okResponse.data.body);
+        expect(entry.date).toBe(okResponse.data.date);
+
         expect(entry.createdAt <= entry.updatedAt).toBe(true);
     });
 });

@@ -1,51 +1,50 @@
-import {vi} from 'vitest';
+import {vi, expect} from 'vitest';
 import {FetchHttpClient} from '@src/Infrastructure/Http/FetchHttpClient';
 
 export type HttpTestCtxBase = {
     fetchMock: ReturnType<typeof vi.fn>;
-    http: FetchHttpClient;
+    httpClient: FetchHttpClient;
     cleanup: () => void;
 };
 
 /**
  * Creates a fresh HTTP test context with a stubbed global.fetch and FetchHttpClient.
- * The caller must call ctx.cleanup() in afterEach().
  */
 export function createHttpCtx(baseUrl: string = 'http://localhost'): HttpTestCtxBase {
     const fetchMock = vi.fn();
     vi.stubGlobal('fetch', fetchMock);
 
-    const http = new FetchHttpClient(baseUrl);
+    const httpClient = new FetchHttpClient(baseUrl);
 
     const cleanup = (): void => {
         vi.unstubAllGlobals();
         vi.clearAllMocks();
     };
 
-    const ctx: HttpTestCtxBase = {fetchMock, http, cleanup};
-    return ctx;
+    const httpCtx: HttpTestCtxBase = {fetchMock, httpClient, cleanup};
+
+    return httpCtx;
 }
 
 /**
  * Type for a gateway class with constructor that accepts FetchHttpClient.
  */
-export type HttpGatewayCtor<T> = new (http: FetchHttpClient) => T;
+// eslint-disable-next-line no-unused-vars
+type HttpGatewayCtor<T> = new (http: FetchHttpClient) => T;
 
 /**
- * Build a typed gateway test context over the shared HTTP mock context.
- * Keeps the same outward shape used in per-gateway helpers: { ...HttpTestCtxBase, gw: T }.
- * Non-breaking for dependent tests that rely on 'gw' property.
+ * Builds a typed gateway test context over the shared HTTP mock context.
  */
 export function makeGatewayCtx<T>(
     Gateway: HttpGatewayCtor<T>,
     baseUrl: string = 'http://localhost'
-): HttpTestCtxBase & {gw: T} {
-    const base = createHttpCtx(baseUrl);
-    const gw = new Gateway(base.http);
+): HttpTestCtxBase & {gateway: T} {
+    const httpCtx = createHttpCtx(baseUrl);
+    const gateway = new Gateway(httpCtx.httpClient);
 
-    const ctx: HttpTestCtxBase & {gw: T} = {
-        ...base,
-        gw
+    const ctx: HttpTestCtxBase & {gateway: T} = {
+        ...httpCtx,
+        gateway
     };
 
     return ctx;
@@ -67,4 +66,20 @@ export function mockJsonOnce(
     });
 
     fetchMock.mockResolvedValueOnce(res);
+}
+
+/**
+ * Narrows any `{ success: boolean }` union to the success branch.
+ * Uses test assertion so failures are reported by the test runner.
+ *
+ * Example:
+ *   const res = makeResponse(req);
+ *   assertSuccess(res); // from here TS sees res as `{ success: true; ... }`
+ *
+ * @param r The response-like object with a boolean `success` flag
+ */
+export function assertSuccess<T extends {success: boolean}>(
+    r: T
+): asserts r is T & {success: true} {
+    expect(r.success).toBe(true);
 }

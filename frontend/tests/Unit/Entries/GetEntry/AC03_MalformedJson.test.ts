@@ -39,7 +39,7 @@ describe('AC03 — GetEntryGateway rejects on malformed JSON (missing data)', ()
         mockJsonOnce(ctx.fetchMock, 200, response);
 
         // Act
-        const fn = ctx.gw.get(request);
+        const fn = ctx.gateway.get(request);
         const message = 'Malformed response for GET /api/entries/:id';
 
         // Assert
