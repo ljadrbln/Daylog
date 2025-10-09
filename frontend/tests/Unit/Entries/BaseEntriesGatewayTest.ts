@@ -1,4 +1,3 @@
-// BaseHttpGatewayTest.ts — общий базовый хелпер для HTTP-тестов (любой gateway)
 import {vi} from 'vitest';
 import {FetchHttpClient} from '@src/Infrastructure/Http/FetchHttpClient';
 
@@ -24,6 +23,30 @@ export function createHttpCtx(baseUrl: string = 'http://localhost'): HttpTestCtx
     };
 
     const ctx: HttpTestCtxBase = {fetchMock, http, cleanup};
+    return ctx;
+}
+
+/**
+ * Type for a gateway class with constructor that accepts FetchHttpClient.
+ */
+export type HttpGatewayCtor<T> = new (http: FetchHttpClient) => T;
+
+/**
+ * Build a typed gateway test context over the shared HTTP mock context.
+ * Keeps the same outward shape used in per-gateway helpers: { ...HttpTestCtxBase, gw: T }.
+ * Non-breaking for dependent tests that rely on 'gw' property.
+ */
+export function makeGatewayCtx<T>(
+    Gateway: HttpGatewayCtor<T>,
+    baseUrl: string = 'http://localhost'
+): HttpTestCtxBase & {gw: T} {
+    const base = createHttpCtx(baseUrl);
+    const gw = new Gateway(base.http);
+
+    const ctx: HttpTestCtxBase & {gw: T} = {
+        ...base,
+        gw
+    };
 
     return ctx;
 }

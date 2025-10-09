@@ -1,4 +1,8 @@
-import {type HttpTestCtxBase, createHttpCtx} from '@tests/Unit/Entries/BaseEntriesGatewayTest';
+import {
+    type HttpTestCtxBase,
+    makeGatewayCtx,
+    mockJsonOnce
+} from '@tests/Unit/Entries/BaseEntriesGatewayTest';
 import {AddEntryGateway} from '@src/Infrastructure/Entries/AddEntryGateway';
 
 export type GatewayTestCtx = HttpTestCtxBase & {
@@ -10,15 +14,9 @@ export type GatewayTestCtx = HttpTestCtxBase & {
  * The caller is responsible for calling ctx.cleanup() in afterEach().
  */
 export function createGateway(baseUrl: string = 'http://localhost'): GatewayTestCtx {
-    const base = createHttpCtx(baseUrl);
-    const gw = new AddEntryGateway(base.http);
+    const ctx = makeGatewayCtx(AddEntryGateway, baseUrl);
 
-    const ctx: GatewayTestCtx = {
-        ...base,
-        gw
-    };
-
-    return ctx;
+    return ctx as GatewayTestCtx;
 }
 
-export {mockJsonOnce} from '@tests/Unit/Entries/BaseEntriesGatewayTest';
+export {mockJsonOnce};
