@@ -42,13 +42,32 @@ export interface MalformedDeleteEntrySuccessPayload {
  * @param {DeleteEntryRequest} _request Accepted for signature consistency; intentionally unused.
  * @returns {MalformedDeleteEntrySuccessPayload} success=true payload without `data`.
  */
-export function ac03MalformedJson(_request: DeleteEntryRequest): MalformedDeleteEntrySuccessPayload {
+export function ac03MalformedJson(
+    _request: DeleteEntryRequest
+): MalformedDeleteEntrySuccessPayload {
     void _request;
 
     const payload: MalformedDeleteEntrySuccessPayload = {
         success: true,
         status: 200
         // intentionally missing `data`
+    };
+
+    return payload;
+}
+
+/**
+ * AC-04 — Contract guard payload.
+ * Backend should NOT return success:false with 200; if it does, gateway must reject as malformed.
+ */
+export function ac04SuccessFalse(_req: DeleteEntryRequest): DeleteEntryResponse {
+    void _req;
+
+    // success:false + 200 (no data by contract on error-like responses)
+    const payload: DeleteEntryResponse = {
+        success: false,
+        status: 200
+        // code is optional per UseCaseResponse; omitted intentionally
     };
 
     return payload;

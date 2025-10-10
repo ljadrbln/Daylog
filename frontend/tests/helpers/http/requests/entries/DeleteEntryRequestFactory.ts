@@ -29,3 +29,13 @@ export function ac03MalformedJson(): DeleteEntryRequest {
         id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'
     };
 }
+
+/**
+ * AC-04 — Contract guard (success:false with 200).
+ * Uses a stable UUID; concrete value is irrelevant for this check.
+ */
+export function ac04SuccessFalse(): DeleteEntryRequest {
+    return {
+        id: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc'
+    };
+}
