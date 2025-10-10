@@ -1,41 +1,76 @@
+// UC-4 DeleteEntry — Request factory (AC01–AC04).
 import type {DeleteEntryRequest} from '@src/Application/DTO/Entries/DeleteEntry/DeleteEntryRequest';
-import {uuidv4} from '@tests/helpers/utils/uuid';
+import {EntryFactory} from '@tests/helpers/factories/EntryFactory';
 
 /**
- * Request factory for UC-4 DeleteEntry.
- * AC-01 builds a valid payload with a stable UUID (no literals at call sites).
+ * AC-01 — Happy Path request.
+ *
+ * Builds a request object with a valid UUID taken from EntryFactory.
+ * This mirrors real-world usage where the client already knows the entry ID.
+ *
+ * @returns {DeleteEntryRequest} Valid request for happy path.
  */
 export function ac01HappyPath(): DeleteEntryRequest {
-    return {
-        id: uuidv4()
-    };
+    const entry = EntryFactory.make({title: 'Valid title (UC-04, AC-01)'});
+
+    const id = entry.id;
+    const payload = {id};
+
+    return payload;
 }
+
+/**
+ * AC-02 — Non-2xx Response request.
+ *
+ * Builds a syntactically valid request used for transport-level error tests
+ * (e.g., 400/404/500). The request itself is correct; only HTTP status differs.
+ *
+ * @returns {DeleteEntryRequest} Valid request for non-2xx scenarios.
+ */
 
 /**
  * AC-02: any valid UUID; value is irrelevant for non-2xx checks.
  */
 export function ac02Non2xxResponse(): DeleteEntryRequest {
-    return {
-        id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
-    };
+    const entry = EntryFactory.make({title: 'Valid title (UC-04, AC-02)'});
+
+    const id = entry.id;
+    const payload = {id};
+
+    return payload;
 }
 
 /**
- * AC-03 — Malformed JSON (success:true but no data)
- * Uses a stable UUID; value irrelevant for this test.
+ * AC-03 — Malformed JSON request.
+ *
+ * Builds a valid request intended for tests where the server responds
+ * with a malformed JSON body (e.g., missing `data` even though success=true).
+ * The request is valid by design.
+ *
+ * @returns {DeleteEntryRequest} Valid request for malformed JSON scenarios.
  */
 export function ac03MalformedJson(): DeleteEntryRequest {
-    return {
-        id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'
-    };
+    const entry = EntryFactory.make({title: 'Valid title (UC-04, AC-03)'});
+
+    const id = entry.id;
+    const payload = {id};
+
+    return payload;
 }
 
 /**
  * AC-04 — Contract guard (success:false with 200).
- * Uses a stable UUID; concrete value is irrelevant for this check.
+ *
+ * Builds a valid request used in tests where the API responds with
+ * { success:false } and HTTP status 200 (logical failure branch).
+ *
+ * @returns {DeleteEntryRequest} Valid request for success=false scenarios.
  */
-export function ac04SuccessFalse(): DeleteEntryRequest {
-    return {
-        id: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc'
-    };
+export function ac04SuccessFalse(): {id: string} {
+    const entry = EntryFactory.make({title: 'Valid title (UC-04, AC-04)'});
+
+    const id = entry.id;
+    const payload = {id};
+
+    return payload;
 }
