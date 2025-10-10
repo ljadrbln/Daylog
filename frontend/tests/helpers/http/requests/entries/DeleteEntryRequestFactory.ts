@@ -10,3 +10,12 @@ export function ac01HappyPath(): DeleteEntryRequest {
         id: uuidv4()
     };
 }
+
+/**
+ * AC-02: any valid UUID; value is irrelevant for non-2xx checks.
+ */
+export function ac02Non2xxResponse(): DeleteEntryRequest {
+    return {
+        id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
+    };
+}
