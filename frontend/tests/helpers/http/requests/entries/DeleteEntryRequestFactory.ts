@@ -3,6 +3,26 @@ import type {DeleteEntryRequest} from '@src/Application/DTO/Entries/DeleteEntry/
 import {EntryFactory} from '@tests/helpers/factories/EntryFactory';
 
 /**
+ * Builds a `{ id }` request payload using EntryFactory as the single source of truth.
+ *
+ * Purpose: generate a valid DeleteEntryRequest without hard-coded UUIDs; the title embeds UC/AC
+ * for traceability in test data.
+ *
+ * @param {string} uc Use case label, e.g. "UC-04".
+ * @param {string} ac Acceptance criteria label, e.g. "AC-02".
+ * @returns {DeleteEntryRequest} Request payload with a valid entry id.
+ */
+function getPayload(uc: string, ac: string): DeleteEntryRequest {
+    const title = `Valid title (${uc}, ${ac})`;
+    const entry = EntryFactory.make({title});
+
+    const id = entry.id;
+    const payload: DeleteEntryRequest = {id};
+
+    return payload;
+}
+
+/**
  * AC-01 — Happy Path request.
  *
  * Builds a request object with a valid UUID taken from EntryFactory.
@@ -11,10 +31,7 @@ import {EntryFactory} from '@tests/helpers/factories/EntryFactory';
  * @returns {DeleteEntryRequest} Valid request for happy path.
  */
 export function ac01HappyPath(): DeleteEntryRequest {
-    const entry = EntryFactory.make({title: 'Valid title (UC-04, AC-01)'});
-
-    const id = entry.id;
-    const payload = {id};
+    const payload = getPayload('UC-04', 'AC-01');
 
     return payload;
 }
@@ -32,10 +49,7 @@ export function ac01HappyPath(): DeleteEntryRequest {
  * AC-02: any valid UUID; value is irrelevant for non-2xx checks.
  */
 export function ac02Non2xxResponse(): DeleteEntryRequest {
-    const entry = EntryFactory.make({title: 'Valid title (UC-04, AC-02)'});
-
-    const id = entry.id;
-    const payload = {id};
+    const payload = getPayload('UC-04', 'AC-02');
 
     return payload;
 }
@@ -50,10 +64,7 @@ export function ac02Non2xxResponse(): DeleteEntryRequest {
  * @returns {DeleteEntryRequest} Valid request for malformed JSON scenarios.
  */
 export function ac03MalformedJson(): DeleteEntryRequest {
-    const entry = EntryFactory.make({title: 'Valid title (UC-04, AC-03)'});
-
-    const id = entry.id;
-    const payload = {id};
+    const payload = getPayload('UC-04', 'AC-03');
 
     return payload;
 }
@@ -67,10 +78,7 @@ export function ac03MalformedJson(): DeleteEntryRequest {
  * @returns {DeleteEntryRequest} Valid request for success=false scenarios.
  */
 export function ac04SuccessFalse(): {id: string} {
-    const entry = EntryFactory.make({title: 'Valid title (UC-04, AC-04)'});
-
-    const id = entry.id;
-    const payload = {id};
+    const payload = getPayload('UC-04', 'AC-04');
 
     return payload;
 }

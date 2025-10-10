@@ -1,6 +1,29 @@
 // UC-1 AddEntry — Request factory (AC01–AC04).
-// Returns plain request objects without importing types from src.
 import {EntryFactory} from '@tests/helpers/factories/EntryFactory';
+import type {AddEntryRequest} from '@src/Application/DTO/Entries/AddEntry/AddEntryRequest';
+
+/**
+ * Builds a `{title, body, date}` request payload using EntryFactory as the single source of truth.
+ *
+ * Purpose: generate a valid AddEntryRequest without hard-coded data; the title embeds UC/AC
+ * for traceability in test data.
+ *
+ * @param {string} uc Use case label, e.g. "UC-04".
+ * @param {string} ac Acceptance criteria label, e.g. "AC-02".
+ *
+ * @returns {AddEntryRequest} Request payload with a valid entry id.
+ */
+function getPayload(uc: string, ac: string): AddEntryRequest {
+    const title = `Valid title (${uc}, ${ac})`;
+    const entry = EntryFactory.make({title});
+
+    const body = entry.body;
+    const date = entry.date;
+
+    const payload: AddEntryRequest = {title, body, date};
+
+    return payload;
+}
 
 /**
  * AC-01 — Happy Path payload.
@@ -9,13 +32,10 @@ import {EntryFactory} from '@tests/helpers/factories/EntryFactory';
  * Extracts title, body, and date via destructuring for consistency
  * with domain Entry shape.
  *
- * @return {{title: string, body: string, date: string}} Valid AddEntry request body.
+ * @return {AddEntryRequest} Valid AddEntry request body.
  */
-export function ac01HappyPath(): {title: string; body: string; date: string} {
-    const entry = EntryFactory.make({title: 'Valid title (UC-01, AC-01)'});
-
-    const {title, body, date} = entry;
-    const payload = {title, body, date};
+export function ac01HappyPath(): AddEntryRequest {
+    const payload = getPayload('UC-01', 'AC-01');
 
     return payload;
 }
@@ -28,14 +48,11 @@ export function ac01HappyPath(): {title: string; body: string; date: string} {
  * Extracts only title, body, and date from EntryFactory output
  * to stay consistent with domain Entry shape.
  *
- * @return {{title: string, body: string, date: string}} Valid request for non-2xx tests.
+ * @return {AddEntryRequest} Valid request for non-2xx tests.
  */
-export function ac02Non2xxResponse(): {title: string; body: string; date: string} {
-    const entry = EntryFactory.make({title: 'Valid title (UC-01, AC-02)'});
+export function ac02Non2xxResponse(): AddEntryRequest {
+    const payload = getPayload('UC-01', 'AC-02');
 
-    const {title, body, date} = entry;
-
-    const payload = {title, body, date};
     return payload;
 }
 
@@ -47,14 +64,11 @@ export function ac02Non2xxResponse(): {title: string; body: string; date: string
  * (e.g., missing data.item or invalid shape).
  * The request itself is completely valid; only the response is corrupted.
  *
- * @return {{title: string, body: string, date: string}} Valid AddEntry request for malformed JSON tests.
+ * @return {AddEntryRequest} Valid AddEntry request for malformed JSON tests.
  */
-export function ac03MalformedJson(): {title: string; body: string; date: string} {
-    const entry = EntryFactory.make({title: 'Valid title (UC-01, AC-03)'});
+export function ac03MalformedJson(): AddEntryRequest {
+    const payload = getPayload('UC-01', 'AC-03');
 
-    const {title, body, date} = entry;
-
-    const payload = {title, body, date};
     return payload;
 }
 
@@ -65,13 +79,10 @@ export function ac03MalformedJson(): {title: string; body: string; date: string}
  * where the server responds with { success: false } but HTTP status is 200.
  * The request itself is correct; only the logical outcome differs.
  *
- * @return {{title: string, body: string, date: string}} Valid AddEntry request for success=false tests.
+ * @return {AddEntryRequest} Valid AddEntry request for success=false tests.
  */
-export function ac04SuccessFalse(): {title: string; body: string; date: string} {
-    const entry = EntryFactory.make({title: 'Valid title (UC-01, AC-04)'});
+export function ac04SuccessFalse(): AddEntryRequest {
+    const payload = getPayload('UC-01', 'AC-04');
 
-    const {title, body, date} = entry;
-
-    const payload = {title, body, date};
     return payload;
 }
