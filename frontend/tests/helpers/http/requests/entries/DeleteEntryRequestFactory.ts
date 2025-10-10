@@ -19,3 +19,13 @@ export function ac02Non2xxResponse(): DeleteEntryRequest {
         id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
     };
 }
+
+/**
+ * AC-03 — Malformed JSON (success:true but no data)
+ * Uses a stable UUID; value irrelevant for this test.
+ */
+export function ac03MalformedJson(): DeleteEntryRequest {
+    return {
+        id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'
+    };
+}

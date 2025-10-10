@@ -21,3 +21,35 @@ export function ac01HappyPath(req: DeleteEntryRequest): DeleteEntryResponse {
         data: entry
     };
 }
+
+/**
+ * AC-03 — Malformed JSON (structural).
+ *
+ * Builds a syntactically valid payload that violates the success=true branch
+ * of UseCaseResponse by omitting the required `data` field.
+ * Used to ensure the gateway rejects such responses as malformed.
+ *
+ * @typedef MalformedDeleteEntrySuccessPayload
+ * A payload with success=true and missing `data` on purpose.
+ */
+export interface MalformedDeleteEntrySuccessPayload {
+    success: true;
+    status: number;
+    // intentionally no `data`
+}
+
+/**
+ * @param {DeleteEntryRequest} _request Accepted for signature consistency; intentionally unused.
+ * @returns {MalformedDeleteEntrySuccessPayload} success=true payload without `data`.
+ */
+export function ac03MalformedJson(_request: DeleteEntryRequest): MalformedDeleteEntrySuccessPayload {
+    void _request;
+
+    const payload: MalformedDeleteEntrySuccessPayload = {
+        success: true,
+        status: 200
+        // intentionally missing `data`
+    };
+
+    return payload;
+}
