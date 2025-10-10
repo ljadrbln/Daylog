@@ -1,13 +1,15 @@
 import type {HttpClient} from '@src/Infrastructure/Http/HttpClient';
 import type {Entry} from '@src/Domain/Entries/Entry';
 import type {DeleteEntryRequest} from '@src/Application/DTO/Entries/DeleteEntry/DeleteEntryRequest';
-import type {DeleteEntryResponse} from '@src/Application/DTO/Entries/DeleteEntry/DeleteEntryResponse';
+import type {UseCaseResponse} from '@src/Application/DTO/Common/UseCaseResponse';
 
 /**
  * UC-4: Delete Entry (Frontend)
  *
- * Sends DELETE /api/entries/:id and returns response.data as Entry.
- * Minimal GREEN for AC-01: no extra transport/malformed checks yet.
+ * Sends DELETE /api/entries/:id and validates transport envelope:
+ * - success must be true;
+ * - data must be a non-null object.
+ * Otherwise throws an Error with a descriptive message.
  */
 export class DeleteEntryGateway {
     private readonly http: HttpClient;
@@ -18,10 +20,22 @@ export class DeleteEntryGateway {
 
     async delete(req: DeleteEntryRequest): Promise<Entry> {
         const url = `/api/entries/${req.id}`;
+        const json = await this.http.request<UseCaseResponse<Entry>>('DELETE', url);
 
-        const json = await this.http.request<DeleteEntryResponse>('DELETE', url);
-        const result = json.data;
+        // success flag must be true
+        if (json.success !== true) {
+            const message = 'Malformed response for DELETE /api/entries/:id';
+            throw new Error(message);
+        }
 
-        return result;
+        // data must be a non-null object
+        const hasData = typeof json.data === 'object' && json.data !== null;
+        if (!hasData) {
+            const message = 'Malformed response for DELETE /api/entries/:id';
+            throw new Error(message);
+        }
+
+        const entry = json.data as Entry;
+        return entry;
     }
 }
