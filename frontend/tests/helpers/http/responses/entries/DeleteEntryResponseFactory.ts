@@ -1,3 +1,5 @@
+import {EntryFactory} from '@tests/helpers/factories/EntryFactory';
+
 import type {DeleteEntryResponse} from '@src/Application/DTO/Entries/DeleteEntry/DeleteEntryResponse';
 import type {DeleteEntryRequest} from '@src/Application/DTO/Entries/DeleteEntry/DeleteEntryRequest';
 
@@ -6,20 +8,15 @@ import type {DeleteEntryRequest} from '@src/Application/DTO/Entries/DeleteEntry/
  * AC-01 returns success:true with a full Entry object in data.
  */
 export function ac01HappyPath(req: DeleteEntryRequest): DeleteEntryResponse {
-    const entry = {
-        id: req.id,
-        title: 'Valid title',
-        body: 'Valid body',
-        date: '2025-02-12',
-        createdAt: '2025-10-09T12:01:57+00:00',
-        updatedAt: '2025-10-09T12:02:00+00:00'
-    };
+    const item = EntryFactory.make(req);
 
-    return {
+    const response: DeleteEntryResponse = {
         success: true,
         status: 200,
-        data: entry
+        data: item
     };
+
+    return response;
 }
 
 /**
