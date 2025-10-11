@@ -41,7 +41,7 @@ describe('AC03 — UpdateEntryGateway rejects on malformed JSON (success=true, n
         const fn = ctx.gateway.update(request);
 
         // Assert
-        const message = /malformed|invalid/i;
+        const message = 'Malformed response for PUT /api/entries/:id';
         await expect(fn).rejects.toThrowError(message);
     });
 });
