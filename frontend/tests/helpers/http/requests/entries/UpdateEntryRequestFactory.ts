@@ -13,10 +13,10 @@ import type {UpdateEntryRequest} from '@src/Application/DTO/Entries/UpdateEntry/
 function getPayload(uc: string, ac: string): UpdateEntryRequest {
     const base = EntryFactory.make(); // source of truth for valid fields
 
-    const id    = base.id;
+    const id = base.id;
     const title = `Valid title (updated) (${uc}, ${ac})`;
-    const body  = base.body;
-    const date  = base.date;
+    const body = base.body;
+    const date = base.date;
 
     const payload: UpdateEntryRequest = {id, title, body, date};
     return payload;
