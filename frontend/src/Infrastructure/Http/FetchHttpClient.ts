@@ -22,7 +22,7 @@ export class FetchHttpClient implements HttpClient {
             },
             body: init.body
         });
-        console.log(fullUrl);
+
         if (!res.ok) {
             const message = `HTTP ${res.status} for ${fullUrl}`;
             throw new Error(message);

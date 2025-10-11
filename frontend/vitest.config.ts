@@ -10,6 +10,6 @@ export default defineConfig({
         include: ['tests/**/*.test.ts'],
         reporters: ['default'],
         testTimeout: 5000,
-        silent: true
+        silent: false
     }
 });
