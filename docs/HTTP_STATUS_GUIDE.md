@@ -3,10 +3,12 @@
 This document defines the mapping between application-level errors and HTTP response status codes.
 
 ## Transport / Protocol (before DTO parsing)
+
 - **400 Bad Request** — malformed JSON, empty body, or structurally invalid request payload.
 - **405 Method Not Allowed** — invalid HTTP method for the endpoint.
 
 ## Routing / Resource
+
 - **404 Not Found**
   - Unknown endpoint path.
   - Resource not found (e.g., `ENTRY_NOT_FOUND`).
@@ -14,6 +16,7 @@ This document defines the mapping between application-level errors and HTTP resp
 ## Validation / Business Rules (after DTO parsing)
 
 ### 400 Bad Request (Transport)
+
 - Missing required JSON key (`title`, `body`, or `date` not present at all).  
   Error codes raised by transport rules (e.g., `TitleTransportRule`):  
   - `TITLE_REQUIRED`  
@@ -23,6 +26,7 @@ This document defines the mapping between application-level errors and HTTP resp
   - `ID_NOT_STRING`
 
 ### 422 Unprocessable Entity (Domain)
+
 - JSON structure is valid, keys are present, but **business rules are violated**:  
   - `TITLE_REQUIRED` (present, but empty after trimming).  
   - `TITLE_TOO_LONG`.  
@@ -33,6 +37,7 @@ This document defines the mapping between application-level errors and HTTP resp
   - `ID_INVALID` (present, string, but not a valid UUID v4).
 
 ## Identifiers
+
 - **400 Bad Request (Transport)**  
   - `ID_REQUIRED` (id key missing).  
   - `ID_NOT_STRING` (id present but not a string).  
@@ -46,6 +51,7 @@ This document defines the mapping between application-level errors and HTTP resp
 ---
 
 ### Notes
+
 - Transport-level errors are always **400/405**.  
 - Business-rule violations (UC / ENTRY-BR / BR) are always **422**, except when a required key is **missing entirely**, which is treated as **400**.  
 - The same error code string (e.g., `TITLE_REQUIRED`) can appear in both **Transport** and **Domain** contexts:  

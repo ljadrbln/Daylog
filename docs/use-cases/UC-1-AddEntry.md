@@ -1,18 +1,22 @@
 # UC-1 — Add Entry
 
 ## Intent
+
 Create a new diary entry in a single-user environment.
 
 ## Preconditions
+
 - Application is running.
 - The system will receive `title`, `body`, and `date` (YYYY-MM-DD).
 
 ## Parameters & Limits
+
 - `title`: string. See ENTRY-BR-1 (length after trimming) and BR-1 (trimming).
 - `body`: string. See ENTRY-BR-2 (length after trimming) and BR-1 (trimming).
 - `date`: string. See BR-2 (YYYY-MM-DD, valid calendar date).
 
 ## Main Success Scenario
+
 1. The system receives `title`, `body`, and `date`.
 2. The system validates inputs according to global business rules (BR-1..BR-2, ENTRY-BR-1..ENTRY-BR-4).
 3. The system creates a new Entry with an immutable EntryId, the given `date`, `createdAt`, and `updatedAt`.
@@ -20,6 +24,7 @@ Create a new diary entry in a single-user environment.
 5. The system returns the new EntryId.
 
 ## Alternative / Error Flows
+
 - **AF-1**: Empty title → `TITLE_REQUIRED`.
 - **AF-2**: Title exceeds limit → `TITLE_TOO_LONG`.
 - **AF-3**: Empty body → `BODY_REQUIRED`.
@@ -28,10 +33,12 @@ Create a new diary entry in a single-user environment.
 - **AF-6**: Invalid date input (not strict `YYYY-MM-DD` or not a real calendar date) → `DATE_INVALID`.
 
 ## Postconditions
+
 - A new Entry exists in storage with valid timestamps.
 - `updatedAt == createdAt` on creation.
 
 ## Business Rules (referencing globals)
+
 - ENTRY-BR-1 Title length (1..200) after trimming.
 - ENTRY-BR-2 Body length (1..50000).
 - BR-1 Trimming.
@@ -39,6 +46,7 @@ Create a new diary entry in a single-user environment.
 - BR-2 Entry date format and validity.
 
 ## Acceptance Criteria
+
 - **AC-1 (happy path)**: Given a non-empty title and body within limits, when adding an entry, then the system returns a new id and the entry is persisted with correct timestamps.
 - **AC-2 (empty title)**: Given an empty (after trimming) title, when adding an entry, then validation fails with error code `TITLE_REQUIRED`.
 - **AC-3 (title too long)**: Given a title longer than 200 characters, when adding an entry, then validation fails with error code `TITLE_TOO_LONG`.
@@ -47,5 +55,3 @@ Create a new diary entry in a single-user environment.
 - **AC-6 (missing date)**: Given no date, when adding an entry, then validation fails with error code `DATE_REQUIRED`.
 - **AC-7 (invalid date input)**: Given a date not matching `YYYY-MM-DD`, when adding an entry, then validation fails with error code `DATE_INVALID`.
 - **AC-8 (invalid calendar date)**: Given a date like 2025-02-30, when adding an entry, then validation fails with error code `DATE_INVALID`.
-
-
