@@ -13,12 +13,7 @@ import type {UpdateEntryRequest} from '@src/Application/DTO/Entries/UpdateEntry/
  */
 export function ac01HappyPath(request: UpdateEntryRequest): UseCaseResponse<Entry> {
     // prettier-ignore
-    const item = EntryFactory.make({
-        id   : request.id,
-        title: request.title,
-        body : request.body,
-        date : request.date
-    });
+    const item = EntryFactory.make(request);
 
     // prettier-ignore
     const response: UseCaseResponse<Entry> = {

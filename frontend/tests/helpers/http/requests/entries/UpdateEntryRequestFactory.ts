@@ -11,14 +11,12 @@ import type {UpdateEntryRequest} from '@src/Application/DTO/Entries/UpdateEntry/
  * - At least one updatable field must be present (title/body/date).
  */
 function getPayload(uc: string, ac: string): UpdateEntryRequest {
-    const base = EntryFactory.make(); // source of truth for valid fields
+    const title = `Valid title (${uc}, ${ac})`;
+    const entry = EntryFactory.make({title});
 
-    const id = base.id;
-    const title = `Valid title (updated) (${uc}, ${ac})`;
-    const body = base.body;
-    const date = base.date;
-
+    const {id, body, date} = entry;
     const payload: UpdateEntryRequest = {id, title, body, date};
+
     return payload;
 }
 
