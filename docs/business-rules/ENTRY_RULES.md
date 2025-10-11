@@ -8,6 +8,7 @@ They complement global, cross-cutting rules (see `BUSINESS_RULES.md`, e.g., trim
 ---
 
 ## ENTRY-BR-1 — Title length
+
 - The title must be between **1 and 200** characters **after trimming**.
 - Trimming is defined by the global rule (see `BR-1` in `BUSINESS_RULES.md`).
 
@@ -20,6 +21,7 @@ They complement global, cross-cutting rules (see `BUSINESS_RULES.md`, e.g., trim
 ---
 
 ## ENTRY-BR-2 — Body length
+
 - The body must be between **1 and 50000** characters **after trimming**.
 - Trimming is defined by the global rule (see `BR-1` in `BUSINESS_RULES.md`)..
 
@@ -32,6 +34,7 @@ They complement global, cross-cutting rules (see `BUSINESS_RULES.md`, e.g., trim
 ---
 
 ## ENTRY-BR-3 — Default status
+
 - New entries **default to `published`**.
 - No draft workflow in v1.
 
@@ -44,6 +47,7 @@ They complement global, cross-cutting rules (see `BUSINESS_RULES.md`, e.g., trim
 ---
 
 ## ENTRY-BR-4 — Logical entry date
+
 - Client MUST provide an explicit **`YYYY-MM-DD`** date.
 - The date MUST be a **valid calendar date** and **not empty**.
 - The date is **independent** from timestamps (`createdAt`, `updatedAt`).
@@ -59,11 +63,13 @@ They complement global, cross-cutting rules (see `BUSINESS_RULES.md`, e.g., trim
 ---
 
 ## Cross-references (Global)
+
 - **BR-1 Trimming:** Whitespace trimming happens before length checks.
 - **BR-2 Timestamps (UTC, monotonicity):** `createdAt = updatedAt = Clock.now()` on creation; `updatedAt := max(prev.updatedAt, Clock.now())` on updates; invariant `updatedAt ≥ createdAt`.
 
 ---
 
 ## Notes for tests & docs
+
 - UC documents should **reference `ENTRY-BR-*`** for Entry-specific constraints and **`BR-*`** for global ones.
 - Validation tests SHOULD assert trimming-first semantics for title/body (global `BR-1`) and strict calendar dates for `ENTRY-BR-4`.

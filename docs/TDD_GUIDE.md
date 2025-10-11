@@ -9,6 +9,7 @@ We follow the Red → Green → Refactor cycle.
 3. **Refactor** — improve the design while keeping tests green.
 
 ## Constraints
+
 - Each step is a separate commit.
 - Commit messages must indicate the step:
   - Red: `test(unit): red <description>`
@@ -18,6 +19,7 @@ We follow the Red → Green → Refactor cycle.
 - Red failure messages must be clear and intentional.
 
 ## Benefits
+
 - Forces clear requirements before coding.
 - Keeps design flexible and modular.
 - Ensures every line of code is covered by tests.

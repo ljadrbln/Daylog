@@ -18,6 +18,7 @@ Every endpoint returns JSON with these fields observed in the log:
 ## 1) UC‑1 — AddEntry
 
 ### Success — 200
+
 ```json
 {
   "success": true,
@@ -34,6 +35,7 @@ Every endpoint returns JSON with these fields observed in the log:
 ```
 
 ### Missing/required fields — 400
+
 Representative cases (each returns one `code`):
 
 - `TITLE_REQUIRED`
@@ -41,6 +43,7 @@ Representative cases (each returns one `code`):
 - `DATE_REQUIRED`
 
 Example:
+
 ```json
 {
   "success": false,
@@ -50,6 +53,7 @@ Example:
 ```
 
 ### Validation errors — 422
+
 Representative cases:
 
 - `TITLE_TOO_LONG`
@@ -58,6 +62,7 @@ Representative cases:
 - `TITLE_REQUIRED` (when empty/whitespace after normalization)
 
 Example:
+
 ```json
 {
   "success": false,
@@ -71,6 +76,7 @@ Example:
 ## 3) UC‑2 — ListEntries
 
 ### Success — 200
+
 The response contains `items[]` and pagination fields.
 
 ```json
@@ -113,6 +119,7 @@ The response contains `items[]` and pagination fields.
 ```
 
 ### Empty page — 200
+
 ```json
 {
   "success": true,
@@ -128,6 +135,7 @@ The response contains `items[]` and pagination fields.
 ```
 
 ### Validation errors — 422
+
 Representative cases:
 
 - `DATE_INVALID`
@@ -135,6 +143,7 @@ Representative cases:
 - `QUERY_TOO_LONG`
 
 Example:
+
 ```json
 {
   "success": false,
@@ -144,6 +153,7 @@ Example:
 ```
 
 ### Type/shape errors — 400
+
 Representative cases (parameters sent as arrays or wrong primitive type):
 
 - `PAGE_MUST_BE_NUMERIC`
@@ -156,6 +166,7 @@ Representative cases (parameters sent as arrays or wrong primitive type):
 - `QUERY_MUST_BE_STRING`
 
 Example:
+
 ```json
 {
   "success": false,
@@ -169,6 +180,7 @@ Example:
 ## 3) UC‑3 — GetEntry
 
 ### Success — 200
+
 ```json
 {
   "success": true,
@@ -185,6 +197,7 @@ Example:
 ```
 
 ### Not found — 404
+
 ```json
 {
   "success": false,
@@ -194,6 +207,7 @@ Example:
 ```
 
 ### Invalid id — 422
+
 ```json
 {
   "success": false,
@@ -207,7 +221,9 @@ Example:
 ## 4) UC‑4 — DeleteEntry
 
 ### Success — 200
+
 Returns the deleted entry **object** in `data`:
+
 ```json
 {
   "success": true,
@@ -224,6 +240,7 @@ Returns the deleted entry **object** in `data`:
 ```
 
 ### Not found — 404
+
 ```json
 {
   "success": false,
@@ -233,6 +250,7 @@ Returns the deleted entry **object** in `data`:
 ```
 
 ### Invalid id — 422
+
 ```json
 {
   "success": false,
@@ -246,6 +264,7 @@ Returns the deleted entry **object** in `data`:
 ## 5) UC‑5 — UpdateEntry
 
 ### Success — 200
+
 ```json
 {
   "success": true,
@@ -262,6 +281,7 @@ Returns the deleted entry **object** in `data`:
 ```
 
 ### Validation / business errors — 422
+
 Representative cases:
 
 - `ID_INVALID`
@@ -283,6 +303,7 @@ Example:
 ```
 
 ### Not found — 404
+
 ```json
 {
   "success": false,

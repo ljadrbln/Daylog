@@ -1,6 +1,7 @@
 # UC-2 — List Entries (Frontend AC)
 
 ## Scope
+
 Frontend gateway validates only the parts of the API response it consumes.  
 Authoritative sources:
 - **HTTP status** (`res.ok` from Fetch)  
@@ -26,6 +27,7 @@ Ignored by frontend:
   200 OK but `success=false` ⇒ throws `Error("Malformed response: success")`.
 
 ## Coverage
+
 - `frontend/tests/Unit/Entries/ListEntries/AC01_HappyPath.test.ts`;
 - `frontend/tests/Unit/Entries/ListEntries/AC02_Non2xxResponse.test.ts`;
 - `frontend/tests/Unit/Entries/ListEntries/AC03_MalformedJson.test.ts`;

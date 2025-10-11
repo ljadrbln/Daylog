@@ -4,46 +4,46 @@ Start here to navigate the project documentation.
 
 ## Overview
 
-- [Project Charter](PROJECT_CHARTER.md)
-- [Requirements (Overview)](REQUIREMENTS.md)
-- [Architecture: ERD & Glossary](ARCHITECTURE_ERD_AND_GLOSSARY.md)
-- [Global Business Rules](BUSINESS_RULES.md)
-- [Install & Setup](INSTALL.md)
+- [Project Charter](./PROJECT_CHARTER.md)
+- [Requirements (Overview)](./REQUIREMENTS.md)
+- [Architecture: ERD & Glossary](./ARCHITECTURE_ERD_AND_GLOSSARY.md)
+- [Global Business Rules](./BUSINESS_RULES.md)
+- [Install & Setup](./INSTALL.md)
 
 ## Use Cases
 
-- [Use Cases Index](USE_CASES.md)
-- UC-1 details: [UC-1 — Add Entry](use-cases/UC-1-AddEntry.md)
-- UC-2 details: [UC-2 — List Entries](use-cases/UC-2-ListEntries.md)
-- UC-3 details: [UC-3 — Get Entry](use-cases/UC-3-GetEntry.md)
-- UC-4 details: [UC-4 — Delete Entry](use-cases/UC-4-DeleteEntry.md)
-- UC-5 details: [UC-5 — Update Entry](use-cases/UC-5-UpdateEntry.md)
-- Template: [UC Template](use-cases/UC_TEMPLATE.md)
+- [Use Cases Index](./USE_CASES.md)
+- UC-1 details: [UC-1 — Add Entry](./use-cases/UC-1-AddEntry.md)
+- UC-2 details: [UC-2 — List Entries](./use-cases/UC-2-ListEntries.md)
+- UC-3 details: [UC-3 — Get Entry](./use-cases/UC-3-GetEntry.md)
+- UC-4 details: [UC-4 — Delete Entry](./use-cases/UC-4-DeleteEntry.md)
+- UC-5 details: [UC-5 — Update Entry](./use-cases/UC-5-UpdateEntry.md)
+- Template: [UC Template](./use-cases/UC_TEMPLATE.md)
 
 ## Frontend
 
 The frontend (TypeScript + Vite + Vitest) has its own tooling and workflow.  
-See [`frontend/README.md`](./frontend/README.md) for details.
+See [`frontend/README.md`](././frontend/README.md) for details.
 
 ### API Documentation
 
 - **Entries API Contract (UC-1 → UC-5)**  
   Defines all response shapes and statuses used by frontend gateways.  
-  → [`frontend/docs/api/entries-api-contract.md`](frontend/docs/api/entries-api-contract.md)
+  → [`frontend/docs/api/entries-api-contract.md`](./frontend/docs/api/entries-api-contract.md)
 
 ## Frontend Acceptance
 
-- UC-1 details: [UC-1 — Add Entry (Frontend AC)](frontend/acceptance/UC-1-AddEntry.md);
-- UC-2 details: [UC-2 — List Entries (Frontend AC)](frontend/acceptance/UC-2-ListEntries.md);
-- UC-3 details: [UC-3 — Get Entry (Frontend AC)](frontend/acceptance/UC-3-GetEntry.md);
-- UC-4 details: [UC-4 — Delete Entry (Frontend AC)](frontend/acceptance/UC-4-DeleteEntry.md);
-- UC-5 details: [UC-5 — Update Entry (Frontend AC)](frontend/acceptance/UC-5-UpdateEntry.md).
+- UC-1 details: [UC-1 — Add Entry (Frontend AC)](./frontend/acceptance/UC-1-AddEntry.md);
+- UC-2 details: [UC-2 — List Entries (Frontend AC)](./frontend/acceptance/UC-2-ListEntries.md);
+- UC-3 details: [UC-3 — Get Entry (Frontend AC)](./frontend/acceptance/UC-3-GetEntry.md);
+- UC-4 details: [UC-4 — Delete Entry (Frontend AC)](./frontend/acceptance/UC-4-DeleteEntry.md);
+- UC-5 details: [UC-5 — Update Entry (Frontend AC)](./frontend/acceptance/UC-5-UpdateEntry.md).
 
 
 ## Process & Conventions
 
-- [Conventional Commits](CONVENTIONAL_COMMITS.md)
-- [TDD Guide](TDD_GUIDE.md)
+- [Conventional Commits](./CONVENTIONAL_COMMITS.md)
+- [TDD Guide](./TDD_GUIDE.md)
 
 ## Notes
 

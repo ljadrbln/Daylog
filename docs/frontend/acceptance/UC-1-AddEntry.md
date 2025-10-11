@@ -1,6 +1,7 @@
 # UC-1 — Add Entry (Frontend AC)
 
 ## Scope
+
 Frontend gateway validates only the parts of the API response it consumes.  
 Authoritative sources:
 - **HTTP status** (`res.ok` from Fetch)
@@ -26,6 +27,7 @@ Ignored by frontend:
   200 OK but `success=false` ⇒ throws `Error("Malformed response: success")`.
 
 ## Coverage
+
 - `frontend/tests/Unit/Entries/AddEntry/AC01_HappyPath.test.ts`;
 - `frontend/tests/Unit/Entries/AddEntry/AC02_Non2xxResponse.test.ts`;
 - `frontend/tests/Unit/Entries/AddEntry/AC03_MalformedJson.test.ts`;

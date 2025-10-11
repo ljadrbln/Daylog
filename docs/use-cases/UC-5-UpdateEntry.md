@@ -1,13 +1,16 @@
 # UC-5 — Update Entry
 
 ## Intent
+
 Update an existing diary entry’s mutable fields (`title`, `body`, `date`) by id.
 
 ## Preconditions
+
 - Application is running.
 - The system will receive `id` (UUID v4) and at least one of: `title`, `body`, `date`.
 
 ## Parameters & Limits
+
 - `id`: string (UUID v4). Must reference an existing entry.
 - `title`: string (optional). See ENTRY-BR-1 (length after trimming) and BR-1 (trimming).
 - `body`: string (optional). See ENTRY-BR-2 (length after trimming) and BR-1 (trimming).
@@ -15,6 +18,7 @@ Update an existing diary entry’s mutable fields (`title`, `body`, `date`) by i
 - At least one of `title`, `body`, `date` MUST be provided.
 
 ## Main Success Scenario
+
 1. The system receives `id` and a subset of fields (`title`, `body`, `date`).
 2. The system validates inputs according to global business rules (BR-1..BR-2, ENTRY-BR-1..ENTRY-BR-2).
 3. The system loads the Entry by `id`.
@@ -23,6 +27,7 @@ Update an existing diary entry’s mutable fields (`title`, `body`, `date`) by i
 6. The system returns the updated EntryId (or Presentation payload per current project standard).
 
 ## Alternative / Error Flows
+
 - **AF-1**: Missing `id` → `ID_REQUIRED`.
 - **AF-2**: Invalid `id` (not UUID v4) → `ID_INVALID`.
 - **AF-3**: Entry not found by `id` → `ENTRY_NOT_FOUND`.
@@ -35,17 +40,20 @@ Update an existing diary entry’s mutable fields (`title`, `body`, `date`) by i
 - **AF-10**: No effective changes (provided values equal current values) → `NO_CHANGES_APPLIED` (informational, non-error).
 
 ## Postconditions
+
 - On success with effective changes: the Entry exists with updated fields and a refreshed `updatedAt`; `createdAt` remains unchanged.
 - On success without effective changes: the Entry remains unchanged; `updatedAt` is not modified and the system returns `NO_CHANGES_APPLIED`.
 - On failure: the Entry remains unchanged.
 
 ## Business Rules (referencing globals)
+
 - ENTRY-BR-1 Title length (1..200) after trimming.
 - ENTRY-BR-2 Body length (1..50000).
 - BR-1 Trimming.
 - BR-2 Timestamps consistency & monotonicity.
 
 ## Acceptance Criteria
+
 - **AC-1 (happy path — title)**: Given a valid `id` and a non-empty `title` within limits, when updating, then the system persists the new title and refreshes `updatedAt`.
 - **AC-2 (happy path — body)**: Given a valid `id` and a non-empty `body` within limits, when updating, then the system persists the new body and refreshes `updatedAt`.
 - **AC-3 (happy path — date)**: Given a valid `id` and a valid `date`, when updating, then the system persists the new date and refreshes `updatedAt`.

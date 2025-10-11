@@ -3,6 +3,7 @@
 Daylog frontend uses a modern TypeScript-based toolchain for consistent code quality and developer experience.
 
 ## Configuration
+
 | Tool | Purpose | Config file |
 |------|----------|--------------|
 | **ESLint (Flat config)** | Enforces code style and catches errors. | `frontend/eslint.config.js` |
@@ -47,7 +48,8 @@ Daylog frontend uses a modern TypeScript-based toolchain for consistent code qua
    ```
 
 ### API Contracts
-- [Entries API Contract](docs/api/entries-api-contract.md) — based on backend functional tests (UC-1…UC-5, 2025-10-09)
+
+- [Entries API Contract](../api/entries-api-contract.md) — based on backend functional tests (UC-1…UC-5, 2025-10-09)
 
 ## Notes
 
