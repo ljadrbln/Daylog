@@ -28,6 +28,7 @@ describe('FetchHttpClient — Abort (fetch rejects with AbortError)', () => {
     });
 
     it('rejects when fetch rejects with AbortError', async () => {
+        // Arrange
         const baseUrl = 'http://localhost';
         const client = new FetchHttpClient(baseUrl);
 
@@ -35,9 +36,11 @@ describe('FetchHttpClient — Abort (fetch rejects with AbortError)', () => {
         const error = new Error(message);
         fetchMock.mockRejectedValueOnce(error);
 
+        // Act
         const url = makeProbeUrl('HTTP', 'Abort');
         const run = client.request('GET', url);
 
+        // Assert
         await expect(run).rejects.toThrow(message);
     });
 });

@@ -28,6 +28,7 @@ describe('FetchHttpClient — Network Failure (fetch rejects)', () => {
     });
 
     it('rejects when fetch rejects (TypeError: Network error)', async () => {
+        // Arrange
         const baseUrl = 'http://localhost';
         const client = new FetchHttpClient(baseUrl);
 
@@ -35,9 +36,11 @@ describe('FetchHttpClient — Network Failure (fetch rejects)', () => {
         const error = new TypeError(message);
         fetchMock.mockRejectedValueOnce(error);
 
+        // Act
         const url = makeProbeUrl('HTTP', 'NetworkFailure');
         const run = client.request('GET', url);
 
+        // Assert
         await expect(run).rejects.toThrow(message);
     });
 });
