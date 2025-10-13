@@ -69,6 +69,22 @@ export function mockJsonOnce(
 }
 
 /**
+ * Enqueue a single rejected fetch call (e.g., network failure or abort).
+ *
+ * Purpose:
+ * - Simulate low-level transport errors (TypeError, AbortError, etc.).
+ * - Keeps consistent typing with other fetch-mocking helpers.
+ *
+ * @param {HttpTestCtxBase['fetchMock']} fetchMock Mocked fetch function from test ctx.
+ * @param {Error} error Error instance to reject with (e.g., TypeError('Network error')).
+ *
+ * @returns {void}
+ */
+export function mockRejectOnce(fetchMock: HttpTestCtxBase['fetchMock'], error: Error): void {
+    fetchMock.mockRejectedValueOnce(error);
+}
+
+/**
  * Narrows any `{ success: boolean }` union to the success branch.
  * Uses test assertion so failures are reported by the test runner.
  *

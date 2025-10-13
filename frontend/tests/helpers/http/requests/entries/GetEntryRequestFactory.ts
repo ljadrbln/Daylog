@@ -79,3 +79,19 @@ export function ac04SuccessFalse(): {id: string} {
 
     return payload;
 }
+
+/**
+ * AC-05 — network failure.
+ *
+ * Builds a valid GetEntryRequest for network failure scenario.
+ * Generate a minimal but valid payload to simulate a network-level rejection
+ * during fetch execution (e.g., no response, connection lost, offline).
+ *
+ * @returns {GetEntryRequest} Valid request payload for network failure test.
+ */
+
+export function ac05NetworkFailure(): {id: string} {
+    const payload = getPayload('UC-03', 'AC-05');
+
+    return payload;
+}
