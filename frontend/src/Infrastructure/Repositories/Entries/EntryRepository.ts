@@ -52,17 +52,16 @@ export class EntryRepository implements EntryRepositoryInterface {
      * - Validate transport envelope (success=true). Payload may contain Entry, but is ignored here.
      *
      * @param {string} id Entry identifier (UUID).
-     * @returns {Promise<void>} Resolves on success.
+     * @returns {Promise<Entry>} Resolves on success.
      * @throws {Error} If transport envelope is malformed or HTTP non-2xx raised upstream.
      */
-    public async deleteById(id: string): Promise<void> {
+    public async deleteById(id: string): Promise<Entry> {
         const url = `/api/entries/${id}`;
-        const json = await this.http.request<UseCaseResponse<unknown>>('DELETE', url);
+        const json = await this.http.request<UseCaseResponse<Entry>>('DELETE', url);
 
-        const endpoint = 'DELETE /api/entries/:id';
-        ResponseValidator.ensureSuccess(json, endpoint);
+        const entry = ResponseValidator.extractData(json, 'DELETE /api/entries/:id');
 
-        return;
+        return entry;
     }
 
     public async findByCriteria(

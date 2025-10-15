@@ -10,9 +10,11 @@ import {ac01HappyPath as makeResponse} from '@tests/helpers/http/responses/entri
 /** UC-4 Delete Entry (Repository): 200 + {success:true} -> resolves void. */
 describe('AC01 — EntryRepository.deleteById resolves on success', () => {
     let ctx: RepositoryTestCtx;
+
     beforeEach(() => {
         ctx = createRepository();
     });
+
     afterEach(() => {
         ctx.cleanup();
     });

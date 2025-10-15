@@ -36,9 +36,9 @@ export interface EntryRepositoryInterface {
      * Delete an entry by its identifier.
      *
      * @param {string} id Entry identifier (UUID).
-     * @returns {Promise<void>} Nothing on completion.
+     * @returns {Promise<Entry|null>} Entry or null when not found.
      */
-    deleteById(id: string): Promise<void>;
+    deleteById(id: string): Promise<Entry | null>;
 
     /**
      * Fetch a page of entries by criteria (UC-2).
