@@ -44,8 +44,25 @@ export class EntryRepository implements EntryRepositoryInterface {
         throw new Error('Not implemented yet');
     }
 
+    /**
+     * Delete an entry by its identifier (UC-4).
+     *
+     * Mechanics:
+     * - Perform DELETE /api/entries/{id}.
+     * - Validate transport envelope (success=true). Payload may contain Entry, but is ignored here.
+     *
+     * @param {string} id Entry identifier (UUID).
+     * @returns {Promise<void>} Resolves on success.
+     * @throws {Error} If transport envelope is malformed or HTTP non-2xx raised upstream.
+     */
     public async deleteById(id: string): Promise<void> {
-        throw new Error('Not implemented yet');
+        const url = `/api/entries/${id}`;
+        const json = await this.http.request<UseCaseResponse<unknown>>('DELETE', url);
+
+        const endpoint = 'DELETE /api/entries/:id';
+        ResponseValidator.ensureSuccess(json, endpoint);
+
+        return;
     }
 
     public async findByCriteria(
