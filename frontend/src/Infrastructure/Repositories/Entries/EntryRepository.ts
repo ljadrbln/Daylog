@@ -3,6 +3,8 @@ import type {Entry} from '@src/Domain/Entries/Entry';
 import type {EntryRepositoryInterface} from '@src/Domain/Interfaces/Entries/EntryRepositoryInterface';
 import type {ListEntriesCriteriaInterface} from '@src/Domain/Interfaces/Entries/ListEntriesCriteriaInterface';
 import type {ListEntriesPageInterface} from '@src/Domain/Interfaces/Entries/ListEntriesPageInterface';
+import type {UseCaseResponse} from '@src/Application/DTO/Common/UseCaseResponse';
+import {ResponseValidator} from '@src/Infrastructure/Http/ResponseValidator';
 
 /**
  * EntryRepository (frontend, HTTP-backed)
@@ -29,7 +31,12 @@ export class EntryRepository implements EntryRepositoryInterface {
      * @throws {Error} if response.success !== true or data malformed.
      */
     public async findById(id: string): Promise<Entry> {
-        throw new Error('Not implemented');
+        const url = `/api/entries/${id}`;
+        const json = await this.http.request<UseCaseResponse<Entry>>('GET', url);
+
+        const entry = ResponseValidator.extractData(json, 'GET /api/entries/:id');
+
+        return entry;
     }
 
     // stubs for other UC — will be filled later
@@ -41,7 +48,9 @@ export class EntryRepository implements EntryRepositoryInterface {
         throw new Error('Not implemented yet');
     }
 
-    public async findByCriteria(criteria: ListEntriesCriteriaInterface): Promise<ListEntriesPageInterface> {
+    public async findByCriteria(
+        criteria: ListEntriesCriteriaInterface
+    ): Promise<ListEntriesPageInterface> {
         throw new Error('Not implemented yet');
     }
 }
