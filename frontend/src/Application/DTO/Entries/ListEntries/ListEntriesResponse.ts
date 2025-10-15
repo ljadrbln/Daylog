@@ -1,5 +1,5 @@
-import type {Entry} from '@src/Domain/Entries/Entry';
 import type {UseCaseResponse} from '@src/Application/DTO/Common/UseCaseResponse';
+import type {ListEntriesPageInterface} from '@src/Domain/Interfaces/Entries/ListEntriesPageInterface';
 
 /**
  * UC-2: List Entries — response DTO.
@@ -8,13 +8,7 @@ import type {UseCaseResponse} from '@src/Application/DTO/Common/UseCaseResponse'
  * { success: true, status: 200, data: { items, page, perPage, total, pagesCount } }.
  * Pagination fields are top-level inside `data` (no nested `pagination` object).
  */
-export type ListEntriesData = {
-    items: Entry[];
-    page: number;
-    perPage: number;
-    total: number;
-    pagesCount: number;
-};
+export type ListEntriesData = ListEntriesPageInterface;
 
 /**
  * Discriminated transport envelope for UC-2.
