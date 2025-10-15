@@ -15,7 +15,7 @@
  * @param message - optional textual description
  * @returns object matching the expected error JSON schema
  */
-export function makeTransportError(status: number, message: string = 'Transport error') {
+function makeTransportError(status: number, message: string = 'Transport error') {
     //prettier-ignore
     const payload = {
         success: false,
