@@ -12,7 +12,6 @@ import type {UpdateEntryRequest} from '@src/Application/DTO/Entries/UpdateEntry/
  * Data mirrors "updated" state derived from request fields.
  */
 export function ac01HappyPath(request: UpdateEntryRequest): UseCaseResponse<Entry> {
-    // prettier-ignore
     const item = EntryFactory.make(request);
 
     // prettier-ignore
@@ -64,4 +63,20 @@ export function ac04SuccessFalse(_request: UpdateEntryRequest): UseCaseResponse<
     };
 
     return payload;
+}
+
+/**
+ * AC-05 — success=true, HTTP 200 (used for method/url/omitUndefined verification).
+ */
+export function ac05MethodUrlAndOmitUndefined(request: UpdateEntryRequest): UseCaseResponse<Entry> {
+    const item = EntryFactory.make(request);
+
+    // prettier-ignore
+    const response: UseCaseResponse<Entry> = {
+        success: true,
+        status : 200,
+        data   : item
+    };
+
+    return response;
 }

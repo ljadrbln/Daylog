@@ -63,3 +63,17 @@ export function ac04SuccessFalse(): UpdateEntryRequest {
 
     return payload;
 }
+
+/**
+ * AC-05 — partial body with undefined fields.
+ *
+ * @returns {UpdateEntryRequest} Request with id and patch for AC-05 assertions.
+ */
+export function ac05MethodUrlAndOmitUndefined(): UpdateEntryRequest {
+    const payload = getPayload('UC-05', 'AC-04');
+
+    payload.body = undefined;
+    payload.date = undefined;
+
+    return payload;
+}
