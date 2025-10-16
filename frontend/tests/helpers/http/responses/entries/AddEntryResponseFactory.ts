@@ -41,12 +41,9 @@ export interface MalformedAddEntrySuccessPayload {
 }
 
 /**
- * @param {AddEntryRequest} _request Accepted for signature consistency; intentionally unused.
  * @returns {MalformedAddEntrySuccessPayload} success=true payload without `data`.
  */
-export function ac03MalformedJson(_request: AddEntryRequest): MalformedAddEntrySuccessPayload {
-    void _request;
-
+export function ac03MalformedJson(): MalformedAddEntrySuccessPayload {
     const payload: MalformedAddEntrySuccessPayload = {
         success: true,
         status: 200
@@ -62,12 +59,9 @@ export function ac03MalformedJson(_request: AddEntryRequest): MalformedAddEntryS
  * Builds a syntactically valid response where success is false.
  * Used to assert that the gateway rejects even when status is 200.
  *
- * @param _request {AddEntryRequest} accepted for signature symmetry; intentionally unused.
  * @returns {AddEntryResponse} mocked payload with success=false.
  */
-export function ac04SuccessFalse(_request: AddEntryRequest): AddEntryResponse {
-    void _request;
-
+export function ac04SuccessFalse(): AddEntryResponse {
     // prettier-ignore
     const payload: AddEntryResponse = {
         success: false,

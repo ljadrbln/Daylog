@@ -39,11 +39,6 @@ export class EntryRepository implements EntryRepositoryInterface {
         return entry;
     }
 
-    // stubs for other UC — will be filled later
-    public async save(entry: Entry): Promise<Entry> {
-        throw new Error('Not implemented yet');
-    }
-
     /**
      * Delete an entry by its identifier (UC-4).
      *
@@ -68,5 +63,68 @@ export class EntryRepository implements EntryRepositoryInterface {
         criteria: ListEntriesCriteriaInterface
     ): Promise<ListEntriesPageInterface> {
         throw new Error('Not implemented yet');
+    }
+
+    /**
+     * Save Entry (backend-aligned upsert).
+     *
+     * Mechanics:
+     * - id === ''  → POST /api/entries  with Entry body.
+     * - id !== ''  → PATCH /api/entries/{id} with Entry body.
+     *
+     * @param {Entry} entry Fully prepared domain Entry.
+     * @returns {Promise<Entry>} Persisted entry returned by backend.
+     */
+    public async save(entry: Entry): Promise<Entry> {
+        const hasId = entry.id !== '';
+
+        if (!hasId) {
+            const created = await this.create(entry);
+            return created;
+        }
+
+        const updated = await this.update(entry);
+        return updated;
+    }
+
+    /**
+     * POST /api/entries.
+     *
+     * Purpose:
+     * - Delegate UC-1 create logic to backend.
+     *
+     * @param {Entry} entry Ready entry data (title, body, date).
+     * @returns {Promise<Entry>} Persisted entry.
+     */
+    private async create(entry: Entry): Promise<Entry> {
+        const method = 'POST';
+        const url = '/api/entries';
+        const endpoint = `${method} ${url}`;
+
+        const response = await this.http.request<UseCaseResponse<Entry>>(method, url, {body: entry});
+        const created = ResponseValidator.extractData(response, endpoint);
+
+        return created;
+    }
+
+    /**
+     * PUT /api/entries/{id}.
+     *
+     * Purpose:
+     * - Delegate UC-5 update logic to backend.
+     * - Backend strips immutable fields internally.
+     *
+     * @param {Entry} entry Ready entry data with id.
+     * @returns {Promise<Entry>} Updated entry.
+     */
+    private async update(entry: Entry): Promise<Entry> {
+        const method = 'PUT';
+        const url = `/api/entries/${entry.id}`;
+        const endpoint = `${method} /api/entries/:id`;
+
+        const response = await this.http.request<UseCaseResponse<Entry>>(method, url, {body: entry});
+
+        const updated = ResponseValidator.extractData(response, endpoint);
+        return updated;
     }
 }
