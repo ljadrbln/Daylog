@@ -28,11 +28,13 @@ describe('AC02–AC04 — EntryRepository.save rejects on invalid responses', ()
     beforeEach(() => {
         ctx = createRepository();
     });
+
     afterEach(() => {
         ctx.cleanup();
     });
 
     const malformedMessage = 'Malformed response for PUT /api/entries/:id';
+
     const cases = [
         ['AC02 non-2xx 400', 400, makeBadRequest(), /400|bad request/i],
         ['AC02 non-2xx 500', 500, makeInternalError(), /500|internal/i],

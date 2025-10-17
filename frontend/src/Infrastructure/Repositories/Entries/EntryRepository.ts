@@ -1,4 +1,4 @@
-import type {HttpClient} from '@src/Infrastructure/Http/HttpClient';
+import type {HttpClient, RequestOptions} from '@src/Infrastructure/Http/HttpClient';
 import type {Entry} from '@src/Domain/Entries/Entry';
 import type {EntryRepositoryInterface} from '@src/Domain/Interfaces/Entries/EntryRepositoryInterface';
 import type {ListEntriesCriteriaInterface} from '@src/Domain/Interfaces/Entries/ListEntriesCriteriaInterface';
@@ -101,7 +101,9 @@ export class EntryRepository implements EntryRepositoryInterface {
         const url = '/api/entries';
         const endpoint = `${method} ${url}`;
 
-        const response = await this.http.request<UseCaseResponse<Entry>>(method, url, {body: entry});
+        const options: RequestOptions = {requestBody: entry};
+        const response = await this.http.request<UseCaseResponse<Entry>>(method, url, options);
+
         const created = ResponseValidator.extractData(response, endpoint);
 
         return created;
@@ -122,9 +124,11 @@ export class EntryRepository implements EntryRepositoryInterface {
         const url = `/api/entries/${entry.id}`;
         const endpoint = `${method} /api/entries/:id`;
 
-        const response = await this.http.request<UseCaseResponse<Entry>>(method, url, {body: entry});
+        const options: RequestOptions = {requestBody: entry};
+        const response = await this.http.request<UseCaseResponse<Entry>>(method, url, options);
 
         const updated = ResponseValidator.extractData(response, endpoint);
+
         return updated;
     }
 }
