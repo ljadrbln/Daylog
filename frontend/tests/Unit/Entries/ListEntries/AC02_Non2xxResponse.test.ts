@@ -2,8 +2,8 @@ import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {createGateway, mockJsonOnce, type GatewayTestCtx} from './BaseListEntriesGatewayTest';
 import {ac02Non2xxResponse as makeRequest} from '@tests/helpers/http/requests/entries/ListEntriesRequestFactory';
 import {
-    makeBadRequest,
-    makeInternalError
+    badRequest,
+    internalServerError
 } from '@tests/helpers/http/responses/common/Non2xxResponseFactory';
 
 /**
@@ -34,7 +34,7 @@ describe('AC02 — ListEntriesGateway throws on non-2xx response (generic)', () 
 
     it('throws when API responds with 400 Bad Request', async () => {
         const request = makeRequest();
-        const response = makeBadRequest();
+        const response = badRequest();
 
         mockJsonOnce(ctx.fetchMock, 400, response);
 
@@ -46,7 +46,7 @@ describe('AC02 — ListEntriesGateway throws on non-2xx response (generic)', () 
 
     it('throws when API responds with 500 Internal Server Error', async () => {
         const request = makeRequest();
-        const response = makeInternalError();
+        const response = internalServerError();
 
         mockJsonOnce(ctx.fetchMock, 500, response);
 

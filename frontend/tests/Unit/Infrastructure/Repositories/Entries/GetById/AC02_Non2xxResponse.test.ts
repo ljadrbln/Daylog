@@ -6,8 +6,8 @@ import {
 } from '@tests/Unit/Infrastructure/Repositories/Entries/BaseEntriesRepositoryTest';
 import {ac02Non2xxResponse as makeRequest} from '@tests/helpers/http/requests/entries/GetEntryRequestFactory';
 import {
-    makeBadRequest,
-    makeInternalError
+    badRequest,
+    internalServerError
 } from '@tests/helpers/http/responses/common/Non2xxResponseFactory';
 
 /**
@@ -29,7 +29,7 @@ describe('AC02 — EntryRepository.findById throws on non-2xx response (generic)
     it('throws when API responds with 400 Bad Request', async () => {
         // Arrange
         const request = makeRequest();
-        const response = makeBadRequest();
+        const response = badRequest();
         mockJsonOnce(ctx.fetchMock, 400, response);
 
         // Act
@@ -42,7 +42,7 @@ describe('AC02 — EntryRepository.findById throws on non-2xx response (generic)
     it('throws when API responds with 500 Internal Server Error', async () => {
         // Arrange
         const request = makeRequest();
-        const response = makeInternalError();
+        const response = internalServerError();
         mockJsonOnce(ctx.fetchMock, 500, response);
 
         // Act

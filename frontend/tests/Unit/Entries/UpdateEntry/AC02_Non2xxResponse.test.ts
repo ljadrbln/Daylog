@@ -3,8 +3,8 @@ import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {createGateway, mockJsonOnce, type GatewayTestCtx} from './BaseUpdateEntryGatewayTest';
 import {ac02Non2xxResponse as makeRequest} from '@tests/helpers/http/requests/entries/UpdateEntryRequestFactory';
 import {
-    makeBadRequest,
-    makeInternalError
+    badRequest,
+    internalServerError
 } from '@tests/helpers/http/responses/common/Non2xxResponseFactory';
 
 /**
@@ -37,7 +37,7 @@ describe('AC02 — UpdateEntryGateway throws on non-2xx response (generic)', () 
         // Arrange
         // prettier-ignore
         const request  = makeRequest();
-        const response = makeBadRequest();
+        const response = badRequest();
 
         // Act
         mockJsonOnce(ctx.fetchMock, 400, response);
@@ -52,7 +52,7 @@ describe('AC02 — UpdateEntryGateway throws on non-2xx response (generic)', () 
         // Arrange
         // prettier-ignore
         const request  = makeRequest();
-        const response = makeInternalError();
+        const response = internalServerError();
 
         // Act
         mockJsonOnce(ctx.fetchMock, 500, response);

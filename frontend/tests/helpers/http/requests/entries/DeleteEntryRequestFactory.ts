@@ -1,6 +1,6 @@
 // UC-4 DeleteEntry — Request factory (AC01–AC04).
 import type {DeleteEntryRequest} from '@src/Application/DTO/Entries/DeleteEntry/DeleteEntryRequest';
-import {EntryFactory} from '@tests/helpers/factories/EntryFactory';
+import {EntryFactory} from '@tests/helpers/domain/entries/EntryFactory';
 
 /**
  * Builds a `{ id }` request payload using EntryFactory as the single source of truth.

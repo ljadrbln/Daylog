@@ -7,8 +7,8 @@ import {
 import {ac02Non2xxResponse as makeRequest} from '@tests/helpers/http/requests/entries/DeleteEntryRequestFactory';
 
 import {
-    makeBadRequest,
-    makeInternalError
+    badRequest,
+    internalServerError
 } from '@tests/helpers/http/responses/common/Non2xxResponseFactory';
 
 import {
@@ -18,8 +18,8 @@ import {
 
 const malformedMessage = 'Malformed response for DELETE /api/entries/:id';
 const cases = [
-    ['AC02 non-2xx 400', 400, makeBadRequest(), /400|bad request/i],
-    ['AC02 non-2xx 500', 500, makeInternalError(), /500|internal/i],
+    ['AC02 non-2xx 400', 400, badRequest(), /400|bad request/i],
+    ['AC02 non-2xx 500', 500, internalServerError(), /500|internal/i],
     ['AC03 malformed', 200, makeMalformed(), malformedMessage],
     ['AC04 success=false', 200, makeSuccessFalse(), malformedMessage]
 ] as const;

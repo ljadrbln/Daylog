@@ -34,11 +34,7 @@ export class FetchHttpClient implements HttpClient {
         url: string,
         options: RequestOptions = {}
     ): Promise<T> {
-
-        // eslint-disable-next-line prettier/prettier
-        const fullUrl = url.startsWith('http')
-            ? url
-            : `${this.baseUrl}${url}`;
+        const fullUrl = url.startsWith('http') ? url : `${this.baseUrl}${url}`;
 
         const headers = {
             Accept: 'application/json',
@@ -46,10 +42,7 @@ export class FetchHttpClient implements HttpClient {
             ...(options.headers ?? {})
         };
 
-        // eslint-disable-next-line prettier/prettier
-        const body = options.requestBody
-            ? JSON.stringify(options.requestBody)
-            : undefined;
+        const body = options.requestBody ? JSON.stringify(options.requestBody) : undefined;
 
         const response = await fetch(fullUrl, {
             method,
@@ -65,10 +58,7 @@ export class FetchHttpClient implements HttpClient {
 
         const text = await response.text();
 
-        // eslint-disable-next-line prettier/prettier
-        const data = text
-            ? (JSON.parse(text) as T)
-            : (undefined as T);
+        const data = text ? (JSON.parse(text) as T) : (undefined as T);
 
         return data;
     }

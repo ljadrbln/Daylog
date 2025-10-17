@@ -1,5 +1,5 @@
 // Purpose: provide consistent mocked API responses for UC-3 GetEntry gateway tests.
-import {EntryFactory} from '@tests/helpers/factories/EntryFactory';
+import {EntryFactory} from '@tests/helpers/domain/entries/EntryFactory';
 import type {GetEntryRequest} from '@src/Application/DTO/Entries/GetEntry/GetEntryRequest';
 import type {GetEntryResponse} from '@src/Application/DTO/Entries/GetEntry/GetEntryResponse';
 

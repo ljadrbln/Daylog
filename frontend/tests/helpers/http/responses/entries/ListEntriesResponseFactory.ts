@@ -1,5 +1,5 @@
 // Purpose: provide consistent mocked API responses for UC-2 ListEntries gateway tests.
-import {EntryFactory} from '@tests/helpers/factories/EntryFactory';
+import {EntryFactory} from '@tests/helpers/domain/entries/EntryFactory';
 import type {ListEntriesResponse} from '@src/Application/DTO/Entries/ListEntries/ListEntriesResponse';
 
 /**
