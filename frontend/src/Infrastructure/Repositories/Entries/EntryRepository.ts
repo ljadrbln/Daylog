@@ -1,8 +1,9 @@
 import type {HttpClient, RequestOptions} from '@src/Infrastructure/Http/HttpClient';
-import type {Entry} from '@src/Domain/Entries/Entry';
+import type {Entry} from '@src/Domain/Models/Entries/Entry';
 import type {EntryRepositoryInterface} from '@src/Domain/Interfaces/Entries/EntryRepositoryInterface';
 import type {ListEntriesCriteriaInterface} from '@src/Domain/Interfaces/Entries/ListEntriesCriteriaInterface';
 import type {ListEntriesPageInterface} from '@src/Domain/Interfaces/Entries/ListEntriesPageInterface';
+import type {ListEntriesResponse} from '@src/Application/DTO/Entries/ListEntries/ListEntriesResponse';
 import type {UseCaseResponse} from '@src/Application/DTO/Common/UseCaseResponse';
 import {ResponseValidator} from '@src/Infrastructure/Http/ResponseValidator';
 
@@ -59,10 +60,56 @@ export class EntryRepository implements EntryRepositoryInterface {
         return entry;
     }
 
+
+    /**
+     * UC-2: Find entries by criteria.
+     *
+     * Purpose:
+     * Build GET /api/entries with query params from criteria, validate envelope,
+     * and map transport DTO into domain page object.
+     *
+     * @param {ListEntriesCriteriaInterface} criteria Normalized/validated list params.
+     * @returns {Promise<ListEntriesPageInterface>} Page with items and pagination meta.
+     */
     public async findByCriteria(
         criteria: ListEntriesCriteriaInterface
     ): Promise<ListEntriesPageInterface> {
-        throw new Error('Not implemented yet');
+        const params = new URLSearchParams();
+
+        if (typeof criteria.page === 'number') {
+            params.set('page', String(criteria.page));
+        }
+
+        if (typeof criteria.perPage === 'number') {
+            params.set('perPage', String(criteria.perPage));
+        }
+
+        if (criteria.query) {
+            params.set('query', criteria.query);
+        }
+
+        if (criteria.dateFrom) {
+            params.set('dateFrom', criteria.dateFrom);
+        }
+
+        if (criteria.dateTo) {
+            params.set('dateTo', criteria.dateTo);
+        }
+
+        const url = `/api/entries?${params.toString()}`;
+
+        const json = await this.http.request<ListEntriesResponse>('GET', url);
+        const data = ResponseValidator.extractData<ListEntriesPageInterface>(json, 'GET /api/entries');
+
+        const page: ListEntriesPageInterface = {
+            items: data.items,
+            page: data.page,
+            perPage: data.perPage,
+            total: data.total,
+            pagesCount: data.pagesCount
+        };
+
+        return page;
     }
 
     /**
