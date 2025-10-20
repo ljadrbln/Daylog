@@ -7,7 +7,7 @@ import {
 
 import {ensureSuccess} from '@tests/helpers/asserts';
 
-import type {Entry} from '@src/Domain/Entries/Entry';
+import type {Entry} from '@src/Domain/Models/Entries/Entry';
 import {EntryFactory} from '@tests/helpers/domain/entries/EntryFactory';
 import {happyPath as makeResponse} from '@tests/helpers/http/responses/entries/AddEntryResponseFactory';
 

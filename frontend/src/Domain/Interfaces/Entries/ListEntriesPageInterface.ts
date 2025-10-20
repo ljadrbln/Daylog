@@ -1,4 +1,4 @@
-import type {Entry} from '@src/Domain/Entries/Entry';
+import type {Entry} from '@src/Domain/Models/Entries/Entry';
 
 /**
  * Interface ListEntriesPageInterface

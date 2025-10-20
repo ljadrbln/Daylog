@@ -10,7 +10,7 @@
  * - `save` performs upsert based on entry id existence.
  * - `findByCriteria` returns plain object with pagination meta.
  */
-import type {Entry} from '@src/Domain/Entries/Entry';
+import type {Entry} from '@src/Domain/Models/Entries/Entry';
 import type {ListEntriesCriteriaInterface} from '@src/Domain/Interfaces/Entries/ListEntriesCriteriaInterface';
 import type {ListEntriesPageInterface} from '@src/Domain/Interfaces/Entries/ListEntriesPageInterface';
 

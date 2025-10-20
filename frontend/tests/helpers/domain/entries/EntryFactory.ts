@@ -1,5 +1,5 @@
 import {uuidv4} from '@tests/helpers/utils/uuid';
-import type {Entry} from '@src/Domain/Entries/Entry';
+import type {Entry} from '@src/Domain/Models/Entries/Entry';
 
 /**
  * Domain Entry factory for repository tests.

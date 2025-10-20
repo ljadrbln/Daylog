@@ -2,7 +2,7 @@ import type {ListEntriesCriteriaInterface} from '@src/Domain/Interfaces/Entries/
 import type {ListEntriesRequest} from '@src/Application/DTO/Entries/ListEntries/ListEntriesRequest';
 
 type SortField = NonNullable<ListEntriesRequest['sortField']>; // 'date' | 'updatedAt'
-type SortDir   = NonNullable<ListEntriesRequest['sortDir']>;   // 'ASC' | 'DESC'
+type SortDir = NonNullable<ListEntriesRequest['sortDir']>; // 'ASC' | 'DESC'
 
 /**
  * Domain criteria for UC-2 ListEntries.

@@ -60,7 +60,6 @@ export class EntryRepository implements EntryRepositoryInterface {
         return entry;
     }
 
-
     /**
      * UC-2: Find entries by criteria.
      *
@@ -99,7 +98,10 @@ export class EntryRepository implements EntryRepositoryInterface {
         const url = `/api/entries?${params.toString()}`;
 
         const json = await this.http.request<ListEntriesResponse>('GET', url);
-        const data = ResponseValidator.extractData<ListEntriesPageInterface>(json, 'GET /api/entries');
+        const data = ResponseValidator.extractData<ListEntriesPageInterface>(
+            json,
+            'GET /api/entries'
+        );
 
         const page: ListEntriesPageInterface = {
             items: data.items,

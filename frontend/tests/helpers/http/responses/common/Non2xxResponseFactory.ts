@@ -24,7 +24,10 @@ export interface TransportErrorResponse {
  * @param {string} [message='Transport error'] Optional textual description.
  * @returns {TransportErrorResponse} Generic transport-level error payload.
  */
-function transportError(status: number, message: string = 'Transport error'): TransportErrorResponse {
+function transportError(
+    status: number,
+    message: string = 'Transport error'
+): TransportErrorResponse {
     // prettier-ignore
     const payload: TransportErrorResponse = {
         success: false,

@@ -1,6 +1,6 @@
 // src/Application/DTO/Entries/UpdateEntry/UpdateEntryResponse.ts
 import type {UseCaseResponse} from '@src/Application/DTO/Common/UseCaseResponse';
-import type {Entry} from '@src/Domain/Entries/Entry';
+import type {Entry} from '@src/Domain/Models/Entries/Entry';
 
 /**
  * UC-5: Update Entry — response DTO.

@@ -1,4 +1,4 @@
-import type {Entry} from '@src/Domain/Entries/Entry';
+import type {Entry} from '@src/Domain/Models/Entries/Entry';
 import type {UseCaseResponse} from '@src/Application/DTO/Common/UseCaseResponse';
 
 /**
