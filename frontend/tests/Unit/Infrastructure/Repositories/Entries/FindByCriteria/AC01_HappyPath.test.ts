@@ -7,7 +7,9 @@ import {
 
 import {ac01HappyPath as makeRequest} from '@tests/helpers/http/requests/entries/ListEntriesRequestFactory';
 import {ac01HappyPath as makeResponse} from '@tests/helpers/http/responses/entries/ListEntriesResponseFactory';
+import {ListEntriesCriteria} from '@src/Domain/Models/Entries/ListEntriesCriteria';
 import type {ListEntriesPageInterface} from '@src/Domain/Interfaces/Entries/ListEntriesPageInterface';
+import {ensureSuccess} from '@tests/helpers/asserts';
 
 /**
  * UC-2: Find entries by criteria (Repository)
@@ -18,8 +20,9 @@ import type {ListEntriesPageInterface} from '@src/Domain/Interfaces/Entries/List
  *
  * Mechanics:
  * - Build request via ListEntriesRequestFactory.ac01HappyPath().
- * - Stub a matching success envelope via ListEntriesResponseFactory.ac01HappyPath().
- * - Map DTO -> Domain (pagesCount preserved).
+ * - Convert request → domain criteria (ListEntriesCriteria.fromRequest()).
+ * - Stub success envelope via ListEntriesResponseFactory.ac01HappyPath().
+ * - Narrow response to success-branch via ensureSuccess() to avoid union-type issues.
  *
  * @covers EntryRepository.findByCriteria
  */
@@ -38,25 +41,21 @@ describe('AC01 — EntryRepository.findByCriteria returns page (mocked)', () => 
         // Arrange
         const request = makeRequest();
         const response = makeResponse(request);
-
         mockJsonOnce(ctx.fetchMock, 200, response);
 
+        const criteria = ListEntriesCriteria.fromRequest(request);
+
         // Act
-        const page = await ctx.repo.findByCriteria({
-            page: request.page,
-            perPage: request.perPage,
-            query: request.query,
-            dateFrom: request.dateFrom,
-            dateTo: request.dateTo
-        });
+        const page = await ctx.repo.findByCriteria(criteria);
 
         // Assert
+        const ok = ensureSuccess(response);
         const expected: ListEntriesPageInterface = {
-            items: response.data!.items,
-            page: response.data!.page,
-            perPage: response.data!.perPage,
-            total: response.data!.total,
-            pagesCount: response.data!.pagesCount
+            items: ok.data.items,
+            page: ok.data.page,
+            perPage: ok.data.perPage,
+            total: ok.data.total,
+            pagesCount: ok.data.pagesCount
         };
 
         expect(page).toEqual(expected);
