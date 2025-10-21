@@ -51,7 +51,7 @@ final class EntryStorage implements EntryStorageInterface
             // Do not touch immutable columns on update
             unset($data['id']);
             unset($data['created_at']);
-                        
+
             $this->model->updateEntry($id, $data);
         } else {
             $this->model->createEntry($data);

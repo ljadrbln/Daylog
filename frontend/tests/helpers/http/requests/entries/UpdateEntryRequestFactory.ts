@@ -1,4 +1,4 @@
-import {EntryFactory} from '@tests/helpers/factories/EntryFactory';
+import {EntryFactory} from '@tests/helpers/domain/entries/EntryFactory';
 import type {UpdateEntryRequest} from '@src/Application/DTO/Entries/UpdateEntry/UpdateEntryRequest';
 
 /**

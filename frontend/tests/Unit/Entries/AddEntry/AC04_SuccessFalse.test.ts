@@ -1,7 +1,7 @@
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {createGateway, mockJsonOnce, type GatewayTestCtx} from './BaseAddEntryGatewayTest';
 import {ac04SuccessFalse as makeRequest} from '@tests/helpers/http/requests/entries/AddEntryRequestFactory';
-import {ac04SuccessFalse as makeResponse} from '@tests/helpers/http/responses/entries/AddEntryResponseFactory';
+import {successFalse as makeResponse} from '@tests/helpers/http/responses/entries/AddEntryResponseFactory';
 
 /**
  * UC-1: Add Entry (Frontend, Gateway)

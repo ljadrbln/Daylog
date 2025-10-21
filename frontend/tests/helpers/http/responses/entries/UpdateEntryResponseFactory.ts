@@ -1,82 +1,67 @@
-// tests/helpers/http/responses/entries/UpdateEntryResponseFactory.ts
-import {EntryFactory} from '@tests/helpers/factories/EntryFactory';
-import type {Entry} from '@src/Domain/Entries/Entry';
-import type {UseCaseResponse} from '@src/Application/DTO/Common/UseCaseResponse';
+// Purpose: provide consistent mocked API responses for UC-5 UpdateEntry repository/gateway tests.
+import {EntryFactory} from '@tests/helpers/domain/entries/EntryFactory';
 import type {UpdateEntryRequest} from '@src/Application/DTO/Entries/UpdateEntry/UpdateEntryRequest';
+import type {UpdateEntryResponse} from '@src/Application/DTO/Entries/UpdateEntry/UpdateEntryResponse';
 
 /**
- * Provides consistent mocked API responses for UC-5 UpdateEntry gateway tests.
+ * AC-01 — Happy path.
  *
- * Happy path:
- * - { success: true, status: 200, data: Entry }
- * Data mirrors "updated" state derived from request fields.
+ * Builds a mocked UpdateEntry success response that mirrors backend payload:
+ * { success: true, status: 200, data: Entry } for PATCH /api/entries/:id.
+ *
+ * Mechanics:
+ * - Derive updated Entry from request via EntryFactory.make(request).
+ * - Wrap in a standard success envelope with status=200.
+ *
+ * @param {UpdateEntryRequest} request Valid UpdateEntry request payload.
+ * @returns {UpdateEntryResponse} Mocked API payload with updated Entry in data.
  */
-export function ac01HappyPath(request: UpdateEntryRequest): UseCaseResponse<Entry> {
+export function happyPath(request: UpdateEntryRequest): UpdateEntryResponse {
     const item = EntryFactory.make(request);
 
-    // prettier-ignore
-    const response: UseCaseResponse<Entry> = {
+    const response: UpdateEntryResponse = {
         success: true,
-        status : 200,
-        data   : item
+        status: 200,
+        data: item
     };
 
     return response;
 }
 
 /**
- * AC-03 — Malformed JSON (success=true but missing `data`).
+ * AC-03 — Malformed JSON (structural).
+ *
+ * Builds a syntactically valid payload that violates UseCaseResponse
+ * by omitting the required `data` field while keeping success=true.
+ *
+ * @returns {object} success=true payload without `data`.
  */
-export interface MalformedUpdateSuccessPayload {
-    success: true;
-    status: number;
-    // intentionally no `data`
-}
-
-/**
- * @returns {MalformedUpdateSuccessPayload} success=true payload without `data`.
- */
-export function ac03MalformedJson(_request: UpdateEntryRequest): MalformedUpdateSuccessPayload {
-    void _request;
-
-    // prettier-ignore
-    const payload: MalformedUpdateSuccessPayload = {
+export function malformed(): object {
+    const payload = {
         success: true,
-        status : 200
-        // no `data`
+        status: 200
+        // intentionally missing `data`
     };
 
     return payload;
 }
 
 /**
- * AC-04 — success=false with HTTP 200.
+ * AC-04 — success=false.
+ *
+ * Builds a valid envelope with success=false, simulating backend-side failure
+ * while transport remains HTTP 200.
+ *
+ * @returns {object} success=false payload with error code and message.
  */
-export function ac04SuccessFalse(_request: UpdateEntryRequest): UseCaseResponse<Entry> {
-    void _request;
-
-    // prettier-ignore
-    const payload: UseCaseResponse<Entry> = {
+export function successFalse(): object {
+    const payload = {
         success: false,
-        status : 200,
-        // no data on error branch per our envelope
+        code: 'E_UPDATE_ENTRY',
+        message: 'Failed to update entry',
+        status: 200
+        // no `data` on error branch by contract
     };
 
     return payload;
-}
-
-/**
- * AC-05 — success=true, HTTP 200 (used for method/url/omitUndefined verification).
- */
-export function ac05MethodUrlAndOmitUndefined(request: UpdateEntryRequest): UseCaseResponse<Entry> {
-    const item = EntryFactory.make(request);
-
-    // prettier-ignore
-    const response: UseCaseResponse<Entry> = {
-        success: true,
-        status : 200,
-        data   : item
-    };
-
-    return response;
 }

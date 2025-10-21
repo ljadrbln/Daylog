@@ -1,5 +1,5 @@
 // Purpose: provide consistent mocked API responses for UC-1 AddEntry gateway tests.
-import {EntryFactory} from '@tests/helpers/factories/EntryFactory';
+import {EntryFactory} from '@tests/helpers/domain/entries/EntryFactory';
 import type {AddEntryRequest} from '@src/Application/DTO/Entries/AddEntry/AddEntryRequest';
 import type {AddEntryResponse} from '@src/Application/DTO/Entries/AddEntry/AddEntryResponse';
 
@@ -12,7 +12,7 @@ import type {AddEntryResponse} from '@src/Application/DTO/Entries/AddEntry/AddEn
  * @param {AddEntryRequest} request Valid AddEntry request payload.
  * @returns {AddEntryResponse} Mocked API payload with created Entry in data.
  */
-export function ac01HappyPath(request: AddEntryRequest): AddEntryResponse {
+export function happyPath(request: AddEntryRequest): AddEntryResponse {
     const item = EntryFactory.make(request);
 
     const response: AddEntryResponse = {
@@ -27,27 +27,13 @@ export function ac01HappyPath(request: AddEntryRequest): AddEntryResponse {
 /**
  * AC-03 — Malformed JSON (structural).
  *
- * Builds a syntactically valid payload that violates the success=true branch
- * of UseCaseResponse by omitting the required `data` field.
- * Used to ensure the gateway rejects such responses as malformed.
+ * Builds a syntactically valid payload that violates UseCaseResponse
+ * by omitting the required `data` field.
  *
- * @typedef MalformedAddEntrySuccessPayload
- * A payload with success=true and missing `data` on purpose.
+ * @returns {object} success=true payload without `data`.
  */
-export interface MalformedAddEntrySuccessPayload {
-    success: true;
-    status: number;
-    // intentionally no `data`
-}
-
-/**
- * @param {AddEntryRequest} _request Accepted for signature consistency; intentionally unused.
- * @returns {MalformedAddEntrySuccessPayload} success=true payload without `data`.
- */
-export function ac03MalformedJson(_request: AddEntryRequest): MalformedAddEntrySuccessPayload {
-    void _request;
-
-    const payload: MalformedAddEntrySuccessPayload = {
+export function malformed(): object {
+    const payload = {
         success: true,
         status: 200
         // intentionally missing `data`
@@ -57,23 +43,19 @@ export function ac03MalformedJson(_request: AddEntryRequest): MalformedAddEntryS
 }
 
 /**
- * AC-04 — success=false with HTTP 200.
+ * AC-04 — success=false.
  *
- * Builds a syntactically valid response where success is false.
- * Used to assert that the gateway rejects even when status is 200.
+ * Builds a valid envelope with success=false, simulating backend failure.
  *
- * @param _request {AddEntryRequest} accepted for signature symmetry; intentionally unused.
- * @returns {AddEntryResponse} mocked payload with success=false.
+ * @returns {object} success=false payload with error code and message.
  */
-export function ac04SuccessFalse(_request: AddEntryRequest): AddEntryResponse {
-    void _request;
-
-    // prettier-ignore
-    const payload: AddEntryResponse = {
+export function successFalse(): object {
+    const payload = {
         success: false,
-        status : 200,
-        // no data on error responses in our contract
-    }
+        code: 'E_ADD_ENTRY',
+        message: 'Failed to add entry',
+        status: 200
+    };
 
     return payload;
 }

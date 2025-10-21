@@ -9,15 +9,27 @@
  */
 
 /**
+ * Shape of a generic transport-level error payload.
+ */
+export interface TransportErrorResponse {
+    success: false;
+    status: number;
+    message: string;
+}
+
+/**
  * Builds a generic transport error payload.
  *
- * @param status - HTTP status code (non-2xx)
- * @param message - optional textual description
- * @returns object matching the expected error JSON schema
+ * @param {number} status HTTP status code (non-2xx)
+ * @param {string} [message='Transport error'] Optional textual description.
+ * @returns {TransportErrorResponse} Generic transport-level error payload.
  */
-export function makeTransportError(status: number, message: string = 'Transport error') {
-    //prettier-ignore
-    const payload = {
+function transportError(
+    status: number,
+    message: string = 'Transport error'
+): TransportErrorResponse {
+    // prettier-ignore
+    const payload: TransportErrorResponse = {
         success: false,
         status : status,
         message: message
@@ -27,44 +39,22 @@ export function makeTransportError(status: number, message: string = 'Transport 
 }
 
 /**
- * 400 Bad Request (generic)
- *
- * Use when backend responds with a syntactically invalid request
- * or malformed payload not tied to a domain rule.
+ * 400 Bad Request (generic).
  */
-export function makeBadRequest() {
-    //prettier-ignore
-    const status  = 400;
-    const message = 'Bad Request';
-    const payload = makeTransportError(status, message);
-
-    return payload;
+export function badRequest(): TransportErrorResponse {
+    return transportError(400, 'Bad Request');
 }
 
 /**
- * 500 Internal Server Error
- *
- * Use when backend fails internally or returns an unexpected exception.
+ * 500 Internal Server Error.
  */
-export function makeInternalError() {
-    //prettier-ignore
-    const status  = 500;
-    const message = 'Internal Server Error';
-    const payload = makeTransportError(status, message);
-
-    return payload;
+export function internalServerError(): TransportErrorResponse {
+    return transportError(500, 'Internal Server Error');
 }
 
 /**
- * 503 Service Unavailable
- *
- * Use when the backend or network layer is temporarily unavailable.
+ * 503 Service Unavailable.
  */
-export function makeServiceUnavailable() {
-    //prettier-ignore
-    const status  = 503;
-    const message = 'Service Unavailable';
-    const payload = makeTransportError(status, message);
-
-    return payload;
+export function serviceUnavailable(): TransportErrorResponse {
+    return transportError(503, 'Service Unavailable');
 }

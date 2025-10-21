@@ -1,5 +1,5 @@
 // UC-3 GetEntry — Request factory (AC01–AC04).
-import {EntryFactory} from '@tests/helpers/factories/EntryFactory';
+import {EntryFactory} from '@tests/helpers/domain/entries/EntryFactory';
 import type {GetEntryRequest} from '@src/Application/DTO/Entries/GetEntry/GetEntryRequest';
 
 /**

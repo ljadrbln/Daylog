@@ -1,7 +1,7 @@
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {createGateway, mockJsonOnce, type GatewayTestCtx} from './BaseAddEntryGatewayTest';
 import {ac01HappyPath as makeRequest} from '@tests/helpers/http/requests/entries/AddEntryRequestFactory';
-import {ac01HappyPath as makeResponse} from '@tests/helpers/http/responses/entries/AddEntryResponseFactory';
+import {happyPath as makeResponse} from '@tests/helpers/http/responses/entries/AddEntryResponseFactory';
 import {ensureSuccess} from '@tests/helpers/asserts';
 
 /**

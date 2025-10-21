@@ -1,5 +1,5 @@
 // UC-1 AddEntry — Request factory (AC01–AC04).
-import {EntryFactory} from '@tests/helpers/factories/EntryFactory';
+import {EntryFactory} from '@tests/helpers/domain/entries/EntryFactory';
 import type {AddEntryRequest} from '@src/Application/DTO/Entries/AddEntry/AddEntryRequest';
 
 /**

@@ -1,5 +1,5 @@
 import type {HttpClient} from '@src/Infrastructure/Http/HttpClient';
-import type {Entry} from '@src/Domain/Entries/Entry';
+import type {Entry} from '@src/Domain/Models/Entries/Entry';
 import type {ListEntriesRequest} from '@src/Application/DTO/Entries/ListEntries/ListEntriesRequest';
 import type {
     ListEntriesData,

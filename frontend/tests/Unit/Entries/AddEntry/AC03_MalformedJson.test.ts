@@ -2,7 +2,7 @@
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {createGateway, mockJsonOnce, type GatewayTestCtx} from './BaseAddEntryGatewayTest';
 import {ac03MalformedJson as makeRequest} from '@tests/helpers/http/requests/entries/AddEntryRequestFactory';
-import {ac03MalformedJson as makeResponse} from '@tests/helpers/http/responses/entries/AddEntryResponseFactory';
+import {malformed as makeResponse} from '@tests/helpers/http/responses/entries/AddEntryResponseFactory';
 
 /**
  * UC-1: Add Entry (Frontend, Gateway)
