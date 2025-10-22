@@ -1,4 +1,4 @@
-import type {HttpClient, RequestOptions} from '@src/Infrastructure/Http/HttpClient';
+import type {HttpError, HttpClient, RequestOptions} from '@src/Infrastructure/Http/HttpClient';
 import type {Entry} from '@src/Domain/Models/Entries/Entry';
 import type {EntryRepositoryInterface} from '@src/Domain/Interfaces/Entries/EntryRepositoryInterface';
 import type {ListEntriesCriteriaInterface} from '@src/Domain/Interfaces/Entries/ListEntriesCriteriaInterface';
@@ -24,19 +24,34 @@ export class EntryRepository implements EntryRepositoryInterface {
     }
 
     /**
-     * Fetch an entry by id (UC-3).
+     * Get entry by id (UC-3).
      *
-     * @param {string} id Entry identifier.
-     * @returns {Promise<Entry | null>} Entry object from backend if exists.
-     * @throws {Error} if response.success !== true or data malformed.
+     * Purpose:
+     * Retrieve a single Entry by id; map 404 to null.
+     *
+     * Mechanics:
+     * - GET /api/entries/{id}
+     * - If status === 404 → return null (per UC-3 Not found)
+     * - Else validate via ResponseValidator.extractData()
+     *
+     * @returns Promise<Entry|null>
      */
     public async findById(id: string): Promise<Entry | null> {
         const url = `/api/entries/${id}`;
 
-        const json = await this.http.request<UseCaseResponse<Entry>>('GET', url);
-        const data = ResponseValidator.extractData<Entry>(json, 'GET /api/entries/:id');
+        try {
+            const json = await this.http.request<UseCaseResponse<Entry>>('GET', url);
+            const endpoint = 'GET /api/entries/:id';
+            const entry = ResponseValidator.extractData<Entry>(json, endpoint);
 
-        return data;
+            return entry;
+        } catch (e: unknown) {
+            if ((e as Partial<HttpError>).status === 404) {
+                return null;
+            }
+
+            throw e;
+        }
     }
 
     /**
@@ -47,10 +62,10 @@ export class EntryRepository implements EntryRepositoryInterface {
      * - Validate transport envelope (success=true). Payload may contain Entry, but is ignored here.
      *
      * @param {string} id Entry identifier (UUID).
-     * @returns {Promise<Entry | null>} Resolves on success.
+     * @returns {Promise<Entry>} Resolves on success.
      * @throws {Error} If transport envelope is malformed or HTTP non-2xx raised upstream.
      */
-    public async deleteById(id: string): Promise<Entry | null> {
+    public async deleteById(id: string): Promise<Entry> {
         const url = `/api/entries/${id}`;
 
         const json = await this.http.request<UseCaseResponse<Entry>>('DELETE', url);
@@ -60,7 +75,7 @@ export class EntryRepository implements EntryRepositoryInterface {
     }
 
     /**
-     * UC-2: Find entries by criteria.
+     * UC-2: List entries with optional filters and pagination.
      *
      * Purpose:
      * Build GET /api/entries with query params from criteria, validate envelope,
@@ -69,9 +84,7 @@ export class EntryRepository implements EntryRepositoryInterface {
      * @param {ListEntriesCriteriaInterface} criteria Normalized/validated list params.
      * @returns {Promise<ListEntriesPageInterface>} Page with items and pagination meta.
      */
-    public async findByCriteria(
-        criteria: ListEntriesCriteriaInterface
-    ): Promise<ListEntriesPageInterface> {
+    public async list(criteria: ListEntriesCriteriaInterface): Promise<ListEntriesPageInterface> {
         const params = new URLSearchParams();
 
         if (typeof criteria.page === 'number') {
@@ -118,7 +131,7 @@ export class EntryRepository implements EntryRepositoryInterface {
      *
      * Mechanics:
      * - id === ''  → POST /api/entries  with Entry body.
-     * - id !== ''  → PATCH /api/entries/{id} with Entry body.
+     * - id !== ''  → PUT /api/entries/{id} with Entry body.
      *
      * @param {Entry} entry Fully prepared domain Entry.
      * @returns {Promise<Entry>} Persisted entry returned by backend.

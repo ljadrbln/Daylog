@@ -1,50 +1,52 @@
 /* eslint-disable no-unused-vars */
 
-/**
- * EntryRepositoryInterface
- *
- * Purpose:
- * Define repository contract mirroring the backend style. The repository orchestrates
- * persistence via a storage adapter and exposes CRUD + list operations on the domain model.
- *
- * Notes:
- * - No Application DTOs here; only domain types.
- * - `save` performs upsert semantics.
- */
 import type {Entry} from '@src/Domain/Models/Entries/Entry';
 import type {ListEntriesCriteriaInterface} from '@src/Domain/Interfaces/Entries/ListEntriesCriteriaInterface';
 import type {ListEntriesPageInterface} from '@src/Domain/Interfaces/Entries/ListEntriesPageInterface';
 
+/**
+ * Frontend Entry repository contract (UC-2/3/4/5).
+ *
+ * Purpose:
+ * Express query/command semantics at the domain boundary.
+ *
+ * Mechanics:
+ * - Queries may return null (e.g., findById on 404).
+ * - Commands must throw on non-executable operations (e.g., delete/update on 404).
+ */
 export interface EntryRepositoryInterface {
     /**
-     * Persist an entry (create or update).
+     * Load a single entry by identifier (UC-3).
      *
-     * @param {Entry} entry Domain entry to be saved.
-     * @returns {Promise<Entry>} The same entry instance (with possible server-adjusted fields).
-     */
-    save(entry: Entry): Promise<Entry>;
-
-    /**
-     * Find entry by its identifier.
-     *
-     * @param {string} id Entry identifier (UUID).
-     * @returns {Promise<Entry|null>} Entry or null when not found.
+     * @param id string UUID v4
+     * @returns Promise<Entry|null> Null on HTTP 404
      */
     findById(id: string): Promise<Entry | null>;
 
     /**
-     * Delete an entry by its identifier.
+     * Delete an entry by identifier (UC-4).
      *
-     * @param {string} id Entry identifier (UUID).
-     * @returns {Promise<Entry|null>} Entry or null when not found.
+     * @param id string UUID v4
+     * @returns Promise<Entry> Deleted entry object from `data`
      */
-    deleteById(id: string): Promise<Entry | null>;
+    deleteById(id: string): Promise<Entry>;
 
     /**
-     * Fetch a page of entries by criteria (UC-2).
+     * Save (create or update) an entry (UC-1/5).
      *
-     * @param {ListEntriesCriteriaInterface} criteria Normalized criteria (validated upstream).
-     * @returns {Promise<{ListEntriesPageInterface}>} Plain object with page metadata.
+     * @param entry Entry
+     * @returns Promise<Entry> Persisted Entry object from `data`
      */
-    findByCriteria(criteria: ListEntriesCriteriaInterface): Promise<ListEntriesPageInterface>;
+    save(entry: Entry): Promise<Entry>;
+
+    /**
+     * List entries (UC-2).
+     *
+     * Purpose:
+     * Retrieve paginated list of entries with optional filters.
+     *
+     * @param {ListEntriesCriteriaInterface} criteria Normalized/validated filters.
+     * @returns {Promise<ListEntriesPageInterface>} Page of entries with pagination meta.
+     */
+    list(criteria: ListEntriesCriteriaInterface): Promise<ListEntriesPageInterface>;
 }

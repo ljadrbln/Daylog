@@ -39,3 +39,29 @@ export interface RequestOptions extends Omit<RequestInit, 'body'> {
 export interface HttpClient {
     request<T>(method: HttpMethod, url: string, options?: RequestOptions): Promise<T>;
 }
+
+/**
+ * Extended error type for HTTP clients.
+ *
+ * Purpose:
+ * Represent transport-level failures (non-2xx responses, network issues, aborts)
+ * with an attached HTTP status code for higher-level mapping (e.g., 404 → null in repositories).
+ *
+ * Mechanics:
+ * - Thrown by HttpClient implementations when response.ok === false.
+ * - Must include the numeric `status` field alongside the standard Error message.
+ *
+ * Usage:
+ * - Catch in repositories to handle specific codes gracefully.
+ * - Example: `if (error.status === 404) return null;`
+ *
+ * Implementations:
+ * - Added in FetchHttpClient before throwing the error:
+ *   ```ts
+ *   const err: HttpError = Object.assign(new Error(message), { status: response.status });
+ *   throw err;
+ *   ```
+ */
+export interface HttpError extends Error {
+    status: number;
+}

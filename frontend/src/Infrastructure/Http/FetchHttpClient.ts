@@ -1,4 +1,4 @@
-import type {HttpClient, HttpMethod, RequestOptions} from './HttpClient';
+import type {HttpClient, HttpError, HttpMethod, RequestOptions} from './HttpClient';
 
 /**
  * Default implementation of HttpClient using native fetch().
@@ -53,12 +53,19 @@ export class FetchHttpClient implements HttpClient {
 
         if (!response.ok) {
             const message = `HTTP ${response.status} for ${fullUrl}`;
-            throw new Error(message);
+
+            const fetchError: Error = new Error(message);
+            const httpError: HttpError = Object.assign(fetchError, {status: response.status});
+
+            throw httpError;
         }
 
         const text = await response.text();
 
-        const data = text ? (JSON.parse(text) as T) : (undefined as T);
+        // prettier-ignore
+        const data = text
+            ? (JSON.parse(text) as T)
+            : (undefined as T);
 
         return data;
     }
