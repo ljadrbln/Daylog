@@ -1,8 +1,9 @@
 import type {ListEntriesCriteriaInterface} from '@src/Domain/Interfaces/Entries/ListEntriesCriteriaInterface';
-import type {ListEntriesRequest} from '@src/Application/DTO/Entries/ListEntries/ListEntriesRequest';
 
-type SortField = NonNullable<ListEntriesRequest['sortField']>; // 'date' | 'updatedAt'
-type SortDir = NonNullable<ListEntriesRequest['sortDir']>; // 'ASC' | 'DESC'
+// Domain-owned types
+// prettier-ignore
+type SortDir   = 'ASC' | 'DESC';
+type SortField = 'date' | 'updatedAt';
 
 /**
  * Domain criteria for UC-2 ListEntries.
@@ -41,39 +42,5 @@ export class ListEntriesCriteria implements ListEntriesCriteriaInterface {
         this.dateTo = dateTo;
         this.sortField = sortField;
         this.sortDir = sortDir;
-    }
-
-    /**
-     * Build criteria from Application Request DTO using safe defaults.
-     *
-     * Defaults:
-     * - page=1, perPage=10
-     * - sortField='updatedAt', sortDir='DESC'
-     *
-     * @param {ListEntriesRequest} req Request DTO with filters/paging/sort.
-     * @returns {ListEntriesCriteria} Immutable criteria.
-     */
-    public static fromRequest(req: ListEntriesRequest): ListEntriesCriteria {
-        const page = req.page ?? 1;
-        const perPage = req.perPage ?? 10;
-
-        const query = req.query ?? undefined;
-        const dateFrom = req.dateFrom ?? undefined;
-        const dateTo = req.dateTo ?? undefined;
-
-        const sortField: SortField = req.sortField ?? 'updatedAt';
-        const sortDir: SortDir = req.sortDir ?? 'DESC';
-
-        const criteria = new ListEntriesCriteria(
-            page,
-            perPage,
-            query,
-            dateFrom,
-            dateTo,
-            sortField,
-            sortDir
-        );
-
-        return criteria;
     }
 }

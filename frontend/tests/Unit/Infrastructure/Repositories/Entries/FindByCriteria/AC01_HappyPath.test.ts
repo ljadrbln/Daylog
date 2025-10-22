@@ -7,7 +7,7 @@ import {
 
 import {ac01HappyPath as makeRequest} from '@tests/helpers/http/requests/entries/ListEntriesRequestFactory';
 import {ac01HappyPath as makeResponse} from '@tests/helpers/http/responses/entries/ListEntriesResponseFactory';
-import {ListEntriesCriteria} from '@src/Domain/Models/Entries/ListEntriesCriteria';
+import {ListEntriesCriteriaFactory} from '@src/Application/Factories/ListEntriesCriteriaFactory';
 import type {ListEntriesPageInterface} from '@src/Domain/Interfaces/Entries/ListEntriesPageInterface';
 import {ensureSuccess} from '@tests/helpers/asserts';
 
@@ -43,7 +43,7 @@ describe('AC01 — EntryRepository.findByCriteria returns page (mocked)', () => 
         const response = makeResponse(request);
         mockJsonOnce(ctx.fetchMock, 200, response);
 
-        const criteria = ListEntriesCriteria.fromRequest(request);
+        const criteria = ListEntriesCriteriaFactory.fromRequest(request);
 
         // Act
         const page = await ctx.repo.findByCriteria(criteria);
