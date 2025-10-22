@@ -27,10 +27,10 @@ export class EntryRepository implements EntryRepositoryInterface {
      * Fetch an entry by id (UC-3).
      *
      * @param {string} id Entry identifier.
-     * @returns {Promise<Entry>} Entry object from backend.
+     * @returns {Promise<Entry | null>} Entry object from backend if exists.
      * @throws {Error} if response.success !== true or data malformed.
      */
-    public async findById(id: string): Promise<Entry> {
+    public async findById(id: string): Promise<Entry | null> {
         const url = `/api/entries/${id}`;
 
         const json = await this.http.request<UseCaseResponse<Entry>>('GET', url);
@@ -47,10 +47,10 @@ export class EntryRepository implements EntryRepositoryInterface {
      * - Validate transport envelope (success=true). Payload may contain Entry, but is ignored here.
      *
      * @param {string} id Entry identifier (UUID).
-     * @returns {Promise<Entry>} Resolves on success.
+     * @returns {Promise<Entry | null>} Resolves on success.
      * @throws {Error} If transport envelope is malformed or HTTP non-2xx raised upstream.
      */
-    public async deleteById(id: string): Promise<Entry> {
+    public async deleteById(id: string): Promise<Entry | null> {
         const url = `/api/entries/${id}`;
 
         const json = await this.http.request<UseCaseResponse<Entry>>('DELETE', url);
@@ -96,8 +96,11 @@ export class EntryRepository implements EntryRepositoryInterface {
 
         const url = `/api/entries?${params.toString()}`;
         const json = await this.http.request<UseCaseResponse<ListEntriesPageInterface>>('GET', url);
-        // eslint-disable-next-line prettier/prettier
-        const data = ResponseValidator.extractData<ListEntriesPageInterface>(json, 'GET /api/entries');
+
+        const data = ResponseValidator.extractData<ListEntriesPageInterface>(
+            json,
+            'GET /api/entries'
+        );
 
         const page: ListEntriesPageInterface = {
             items: data.items,
