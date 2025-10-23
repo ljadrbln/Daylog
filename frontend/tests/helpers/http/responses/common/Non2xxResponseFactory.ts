@@ -46,6 +46,13 @@ export function badRequest(): TransportErrorResponse {
 }
 
 /**
+ * 404 Not Found (generic).
+ */
+export function notFound(): TransportErrorResponse {
+    return transportError(404, 'Not Found');
+}
+
+/**
  * 500 Internal Server Error.
  */
 export function internalServerError(): TransportErrorResponse {

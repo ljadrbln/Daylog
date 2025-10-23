@@ -1,8 +1,8 @@
 import {describe, it, expect} from 'vitest';
 
-import {ListEntriesCriteria} from '@src/Domain/Models/Entries/ListEntriesCriteria';
 import {ac01HappyPath as makeRequest} from '@tests/helpers/http/requests/entries/ListEntriesRequestFactory';
 import type {ListEntriesRequest} from '@src/Application/DTO/Entries/ListEntries/ListEntriesRequest';
+import {ListEntriesCriteriaFactory} from '@src/Application/Factories/ListEntriesCriteriaFactory';
 
 /**
  * UC-2: ListEntriesCriteria — factory from Request DTO (happy path).
@@ -24,7 +24,7 @@ describe('AC01 — ListEntriesCriteria.fromRequest builds domain criteria (happy
         const request: ListEntriesRequest = makeRequest();
 
         // Act
-        const criteria = ListEntriesCriteria.fromRequest(request);
+        const criteria = ListEntriesCriteriaFactory.fromRequest(request);
 
         // Assert
         const expectedPage = request.page ?? 1;

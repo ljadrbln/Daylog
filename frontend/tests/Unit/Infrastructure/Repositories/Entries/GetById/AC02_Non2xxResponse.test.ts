@@ -1,3 +1,16 @@
+/**
+ * @covers EntryRepository.findById
+ *
+ * Purpose:
+ * Validate repository behavior for UC-3.
+ *
+ * Mechanics:
+ * - Mock HTTP responses and assert repository invariants.
+ *
+ * Cases:
+ * - AC02 Non-2xx
+ */
+
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {
     createRepository,
@@ -10,12 +23,6 @@ import {
     internalServerError
 } from '@tests/helpers/http/responses/common/Non2xxResponseFactory';
 
-/**
- * UC-3: Get Entry (Repository)
- * Verifies EntryRepository.findById rejects on generic non-2xx HTTP responses (400/500).
- * Mechanics: build request via factory, enqueue JSON with 400/500, expect rejection.
- * @covers EntryRepository
- */
 describe('AC02 — EntryRepository.findById throws on non-2xx response (generic)', () => {
     let ctx: RepositoryTestCtx;
 

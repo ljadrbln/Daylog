@@ -1,3 +1,16 @@
+/**
+ * @covers EntryRepository.deleteById
+ *
+ * Purpose:
+ * Validate repository behavior for UC-4.
+ *
+ * Mechanics:
+ * - Mock HTTP responses and assert repository invariants.
+ *
+ * Cases:
+ * - AC03 Malformed JSON
+ */
+
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {
     createRepository,
@@ -8,19 +21,6 @@ import {
 import {ac03MalformedJson as makeRequest} from '@tests/helpers/http/requests/entries/DeleteEntryRequestFactory';
 import {ac03MalformedJson as makeResponse} from '@tests/helpers/http/responses/entries/DeleteEntryResponseFactory';
 
-/**
- * UC-4: Delete Entry (Repository)
- *
- * Purpose:
- * Verify that EntryRepository.deleteById rejects when API responds
- * with malformed JSON for DELETE /api/entries/:id (e.g., missing required fields).
- *
- * Mechanics:
- * - Enqueue a 200 OK response with an invalid success envelope.
- * - Expect rejection with the canonical "Malformed response" message.
- *
- * @covers EntryRepository.deleteById
- */
 describe('AC03 — EntryRepository.deleteById rejects on malformed JSON', () => {
     let ctx: RepositoryTestCtx;
 

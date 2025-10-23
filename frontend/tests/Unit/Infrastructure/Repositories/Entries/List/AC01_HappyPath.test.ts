@@ -1,3 +1,16 @@
+/**
+ * @covers EntryRepository.list
+ *
+ * Purpose:
+ * Validate repository behavior for UC-2.
+ *
+ * Mechanics:
+ * - Mock HTTP responses and assert repository invariants.
+ *
+ * Cases:
+ * - AC01 Happy path
+ */
+
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {
     createRepository,
@@ -7,26 +20,11 @@ import {
 
 import {ac01HappyPath as makeRequest} from '@tests/helpers/http/requests/entries/ListEntriesRequestFactory';
 import {ac01HappyPath as makeResponse} from '@tests/helpers/http/responses/entries/ListEntriesResponseFactory';
-import {ListEntriesCriteria} from '@src/Domain/Models/Entries/ListEntriesCriteria';
+import {ListEntriesCriteriaFactory} from '@src/Application/Factories/ListEntriesCriteriaFactory';
 import type {ListEntriesPageInterface} from '@src/Domain/Interfaces/Entries/ListEntriesPageInterface';
 import {ensureSuccess} from '@tests/helpers/asserts';
 
-/**
- * UC-2: Find entries by criteria (Repository)
- *
- * Purpose:
- * Ensure EntryRepository.findByCriteria resolves with a valid page when API responds
- * 200 + { success:true, data:{ items[], page, perPage, total, pagesCount } }.
- *
- * Mechanics:
- * - Build request via ListEntriesRequestFactory.ac01HappyPath().
- * - Convert request → domain criteria (ListEntriesCriteria.fromRequest()).
- * - Stub success envelope via ListEntriesResponseFactory.ac01HappyPath().
- * - Narrow response to success-branch via ensureSuccess() to avoid union-type issues.
- *
- * @covers EntryRepository.findByCriteria
- */
-describe('AC01 — EntryRepository.findByCriteria returns page (mocked)', () => {
+describe('AC01 — EntryRepository.list returns page (mocked)', () => {
     let ctx: RepositoryTestCtx;
 
     beforeEach(() => {
@@ -43,10 +41,10 @@ describe('AC01 — EntryRepository.findByCriteria returns page (mocked)', () => 
         const response = makeResponse(request);
         mockJsonOnce(ctx.fetchMock, 200, response);
 
-        const criteria = ListEntriesCriteria.fromRequest(request);
+        const criteria = ListEntriesCriteriaFactory.fromRequest(request);
 
         // Act
-        const page = await ctx.repo.findByCriteria(criteria);
+        const page = await ctx.repo.list(criteria);
 
         // Assert
         const ok = ensureSuccess(response);

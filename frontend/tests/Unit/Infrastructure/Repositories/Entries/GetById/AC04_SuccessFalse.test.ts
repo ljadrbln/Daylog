@@ -1,3 +1,16 @@
+/**
+ * @covers EntryRepository.findById
+ *
+ * Purpose:
+ * Validate repository behavior for UC-3.
+ *
+ * Mechanics:
+ * - Mock HTTP responses and assert repository invariants.
+ *
+ * Cases:
+ * - AC04 success=false
+ */
+
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {
     createRepository,
@@ -7,15 +20,6 @@ import {
 import {ac04SuccessFalse as makeRequest} from '@tests/helpers/http/requests/entries/GetEntryRequestFactory';
 import {ac04SuccessFalse as makeResponse} from '@tests/helpers/http/responses/entries/GetEntryResponseFactory';
 
-/**
- * UC-3: Get Entry (Repository)
- *
- * Purpose:
- * Verify that EntryRepository.findById rejects when API responds
- * with { success:false } despite HTTP 200.
- *
- * @covers EntryRepository
- */
 describe('AC04 — EntryRepository.findById rejects when success=false with 200 OK', () => {
     let ctx: RepositoryTestCtx;
 

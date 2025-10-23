@@ -1,3 +1,16 @@
+/**
+ * @covers EntryRepository.findById
+ *
+ * Purpose:
+ * Validate repository behavior for UC-3.
+ *
+ * Mechanics:
+ * - Mock HTTP responses and assert repository invariants.
+ *
+ * Cases:
+ * - AC01 Happy path
+ */
+
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {
     createRepository,
@@ -9,13 +22,6 @@ import {ac01HappyPath as makeRequest} from '@tests/helpers/http/requests/entries
 import {ac01HappyPath as makeResponse} from '@tests/helpers/http/responses/entries/GetEntryResponseFactory';
 import {ensureSuccess} from '@tests/helpers/asserts';
 
-/**
- * UC-3: Get Entry (Frontend, Repository)
- *
- * Purpose:
- * Verify that EntryRepository.findById resolves with Entry when API responds
- * 200 + { success:true, data: Entry }.
- */
 describe('AC01 — EntryRepository.findById returns entry (mocked)', () => {
     let ctx: RepositoryTestCtx;
 
@@ -39,6 +45,9 @@ describe('AC01 — EntryRepository.findById returns entry (mocked)', () => {
         // Act
         mockJsonOnce(ctx.fetchMock, 200, response);
         const entry = await ctx.repo.findById(request.id);
+        if (entry === null) {
+            throw new Error('Entry not found');
+        }
 
         // Assert
         expect(entry.id).toBe(request.id);
