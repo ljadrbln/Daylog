@@ -5,6 +5,7 @@ import type {ListEntriesCriteriaInterface} from '@src/Domain/Interfaces/Entries/
 import type {ListEntriesPageInterface} from '@src/Domain/Interfaces/Entries/ListEntriesPageInterface';
 import type {UseCaseResponse} from '@src/Application/DTO/Common/UseCaseResponse';
 import {ResponseValidator} from '@src/Infrastructure/Http/ResponseValidator';
+import {Endpoints} from '@src/Infrastructure/Http/Endpoints';
 
 /**
  * EntryRepository (frontend, HTTP-backed)
@@ -37,12 +38,11 @@ export class EntryRepository implements EntryRepositoryInterface {
      * @returns Promise<Entry|null>
      */
     public async findById(id: string): Promise<Entry | null> {
-        const url = `/api/entries/${id}`;
+        const url = Endpoints.entryById(id);
 
         try {
             const json = await this.http.request<UseCaseResponse<Entry>>('GET', url);
-            const endpoint = 'GET /api/entries/:id';
-            const entry = ResponseValidator.extractData<Entry>(json, endpoint);
+            const entry = ResponseValidator.extractData<Entry>(json, 'GET /api/entries/:id');
 
             return entry;
         } catch (e: unknown) {
@@ -73,7 +73,7 @@ export class EntryRepository implements EntryRepositoryInterface {
      */
 
     public async deleteById(id: string): Promise<Entry> {
-        const url = `/api/entries/${id}`;
+        const url = Endpoints.entryById(id);
 
         const json = await this.http.request<UseCaseResponse<Entry>>('DELETE', url);
         const data = ResponseValidator.extractData<Entry>(json, 'DELETE /api/entries/:id');
@@ -114,9 +114,11 @@ export class EntryRepository implements EntryRepositoryInterface {
             params.set('dateTo', criteria.dateTo);
         }
 
-        const url = `/api/entries?${params.toString()}`;
-        const json = await this.http.request<UseCaseResponse<ListEntriesPageInterface>>('GET', url);
+        const baseUrl = Endpoints.entries();
+        const query = params.toString();
+        const url = `${baseUrl}?${query}`;
 
+        const json = await this.http.request<UseCaseResponse<ListEntriesPageInterface>>('GET', url);
         const data = ResponseValidator.extractData<ListEntriesPageInterface>(
             json,
             'GET /api/entries'
@@ -165,7 +167,7 @@ export class EntryRepository implements EntryRepositoryInterface {
      * @returns {Promise<Entry>} Persisted entry.
      */
     private async create(entry: Entry): Promise<Entry> {
-        const url = '/api/entries';
+        const url = Endpoints.entries();
         const options: RequestOptions = {requestBody: entry};
 
         const json = await this.http.request<UseCaseResponse<Entry>>('POST', url, options);
@@ -185,7 +187,7 @@ export class EntryRepository implements EntryRepositoryInterface {
      * @returns {Promise<Entry>} Updated entry.
      */
     private async update(entry: Entry): Promise<Entry> {
-        const url = `/api/entries/${entry.id}`;
+        const url = Endpoints.entryById(entry.id);
         const options: RequestOptions = {requestBody: entry};
 
         const json = await this.http.request<UseCaseResponse<Entry>>('PUT', url, options);
