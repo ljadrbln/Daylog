@@ -45,6 +45,9 @@ describe('AC01 — EntryRepository.findById returns entry (mocked)', () => {
         // Act
         mockJsonOnce(ctx.fetchMock, 200, response);
         const entry = await ctx.repo.findById(request.id);
+        if (entry === null) {
+            throw new Error('Entry not found');
+        }
 
         // Assert
         expect(entry.id).toBe(request.id);
