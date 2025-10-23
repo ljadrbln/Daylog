@@ -1,3 +1,16 @@
+/**
+ * @covers EntryRepository.save
+ *
+ * Purpose:
+ * Validate repository behavior for UC-1.
+ *
+ * Mechanics:
+ * - Mock HTTP responses and assert repository invariants.
+ *
+ * Cases:
+ * - AC02 Non-2xx
+ */
+
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {
     createRepository,
@@ -12,11 +25,6 @@ import {
     internalServerError
 } from '@tests/helpers/http/responses/common/Non2xxResponseFactory';
 
-/**
- * UC-1: Save (create) — AC02 non-2xx → reject.
- * Mechanics: POST /api/entries with Entry (id=''), enqueue 400/500, expect throw.
- * @covers EntriesRepository.save
- */
 describe('AC02 — save(create) rejects on non-2xx', () => {
     let ctx: RepositoryTestCtx;
 

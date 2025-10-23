@@ -1,3 +1,16 @@
+/**
+ * @covers EntryRepository.save
+ *
+ * Purpose:
+ * Validate repository behavior for UC-1.
+ *
+ * Mechanics:
+ * - Mock HTTP responses and assert repository invariants.
+ *
+ * Cases:
+ * - AC03 Malformed JSON
+ */
+
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {
     createRepository,
@@ -7,11 +20,6 @@ import {
 import {EntryFactory} from '@tests/helpers/domain/entries/EntryFactory';
 import {malformed} from '@tests/helpers/http/responses/entries/AddEntryResponseFactory';
 
-/**
- * UC-1: Save (create) — AC03 malformed JSON → reject.
- * Mechanics: POST /api/entries with Entry (id=''), enqueue success=true,data=null.
- * @covers EntriesRepository.save
- */
 describe('AC03 — save(create) rejects on malformed JSON', () => {
     let ctx: RepositoryTestCtx;
 

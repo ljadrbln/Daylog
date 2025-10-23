@@ -1,3 +1,16 @@
+/**
+ * @covers EntryRepository.list
+ *
+ * Purpose:
+ * Validate repository behavior for UC-2.
+ *
+ * Mechanics:
+ * - Mock HTTP responses and assert repository invariants.
+ *
+ * Cases:
+ * - AC04 success=false
+ */
+
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {
     createRepository,

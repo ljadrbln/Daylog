@@ -55,16 +55,23 @@ export class EntryRepository implements EntryRepositoryInterface {
     }
 
     /**
-     * Delete an entry by its identifier (UC-4).
+     * Delete an Entry by its identifier (UC-4).
+     *
+     * Purpose:
+     * Executes deletion of the specified Entry and returns
+     * the deleted Entry object received from the API response.
      *
      * Mechanics:
      * - Perform DELETE /api/entries/{id}.
-     * - Validate transport envelope (success=true). Payload may contain Entry, but is ignored here.
+     * - Expect a 200 OK response with transport envelope { success: true, data: Entry }.
+     * - Validate the envelope and extract the Entry object from `data`.
+     * - Propagate any non-2xx or malformed responses as errors.
      *
-     * @param {string} id Entry identifier (UUID).
-     * @returns {Promise<Entry>} Resolves on success.
-     * @throws {Error} If transport envelope is malformed or HTTP non-2xx raised upstream.
+     * @param {string} id Entry identifier (UUID)
+     * @returns {Promise<Entry>} Deleted Entry object containing id, title, body, date, createdAt, updatedAt
+     * @throws {Error} When the transport envelope is malformed or a non-2xx HTTP error occurs upstream
      */
+
     public async deleteById(id: string): Promise<Entry> {
         const url = `/api/entries/${id}`;
 

@@ -1,3 +1,16 @@
+/**
+ * @covers EntryRepository.save
+ *
+ * Purpose:
+ * Validate repository behavior for UC-5.
+ *
+ * Mechanics:
+ * - Mock HTTP responses and assert repository invariants.
+ *
+ * Cases:
+ * - AC01 Happy path
+ */
+
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {
     createRepository,
@@ -11,20 +24,6 @@ import type {Entry} from '@src/Domain/Models/Entries/Entry';
 import {EntryFactory} from '@tests/helpers/domain/entries/EntryFactory';
 import {happyPath as makeResponse} from '@tests/helpers/http/responses/entries/UpdateEntryResponseFactory';
 
-/**
- * UC-5: Save Entry (update) — Repository happy path.
- *
- * Purpose:
- * - Ensure EntryRepository.save resolves with Entry when backend responds
- *   200 + {success:true, data: Entry} for PATCH /api/entries/:id.
- *
- * Mechanics:
- * - Build request via UpdateEntryRequestFactory.ac01HappyPath().
- * - Enqueue a matching success envelope via UpdateEntryResponseFactory.ac01HappyPath().
- * - Call repo.save(entry) and assert returned Entry equals backend data.
- *
- * @covers EntriesRepository.save
- */
 describe('AC01 — EntryRepository.save (update) returns entry (mocked)', () => {
     let ctx: RepositoryTestCtx;
 

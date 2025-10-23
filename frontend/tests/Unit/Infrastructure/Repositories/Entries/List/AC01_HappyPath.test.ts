@@ -1,3 +1,16 @@
+/**
+ * @covers EntryRepository.list
+ *
+ * Purpose:
+ * Validate repository behavior for UC-2.
+ *
+ * Mechanics:
+ * - Mock HTTP responses and assert repository invariants.
+ *
+ * Cases:
+ * - AC01 Happy path
+ */
+
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {
     createRepository,
@@ -11,21 +24,6 @@ import {ListEntriesCriteriaFactory} from '@src/Application/Factories/ListEntries
 import type {ListEntriesPageInterface} from '@src/Domain/Interfaces/Entries/ListEntriesPageInterface';
 import {ensureSuccess} from '@tests/helpers/asserts';
 
-/**
- * UC-2: Find entries by criteria (Repository)
- *
- * Purpose:
- * Ensure EntryRepository.list resolves with a valid page when API responds
- * 200 + { success:true, data:{ items[], page, perPage, total, pagesCount } }.
- *
- * Mechanics:
- * - Build request via ListEntriesRequestFactory.ac01HappyPath().
- * - Convert request → domain criteria (ListEntriesCriteria.fromRequest()).
- * - Stub success envelope via ListEntriesResponseFactory.ac01HappyPath().
- * - Narrow response to success-branch via ensureSuccess() to avoid union-type issues.
- *
- * @covers EntryRepository.list
- */
 describe('AC01 — EntryRepository.list returns page (mocked)', () => {
     let ctx: RepositoryTestCtx;
 

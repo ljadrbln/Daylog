@@ -1,3 +1,16 @@
+/**
+ * @covers EntryRepository.list
+ *
+ * Purpose:
+ * Validate repository behavior for UC-2.
+ *
+ * Mechanics:
+ * - Mock HTTP responses and assert repository invariants.
+ *
+ * Cases:
+ * - AC03 Malformed JSON
+ */
+
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {
     createRepository,
@@ -8,19 +21,6 @@ import {
 import {ac03MalformedJson as makeRequest} from '@tests/helpers/http/requests/entries/GetEntryRequestFactory';
 import {ac03MalformedJson as makeResponse} from '@tests/helpers/http/responses/entries/GetEntryResponseFactory';
 
-/**
- * UC-3: Get Entry (Repository)
- *
- * Purpose:
- * Verify that EntryRepository.findById rejects when API responds with malformed JSON
- * for GET /api/entries/:id (e.g., success=true but `data` missing/invalid).
- *
- * Mechanics:
- * - Enqueue 200 OK + malformed success envelope.
- * - Expect rejection with the canonical "Malformed response" message.
- *
- * @covers EntryRepository.findById
- */
 describe('AC03 — EntryRepository.findById rejects on malformed JSON', () => {
     let ctx: RepositoryTestCtx;
 

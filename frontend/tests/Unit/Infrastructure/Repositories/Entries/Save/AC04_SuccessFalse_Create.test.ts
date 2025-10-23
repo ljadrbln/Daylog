@@ -1,3 +1,16 @@
+/**
+ * @covers EntryRepository.save
+ *
+ * Purpose:
+ * Validate repository behavior for UC-1.
+ *
+ * Mechanics:
+ * - Mock HTTP responses and assert repository invariants.
+ *
+ * Cases:
+ * - AC01 Happy path
+ */
+
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {
     createRepository,
@@ -7,11 +20,6 @@ import {
 import {EntryFactory} from '@tests/helpers/domain/entries/EntryFactory';
 import {successFalse} from '@tests/helpers/http/responses/entries/AddEntryResponseFactory';
 
-/**
- * UC-1: Save (create) — AC04 success=false → reject.
- * Mechanics: POST /api/entries with Entry (id=''), enqueue success=false.
- * @covers EntriesRepository.save
- */
 describe('AC04 — save(create) rejects on success=false', () => {
     let ctx: RepositoryTestCtx;
 
