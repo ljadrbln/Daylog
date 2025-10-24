@@ -1,14 +1,46 @@
+import type {EntryRepositoryInterface} from '@src/Domain/Interfaces/Entries/EntryRepositoryInterface';
+import type {ListEntriesRequest} from '@src/Application/DTO/Entries/ListEntries/ListEntriesRequest';
+import type {ListEntriesResponse} from '@src/Application/DTO/Entries/ListEntries/ListEntriesResponse';
+import {ListEntriesCriteriaFactory} from '@src/Application/Factories/ListEntriesCriteriaFactory';
+
 /**
- * Temporary stub for UC-2 ListEntries use case.
+ * UC-2: List Entries — Application use case.
  *
  * Purpose:
- * Allow RED phase of the test to compile before implementation.
- * Throws explicitly to mark unimplemented logic.
+ * Bridge Application DTOs with the domain EntryRepository and
+ * return typed UseCaseResponse envelope on the happy path.
+ *
+ * Mechanics:
+ * - Build criteria via ListEntriesCriteriaFactory.fromRequest(request).
+ * - Delegate to repo.list(criteria).
+ * - Return { success:true, status:200, data: page }.
  */
 export class ListEntries {
-    public constructor(_repo: unknown) {}
+    private readonly repo: EntryRepositoryInterface;
 
-    public async execute(_request: unknown): Promise<never> {
-        throw new Error('Not implemented yet');
+    /**
+     * @param {EntryRepositoryInterface} repo Domain repository dependency (injected).
+     */
+    public constructor(repo: EntryRepositoryInterface) {
+        this.repo = repo;
+    }
+
+    /**
+     * Execute UC-2 with the given request.
+     *
+     * @param {ListEntriesRequest} request
+     * @returns {Promise<ListEntriesResponse>} Success envelope with page data.
+     */
+    public async execute(request: ListEntriesRequest): Promise<ListEntriesResponse> {
+        const criteria = ListEntriesCriteriaFactory.fromRequest(request);
+        const page = await this.repo.list(criteria);
+
+        const response: ListEntriesResponse = {
+            success: true,
+            status: 200,
+            data: page
+        };
+
+        return response;
     }
 }
