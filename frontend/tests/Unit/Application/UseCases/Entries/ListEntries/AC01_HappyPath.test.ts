@@ -20,6 +20,7 @@ import {ListEntriesCriteriaFactory} from '@src/Application/Factories/ListEntries
 
 import {ac01HappyPath as makeRequest} from '@tests/helpers/http/requests/entries/ListEntriesRequestFactory';
 import {EntryFactory} from '@tests/helpers/domain/entries/EntryFactory';
+import {ensureSuccess} from '@tests/helpers/asserts';
 
 describe('AC01 — ListEntries (Application) returns success=true and page', () => {
     let repo: EntryRepositoryInterface;
@@ -58,11 +59,12 @@ describe('AC01 — ListEntries (Application) returns success=true and page', () 
 
         // Act
         const response = await uc.execute(request);
+        const okResponse = ensureSuccess(response);
 
         // Assert
-        expect(response.success).toBe(true);
-        expect(response.status).toBe(200);
-        expect(response.data).toEqual(page);
+        expect(okResponse.success).toBe(true);
+        expect(okResponse.status).toBe(200);
+        expect(okResponse.data).toEqual(page);
 
         expect(listMock).toHaveBeenCalledTimes(1);
         expect(listMock).toHaveBeenCalledWith(criteria);
