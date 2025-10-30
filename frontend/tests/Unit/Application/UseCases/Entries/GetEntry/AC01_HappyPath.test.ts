@@ -16,6 +16,7 @@ import type {EntryRepositoryInterface} from '@src/Domain/Interfaces/Entries/Entr
 import {GetEntry} from '@src/Application/UseCases/Entries/GetEntry/GetEntry';
 
 import {EntryFactory} from '@tests/helpers/domain/entries/EntryFactory';
+import {ensureSuccess} from '@tests/helpers/asserts';
 
 describe('AC01 — GetEntry returns success=true and entry (Application)', () => {
     let repo: EntryRepositoryInterface;
@@ -42,11 +43,12 @@ describe('AC01 — GetEntry returns success=true and entry (Application)', () =>
 
         // Act
         const response = await uc.execute(request);
+        const okResponse = ensureSuccess(response);
 
         // Assert
-        expect(response.success).toBe(true);
-        expect(response.status).toBe(200);
-        expect(response.data).toEqual(existing);
+        expect(okResponse.success).toBe(true);
+        expect(okResponse.status).toBe(200);
+        expect(okResponse.data).toEqual(existing);
 
         expect(findByIdMock).toHaveBeenCalledTimes(1);
         expect(findByIdMock).toHaveBeenCalledWith(id);

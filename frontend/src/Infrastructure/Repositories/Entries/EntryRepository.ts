@@ -68,11 +68,10 @@ export class EntryRepository implements EntryRepositoryInterface {
      * - Propagate any non-2xx or malformed responses as errors.
      *
      * @param {string} id Entry identifier (UUID)
-     * @returns {Promise<Entry>} Deleted Entry object containing id, title, body, date, createdAt, updatedAt
+     * @returns {Promise<Entry | null>} Deleted Entry object containing id, title, body, date, createdAt, updatedAt
      * @throws {Error} When the transport envelope is malformed or a non-2xx HTTP error occurs upstream
      */
-
-    public async deleteById(id: string): Promise<Entry> {
+    public async deleteById(id: string): Promise<Entry | null> {
         const url = Endpoints.entryById(id);
 
         const json = await this.http.request<UseCaseResponse<Entry>>('DELETE', url);
