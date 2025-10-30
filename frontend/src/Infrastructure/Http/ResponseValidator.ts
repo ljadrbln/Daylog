@@ -45,6 +45,7 @@ export class ResponseValidator {
 
         // Everything else (422, 400, invalid shape) → true error
         const message = `Malformed response for ${endpoint}`;
+
         throw new Error(message);
     }
 }
