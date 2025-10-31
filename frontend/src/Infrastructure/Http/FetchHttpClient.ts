@@ -34,7 +34,10 @@ export class FetchHttpClient implements HttpClient {
         url: string,
         options: RequestOptions = {}
     ): Promise<T> {
-        const fullUrl = url.startsWith('http') ? url : `${this.baseUrl}${url}`;
+        // prettier-ignore
+        const fullUrl = url.startsWith('http')
+            ? url
+            : `${this.baseUrl}${url}`;
 
         const headers = {
             Accept: 'application/json',
@@ -42,7 +45,10 @@ export class FetchHttpClient implements HttpClient {
             ...(options.headers ?? {})
         };
 
-        const body = options.requestBody ? JSON.stringify(options.requestBody) : undefined;
+        // prettier-ignore
+        const body = options.requestBody
+            ? JSON.stringify(options.requestBody)
+            : undefined;
 
         const response = await fetch(fullUrl, {
             method,

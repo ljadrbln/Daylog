@@ -26,23 +26,26 @@ export class ResponseValidator {
     }
 
     /**
-     * Return typed data for success branch; require non-null object.
+     * Extracts typed `data` field from a successful UseCaseResponse.
      *
-     * @template T
-     * @param {UseCaseResponse<T>} json Envelope to validate.
-     * @param {string} endpoint Human-friendly endpoint label for error message.
-     * @returns {T} Validated data payload.
-     * @throws {Error} If success !== true or data is missing/malformed.
+     * - On {success:true, data:T} → returns data.
+     * - On {success:false, status:404} → returns null (for UC consistency).
+     * - On malformed or unexpected → throws Error.
      */
-    public static extractData<T>(json: UseCaseResponse<T>, endpoint: string): T {
-        const isValid =
-            json.success === true && typeof json.data === 'object' && json.data !== null;
-
-        if (!isValid) {
-            const message = `Malformed response for ${endpoint}`;
-            throw new Error(message);
+    public static extractData<T>(json: UseCaseResponse<T>, endpoint: string): T | null {
+        // Happy path: normal success
+        if (json.success === true && typeof json.data === 'object' && json.data !== null) {
+            return json.data as T;
         }
 
-        return json.data as T;
+        // Domain-level "not found" → interpret as null instead of throwing
+        if (json.success === false && json.status === 404 && json.code === 'ENTRY_NOT_FOUND') {
+            return null;
+        }
+
+        // Everything else (422, 400, invalid shape) → true error
+        const message = `Malformed response for ${endpoint}`;
+
+        throw new Error(message);
     }
 }

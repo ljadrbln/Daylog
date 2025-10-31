@@ -19,7 +19,7 @@ export interface EntryRepositoryInterface {
      * Load a single entry by identifier (UC-3).
      *
      * @param id string UUID v4
-     * @returns Promise<Entry|null> Null on HTTP 404
+     * @returns Promise<Entry|null> Null on HTTP Error
      */
     findById(id: string): Promise<Entry | null>;
 
@@ -27,9 +27,9 @@ export interface EntryRepositoryInterface {
      * Delete an entry by identifier (UC-4).
      *
      * @param id string UUID v4
-     * @returns Promise<Entry> Deleted entry object from `data`
+     * @returns Promise<Entry|null> Deleted entry object from `data`
      */
-    deleteById(id: string): Promise<Entry>;
+    deleteById(id: string): Promise<Entry | null>;
 
     /**
      * Save (create or update) an entry (UC-1/5).
