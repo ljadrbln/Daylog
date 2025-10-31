@@ -1,25 +1,30 @@
 /**
- * @covers EntryRepository.findById
+ * AC-02 — EntryRepository.deleteById returns null on 404 Not Found (Infrastructure).
  *
  * Purpose:
- * Validate repository behavior for UC-3.
+ * Ensure transport-level 404 with a structured JSON body
+ * ({ success:false, status:404, code:'ENTRY_NOT_FOUND' }) is normalized by the repository
+ * into `null`, so Application-level UC maps it to a 404 envelope.
  *
  * Mechanics:
- * - Mock HTTP responses and assert repository invariants.
+ * - Mock HTTP DELETE /api/entries/:id to return 404 with JSON body.
+ * - Call repo.deleteById(id).
+ * - Expect `null`.
  *
  * Cases:
- * - AC02 Not Found (404) ⇒ returns null
+ * - Not found → null
  */
+
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {
     createRepository,
     mockJsonOnce,
     type RepositoryTestCtx
 } from '@tests/Unit/Infrastructure/Repositories/Entries/BaseEntriesRepositoryTest';
-import {ac02Non2xxResponse as makeRequest} from '@tests/helpers/http/requests/entries/GetEntryRequestFactory';
+import {ac02Non2xxResponse as makeRequest} from '@tests/helpers/http/requests/entries/DeleteEntryRequestFactory';
 import {notFound} from '@tests/helpers/http/responses/common/Non2xxResponseFactory';
 
-describe('AC02 — EntryRepository.findById returns null on 404 Not Found', () => {
+describe('AC02 — EntryRepository.deleteById returns null on 404 Not Found', () => {
     let ctx: RepositoryTestCtx;
 
     beforeEach(() => {
@@ -38,7 +43,7 @@ describe('AC02 — EntryRepository.findById returns null on 404 Not Found', () =
         mockJsonOnce(ctx.fetchMock, 404, response);
 
         // Act
-        const result = await ctx.repo.findById(request.id);
+        const result = await ctx.repo.deleteById(request.id);
 
         // Assert
         expect(result).toBeNull();

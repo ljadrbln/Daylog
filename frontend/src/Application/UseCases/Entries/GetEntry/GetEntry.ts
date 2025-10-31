@@ -32,6 +32,25 @@ export class GetEntry {
      * @returns {Promise<GetEntryResponse>} Typed transport envelope for UI.
      */
     public async execute(request: GetEntryRequest): Promise<GetEntryResponse> {
-        throw new Error("Not implemented");
+        const id = request.id;
+        const entry = await this.repo.findById(id);
+
+        if (entry) {
+            const response: GetEntryResponse = {
+                success: true,
+                status: 200,
+                data: entry
+            };
+
+            return response;
+        }
+
+        const notFound: GetEntryResponse = {
+            success: false,
+            status: 404,
+            code: 'ENTRY_NOT_FOUND'
+        };
+
+        return notFound;
     }
 }

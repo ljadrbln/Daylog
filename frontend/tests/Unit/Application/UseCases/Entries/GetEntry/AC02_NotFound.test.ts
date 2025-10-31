@@ -3,12 +3,15 @@
  * @group Application
  *
  * Purpose:
- * Validate that UC-3 returns { success:true, status:200, data: Entry } when repository finds the entry.
+ * Validate that UC-3 returns { success:false, status:404, code:'ENTRY_NOT_FOUND' } when repository returns null.
  *
  * Mechanics:
- * - Mock EntryRepository.findById to resolve a concrete Entry object.
- * - Build request with the same id.
- * - Assert response envelope and repository interaction.
+ * - Mock EntryRepository.findById to resolve null.
+ * - Build request with arbitrary UUID.
+ * - Assert failure envelope and repository interaction.
+ *
+ * Cases:
+ * - AC02 Not found → 404
  */
 
 import {describe, it, expect, beforeEach, vi} from 'vitest';
@@ -16,9 +19,8 @@ import type {EntryRepositoryInterface} from '@src/Domain/Interfaces/Entries/Entr
 import {GetEntry} from '@src/Application/UseCases/Entries/GetEntry/GetEntry';
 
 import {EntryFactory} from '@tests/helpers/domain/entries/EntryFactory';
-import {ensureSuccess} from '@tests/helpers/asserts';
 
-describe('AC01 — GetEntry returns success=true and entry (Application)', () => {
+describe('AC02 — GetEntry returns success=false and 404 when entry is not found (Application)', () => {
     let repo: EntryRepositoryInterface;
 
     beforeEach(() => {
@@ -30,25 +32,24 @@ describe('AC01 — GetEntry returns success=true and entry (Application)', () =>
         repo = {list, findById, deleteById, save};
     });
 
-    it('returns { success:true, status:200, data: entry } when entry exists', async () => {
+    it('returns { success:false, status:404, code:"ENTRY_NOT_FOUND" } when repository returns null', async () => {
         // Arrange
-        const existing = EntryFactory.make({title: 'Valid title'});
-        const id = existing.id;
+        const sample = EntryFactory.make(); // use factory to get a valid-looking UUID
+        const id = sample.id;
 
         const findByIdMock = repo.findById as unknown as ReturnType<typeof vi.fn>;
-        findByIdMock.mockResolvedValueOnce(existing);
+        findByIdMock.mockResolvedValueOnce(null);
 
         const uc = new GetEntry(repo);
         const request = {id};
 
         // Act
         const response = await uc.execute(request);
-        const okResponse = ensureSuccess(response);
 
         // Assert
-        expect(okResponse.success).toBe(true);
-        expect(okResponse.status).toBe(200);
-        expect(okResponse.data).toEqual(existing);
+        expect(response.success).toBe(false);
+        expect(response.status).toBe(404);
+        expect(response).toHaveProperty('code', 'ENTRY_NOT_FOUND');
 
         expect(findByIdMock).toHaveBeenCalledTimes(1);
         expect(findByIdMock).toHaveBeenCalledWith(id);
