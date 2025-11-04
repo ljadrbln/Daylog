@@ -7,15 +7,15 @@ import type {UseCaseResponse} from '@src/Application/UseCases/Shared/UseCaseResp
  * UC-5: Update Entry — Application use case.
  *
  * Purpose:
- * Bridge UpdateEntryRequest (id + optional fields) with repo.save() and return
- * typed UseCaseResponse<Entry> for success, or map 404/422 to failure envelopes.
+ * Connects UpdateEntryRequest (id + fields) with the domain repository save()
+ * and returns a typed UseCaseResponse<Entry>.
  *
  * Mechanics:
- * - Extract id and optional fields into local variables.
- * - Build an "entry-like" object; backend merges provided fields and ignores placeholders.
- * - On success → { success:true, status:200, data }.
- * - If repo signals 404 → { success:false, status:404, code:'ENTRY_NOT_FOUND' }.
- * - If validation fails (422) → { success:false, status:422, code:'VALIDATION_FAILED' }.
+ * - Extract id, title, body, date from request.
+ * - Build an entry-like object for repo.save().
+ * - If repository returns an Entry → { success:true, status:200, data }.
+ * - If repository returns null → { success:false, status:404, code:'ENTRY_NOT_FOUND' }.
+ * - Validation errors (422) are handled by validators/Presentation, not here.
  */
 export class UpdateEntry {
     private readonly repo: EntryRepositoryInterface;
@@ -31,9 +31,41 @@ export class UpdateEntry {
      * Execute UC-5 with the given request.
      *
      * @param {UpdateEntryRequest} request DTO with id and optional fields.
-     * @returns {Promise<UseCaseResponse<Entry>>} Typed envelope for UI.
+     * @returns {Promise<UseCaseResponse<Entry>>} Typed envelope for UI layer.
      */
     public async execute(request: UpdateEntryRequest): Promise<UseCaseResponse<Entry>> {
-        throw new Error('Update Entry not implemented');
+        const id = request.id;
+        const title = request.title ?? '';
+        const body = request.body ?? '';
+        const date = request.date ?? '';
+
+        const input: Entry = {
+            id,
+            title,
+            body,
+            date,
+            createdAt: '',
+            updatedAt: ''
+        };
+
+        const updated = await this.repo.save(input);
+
+        if (updated) {
+            const ok: UseCaseResponse<Entry> = {
+                success: true,
+                status: 200,
+                data: updated
+            };
+
+            return ok;
+        }
+
+        const notFound: UseCaseResponse<Entry> = {
+            success: false,
+            status: 404,
+            code: 'ENTRY_NOT_FOUND'
+        };
+
+        return notFound;
     }
 }

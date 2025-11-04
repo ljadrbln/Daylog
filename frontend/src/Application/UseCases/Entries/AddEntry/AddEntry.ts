@@ -1,22 +1,20 @@
 import type {EntryRepositoryInterface} from '@src/Domain/Interfaces/Entries/EntryRepositoryInterface';
 import type {Entry} from '@src/Domain/Models/Entries/Entry';
 import type {AddEntryRequest} from '@src/Application/DTO/Entries/AddEntry/AddEntryRequest';
-import type {UseCaseResponse} from '@src/Application/UseCases/Shared/UseCaseResponse';
+import type {AddEntryResponse} from '@src/Application/DTO/Entries/AddEntry/AddEntryResponse';
 
 /**
- * UC-1: Add Entry — Application use case.
+ * UC-1: Add Entry — Application use case (pure).
  *
  * Purpose:
- * Bridge DTO (title/body/date) with domain repository save() and produce a typed
- * UseCaseResponse<Entry> on success or a validation failure envelope on error.
+ * Bridge Application DTO (title/body/date) with the domain repository save()
+ * and return a typed AddEntryResponse on success. No exception handling here:
+ * validation and transport concerns are handled by validators/Presentation.
  *
  * Mechanics:
- * - Extract fields from request into explicit local variables.
- * - Build an input "entry-like" object for repo.save(). Backend ignores id/timestamps on create.
- * - Return { success:true, status:200, data } on success.
- * - On domain validation failure (422) → { success:false, status:422, code:'VALIDATION_FAILED' }.
- *
- * @template Entry
+ * - Extract fields from request.
+ * - Call repo.save(entry-like object).
+ * - Always return { success:true, status:200, data } on success.
  */
 export class AddEntry {
     private readonly repo: EntryRepositoryInterface;
@@ -32,9 +30,30 @@ export class AddEntry {
      * Execute UC-1 with the given request.
      *
      * @param {AddEntryRequest} request DTO with title/body/date.
-     * @returns {Promise<UseCaseResponse<Entry>>} Typed response envelope for the UI.
+     * @returns {Promise<AddEntryResponse>} Typed envelope for UI.
      */
-    public async execute(request: AddEntryRequest): Promise<UseCaseResponse<Entry>> {
-        throw new Error('Add entry not implemented');
+    public async execute(request: AddEntryRequest): Promise<AddEntryResponse> {
+        const title = request.title;
+        const body = request.body;
+        const date = request.date;
+
+        const input: Entry = {
+            id: '',
+            title,
+            body,
+            date,
+            createdAt: '',
+            updatedAt: ''
+        };
+
+        const saved = await this.repo.save(input);
+
+        const response: AddEntryResponse = {
+            success: true,
+            status: 200,
+            data: saved
+        };
+
+        return response;
     }
 }
