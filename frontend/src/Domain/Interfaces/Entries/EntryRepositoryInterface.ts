@@ -5,48 +5,70 @@ import type {ListEntriesCriteriaInterface} from '@src/Domain/Interfaces/Entries/
 import type {ListEntriesPageInterface} from '@src/Domain/Interfaces/Entries/ListEntriesPageInterface';
 
 /**
- * Frontend Entry repository contract (UC-2/3/4/5).
+ * EntryRepositoryInterface
  *
  * Purpose:
- * Express query/command semantics at the domain boundary.
+ * Domain-level port for Entries. Keeps HTTP/transport details out of the domain.
  *
- * Mechanics:
- * - Queries may return null (e.g., findById on 404).
- * - Commands must throw on non-executable operations (e.g., delete/update on 404).
+ * Semantics:
+ * - Repository never returns `null`; absence or transport errors are exceptional.
+ * - All 4xx/5xx responses are surfaced as typed errors:
+ *   - NotFoundError  (status:404, code:'ENTRY_NOT_FOUND') for missing resources.
+ *   - DomainValidationError (status:422, code:'...') for business rule violations.
+ *
+ * This interface mirrors backend contracts but delegates all error handling
+ * to upper layers (Application/Presentation).
  */
+
 export interface EntryRepositoryInterface {
     /**
-     * Load a single entry by identifier (UC-3).
+     * Retrieve a single entry by id (UC-3 GetEntry).
      *
-     * @param id string UUID v4
-     * @returns Promise<Entry|null> Null on HTTP Error
+     * Error semantics:
+     * - Does not return null.
+     * - Propagates transport/domain errors upward (e.g., NotFoundError with {status:404, code:'ENTRY_NOT_FOUND'}).
+     *
+     * @param {string} id Entry identifier (UUID v4).
+     * @returns {Promise<Entry>} Resolved Entry from backend.
      */
-    findById(id: string): Promise<Entry | null>;
+    findById(id: string): Promise<Entry>;
 
     /**
-     * Delete an entry by identifier (UC-4).
+     * List entries with optional filters and pagination (UC-2 ListEntries).
      *
-     * @param id string UUID v4
-     * @returns Promise<Entry|null> Deleted entry object from `data`
+     * @param {ListEntriesCriteriaInterface} criteria Normalized list parameters.
+     * @returns {Promise<ListEntriesPageInterface>} Page object with items and meta.
      */
-    deleteById(id: string): Promise<Entry | null>;
+    list(criteria: ListEntriesCriteriaInterface): Promise<ListEntriesPageInterface>;
 
     /**
-     * Save (create or update) an entry (UC-1/5).
+     * Create or update an entry (UC-1 AddEntry / UC-5 UpdateEntry).
      *
-     * @param entry Entry
-     * @returns Promise<Entry> Persisted Entry object from `data`
+     * Rules:
+     * - Create when entry.id === ''.
+     * - Update when entry.id !== ''.
+     *
+     * Error semantics:
+     * - Propagates NotFoundError {status:404, code:'ENTRY_NOT_FOUND'} on updating a missing entry.
+     * - Propagates DomainValidationError {status:422, code:'...'} on business rule violations.
+     *
+     * @param {Entry} entry Entry to persist.
+     * @returns {Promise<Entry>} Persisted Entry from backend.
      */
     save(entry: Entry): Promise<Entry>;
 
     /**
-     * List entries (UC-2).
+     * Delete an entry by id (UC-4 DeleteEntry).
      *
-     * Purpose:
-     * Retrieve paginated list of entries with optional filters.
+     * Mechanics:
+     * - Performs DELETE /api/entries/{id}.
      *
-     * @param {ListEntriesCriteriaInterface} criteria Normalized/validated filters.
-     * @returns {Promise<ListEntriesPageInterface>} Page of entries with pagination meta.
+     * Error semantics:
+     * - Does not return null.
+     * - Propagates NotFoundError {status:404, code:'ENTRY_NOT_FOUND'} if entry does not exist.
+     *
+     * @param {string} id Entry identifier (UUID v4).
+     * @returns {Promise<Entry>} Deleted Entry returned by backend (200 OK).
      */
-    list(criteria: ListEntriesCriteriaInterface): Promise<ListEntriesPageInterface>;
+    deleteById(id: string): Promise<Entry>;
 }

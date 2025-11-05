@@ -6,95 +6,55 @@ import type {ListEntriesPageInterface} from '@src/Domain/Interfaces/Entries/List
 import type {UseCaseResponse} from '@src/Application/DTO/Common/UseCaseResponse';
 import {ResponseValidator} from '@src/Infrastructure/Http/ResponseValidator';
 import {Endpoints} from '@src/Infrastructure/Http/Endpoints';
-import {extractHttpStatus} from '@src/Infrastructure/Http/utils/extractHttpStatus';
 
 /**
- * EntryRepository (frontend, HTTP-backed)
+ * EntryRepository (frontend, HTTP-backed).
  *
  * Purpose:
- * Implements EntryRepositoryInterface using HttpClient.
- * Performs all CRUD and list operations against REST endpoints.
+ * Implements EntryRepositoryInterface using HttpClient and mirrors backend semantics:
+ * - Queries may return `null` for 404 (resource absence is not exceptional).
+ * - Commands never return `null`; business/validation errors are thrown as exceptions.
  *
- * - Mirrors the old GetEntryGateway and others under /Infrastructure/Entries/.
- * - Validates transport envelope before returning domain data.
+ * Mechanics:
+ * - Validates transport envelope via ResponseValidator before returning domain data.
  */
 export class EntryRepository implements EntryRepositoryInterface {
     private readonly http: HttpClient;
 
-    constructor(http: HttpClient) {
+    /**
+     * @param {HttpClient} http Low-level HTTP client.
+     */
+    public constructor(http: HttpClient) {
         this.http = http;
     }
 
     /**
-     * Get entry by id (UC-3).
+     * Get a single Entry by id (UC-3).
      *
      * Purpose:
-     * Retrieve a single Entry by id; rely on ResponseValidator for 404→null mapping.
+     * Retrieve a single Entry by id.
+     * Repository never maps 404 to `null` — errors bubble up to Presentation.
      *
      * Mechanics:
-     * - GET /api/entries/{id}
-     * - ResponseValidator.extractData() handles:
-     *   - success:true → returns Entry
-     *   - success:false + 404 → returns null
+     * - Performs GET /api/entries/{id}.
+     * - ResponseValidator.extractData():
+     *   - success:true  → returns Entry.
+     *   - any 4xx/5xx   → throws HttpError (status, code).
      *
-     * @returns Promise<Entry|null>
-     * @throws {Error} When the transport envelope is malformed or a non-2xx HTTP error occurs upstream
+     * @param {string} id Entry identifier (UUID v4).
+     * @returns {Promise<Entry>} Retrieved Entry.
+     * @throws {HttpError} For 404 or other non-2xx transport errors.
      */
-    public async findById(id: string): Promise<Entry | null> {
+    public async findById(id: string): Promise<Entry> {
         const url = Endpoints.entryById(id);
+        const json = await this.http.request<UseCaseResponse<Entry>>('GET', url);
 
-        try {
-            const json = await this.http.request<UseCaseResponse<Entry>>('GET', url);
-            const entry = ResponseValidator.extractData<Entry>(json, 'GET /api/entries/:id');
-            return entry;
-        } catch (error: unknown) {
-            const status = extractHttpStatus(error);
-
-            if (status === 404) {
-                return null;
-            }
-
-            throw error;
-        }
+        const entry = ResponseValidator.extractData<Entry>(json, 'GET /api/entries/:id');
+        return entry;
     }
 
     /**
-     * Delete an Entry by its identifier (UC-4).
-     *
-     * Purpose:
-     * Executes deletion of the specified Entry and returns
-     * the deleted Entry object received from the API response.
-     *
-     * Mechanics:
-     * - Perform DELETE /api/entries/{id}.
-     * - Expect a 200 OK response with transport envelope { success: true, data: Entry }.
-     * - Validate the envelope and extract the Entry object from `data`.
-     * - Propagate any non-2xx or malformed responses as errors.
-     *
-     * @param {string} id Entry identifier (UUID)
-     * @returns {Promise<Entry | null>} Deleted Entry object containing id, title, body, date, createdAt, updatedAt
-     * @throws {Error} When the transport envelope is malformed or a non-2xx HTTP error occurs upstream
-     */
-    public async deleteById(id: string): Promise<Entry | null> {
-        const url = Endpoints.entryById(id);
-
-        try {
-            const json = await this.http.request<UseCaseResponse<Entry>>('DELETE', url);
-            const entry = ResponseValidator.extractData<Entry>(json, 'DELETE /api/entries/:id');
-            return entry;
-        } catch (error: unknown) {
-            const status = extractHttpStatus(error);
-
-            if (status === 404) {
-                return null;
-            }
-
-            throw error;
-        }
-    }
-
-    /**
-     * UC-2: List entries with optional filters and pagination.
+     * List entries with optional filters and pagination (UC-2).
      *
      * Purpose:
      * Build GET /api/entries with query params from criteria, validate envelope,
@@ -157,8 +117,8 @@ export class EntryRepository implements EntryRepositoryInterface {
      * Save Entry (backend-aligned upsert).
      *
      * Mechanics:
-     * - id === ''  → POST /api/entries  with Entry body.
-     * - id !== ''  → PUT /api/entries/{id} with Entry body.
+     * - id === ''  → POST /api/entries  (create).
+     * - id !== ''  → PUT /api/entries/{id} (update).
      *
      * @param {Entry} entry Fully prepared domain Entry.
      * @returns {Promise<Entry>} Persisted entry returned by backend.
@@ -168,6 +128,7 @@ export class EntryRepository implements EntryRepositoryInterface {
 
         if (!hasId) {
             const created = await this.create(entry);
+
             return created;
         }
 
@@ -177,15 +138,39 @@ export class EntryRepository implements EntryRepositoryInterface {
     }
 
     /**
-     * POST /api/entries.
+     * Delete an Entry by its identifier (UC-4).
+     *
+     * Purpose:
+     * Executes deletion of the specified Entry and returns the deleted Entry on success.
+     *
+     * Mechanics:
+     * - DELETE /api/entries/{id}
+     * - Success: returns deleted Entry (never null)
+     * - Not found: ResponseValidator.extractData() returns null → convert to 404 error
+     *
+     * @param {string} id Entry identifier (UUID)
+     * @returns {Promise<Entry>} Deleted Entry object
+     * @throws {Error} When backend returns malformed payload or non-2xx transport error
+     */
+    public async deleteById(id: string): Promise<Entry> {
+        const url = Endpoints.entryById(id);
+        const json = await this.http.request<UseCaseResponse<Entry>>('DELETE', url);
+
+        const data = ResponseValidator.extractData<Entry>(json, 'DELETE /api/entries/:id');
+
+        if (data === null) {
+            this.throwNotFound();
+        }
+
+        return data;
+    }
+
+    /**
+     * POST /api/entries (create).
      *
      * Purpose:
      * Send a new entry to the backend and return the persisted entity.
      * Guarantees non-null response; throws if backend payload is malformed.
-     *
-     * Mechanics:
-     * - Delegates creation logic to backend (UC-1).
-     * - Validates that backend returned a valid Entry object.
      *
      * @param {Entry} entry Entry data to persist (title, body, date).
      * @returns {Promise<Entry>} Persisted entry from backend.
@@ -207,16 +192,11 @@ export class EntryRepository implements EntryRepositoryInterface {
     }
 
     /**
-     * PUT /api/entries/{id}.
+     * PUT /api/entries/{id} (update).
      *
      * Purpose:
      * Update an existing entry on the backend and return the persisted entity.
-     * Ensures non-null response; throws if backend payload is malformed.
-     *
-     * Mechanics:
-     * - Delegates UC-5 update logic to backend.
-     * - Backend strips immutable fields internally (id, timestamps, etc.).
-     * - Validates that backend returned a valid updated Entry object.
+     * Commands never return null. Not found must be thrown as 404 error.
      *
      * @param {Entry} entry Entry data to update (must include valid id).
      * @returns {Promise<Entry>} Updated entry from backend.
@@ -230,10 +210,24 @@ export class EntryRepository implements EntryRepositoryInterface {
         const data = ResponseValidator.extractData<Entry>(json, 'PUT /api/entries/:id');
 
         if (data === null) {
-            const message = 'Unexpected null payload for PUT /api/entries/{id}';
-            throw new Error(message);
+            this.throwNotFound();
         }
 
         return data;
+    }
+
+    /**
+     * Throw standardized 404 error for ENTRY_NOT_FOUND.
+     *
+     * @throws {Error} Error object with { status:404, code:'ENTRY_NOT_FOUND' }
+     */
+    private throwNotFound(): never {
+        const message = 'ENTRY_NOT_FOUND';
+        const error = new Error(message) as Error & {status?: number; code?: string};
+
+        error.status = 404;
+        error.code = message;
+
+        throw error;
     }
 }
