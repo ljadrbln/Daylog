@@ -32,25 +32,25 @@ export class EntryRepository implements EntryRepositoryInterface {
      * Get a single Entry by id (UC-3).
      *
      * Purpose:
-     * Retrieve a single Entry by id. 404 is represented as `null`.
+     * Retrieve a single Entry by id.
+     * Repository never maps 404 to `null` — errors bubble up to Presentation.
      *
      * Mechanics:
-     * - GET /api/entries/{id}
+     * - Performs GET /api/entries/{id}.
      * - ResponseValidator.extractData():
-     *   - success:true  → returns Entry
-     *   - success:false + ENTRY_NOT_FOUND → returns null
+     *   - success:true  → returns Entry.
+     *   - any 4xx/5xx   → throws HttpError (status, code).
      *
-     * @param {string} id Entry identifier (UUID).
-     * @returns {Promise<Entry|null>} Entry or null (when not found).
-     * @throws {Error} For malformed envelopes or non-2xx transport errors.
+     * @param {string} id Entry identifier (UUID v4).
+     * @returns {Promise<Entry>} Retrieved Entry.
+     * @throws {HttpError} For 404 or other non-2xx transport errors.
      */
-    public async findById(id: string): Promise<Entry | null> {
+    public async findById(id: string): Promise<Entry> {
         const url = Endpoints.entryById(id);
         const json = await this.http.request<UseCaseResponse<Entry>>('GET', url);
 
-        const data = ResponseValidator.extractData<Entry>(json, 'GET /api/entries/:id');
-
-        return data;
+        const entry = ResponseValidator.extractData<Entry>(json, 'GET /api/entries/:id');
+        return entry;
     }
 
     /**

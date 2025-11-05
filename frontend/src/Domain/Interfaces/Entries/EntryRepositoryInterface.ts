@@ -9,26 +9,35 @@ import type {ListEntriesPageInterface} from '@src/Domain/Interfaces/Entries/List
  *
  * Purpose:
  * Domain-level port for Entries. Keeps HTTP/transport details out of the domain.
- * Mirrors backend semantics exactly:
- * - Queries may return `null` for 404 (resource absence is not exceptional).
- * - Commands never return `null`; business/validation errors are thrown as exceptions:
- *   - NotFoundError (status: 404, code: 'ENTRY_NOT_FOUND') for Update/Delete when id doesn't exist.
- *   - DomainValidationError (status: 422, code: '...') for title/body/date rule violations.
+ *
+ * Semantics:
+ * - Repository never returns `null`; absence or transport errors are exceptional.
+ * - All 4xx/5xx responses are surfaced as typed errors:
+ *   - NotFoundError  (status:404, code:'ENTRY_NOT_FOUND') for missing resources.
+ *   - DomainValidationError (status:422, code:'...') for business rule violations.
+ *
+ * This interface mirrors backend contracts but delegates all error handling
+ * to upper layers (Application/Presentation).
  */
+
 export interface EntryRepositoryInterface {
     /**
      * Retrieve a single entry by id (UC-3 GetEntry).
      *
-     * @param {string} id Entry identifier (UUID).
-     * @returns {Promise<Entry|null>} Entry or null when not found (404).
+     * Error semantics:
+     * - Does not return null.
+     * - Propagates transport/domain errors upward (e.g., NotFoundError with {status:404, code:'ENTRY_NOT_FOUND'}).
+     *
+     * @param {string} id Entry identifier (UUID v4).
+     * @returns {Promise<Entry>} Resolved Entry from backend.
      */
-    findById(id: string): Promise<Entry | null>;
+    findById(id: string): Promise<Entry>;
 
     /**
      * List entries with optional filters and pagination (UC-2 ListEntries).
      *
-     * @param {ListEntriesCriteriaInterface} criteria Normalized list params.
-     * @returns {Promise<ListEntriesPageInterface>} Page object with items & meta.
+     * @param {ListEntriesCriteriaInterface} criteria Normalized list parameters.
+     * @returns {Promise<ListEntriesPageInterface>} Page object with items and meta.
      */
     list(criteria: ListEntriesCriteriaInterface): Promise<ListEntriesPageInterface>;
 
@@ -38,11 +47,10 @@ export interface EntryRepositoryInterface {
      * Rules:
      * - Create when entry.id === ''.
      * - Update when entry.id !== ''.
-     * - Never returns null.
      *
-     * Error semantics (mirrors backend):
-     * - Throws NotFoundError { status: 404, code: 'ENTRY_NOT_FOUND' } when updating a missing entry.
-     * - Throws DomainValidationError { status: 422, code: '...' } on BR violations.
+     * Error semantics:
+     * - Propagates NotFoundError {status:404, code:'ENTRY_NOT_FOUND'} on updating a missing entry.
+     * - Propagates DomainValidationError {status:422, code:'...'} on business rule violations.
      *
      * @param {Entry} entry Entry to persist.
      * @returns {Promise<Entry>} Persisted Entry from backend.
@@ -54,11 +62,13 @@ export interface EntryRepositoryInterface {
      *
      * Mechanics:
      * - Performs DELETE /api/entries/{id}.
-     * - Returns deleted Entry object on success (200 OK).
-     * - Throws NotFoundError { status: 404, code: 'ENTRY_NOT_FOUND' } if entry does not exist.
      *
-     * @param {string} id Entry identifier (UUID).
-     * @returns {Promise<Entry>} Deleted Entry object from backend.
+     * Error semantics:
+     * - Does not return null.
+     * - Propagates NotFoundError {status:404, code:'ENTRY_NOT_FOUND'} if entry does not exist.
+     *
+     * @param {string} id Entry identifier (UUID v4).
+     * @returns {Promise<Entry>} Deleted Entry returned by backend (200 OK).
      */
     deleteById(id: string): Promise<Entry>;
 }
