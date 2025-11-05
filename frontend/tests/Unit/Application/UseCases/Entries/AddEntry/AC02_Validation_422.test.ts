@@ -23,46 +23,46 @@ import type {AddEntryRequest} from '@src/Application/DTO/Entries/AddEntry/AddEnt
 import {AddEntry} from '@src/Application/UseCases/Entries/AddEntry/AddEntry';
 
 describe('AC02 — AddEntry propagates DomainValidationError (422) (Application)', () => {
-	let repo: EntryRepositoryInterface;
+    let repo: EntryRepositoryInterface;
 
-	beforeEach(() => {
-		repo = {
-			findById: vi.fn(),
-			list: vi.fn(),
-			save: vi.fn(),
-			deleteById: vi.fn()
-		};
-	});
+    beforeEach(() => {
+        repo = {
+            findById: vi.fn(),
+            list: vi.fn(),
+            save: vi.fn(),
+            deleteById: vi.fn()
+        };
+    });
 
-	function makeValidationError() {
-		const message = 'VALIDATION_FAILED';
-		const error = new Error(message) as Error & { status?: number; code?: string };
-		error.status = 422;
-		error.code = 'VALIDATION_FAILED';
-		return error;
-	}
+    function makeValidationError() {
+        const message = 'VALIDATION_FAILED';
+        const error = new Error(message) as Error & {status?: number; code?: string};
+        error.status = 422;
+        error.code = 'VALIDATION_FAILED';
+        return error;
+    }
 
-	it('rejects with { status:422, code:"VALIDATION_FAILED" }', async () => {
-		// Arrange
-		const request: AddEntryRequest = {
-			title: '', // invalid: required
-			body: 'x'.repeat(6000), // invalid: too long (example)
-			date: '2025-11-05'
-		};
+    it('rejects with { status:422, code:"VALIDATION_FAILED" }', async () => {
+        // Arrange
+        const request: AddEntryRequest = {
+            title: '', // invalid: required
+            body: 'x'.repeat(6000), // invalid: too long (example)
+            date: '2025-11-05'
+        };
 
-		const saveMock = repo.save as unknown as ReturnType<typeof vi.fn>;
-		const validationError = makeValidationError();
-		saveMock.mockRejectedValueOnce(validationError);
+        const saveMock = repo.save as unknown as ReturnType<typeof vi.fn>;
+        const validationError = makeValidationError();
+        saveMock.mockRejectedValueOnce(validationError);
 
-		const uc = new AddEntry(repo);
+        const uc = new AddEntry(repo);
 
-		// Act + Assert
-		await expect(uc.execute(request)).rejects.toMatchObject({
-			status: 422,
-			code: 'VALIDATION_FAILED',
-			message: 'VALIDATION_FAILED'
-		});
+        // Act + Assert
+        await expect(uc.execute(request)).rejects.toMatchObject({
+            status: 422,
+            code: 'VALIDATION_FAILED',
+            message: 'VALIDATION_FAILED'
+        });
 
-		expect(saveMock).toHaveBeenCalledTimes(1);
-	});
+        expect(saveMock).toHaveBeenCalledTimes(1);
+    });
 });

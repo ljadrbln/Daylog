@@ -35,10 +35,10 @@ export class UpdateEntry {
      * @returns {Promise<UpdateEntryResponse>} Typed envelope for UI.
      */
     public async execute(request: UpdateEntryRequest): Promise<UpdateEntryResponse> {
-        const id    = request.id;
+        const id = request.id;
         const title = request.title ?? '';
-        const body  = request.body ?? '';
-        const date  = request.date ?? '';
+        const body = request.body ?? '';
+        const date = request.date ?? '';
 
         const input: Entry = {
             id,
