@@ -1,27 +1,28 @@
 import type {EntryRepositoryInterface} from '@src/Domain/Interfaces/Entries/EntryRepositoryInterface';
 import type {Entry} from '@src/Domain/Models/Entries/Entry';
 import type {UpdateEntryRequest} from '@src/Application/DTO/Entries/UpdateEntry/UpdateEntryRequest';
-import type {UseCaseResponse} from '@src/Application/UseCases/Shared/UseCaseResponse';
+import type {UpdateEntryResponse} from '@src/Application/DTO/Entries/UpdateEntry/UpdateEntryResponse';
 
 /**
- * UC-5: Update Entry — Application use case.
+ * UC-5: Update Entry — Application use case (thin).
  *
  * Purpose:
- * Connects UpdateEntryRequest (id + fields) with the domain repository save()
- * and returns a typed UseCaseResponse<Entry>.
+ * Bridge Application DTO with the domain repository save() and return
+ * a typed UseCaseResponse on success. No exception handling here —
+ * 404/422/transport errors are propagated to Presentation.
  *
  * Mechanics:
- * - Extract id, title, body, date from request.
- * - Build an entry-like object for repo.save().
- * - If repository returns an Entry → { success:true, status:200, data }.
- * - If repository returns null → { success:false, status:404, code:'ENTRY_NOT_FOUND' }.
- * - Validation errors (422) are handled by validators/Presentation, not here.
+ * - Extract id/title/body/date from request (id is required).
+ * - Call repo.save(entry).
+ * - Return { success:true, status:200, data } on success.
+ *
+ * @returns Promise<UpdateEntryResponse>
  */
 export class UpdateEntry {
     private readonly repo: EntryRepositoryInterface;
 
     /**
-     * @param {EntryRepositoryInterface} repo Domain repository dependency (injected).
+     * @param {EntryRepositoryInterface} repo Domain repository dependency.
      */
     public constructor(repo: EntryRepositoryInterface) {
         this.repo = repo;
@@ -30,14 +31,14 @@ export class UpdateEntry {
     /**
      * Execute UC-5 with the given request.
      *
-     * @param {UpdateEntryRequest} request DTO with id and optional fields.
-     * @returns {Promise<UseCaseResponse<Entry>>} Typed envelope for UI layer.
+     * @param {UpdateEntryRequest} request DTO with id and mutable fields.
+     * @returns {Promise<UpdateEntryResponse>} Typed envelope for UI.
      */
-    public async execute(request: UpdateEntryRequest): Promise<UseCaseResponse<Entry>> {
-        const id = request.id;
+    public async execute(request: UpdateEntryRequest): Promise<UpdateEntryResponse> {
+        const id    = request.id;
         const title = request.title ?? '';
-        const body = request.body ?? '';
-        const date = request.date ?? '';
+        const body  = request.body ?? '';
+        const date  = request.date ?? '';
 
         const input: Entry = {
             id,
@@ -48,24 +49,14 @@ export class UpdateEntry {
             updatedAt: ''
         };
 
-        const updated = await this.repo.save(input);
+        const saved = await this.repo.save(input);
 
-        if (updated) {
-            const ok: UseCaseResponse<Entry> = {
-                success: true,
-                status: 200,
-                data: updated
-            };
-
-            return ok;
-        }
-
-        const notFound: UseCaseResponse<Entry> = {
-            success: false,
-            status: 404,
-            code: 'ENTRY_NOT_FOUND'
+        const response: UpdateEntryResponse = {
+            success: true,
+            status: 200,
+            data: saved
         };
 
-        return notFound;
+        return response;
     }
 }

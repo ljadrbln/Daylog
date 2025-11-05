@@ -26,12 +26,12 @@ describe('AC01 — UpdateEntry returns success=true and updated entry (Applicati
     let repo: EntryRepositoryInterface;
 
     beforeEach(() => {
-        const list = vi.fn();
-        const findById = vi.fn();
-        const deleteById = vi.fn();
-        const save = vi.fn();
-
-        repo = {list, findById, deleteById, save};
+        repo = {
+            findById: vi.fn(),
+            list: vi.fn(),
+            save: vi.fn(),
+            deleteById: vi.fn()
+        };
     });
 
     it('returns { success:true, status:200, data } when entry is updated', async () => {
@@ -41,12 +41,12 @@ describe('AC01 — UpdateEntry returns success=true and updated entry (Applicati
 
         const request: UpdateEntryRequest = {
             id,
-            title: 'Valid title'
+            title: 'Updated title'
         };
 
         const updated = EntryFactory.make({
             id,
-            title: 'Valid title'
+            title: 'Updated title'
         });
 
         const saveMock = repo.save as unknown as ReturnType<typeof vi.fn>;
@@ -64,9 +64,9 @@ describe('AC01 — UpdateEntry returns success=true and updated entry (Applicati
         expect(ok.data).toEqual(updated);
 
         expect(saveMock).toHaveBeenCalledTimes(1);
-
         const calledWith = saveMock.mock.calls[0][0];
+
         expect(calledWith.id).toBe(id);
-        expect(calledWith.title).toBe('Valid title');
+        expect(calledWith.title).toBe('Updated title');
     });
 });

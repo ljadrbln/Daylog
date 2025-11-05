@@ -4,17 +4,19 @@ import type {AddEntryRequest} from '@src/Application/DTO/Entries/AddEntry/AddEnt
 import type {AddEntryResponse} from '@src/Application/DTO/Entries/AddEntry/AddEntryResponse';
 
 /**
- * UC-1: Add Entry — Application use case (pure).
+ * UC-1: Add Entry — Application use case (thin).
  *
  * Purpose:
- * Bridge Application DTO (title/body/date) with the domain repository save()
- * and return a typed AddEntryResponse on success. No exception handling here:
- * validation and transport concerns are handled by validators/Presentation.
+ * Bridge Application DTO with the domain repository save() and return
+ * a typed UseCaseResponse on success. No exception handling here —
+ * 422/transport errors are propagated to Presentation.
  *
  * Mechanics:
- * - Extract fields from request.
- * - Call repo.save(entry-like object).
- * - Always return { success:true, status:200, data } on success.
+ * - Extract title/body/date from request.
+ * - Call repo.save(entry with id='').
+ * - Return { success:true, status:200, data } on success.
+ *
+ * @returns Promise<AddEntryResponse>
  */
 export class AddEntry {
     private readonly repo: EntryRepositoryInterface;

@@ -1,20 +1,16 @@
 /**
- * AC-02 — EntryRepository.deleteById returns null on 404 Not Found (Infrastructure).
+ * @covers EntryRepository.deleteById
  *
  * Purpose:
- * Ensure transport-level 404 with a structured JSON body
- * ({ success:false, status:404, code:'ENTRY_NOT_FOUND' }) is normalized by the repository
- * into `null`, so Application-level UC maps it to a 404 envelope.
+ * Validate repository behavior for UC-4.
+ * Repository must bubble up HttpError from transport layer.
  *
  * Mechanics:
- * - Mock HTTP DELETE /api/entries/:id to return 404 with JSON body.
- * - Call repo.deleteById(id).
- * - Expect `null`.
+ * - Mock HTTP 404 response and assert that repo rejects with {status:404}.
  *
  * Cases:
- * - Not found → null
+ * - AC02 Not Found (404) ⇒ rejects with HttpError { status:404 }
  */
-
 import {describe, it, expect, beforeEach, afterEach} from 'vitest';
 import {
     createRepository,
@@ -24,7 +20,7 @@ import {
 import {ac02Non2xxResponse as makeRequest} from '@tests/helpers/http/requests/entries/DeleteEntryRequestFactory';
 import {notFound} from '@tests/helpers/http/responses/common/Non2xxResponseFactory';
 
-describe('AC02 — EntryRepository.deleteById returns null on 404 Not Found', () => {
+describe('AC02 — EntryRepository.deleteById rejects with HttpError{status:404}', () => {
     let ctx: RepositoryTestCtx;
 
     beforeEach(() => {
@@ -35,17 +31,19 @@ describe('AC02 — EntryRepository.deleteById returns null on 404 Not Found', ()
         ctx.cleanup();
     });
 
-    it('returns null when API responds with 404 Not Found', async () => {
+    it('rejects with {status:404} when API responds with 404 Not Found', async () => {
         // Arrange
-        const request = makeRequest();
-
+        // prettier-ignore
+        const request  = makeRequest();
         const response = notFound();
+
         mockJsonOnce(ctx.fetchMock, 404, response);
 
         // Act
-        const result = await ctx.repo.deleteById(request.id);
+        const promise = ctx.repo.findById(request.id);
 
         // Assert
-        expect(result).toBeNull();
+        const expectation = expect(promise);
+        await expectation.rejects.toMatchObject({status: 404});
     });
 });

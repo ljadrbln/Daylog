@@ -1,5 +1,3 @@
-// tests/Unit/Application/UseCases/Entries/DeleteEntry/AC02_NotFound.test.ts
-
 /**
  * AC-02 — Not found (404) — Application level.
  *
