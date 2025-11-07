@@ -1,26 +1,49 @@
-// frontend/src/Presentation/runner/UseCaseRunner.ts
+/**
+ * Generic interface for any Application-level use case.
+ *
+ * @template TRequest Request DTO type.
+ */
+export interface ExecutableUseCase<TRequest> {
+    /**
+     * Execute the use case with given request DTO.
+     *
+     * @param {TRequest} req
+     * Request DTO.
+     *
+     * @returns {Promise<unknown>}
+     * Promise resolving to raw Application result or throwing an error.
+     */
+    execute(req: TRequest): Promise<unknown>;
+}
+
+/**
+ * Success envelope returned by UseCaseRunner.
+ *
+ * @template TData Payload type of successful response.
+ */
+export type RunnerSuccess<TData> = {
+    success: true;
+    status: 200;
+    data: TData;
+};
+
+/**
+ * Failure envelope returned by UseCaseRunner.
+ */
+export type RunnerFailure = {
+    success: false;
+    status: number;
+    code: string;
+    errors?: unknown;
+};
 
 /**
  * UseCaseRunner — Presentation-level wrapper for executing Application use cases.
  *
  * Purpose:
- * Provide a single, UI-friendly envelope for all use cases. It runs an arbitrary
- * Application use case (uc.execute(request)) and normalizes the outcome:
+ * Execute any Application use case and normalize its output for UI consumption:
  * - Success → { success:true, status:200, data }
  * - Failure → { success:false, status, code, errors? }
- *
- * Mechanics:
- * - Accepts any object exposing execute(req): Promise<unknown>.
- * - On success: extracts `data` from the resolved payload and returns the success envelope.
- * - On error: extracts { status, code, errors } from the thrown object and applies
- *   fallback mapping for `code` if missing: 404→ENTRY_NOT_FOUND, 422→VALIDATION_ERROR,
- *   otherwise UNKNOWN_ERROR.
- * - No chained expressions: all intermediate values are assigned to variables
- *   before awaiting or returning (project convention).
- *
- * Cases:
- * - Happy path (success) — returns the normalized success envelope.
- * - 404/422/other errors — will be covered by dedicated tests AC02–AC04.
  */
 export const UseCaseRunner = {
     /**
@@ -29,25 +52,58 @@ export const UseCaseRunner = {
      * @template TRequest Incoming request DTO type.
      * @template TData    Data type expected in the success envelope.
      *
-     * @param {{ execute(req: TRequest): Promise<unknown> }} uc
-     * Application use case exposing an async execute(req) method.
+     * @param {ExecutableUseCase<TRequest>} uc
+     * Use case exposing an async execute(req) method.
      *
      * @param {TRequest} request
      * Transport-level request DTO to pass into the use case.
      *
-     * @returns {Promise<
-     *   | { success: true;  status: 200; data: TData }
-     *   | { success: false; status: number; code: string; errors?: unknown }
-     * >}
+     * @returns {Promise<RunnerSuccess<TData> | RunnerFailure>}
      * A UI-friendly envelope with either success payload or normalized error.
      */
     async run<TRequest, TData>(
-        uc: {execute(req: TRequest): Promise<unknown>},
+        uc: ExecutableUseCase<TRequest>,
         request: TRequest
-    ): Promise<
-        | {success: true; status: 200; data: TData}
-        | {success: false; status: number; code: string; errors?: unknown}
-    > {
-        throw new Error('Not implemented');
+    ): Promise<RunnerSuccess<TData> | RunnerFailure> {
+        try {
+            const req = request;
+            const result = await uc.execute(req);
+
+            const asAny = result as {data?: TData};
+            const extractedData = asAny.data as TData;
+
+            const envelope: RunnerSuccess<TData> = {
+                success: true,
+                status: 200,
+                data: extractedData
+            };
+
+            return envelope;
+        } catch (err: unknown) {
+            const thrown = err as {status?: number; code?: string; errors?: unknown};
+
+            const status = typeof thrown.status === 'number' ? thrown.status : 500;
+            const errors = thrown.errors;
+
+            let code = thrown.code;
+            if (!code) {
+                if (status === 404) {
+                    code = 'ENTRY_NOT_FOUND';
+                } else if (status === 422) {
+                    code = 'VALIDATION_ERROR';
+                } else {
+                    code = 'UNKNOWN_ERROR';
+                }
+            }
+
+            const failure: RunnerFailure = {
+                success: false,
+                status,
+                code,
+                errors
+            };
+
+            return failure;
+        }
     }
 };
