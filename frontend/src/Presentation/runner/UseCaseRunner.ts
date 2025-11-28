@@ -1,41 +1,6 @@
-/**
- * Generic interface for any Application-level use case.
- *
- * @template TRequest Request DTO type.
- */
-export interface ExecutableUseCase<TRequest> {
-    /**
-     * Execute the use case with given request DTO.
-     *
-     * @param {TRequest} req
-     * Request DTO.
-     *
-     * @returns {Promise<unknown>}
-     * Promise resolving to raw Application result or throwing an error.
-     */
-    execute(req: TRequest): Promise<unknown>;
-}
-
-/**
- * Success envelope returned by UseCaseRunner.
- *
- * @template TData Payload type of successful response.
- */
-export type RunnerSuccess<TData> = {
-    success: true;
-    status: 200;
-    data: TData;
-};
-
-/**
- * Failure envelope returned by UseCaseRunner.
- */
-export type RunnerFailure = {
-    success: false;
-    status: number;
-    code: string;
-    errors?: unknown;
-};
+import type {ExecutableUseCase} from '@src/Application/DTO/Common/ExecutableUseCase';
+import type {RunnerSuccess} from './RunnerSuccess';
+import type {RunnerFailure} from './RunnerFailure';
 
 /**
  * UseCaseRunner — Presentation-level wrapper for executing Application use cases.
