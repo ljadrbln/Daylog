@@ -87,6 +87,14 @@ export class EntryRepository implements EntryRepositoryInterface {
             params.set('dateTo', criteria.dateTo);
         }
 
+        if (criteria.sortField) {
+            params.set('sortField', criteria.sortField);
+        }
+
+        if (criteria.sortDir) {
+            params.set('sortDir', criteria.sortDir);
+        }
+
         const baseUrl = Endpoints.entries();
         const query = params.toString();
         const url = `${baseUrl}?${query}`;

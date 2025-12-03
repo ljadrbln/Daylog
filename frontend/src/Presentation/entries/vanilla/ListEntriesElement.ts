@@ -199,15 +199,25 @@ export class ListEntriesElement extends HTMLElement {
      */
     private renderData(shadow: ShadowRoot, page: ListEntriesPageInterface): void {
         const itemsHtml = page.items
-            .map((entry): string => {
-                const dateText = entry.date;
+            .map((entry, index): string => {
+                const baseIndex = (page.page - 1) * page.perPage;
+                const number = baseIndex + index + 1;
+
+                const numberText = `№ ${number}. ${entry.date}`;
+                const titleText = entry.title;
+                const bodyText = entry.body;
 
                 const itemHtml = `
                     <li class="dl-list-entries__item" data-testid="entry-item">
-                        <h3 class="dl-list-entries__item-title">${entry.title}</h3>
-                        <p class="dl-list-entries__item-meta">
-                            <span>${dateText}</span>
-                        </p>
+                        <div class="dl-list-entries__item-header">
+                            <span class="dl-list-entries__item-number">${numberText}</span>
+                            <button class="dl-list-entries__view-button" type="button">
+                                Просмотреть
+                            </button>
+                        </div>
+
+                        <p class="dl-list-entries__item-title">${titleText}</p>
+                        <p class="dl-list-entries__item-body">${bodyText}</p>
                     </li>
                 `;
 
@@ -230,19 +240,38 @@ export class ListEntriesElement extends HTMLElement {
                 }
 
                 .dl-list-entries__item {
-                    padding: 0.5rem 0;
+                    padding: 0.75rem 1rem;
                     border-bottom: 1px solid #ddd;
                 }
 
-                .dl-list-entries__item-title {
-                    font-weight: 600;
-                    margin: 0 0 0.15rem;
+                .dl-list-entries__item-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 0.5rem;
                 }
 
-                .dl-list-entries__item-meta {
-                    font-size: 0.8rem;
-                    color: #555;
+                .dl-list-entries__item-number {
+                    font-weight: 600;
+                }
+
+                .dl-list-entries__view-button {
+                    font-size: 0.85rem;
+                    padding: 0.25rem 0.75rem;
+                    border-radius: 4px;
+                    border: 1px solid #e0e0e0;
+                    background: #f5f5f5;
+                    cursor: pointer;
+                }
+
+                .dl-list-entries__item-title {
+                    margin: 0 0 0.25rem;
+                    font-weight: 500;
+                }
+
+                .dl-list-entries__item-body {
                     margin: 0;
+                    font-size: 0.9rem;
                 }
             </style>
             <ul class="dl-list-entries__items">
@@ -252,4 +281,5 @@ export class ListEntriesElement extends HTMLElement {
 
         shadow.innerHTML = html;
     }
+
 }
