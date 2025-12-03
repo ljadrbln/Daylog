@@ -106,9 +106,7 @@ function createErrorResponse(
  *
  * @returns {ListEntriesRunner} Runner whose run() method resolves with the response.
  */
-function createFakeRunner(
-    response: UseCaseResponse<ListEntriesPageInterface>
-): ListEntriesRunner {
+function createFakeRunner(response: UseCaseResponse<ListEntriesPageInterface>): ListEntriesRunner {
     const spy = vi.fn<[], Promise<UseCaseResponse<ListEntriesPageInterface>>>();
 
     spy.mockResolvedValue(response);
