@@ -1,4 +1,3 @@
-
 /**
  * Success envelope returned by UseCaseRunner.
  *

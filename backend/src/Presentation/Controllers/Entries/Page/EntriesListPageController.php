@@ -18,8 +18,8 @@ final class EntriesListPageController extends BaseController
     public function show(): void
     {
         $data = [
-            'template' => 'list.html',
-            'script'   => 'list.js',
+            'template' => 'entries-list.html',
+            'script'   => 'entries-list-vanilla.js',
         ];
 
         $payload = ResponsePayload::success()

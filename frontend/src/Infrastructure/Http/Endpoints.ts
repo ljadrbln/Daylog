@@ -21,6 +21,6 @@
  */
 
 export const Endpoints = {
-    entries: () => '/api/entries',
-    entryById: (id: string) => `/api/entries/${id}`
+    entries: () => '/entries',
+    entryById: (id: string) => `/entries/${id}`
 };
