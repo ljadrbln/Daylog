@@ -14,43 +14,8 @@
 
 import type {UseCaseResponse} from '@src/Application/DTO/Common/UseCaseResponse';
 import type {ListEntriesPageInterface} from '@src/Domain/Interfaces/Entries/ListEntriesPageInterface';
-import {UseCaseRunner} from '@src/Presentation/runner/UseCaseRunner';
-import {makeListEntriesUseCase} from '@src/Configuration/Providers/Entries/ListEntriesProvider';
-
-/**
- * Minimal runner interface used by the component.
- * Real implementation is built from UseCaseRunner + ListEntries use case.
- * Tests inject a fake implementation.
- */
-export interface ListEntriesRunner {
-    run: () => Promise<UseCaseResponse<ListEntriesPageInterface>>;
-}
-
-/**
- * Create ListEntriesRunner backed by UseCaseRunner and ListEntries use case provider.
- *
- * @returns {ListEntriesRunner} Runner that executes UC-2 ListEntries.
- */
-function createListEntriesRunner(): ListEntriesRunner {
-    const useCase = makeListEntriesUseCase();
-
-    const listEntriesRunner: ListEntriesRunner = {
-        run: async (): Promise<UseCaseResponse<ListEntriesPageInterface>> => {
-            const params = {};
-
-            const runnerResult = await UseCaseRunner.run<typeof params, ListEntriesPageInterface>(
-                useCase,
-                params
-            );
-
-            const response = runnerResult as UseCaseResponse<ListEntriesPageInterface>;
-
-            return response;
-        }
-    };
-
-    return listEntriesRunner;
-}
+import type {ListEntriesRunner} from './ListEntriesRunner';
+import {createListEntriesRunner} from './ListEntriesRunner';
 
 /**
  * Web Component <dl-list-entries> for UC-2 ListEntries.
@@ -115,6 +80,8 @@ export class ListEntriesElement extends HTMLElement {
             const message = this.extractErrorMessage(response);
             this.renderError(shadow, message);
         } catch (error) {
+            console.error('UC-2 ListEntries failed:', error);
+
             const fallback = 'Failed to load entries. Please try again.';
             this.renderError(shadow, fallback);
         }
@@ -149,7 +116,7 @@ export class ListEntriesElement extends HTMLElement {
     private renderLoading(shadow: ShadowRoot): void {
         const html = `
             <div class="dl-list-entries__loading" data-testid="loading">
-                Loading entries...
+                Loading entries&hellip;
             </div>
         `;
 
@@ -183,6 +150,17 @@ export class ListEntriesElement extends HTMLElement {
      * @returns {void}
      */
     private renderData(shadow: ShadowRoot, page: ListEntriesPageInterface): void {
+        if (!page.items.length) {
+            const html = `
+                <div class="dl-list-entries__empty" data-testid="empty">
+                    Записей не найдено.
+                </div>`;
+
+            shadow.innerHTML = html;
+
+            return;
+        }
+
         const itemsHtml = page.items
             .map((entry, index): string => {
                 const baseIndex = (page.page - 1) * page.perPage;
