@@ -1,25 +1,36 @@
 import {defineConfig} from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
-import path from 'path';
+
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {dirname} from 'node:path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export default defineConfig({
+    root: path.resolve(__dirname),
     plugins: [tsconfigPaths()],
-
     build: {
         outDir: path.resolve(__dirname, '../public/assets'),
-        emptyOutDir: true,
-
+        emptyOutDir: false,
         rollupOptions: {
             input: {
                 'entries-list-vanilla': path.resolve(
                     __dirname,
                     'src/Presentation/entries/vanilla/list.vanilla.entry.ts'
-                )
+                ),
+
+                'dl-list-entries': path.resolve(__dirname, 'ui/scss/dl-list-entries.scss')
             },
             output: {
-                entryFileNames: 'js/[name].js',
-                chunkFileNames: 'js/[name].js',
-                assetFileNames: 'assets/[name][extname]'
+                assetFileNames: (asset) => {
+                    if (asset.name?.endsWith('.css')) {
+                        return 'css/[name][extname]';
+                    }
+                    return 'js/[name][extname]';
+                },
+                entryFileNames: 'js/[name].js'
             }
         }
     }
