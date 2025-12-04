@@ -17,4 +17,6 @@ export interface ListEntriesCriteriaInterface {
     query?: string;
     dateFrom?: string;
     dateTo?: string;
+    sortField?: 'date' | 'createdAt' | 'updatedAt';
+    sortDir?: 'ASC' | 'DESC';
 }

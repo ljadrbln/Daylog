@@ -27,3 +27,6 @@ dist/
 
 /backend/logs/*
 !/backend/logs/.gitkeep
+
+# Assets
+public/assets
