@@ -73,6 +73,7 @@ export class ListEntriesElement extends HTMLElement {
 
         this.runner = runner ?? createListEntriesRunner();
 
+        this.loadStyles(shadow);
         this.renderLoading(shadow);
     }
 
@@ -80,6 +81,16 @@ export class ListEntriesElement extends HTMLElement {
         const shadow = this.shadowRoot as ShadowRoot;
 
         void this.loadEntries(shadow);
+    }
+
+    private async loadStyles(shadow: ShadowRoot): Promise<void> {
+        const sheet = new CSSStyleSheet();
+        const cssUrl = '/assets/css/dl-list-entries.css';
+
+        const cssText = await fetch(cssUrl).then((r) => r.text());
+        await sheet.replace(cssText);
+
+        shadow.adoptedStyleSheets = [sheet];
     }
 
     /**
@@ -137,19 +148,6 @@ export class ListEntriesElement extends HTMLElement {
      */
     private renderLoading(shadow: ShadowRoot): void {
         const html = `
-            <style>
-                :host {
-                    display: block;
-                    font-family: system-ui, -apple-system, BlinkMacSystemFont,
-                        "Segoe UI", sans-serif;
-                }
-
-                .dl-list-entries__loading {
-                    padding: 0.5rem 0;
-                    font-size: 0.9rem;
-                    opacity: 0.75;
-                }
-            </style>
             <div class="dl-list-entries__loading" data-testid="loading">
                 Loading entries...
             </div>
@@ -168,19 +166,6 @@ export class ListEntriesElement extends HTMLElement {
      */
     private renderError(shadow: ShadowRoot, message: string): void {
         const html = `
-            <style>
-                :host {
-                    display: block;
-                    font-family: system-ui, -apple-system, BlinkMacSystemFont,
-                        "Segoe UI", sans-serif;
-                }
-
-                .dl-list-entries__error {
-                    padding: 0.5rem 0;
-                    font-size: 0.9rem;
-                    color: #b00020;
-                }
-            </style>
             <div class="dl-list-entries__error" data-testid="error">
                 ${message}
             </div>
@@ -226,54 +211,6 @@ export class ListEntriesElement extends HTMLElement {
             .join('');
 
         const html = `
-            <style>
-                :host {
-                    display: block;
-                    font-family: system-ui, -apple-system, BlinkMacSystemFont,
-                        "Segoe UI", sans-serif;
-                }
-
-                .dl-list-entries__items {
-                    list-style: none;
-                    padding: 0;
-                    margin: 0.5rem 0 0;
-                }
-
-                .dl-list-entries__item {
-                    padding: 0.75rem 1rem;
-                    border-bottom: 1px solid #ddd;
-                }
-
-                .dl-list-entries__item-header {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 0.5rem;
-                }
-
-                .dl-list-entries__item-number {
-                    font-weight: 600;
-                }
-
-                .dl-list-entries__view-button {
-                    font-size: 0.85rem;
-                    padding: 0.25rem 0.75rem;
-                    border-radius: 4px;
-                    border: 1px solid #e0e0e0;
-                    background: #f5f5f5;
-                    cursor: pointer;
-                }
-
-                .dl-list-entries__item-title {
-                    margin: 0 0 0.25rem;
-                    font-weight: 500;
-                }
-
-                .dl-list-entries__item-body {
-                    margin: 0;
-                    font-size: 0.9rem;
-                }
-            </style>
             <ul class="dl-list-entries__items">
                 ${itemsHtml}
             </ul>
@@ -281,5 +218,4 @@ export class ListEntriesElement extends HTMLElement {
 
         shadow.innerHTML = html;
     }
-
 }
