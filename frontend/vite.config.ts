@@ -10,9 +10,11 @@ const __dirname = dirname(__filename);
 
 export default defineConfig({
     root: path.resolve(__dirname),
+    base: '/assets/',
     plugins: [tsconfigPaths()],
     build: {
         outDir: path.resolve(__dirname, '../public/assets'),
+
         emptyOutDir: false,
         rollupOptions: {
             input: {
@@ -21,14 +23,19 @@ export default defineConfig({
                     'src/Presentation/entries/vanilla/list.vanilla.entry.ts'
                 ),
 
-                'dl-list-entries': path.resolve(__dirname, 'ui/scss/dl-list-entries.scss')
+                'dl-components': path.resolve(__dirname, 'ui/scss/dl-components.scss')
             },
             output: {
                 assetFileNames: (asset) => {
                     if (asset.name?.endsWith('.css')) {
                         return 'css/[name][extname]';
                     }
-                    return 'js/[name][extname]';
+
+                    if (asset.name?.endsWith('.woff2')) {
+                        return 'fonts/[name][extname]';
+                    }
+
+                    return 'assets/[name][extname]';
                 },
                 entryFileNames: 'js/[name].js'
             }
