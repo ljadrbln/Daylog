@@ -3,13 +3,17 @@
  *
  * Purpose:
  * - Execute UC-2 via UseCaseRunner + ListEntries provider.
- * - Render three visual states via shadow DOM:
- *   loading, data, error.
+ * - Render three UI states inside shadow DOM: loading, error, data.
+ *
+ * Mechanics:
+ * - A shared stylesheet <link> (/assets/css/dl-components.css) is appended once
+ *   and kept in shadow root.
+ * - All render methods update only a dedicated root container, so the stylesheet
+ *   is never removed during re-rendering.
  *
  * Notes:
- * - The component depends only on application/domain-level abstractions:
- *   UseCaseRunner, UseCaseResponse, ListEntriesPageInterface.
- * - It does not know anything about HTTP or repositories.
+ * - The component depends on runner/provider wiring only.
+ * - It does not access HTTP or repositories directly.
  */
 
 import type {UseCaseResponse} from '@src/Application/DTO/Common/UseCaseResponse';
@@ -17,19 +21,9 @@ import type {ListEntriesPageInterface} from '@src/Domain/Interfaces/Entries/List
 import type {ListEntriesRunner} from './ListEntriesRunner';
 import {createListEntriesRunner} from './ListEntriesRunner';
 
-/**
- * Web Component <dl-list-entries> for UC-2 ListEntries.
- *
- * Scenarios:
- * - On connection, shows loading state and triggers UC-2.
- * - On success, renders a list of entries.
- * - On failure or exception, renders error message.
- *
- * The public contract is the custom element itself; internal wiring
- * is hidden behind ListEntriesRunner.
- */
 export class ListEntriesElement extends HTMLElement {
     private readonly runner: ListEntriesRunner;
+    private readonly root: HTMLDivElement;
 
     public constructor(runner?: ListEntriesRunner) {
         super();
@@ -39,65 +33,71 @@ export class ListEntriesElement extends HTMLElement {
         this.runner = runner ?? createListEntriesRunner();
 
         this.loadStyles(shadow);
-        this.renderLoading(shadow);
+
+        this.root = document.createElement('div');
+        shadow.appendChild(this.root);
     }
 
     public connectedCallback(): void {
-        const shadow = this.shadowRoot as ShadowRoot;
+        this.renderLoading();
 
-        void this.loadEntries(shadow);
+        this.run();
     }
 
-    private async loadStyles(shadow: ShadowRoot): Promise<void> {
-        const sheet = new CSSStyleSheet();
-        const cssUrl = '/assets/css/dl-list-entries.css';
-
-        const cssText = await fetch(cssUrl).then((r) => r.text());
-        await sheet.replace(cssText);
-
-        shadow.adoptedStyleSheets = [sheet];
-    }
-
-    /**
-     * Execute UC-2 and switch between loading/data/error states.
-     *
-     * @param {ShadowRoot} shadow Shadow root used for rendering.
-     *
-     * @returns {Promise<void>} Promise that resolves when rendering is complete.
-     */
-    private async loadEntries(shadow: ShadowRoot): Promise<void> {
-        this.renderLoading(shadow);
-
+    private async run(): Promise<void> {
         try {
             const response = await this.runner.run();
 
-            if (response.success && response.data) {
-                this.renderData(shadow, response.data);
+            if (response.success) {
+                const data = response.data;
+
+                if (!data) {
+                    const message = 'Failed to load entries. Please try again.';
+                    this.renderError(message);
+
+                    return;
+                }
+
+                this.renderData(data);
 
                 return;
             }
 
-            const message = this.extractErrorMessage(response);
-            this.renderError(shadow, message);
-        } catch (error) {
-            console.error('UC-2 ListEntries failed:', error);
+            const message = this.pickErrorMessage(response);
 
-            const fallback = 'Failed to load entries. Please try again.';
-            this.renderError(shadow, fallback);
+            this.renderError(message);
+        } catch (error) {
+            const message = this.normalizeError(error);
+
+            this.renderError(message);
         }
     }
 
-    /**
-     * Extract the most relevant error message from UseCaseResponse.
-     *
-     * @param {UseCaseResponse<ListEntriesPageInterface>} response UC-2 response.
-     *
-     * @returns {string} Human-readable error message.
-     */
-    private extractErrorMessage(response: UseCaseResponse<ListEntriesPageInterface>): string {
-        if (Array.isArray(response.errors) && response.errors.length > 0) {
-            const message = response.errors[0];
+    private loadStyles(shadow: ShadowRoot): void {
+        const href = '/assets/css/dl-components.css';
 
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = href;
+
+        shadow.appendChild(link);
+    }
+
+    private normalizeError(error: unknown): string {
+        if (error instanceof Error) {
+            const message = error.message;
+            return message;
+        }
+
+        const message = 'Failed to load entries. Please try again.';
+        return message;
+    }
+
+    private pickErrorMessage(response: UseCaseResponse<ListEntriesPageInterface>): string {
+        const errors = response.errors;
+
+        if (errors && errors.length) {
+            const message = errors.join(', ');
             return message;
         }
 
@@ -106,57 +106,42 @@ export class ListEntriesElement extends HTMLElement {
         return fallback;
     }
 
-    /**
-     * Render loading state into shadow DOM.
-     *
-     * @param {ShadowRoot} shadow Shadow root for the component.
-     *
-     * @returns {void}
-     */
-    private renderLoading(shadow: ShadowRoot): void {
+    private renderLoading(): void {
         const html = `
-            <div class="dl-list-entries__loading" data-testid="loading">
-                Loading entries&hellip;
+            <div class="dl-list-entries container" data-testid="loading">
+                <div class="box">
+                    <progress class="progress is-small is-primary" max="100">Loading</progress>
+                    <p class="has-text-grey">Loading entries&hellip;</p>
+                </div>
             </div>
         `;
 
-        shadow.innerHTML = html;
+        this.root.innerHTML = html;
     }
 
-    /**
-     * Render error state into shadow DOM.
-     *
-     * @param {ShadowRoot} shadow Shadow root for the component.
-     * @param {string} message Error message to show.
-     *
-     * @returns {void}
-     */
-    private renderError(shadow: ShadowRoot, message: string): void {
+    private renderError(message: string): void {
         const html = `
-            <div class="dl-list-entries__error" data-testid="error">
-                ${message}
+            <div class="dl-list-entries container" data-testid="error">
+                <div class="notification is-danger is-light">
+                    ${message}
+                </div>
             </div>
         `;
 
-        shadow.innerHTML = html;
+        this.root.innerHTML = html;
     }
 
-    /**
-     * Render list of entries into shadow DOM.
-     *
-     * @param {ShadowRoot} shadow Shadow root for the component.
-     * @param {ListEntriesPageInterface} page Page payload returned by UC-2.
-     *
-     * @returns {void}
-     */
-    private renderData(shadow: ShadowRoot, page: ListEntriesPageInterface): void {
+    private renderData(page: ListEntriesPageInterface): void {
         if (!page.items.length) {
             const html = `
-                <div class="dl-list-entries__empty" data-testid="empty">
-                    Записей не найдено.
-                </div>`;
+                <div class="dl-list-entries container" data-testid="empty">
+                    <div class="notification is-warning is-light">
+                        Записей не найдено.
+                    </div>
+                </div>
+            `;
 
-            shadow.innerHTML = html;
+            this.root.innerHTML = html;
 
             return;
         }
@@ -171,17 +156,19 @@ export class ListEntriesElement extends HTMLElement {
                 const bodyText = entry.body;
 
                 const itemHtml = `
-                    <li class="dl-list-entries__item" data-testid="entry-item">
-                        <div class="dl-list-entries__item-header">
-                            <span class="dl-list-entries__item-number">${numberText}</span>
-                            <button class="dl-list-entries__view-button" type="button">
+                    <div class="box" data-testid="entry-item">
+                        <div class="is-flex is-justify-content-space-between is-align-items-center">
+                            <span class="has-text-grey">${numberText}</span>
+                            <button class="button is-link is-small" type="button">
                                 Просмотреть
                             </button>
                         </div>
 
-                        <p class="dl-list-entries__item-title">${titleText}</p>
-                        <p class="dl-list-entries__item-body">${bodyText}</p>
-                    </li>
+                        <p class="title is-6 mt-3">${titleText}</p>
+                        <div class="content">
+                            <p>${bodyText}</p>
+                        </div>
+                    </div>
                 `;
 
                 return itemHtml;
@@ -189,11 +176,11 @@ export class ListEntriesElement extends HTMLElement {
             .join('');
 
         const html = `
-            <ul class="dl-list-entries__items">
+            <div class="dl-list-entries container">
                 ${itemsHtml}
-            </ul>
+            </div>
         `;
 
-        shadow.innerHTML = html;
+        this.root.innerHTML = html;
     }
 }

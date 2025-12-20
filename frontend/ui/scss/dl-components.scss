@@ -1,0 +1,15 @@
+@use "./fonts.inter" as *;
+
+@import "bulma/bulma";
+
+:host {
+    font-family: "Inter2", sans-serif;
+}
+
+:host .dl-list-entries {
+    font-family: "Inter2", sans-serif !important;
+}
+
+:host .dl-list-entries * {
+    font-family: inherit !important;
+}
