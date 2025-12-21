@@ -17,7 +17,7 @@
  */
 
 import type {UseCaseResponse} from '@src/Application/DTO/Common/UseCaseResponse';
-import type {ListEntriesPageInterface} from '@src/Domain/Interfaces/Entries/ListEntriesPageInterface';
+import type {ListEntriesData} from '@src/Application/DTO/Entries/ListEntries/ListEntriesResponse';
 import type {ListEntriesRunner} from './ListEntriesRunner';
 import {createListEntriesRunner} from './ListEntriesRunner';
 
@@ -93,7 +93,7 @@ export class ListEntriesElement extends HTMLElement {
         return message;
     }
 
-    private pickErrorMessage(response: UseCaseResponse<ListEntriesPageInterface>): string {
+    private pickErrorMessage(response: UseCaseResponse<ListEntriesData>): string {
         const errors = response.errors;
 
         if (errors && errors.length) {
@@ -131,7 +131,7 @@ export class ListEntriesElement extends HTMLElement {
         this.root.innerHTML = html;
     }
 
-    private renderData(page: ListEntriesPageInterface): void {
+    private renderData(page: ListEntriesData): void {
         if (!page.items.length) {
             const html = `
                 <div class="dl-list-entries container" data-testid="empty">
@@ -154,14 +154,21 @@ export class ListEntriesElement extends HTMLElement {
                 const numberText = `№ ${number}. ${entry.date}`;
                 const titleText = entry.title;
                 const bodyText = entry.body;
+                const entryId = entry.id;
+
+                const entryUrl = `/entries/${entryId}`;
 
                 const itemHtml = `
                     <div class="box" data-testid="entry-item">
                         <div class="is-flex is-justify-content-space-between is-align-items-center">
                             <span class="has-text-grey">${numberText}</span>
-                            <button class="button is-link is-small" type="button">
-                                Просмотреть
-                            </button>
+                            <a
+                                href="${entryUrl}"
+                                class="button is-link is-small"
+                                data-testid="entry-view-link"
+                            >
+                                View
+                            </a>
                         </div>
 
                         <p class="title is-6 mt-3">${titleText}</p>

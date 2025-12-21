@@ -15,7 +15,7 @@ import {describe, it, expect, vi, beforeAll, beforeEach} from 'vitest';
 import {
     ListEntriesElement,
     type ListEntriesRunner
-} from '@src/Presentation/entries/vanilla/ListEntriesElement';
+} from '@src/Presentation/entries/vanilla/list/ListEntriesElement';
 import type {UseCaseResponse} from '@src/Application/DTO/Common/UseCaseResponse';
 import type {ListEntriesPageInterface} from '@src/Domain/Interfaces/Entries/ListEntriesPageInterface';
 
