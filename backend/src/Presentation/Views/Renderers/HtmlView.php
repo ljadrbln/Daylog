@@ -68,22 +68,28 @@ final class HtmlView extends BaseView
         }
 
         $template = sprintf('pages/%s', $data['template']);
+        unset($data['template']);
 
         $pageTitle = 'Daylog';
         if (array_key_exists('pageTitle', $data) && is_string($data['pageTitle'])) {
             $pageTitle = $data['pageTitle'];
+
+            unset($data['pageTitle']);
         }
 
         $pageScripts = '';
         if (array_key_exists('script', $data) && is_string($data['script'])) {
             $scriptSrc   = $data['script'];
             $pageScripts = sprintf('<script type="module" src="/assets/js/%s"></script>', $scriptSrc);
+
+            unset($data['script']);
         }
 
         $f3 = Base::instance();
         $f3->set('pageTitle', $pageTitle);
         $f3->set('contentTemplate', $template);
         $f3->set('pageScripts', $pageScripts);
+        $f3->mset($data);
 
         $layoutPath     = 'layouts/base.html';
         $templateEngine = Template::instance();

@@ -12,14 +12,14 @@
  */
 
 import {describe, it, expect} from 'vitest';
-import {ListEntriesElement} from '@src/Presentation/entries/vanilla/ListEntriesElement';
+import {ListEntriesElement} from '@src/Presentation/entries/vanilla/list/ListEntriesElement';
 
 describe('list.vanilla.entry', () => {
     it('registers <dl-list-entries> with ListEntriesElement constructor', async () => {
         const tagName = 'dl-list-entries';
 
         // Import entry file that performs registration as a side effect.
-        await import('@src/Presentation/entries/vanilla/list.vanilla.entry');
+        await import('@src/Presentation/entries/vanilla/list/list.vanilla.entry');
 
         const registeredConstructor = customElements.get(tagName);
 

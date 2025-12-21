@@ -7,7 +7,7 @@
  *   can swap implementations without changing HTML.
  */
 
-import {ListEntriesElement} from '@src/Presentation/entries/vanilla/ListEntriesElement';
+import {ListEntriesElement} from '@src/Presentation/entries/vanilla/list/ListEntriesElement';
 
 /**
  * Stable custom element tag name for UC-2 ListEntries.

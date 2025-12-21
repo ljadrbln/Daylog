@@ -8,6 +8,22 @@ import {dirname} from 'node:path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+/**
+ * Resolve project-relative paths for Rollup/Vite inputs.
+ *
+ * Purpose:
+ * Provide a short, explicit helper to keep rollup input configuration readable
+ * while preserving a single source of truth for __dirname-based resolution.
+ *
+ * @param relativePath string Project-relative path from repository root.
+ * @return string Absolute filesystem path.
+ */
+function r(relativePath: string): string {
+    const resolvedPath = path.resolve(__dirname, relativePath);
+
+    return resolvedPath;
+}
+
 export default defineConfig({
     root: path.resolve(__dirname),
     base: '/assets/',
@@ -18,12 +34,15 @@ export default defineConfig({
         emptyOutDir: false,
         rollupOptions: {
             input: {
-                'entries-list-vanilla': path.resolve(
-                    __dirname,
-                    'src/Presentation/entries/vanilla/list.vanilla.entry.ts'
+                'entries-list-vanilla': r(
+                    'src/Presentation/entries/vanilla/list/list.vanilla.entry.ts'
                 ),
 
-                'dl-components': path.resolve(__dirname, 'ui/scss/dl-components.scss')
+                'entry-view-vanilla': r(
+                    'src/Presentation/entries/vanilla/view/view.vanilla.entry.ts'
+                ),
+
+                'dl-components': r('ui/scss/dl-components.scss')
             },
             output: {
                 assetFileNames: (asset) => {
