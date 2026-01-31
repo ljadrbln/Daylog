@@ -4,6 +4,7 @@
  * Purpose:
  * - Execute UC-3 via UseCaseRunner + GetEntry provider.
  * - Render three UI states inside shadow DOM: loading, error, data.
+ * - Provide entry actions in the view UI: edit and delete (UC-4).
  *
  * Mechanics:
  * - A shared stylesheet <link> (/assets/css/dl-components.css) is appended once
@@ -22,19 +23,23 @@ import type {UseCaseResponse} from '@src/Application/DTO/Common/UseCaseResponse'
 import type {GetEntryResponse} from '@src/Application/DTO/Entries/GetEntry/GetEntryResponse';
 import type {EntryRunner} from './EntryRunner';
 import {createEntryRunner} from './EntryRunner';
+import type {DeleteEntryRunner} from './DeleteEntryRunner';
+import {createDeleteEntryRunner} from './DeleteEntryRunner';
 
 export class EntryElement extends HTMLElement {
     private static readonly entryIdAttribute = 'entry-id';
 
     private readonly runner: EntryRunner;
+    private readonly deleteRunner: DeleteEntryRunner;
     private readonly root: HTMLDivElement;
 
-    public constructor(runner?: EntryRunner) {
+    public constructor(runner?: EntryRunner, deleteRunner?: DeleteEntryRunner) {
         super();
 
         const shadow = this.attachShadow({mode: 'open'});
 
         this.runner = runner ?? createEntryRunner();
+        this.deleteRunner = deleteRunner ?? createDeleteEntryRunner();
 
         this.loadStyles(shadow);
 
@@ -104,6 +109,7 @@ export class EntryElement extends HTMLElement {
                 }
 
                 this.renderData(data);
+                this.bindActions();
 
                 return;
             }
@@ -114,6 +120,61 @@ export class EntryElement extends HTMLElement {
         } catch (error) {
             const message = this.normalizeError(error);
 
+            this.renderError(message);
+        }
+    }
+
+    private bindActions(): void {
+        const deleteButton = this.root.querySelector('[data-testid="delete"]');
+
+        if (deleteButton) {
+            deleteButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                this.handleDelete();
+            });
+        }
+    }
+
+    private async handleDelete(): Promise<void> {
+        const entryId = this.getEntryId();
+
+        if (!entryId) {
+            const message = 'Entry id is missing.';
+            this.renderError(message);
+
+            return;
+        }
+
+        const confirmed = window.confirm('Delete this entry?');
+
+        if (!confirmed) {
+            return;
+        }
+
+        this.renderDeleting();
+
+        try {
+            const response = await this.deleteRunner.run(entryId);
+
+            if (response.success) {
+                const event = new CustomEvent('dl-entry-deleted', {
+                    detail: {id: entryId},
+                    bubbles: true,
+                    composed: true
+                });
+
+                this.dispatchEvent(event);
+
+                this.renderDeleted();
+
+                return;
+            }
+
+            const message = this.pickDeleteErrorMessage(response);
+
+            this.renderError(message);
+        } catch (error) {
+            const message = 'Failed to delete entry. Please try again.';
             this.renderError(message);
         }
     }
@@ -166,12 +227,58 @@ export class EntryElement extends HTMLElement {
         return fallback;
     }
 
+    private pickDeleteErrorMessage(response: UseCaseResponse<null>): string {
+        const errors = response.errors;
+
+        if (errors && errors.length) {
+            const message = errors.join(', ');
+            return message;
+        }
+
+        const fallback = 'Failed to delete entry. Please try again.';
+
+        return fallback;
+    }
+
     private renderLoading(): void {
         const html = `
             <div class="dl-entry container" data-testid="loading">
                 <div class="box">
                     <progress class="progress is-small is-primary" max="100">Loading</progress>
                     <p class="has-text-grey">Loading entry&hellip;</p>
+                </div>
+            </div>
+        `;
+
+        this.root.innerHTML = html;
+    }
+
+    private renderDeleting(): void {
+        const html = `
+            <div class="dl-entry container" data-testid="deleting">
+                <div class="box">
+                    <progress class="progress is-small is-danger" max="100">Deleting</progress>
+                    <p class="has-text-grey">Deleting entry&hellip;</p>
+                </div>
+            </div>
+        `;
+
+        this.root.innerHTML = html;
+    }
+
+    private renderDeleted(): void {
+        const html = `
+            <div class="dl-entry container" data-testid="deleted">
+                <article class="message is-success is-light">
+                    <div class="message-body">
+                        Entry deleted.
+                    </div>
+                </article>
+
+                <div class="buttons mt-4">
+                    <a class="button is-light" href="/entries">
+                        Back
+                    </a>
                 </div>
             </div>
         `;
@@ -194,38 +301,57 @@ export class EntryElement extends HTMLElement {
     }
 
     private renderData(entry: GetEntryResponse): void {
-        const titleText = entry.title;
-        const dateText = entry.date;
+        const entryId = this.getEntryId();
+
+        const titleText = entry.date;
+        const createdAtText = entry.createdAt ?? '';
+        const updatedAtText = entry.updatedAt ?? '';
         const bodyText = entry.body;
 
+        const editHref = `/entries/${entryId}/edit`;
+
         const html = `
-            <div class="dl-entry container" data-testid="data">
-                <div class="card">
-                    <header class="card-header">
-                        <p class="card-header-title">
+            <section class="section" data-testid="data">
+                <div class="container">
+                    <div class="box">
+                        <h1 class="title is-3">
                             ${titleText}
+                        </h1>
+
+                        <p class="subtitle is-6 has-text-grey">
+                            Created: ${createdAtText} · Updated: ${updatedAtText}
                         </p>
-                    </header>
 
-                    <div class="card-content">
                         <div class="content">
-                            <p class="has-text-grey">
-                                ${dateText}
-                            </p>
+                            <p>${bodyText}</p>
+                        </div>
 
-                            <hr />
+                        <div class="mt-5 is-flex is-align-items-center is-justify-content-space-between is-fullwidth">
+                            <div class="is-flex">
+                                <a
+                                    href="${editHref}"
+                                    class="button is-link is-light mr-2"
+                                    data-testid="edit"
+                                >
+                                    Edit
+                                </a>
 
-                            <p>
-                                ${bodyText}
-                            </p>
+                                <button
+                                    type="button"
+                                    class="button is-danger is-light"
+                                    data-testid="delete"
+                                >
+                                    Delete
+                                </button>
+                            </div>
+
+                            <a href="/entries" class="button is-light" data-testid="back">
+                                Back
+                            </a>
                         </div>
                     </div>
-
-                    <footer class="card-footer">
-                        <a class="card-footer-item" href="/entries">Back to list</a>
-                    </footer>
                 </div>
-            </div>
+            </section>
         `;
 
         this.root.innerHTML = html;
