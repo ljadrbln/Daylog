@@ -18,8 +18,8 @@ final class EntryCreatePageController extends BaseController
     public function show(): void
     {
         $data = [
-            'template' => 'create.html',
-            'script'   => 'create.js',
+            'template' => 'entry-add.html',
+            'script'   => 'entry-add-vanilla.js',
         ];
 
         $payload = ResponsePayload::success()
