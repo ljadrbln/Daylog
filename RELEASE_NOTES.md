@@ -1,3 +1,21 @@
+# v1.1.0 — 2026-02-01
+
+## Highlights
+- Entries CRUD UI is now available in the web UI (vanilla Web Components + Bulma).
+- Stable HTML contracts (`dl-*`) allow swapping UI bundles later.
+
+## What’s included
+- UC-1 AddEntry: add page and vanilla component.
+- UC-2 ListEntries: list page and vanilla component.
+- UC-3 GetEntry: view page and vanilla component.
+- UC-4 DeleteEntry: delete action from the entry view.
+- UC-5 UpdateEntry: edit page, vanilla component, reusable form view.
+
+## Notes
+- Error fallback behavior is normalized for runner-throw cases.
+
+---
+
 # v1.0.0 — 2025-09-24
 
 ## Highlights
