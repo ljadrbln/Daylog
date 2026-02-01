@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Daylog\Presentation\Controllers\Entries\Page;
 use Daylog\Presentation\Controllers\BaseController;
 use Daylog\Presentation\Views\ResponsePayload;
+use Daylog\Presentation\Http\HttpRequest;
 
 /**
  * Controller for displaying the entry editing form (HTML).
@@ -21,9 +22,13 @@ final class EntryEditPageController extends BaseController
      */
     public function show(): void
     {
+        $params = HttpRequest::params();
+        $entryId = $params['id'];
+
         $data = [
-            'template' => 'edit.html',
-            'script'   => 'edit.js',
+            'entryId'  => $entryId,
+            'template' => 'entry-edit.html',
+            'script'   => 'entry-edit-vanilla.js',
         ];
 
         $payload = ResponsePayload::success()

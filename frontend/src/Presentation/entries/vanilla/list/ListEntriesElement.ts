@@ -84,11 +84,6 @@ export class ListEntriesElement extends HTMLElement {
     }
 
     private normalizeError(error: unknown): string {
-        if (error instanceof Error) {
-            const message = error.message;
-            return message;
-        }
-
         const message = 'Failed to load entries. Please try again.';
         return message;
     }
@@ -120,15 +115,30 @@ export class ListEntriesElement extends HTMLElement {
     }
 
     private renderError(message: string): void {
+        const safeMessage = this.escapeHtml(message);
+
         const html = `
             <div class="dl-list-entries container" data-testid="error">
                 <div class="notification is-danger is-light">
-                    ${message}
+                    ${safeMessage}
                 </div>
             </div>
         `;
 
         this.root.innerHTML = html;
+    }
+
+    private escapeHtml(value: string): string {
+        const text = value ?? '';
+
+        const escaped = text
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+
+        return escaped;
     }
 
     private renderData(page: ListEntriesData): void {
