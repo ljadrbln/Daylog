@@ -42,8 +42,11 @@ export default defineConfig({
                     'src/Presentation/entries/vanilla/view/view.vanilla.entry.ts'
                 ),
 
-                'entry-add-vanilla': r('src/Presentation/entries/vanilla/add/add.vanilla.entry.ts'),
+                'entry-edit-vanilla': r(
+                    'src/Presentation/entries/vanilla/edit/edit.vanilla.entry.ts'
+                ),
 
+                'entry-add-vanilla': r('src/Presentation/entries/vanilla/add/add.vanilla.entry.ts'),
                 'dl-components': r('ui/scss/dl-components.scss')
             },
             output: {

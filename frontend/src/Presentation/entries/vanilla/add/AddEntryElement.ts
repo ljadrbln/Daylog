@@ -11,7 +11,7 @@
  * - All render methods update only a dedicated root container, so the stylesheet
  *   is never removed during re-rendering.
  * - On successful creation, the component dispatches a `dl-entry-created` event
- *   with `{ id }` and optionally redirects using `redirect-to="/entries/{id}"`.
+ *   with `{ id }`.
  *
  * Notes:
  * - The component depends on runner/provider wiring only.
@@ -22,10 +22,12 @@ import type {Entry} from '@src/Domain/Models/Entries/Entry';
 import type {AddEntryResponse} from '@src/Application/DTO/Entries/AddEntry/AddEntryResponse';
 import type {AddEntryRunner} from './AddEntryRunner';
 import {createAddEntryRunner} from './AddEntryRunner';
+import {EntryFormView, type EntryFormParams} from '@src/Presentation/entries/vanilla/form/EntryFormView';
 
 export class AddEntryElement extends HTMLElement {
     private readonly runner: AddEntryRunner;
     private readonly root: HTMLDivElement;
+    private readonly formView: EntryFormView;
 
     private isSubmitting = false;
 
@@ -40,6 +42,17 @@ export class AddEntryElement extends HTMLElement {
 
         this.root = document.createElement('div');
         shadow.appendChild(this.root);
+
+        this.formView = new EntryFormView({
+            containerClass: 'dl-entry-add',
+            labels: {
+                heading: 'New entry',
+                submit: 'Save',
+                cancel: 'Cancel',
+                dateHelp: 'Logical entry date, not timestamps.',
+                submittingText: 'Saving entry…'
+            }
+        });
     }
 
     public connectedCallback(): void {
@@ -58,35 +71,22 @@ export class AddEntryElement extends HTMLElement {
     }
 
     private bindEvents(): void {
-        const form = this.root.querySelector('form[data-testid="form"]');
+        this.formView.bind(this.root, {
+            onSubmit: (params: EntryFormParams) => {
+                if (this.isSubmitting) {
+                    return;
+                }
 
-        if (!form) {
-            return;
-        }
-
-        form.addEventListener('submit', (event: Event) => {
-            event.preventDefault();
-
-            if (this.isSubmitting) {
-                return;
-            }
-
-            this.submit();
-        });
-
-        const cancel = this.root.querySelector('button[data-testid="cancel"]');
-
-        if (cancel) {
-            cancel.addEventListener('click', () => {
+                this.submit(params);
+            },
+            onCancel: () => {
                 this.onCancel();
-            });
-        }
+            }
+        });
     }
 
-    private async submit(): Promise<void> {
+    private async submit(params: EntryFormParams): Promise<void> {
         this.isSubmitting = true;
-
-        const params = this.readFormParams();
 
         this.renderSubmitting(params);
         this.bindEvents();
@@ -131,39 +131,6 @@ export class AddEntryElement extends HTMLElement {
         }
     }
 
-    private readFormParams(): {title: string; body: string; date: string} {
-        const title = this.readInputValue('title');
-        const body = this.readInputValue('body');
-        const date = this.readInputValue('date');
-
-        const params = {title, body, date};
-
-        return params;
-    }
-
-    private readInputValue(name: 'title' | 'body' | 'date'): string {
-        const selector = `[name="${name}"]`;
-        const node = this.root.querySelector(selector);
-
-        if (!node) {
-            const empty = '';
-            return empty;
-        }
-
-        if (node instanceof HTMLInputElement) {
-            const value = node.value.trim();
-            return value;
-        }
-
-        if (node instanceof HTMLTextAreaElement) {
-            const value = node.value.trim();
-            return value;
-        }
-
-        const empty = '';
-        return empty;
-    }
-
     private pickErrorMessage(response: AddEntryResponse): string {
         const errors = response.errors;
 
@@ -176,194 +143,16 @@ export class AddEntryElement extends HTMLElement {
         return fallback;
     }
 
-    private renderForm(params?: {title: string; body: string; date: string}): void {
-        const titleValue = params?.title ?? '';
-        const bodyValue = params?.body ?? '';
-        const dateValue = params?.date ?? '';
-
-        const html = `
-            <div class="dl-entry-add container" data-testid="idle">
-                <div class="card">
-                    <header class="card-header">
-                        <p class="card-header-title">
-                            New entry
-                        </p>
-                    </header>
-
-                    <div class="card-content">
-                        <div class="content">
-                            <form data-testid="form">
-                                <div class="field">
-                                    <label class="label">Title</label>
-                                    <div class="control">
-                                        <input
-                                            class="input"
-                                            type="text"
-                                            name="title"
-                                            value="${this.escapeAttr(titleValue)}"
-                                            autocomplete="off"
-                                            required
-                                        />
-                                    </div>
-                                </div>
-
-                                <div class="field">
-                                    <label class="label">Date</label>
-                                    <div class="control">
-                                        <input
-                                            class="input"
-                                            type="date"
-                                            name="date"
-                                            value="${this.escapeAttr(dateValue)}"
-                                            placeholder="YYYY-MM-DD"
-                                            autocomplete="off"
-                                            required
-                                        />
-                                    </div>
-                                    <p class="help">Logical entry date, not timestamps.</p>
-                                </div>
-
-                                <div class="field">
-                                    <label class="label">Body</label>
-                                    <div class="control">
-                                        <textarea
-                                            class="textarea"
-                                            name="body"
-                                            rows="8"
-                                            required
-                                        >${this.escapeHtml(bodyValue)}</textarea>
-                                    </div>
-                                </div>
-
-                                <div class="field">
-                                    <div class="control">
-                                        <div class="buttons">
-                                            <button class="button is-primary" type="submit">
-                                                Save
-                                            </button>
-
-                                            <button
-                                                class="button"
-                                                type="button"
-                                                data-testid="cancel"
-                                            >
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        this.root.innerHTML = html;
+    private renderForm(params?: EntryFormParams): void {
+        this.formView.renderIdle(this.root, params);
     }
 
-    private renderSubmitting(params: {title: string; body: string; date: string}): void {
-        const titleValue = params.title;
-        const bodyValue = params.body;
-        const dateValue = params.date;
-
-        const html = `
-            <div class="dl-entry-add container" data-testid="submitting">
-                <div class="card">
-                    <header class="card-header">
-                        <p class="card-header-title">
-                            New entry
-                        </p>
-                    </header>
-
-                    <div class="card-content">
-                        <div class="content">
-                            <progress class="progress is-small is-primary" max="100">Loading</progress>
-                            <p class="has-text-grey">Saving entry&hellip;</p>
-
-                            <hr />
-
-                            <form data-testid="form">
-                                <div class="field">
-                                    <label class="label">Title</label>
-                                    <div class="control">
-                                        <input
-                                            class="input"
-                                            type="text"
-                                            name="title"
-                                            value="${this.escapeAttr(titleValue)}"
-                                            disabled
-                                        />
-                                    </div>
-                                </div>
-
-                                <div class="field">
-                                    <label class="label">Date</label>
-                                    <div class="control">
-                                        <input
-                                            class="input"
-                                            type="text"
-                                            name="date"
-                                            value="${this.escapeAttr(dateValue)}"
-                                            disabled
-                                        />
-                                    </div>
-                                </div>
-
-                                <div class="field">
-                                    <label class="label">Body</label>
-                                    <div class="control">
-                                        <textarea
-                                            class="textarea"
-                                            name="body"
-                                            rows="8"
-                                            disabled
-                                        >${this.escapeHtml(bodyValue)}</textarea>
-                                    </div>
-                                </div>
-
-                                <div class="field">
-                                    <div class="control">
-                                        <div class="buttons">
-                                            <button class="button is-primary" type="button" disabled>
-                                                Save
-                                            </button>
-
-                                            <button class="button" type="button" data-testid="cancel" disabled>
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        this.root.innerHTML = html;
+    private renderSubmitting(params: EntryFormParams): void {
+        this.formView.renderSubmitting(this.root, params);
     }
 
-    private renderError(
-        message: string,
-        params: {title: string; body: string; date: string}
-    ): void {
-        const html = `
-            <div class="dl-entry-add container" data-testid="error">
-                <article class="message is-danger is-light">
-                    <div class="message-body">
-                        ${this.escapeHtml(message)}
-                    </div>
-                </article>
-
-                <div class="mt-4">
-                    ${this.renderFormHtml(params)}
-                </div>
-            </div>
-        `;
-
-        this.root.innerHTML = html;
+    private renderError(message: string, params: EntryFormParams): void {
+        this.formView.renderError(this.root, message, params);
     }
 
     private renderSuccess(entry: Entry): void {
@@ -413,86 +202,6 @@ export class AddEntryElement extends HTMLElement {
         this.root.innerHTML = html;
     }
 
-    private renderFormHtml(params: {title: string; body: string; date: string}): string {
-        const titleValue = params.title;
-        const bodyValue = params.body;
-        const dateValue = params.date;
-
-        const html = `
-            <div class="card">
-                <header class="card-header">
-                    <p class="card-header-title">
-                        New entry
-                    </p>
-                </header>
-
-                <div class="card-content">
-                    <div class="content">
-                        <form data-testid="form">
-                            <div class="field">
-                                <label class="label">Title</label>
-                                <div class="control">
-                                    <input
-                                        class="input"
-                                        type="text"
-                                        name="title"
-                                        value="${this.escapeAttr(titleValue)}"
-                                        autocomplete="off"
-                                    />
-                                </div>
-                            </div>
-
-                            <div class="field">
-                                <label class="label">Date</label>
-                                <div class="control">
-                                    <input
-                                        class="input"
-                                        type="text"
-                                        name="date"
-                                        value="${this.escapeAttr(dateValue)}"
-                                        placeholder="YYYY-MM-DD"
-                                        autocomplete="off"
-                                    />
-                                </div>
-                            </div>
-
-                            <div class="field">
-                                <label class="label">Body</label>
-                                <div class="control">
-                                    <textarea
-                                        class="textarea"
-                                        name="body"
-                                        rows="8"
-                                    >${this.escapeHtml(bodyValue)}</textarea>
-                                </div>
-                            </div>
-
-                            <div class="field">
-                                <div class="control">
-                                    <div class="buttons">
-                                        <button class="button is-primary" type="submit">
-                                            Save
-                                        </button>
-
-                                        <button
-                                            class="button"
-                                            type="button"
-                                            data-testid="cancel"
-                                        >
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        return html;
-    }
-
     private afterSuccess(entry: Entry): void {
         const idText = (entry as unknown as {id?: string}).id ?? '';
 
@@ -519,11 +228,6 @@ export class AddEntryElement extends HTMLElement {
             .replaceAll('"', '&quot;')
             .replaceAll("'", '&#039;');
 
-        return escaped;
-    }
-
-    private escapeAttr(value: string): string {
-        const escaped = this.escapeHtml(value);
         return escaped;
     }
 }
